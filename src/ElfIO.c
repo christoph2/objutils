@@ -129,6 +129,7 @@ static const  char *Elf_MachineNames[]={
     "SiTera Prism."
 };
 
+
 #define ELF_NUM_OF_MACHINES (SIZEOF_ARRAY(Elf_MachineNames)-1)
 
 
@@ -242,8 +243,12 @@ ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode 
 
     if (ELF_SHNUM(str->header)>0) {
         assert(ELF_SECTION_SIZE==ELF_SHENTSIZE(str->header));
-        str->program_sections=(Elf32_Shdr *)malloc(ELF_SECTION_SIZE*ELF_SHNUM(str->header));
-        assert(str->program_sections!=(Elf32_Shdr*)NULL);
+        str->section_headers=(Elf32_Shdr *)malloc(ELF_SECTION_SIZE*ELF_SHNUM(str->header));
+        assert(str->section_headers!=(Elf32_Shdr*)NULL);
+        
+        str->sections=(MemorySection *)malloc(sizeof(MemorySection)*ELF_SHNUM(str->header));
+        assert(str->sections!=(MemorySection *)NULL);
+        memset(str->sections,'\0',sizeof(MemorySection)*ELF_SHNUM(str->header));
     }
 
     return ELFIO_E_OK;
@@ -252,6 +257,8 @@ ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode 
 
 ElfIo_StatusType ElfIo_Deinit(ElfIo_Struct *str)
 {
+    uint32_t cnt;
+
     ELFIO_WEAK_PARAM_CHECK(str);
 
     if (str->file_opened==false || str->mode==ELFIO_INVALID_MODE) {
@@ -263,7 +270,15 @@ ElfIo_StatusType ElfIo_Deinit(ElfIo_Struct *str)
     }
 
     if (str->mode==ELFIO_READ && ELF_SHNUM(str->header)>0) {
-        free((void*)str->program_sections);
+        free((void*)str->section_headers);
+
+        for (cnt=0;cnt<ELF_SHNUM(str->header);++cnt) {
+            if (str->sections[cnt].length>0) {
+                free(str->sections[cnt].data);
+            }
+        }
+
+        free((void*)str->sections);
     }
 
     str->guard=(uint8_t)0;
@@ -276,20 +291,24 @@ ElfIo_StatusType ElfIo_Deinit(ElfIo_Struct *str)
     return ELFIO_E_OK;    
 }
 
+
 uint16_t ElfIo_Convert16U(uint16_t w)
 {
     return MAKEWORD(LOBYTE(w),HIBYTE(w));
 }
+
 
 uint32_t ElfIo_Convert32U(uint32_t dw)
 {
     return MAKEDWORD(MAKEWORD(LOBYTE(LOWORD(dw)),HIBYTE(LOWORD(dw))),MAKEWORD(LOBYTE(HIWORD(dw)),HIBYTE(HIWORD(dw))));
 }
 
+
 int32_t ElfIo_Convert32S(int32_t dw)
 {
     return MAKEDWORD(MAKEWORD(LOBYTE(LOWORD(dw)),HIBYTE(LOWORD(dw))),MAKEWORD(LOBYTE(HIWORD(dw)),HIBYTE(HIWORD(dw))));
 }
+
 
 char const * ElfIo_GetMachineName(ElfIo_Struct const * str)
 {
@@ -359,6 +378,7 @@ ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str)
     return ELFIO_E_OK;
 }
 
+
 ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
 {
     Elf32_Off hdr_offs;
@@ -384,7 +404,7 @@ ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
     num_entries=ELF_SHNUM(str->header);
 
     while (num<num_entries) {
-        buf=str->program_sections+num;
+        buf=str->section_headers+num;
         res=fread((void*)buf,sizeof(Elf32_Shdr),1,str->stream);
         if (res==0) {
             return ELFIO_E_FILEIO;
@@ -408,9 +428,55 @@ ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
     return ELFIO_E_OK;
 }
 
+
+ElfIo_StatusType ElfIo_ReadSections(ElfIo_Struct const * str)
+{
+    Elf32_Half num;
+    Elf32_Half num_entries;    
+    Elf32_Shdr *section;
+    int res;
+
+    num=0;
+    num_entries=ELF_SHNUM(str->header);
+
+    while (num<num_entries) {
+        section=ElfIO_GetSectionHeader(str,num);
+        if ((section->sh_type!=SHT_NOBITS) && (section->sh_size>0)) {
+            str->sections[num].data=(uint8_t *)malloc(section->sh_size);
+            assert(str->sections[num].data!=(uint8_t *)NULL);
+            str->sections[num].length=section->sh_size;
+            memset(str->sections[num].data,'\0',section->sh_size);            
+            res=fseek(str->stream,section->sh_offset,SEEK_SET);
+            if (res!=0) {
+                    return ELFIO_E_FILEIO;
+            }
+            res=fread((void*)str->sections[num].data,section->sh_size,1,str->stream);                        
+            if (res==0) {
+                return ELFIO_E_FILEIO;
+            }
+            
+        }
+        num++;
+    }
+
+    return ELFIO_E_OK;
+}
+
+
+Elf32_Shdr * ElfIO_GetSectionHeader(ElfIo_Struct const * str,Elf32_Word idx)
+{		
+    return (Elf32_Shdr*)&str->section_headers[idx];
+}
+
+
+MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx)
+{
+    return (MemorySection * )&str->sections[idx];
+}
+
+
 void ElfIo_ExitUnimplemented(char * const feature)
 {
-
     fprintf(stderr,"I'm sorry, but '%s' is not implemented.\n",feature);
 
     exit(2);

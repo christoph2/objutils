@@ -84,6 +84,7 @@ int main(int argc,char **argv)
 
     (void)ElfIo_ReadProgramTable(&str);
     (void)ElfIo_ReadSectionHeaderTable(&str);
+    (void)ElfIo_ReadSections(&str);
     (void)ElfInfo_PrintProgramTable(&str);
     (void)ElfIo_PrintSectionHeaderTable(&str);
 

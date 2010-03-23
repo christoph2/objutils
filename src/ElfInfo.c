@@ -31,7 +31,8 @@
 #include "ElfInfo.h"
 
 
-static const char *ElfInfo_getSectionType(Elf32_Word section_type);
+static const char *ElfInfo_GetSectionType(Elf32_Word section_type);
+const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx);
 
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
 {
@@ -42,18 +43,8 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
 
     uint16_t idx;
     Elf32_Half machine_id;
-    Elf32_Half type_id;
-    Elf32_Word version_id;
-    Elf32_Addr entry;
-    Elf32_Off phoff;
-    Elf32_Off shoff;    
-    Elf32_Word flags;
+    Elf32_Half type_id;    
     Elf32_Half ehsize;
-    Elf32_Half phentsize;
-    Elf32_Half phnum;
-    Elf32_Half shentsize;
-    Elf32_Half shnum;
-    Elf32_Half shstrndx;
     uint8_t clss;
     uint8_t data;
     uint8_t abi;
@@ -66,18 +57,8 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     }
 
     type_id=ELF_TYPE(str->header);
-    machine_id=ELF_MACHINE(str->header);
-    version_id=ELF_VER(str->header);
-    entry=ELF_ENTRY(str->header);
-    phoff=ELF_PHOFF(str->header);
-    shoff=ELF_SHOFF(str->header);
-    flags=ELF_FLAGS(str->header);
-    ehsize=ELF_EHSIZE(str->header); /* should be used for validation ! */
-    phentsize=ELF_PHENTSIZE(str->header);
-    phnum=ELF_PHNUM(str->header);
-    shentsize=ELF_SHENTSIZE(str->header);
-    shnum=ELF_SHNUM(str->header);
-    shstrndx=ELF_SHSTRNDX(str->header);
+    machine_id=ELF_MACHINE(str->header);    
+    ehsize=ELF_EHSIZE(str->header); /* should be used for validation ! */        
     clss=ELF_CLASS(str->header);
     data=ELF_DATA(str->header);
     abi=ELF_OSABI(str->header);
@@ -89,17 +70,17 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     idx=type_id > 4u ? 0u : type_id+1;
     printf("File-Type:\t\t\t    0x%04x - %s\n",type_id,types[idx]);
     printf("Machine-ID:\t\t\t    0x%04x - %s\n",machine_id,ElfIo_GetMachineName(str));
-    printf("Version:\t\t\t0x%08x - ",(unsigned int)version_id);
-    printf( version_id==0u ? "Invalid.\n" : "Current.\n");
-    printf("Entry-Point:\t\t\t0x%08x\n",(unsigned int)entry);
-    printf("Start of program headers:\t0x%08x\n",(unsigned int)phoff);
-    printf("Start of section headers:\t0x%08x\n",(unsigned int)shoff);
-    printf("Flags:\t\t\t\t0x%08x\n",(unsigned int)flags);
-    printf("PHT entry size:\t\t\t0x%08x\n",(unsigned int)phentsize);
-    printf("Number of PHT entries:\t\t0x%08x\n",(unsigned int)phnum);
-    printf("SHT entry size:\t\t\t0x%08x\n",(unsigned int)shentsize);
-    printf("Number of SHT entries:\t\t0x%08x\n",(unsigned int)shnum);
-    printf("String table index:\t\t0x%08x\n",(unsigned int)shstrndx);
+    printf("Version:\t\t\t0x%08x - ",(unsigned int)ELF_VER(str->header));
+    printf( ELF_VER(str->header)==0u ? "Invalid.\n" : "Current.\n");
+    printf("Entry-Point:\t\t\t0x%08x\n",(unsigned int)ELF_ENTRY(str->header));
+    printf("Start of program headers:\t0x%08x\n",(unsigned int)ELF_PHOFF(str->header));
+    printf("Start of section headers:\t0x%08x\n",(unsigned int)ELF_SHOFF(str->header));
+    printf("Flags:\t\t\t\t0x%08x\n",(unsigned int)ELF_FLAGS(str->header));
+    printf("PHT entry size:\t\t\t0x%08x\n",(unsigned int)ELF_PHENTSIZE(str->header));
+    printf("Number of PHT entries:\t\t0x%08x\n",(unsigned int)ELF_PHNUM(str->header));
+    printf("SHT entry size:\t\t\t0x%08x\n",(unsigned int)ELF_SHENTSIZE(str->header));
+    printf("Number of SHT entries:\t\t0x%08x\n",(unsigned int)ELF_SHNUM(str->header));
+    printf("String table index:\t\t0x%08x\n",(unsigned int)ELF_SHSTRNDX(str->header));
     idx=clss > 2 ? 0 : clss;
     printf("Class:\t\t\t\t0x%08x - %s\n",(unsigned int)clss,classes[idx]);
     idx=data > 2 ? 0 : data;
@@ -119,10 +100,8 @@ ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str)
     Elf32_Half num;
     Elf32_Half num_entries;
     Elf32_Phdr *buf;
-    Elf32_Word type;
-    Elf32_Off offset;
-    Elf32_Addr vaddr,paddr,file_size,mem_size;
-    Elf32_Word flags,align;
+	Elf32_Word flags;
+	
     uint16_t idx;
 
     ELFIO_WEAK_PARAM_CHECK(str);
@@ -145,26 +124,18 @@ ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str)
 
     while (num<num_entries) {
         buf=str->program_headers+num;
-       
-        offset=ELF_PH_OFFSET(buf);
-        type=ELF_PH_TYPE(buf);
-        vaddr=ELF_PH_VADDR(buf);
-        paddr=ELF_PH_PADDR(buf);
-        file_size=ELF_PH_FILESZ(buf);
-        mem_size=ELF_PH_MEMSZ(buf);
-        flags=ELF_PH_FLAGS(buf);
-        align=ELF_PH_ALIGN(buf);
-        idx=(uint16_t)(type > 4 ? 0 : type);
+        flags=ELF_PH_FLAGS(buf);        
+        idx=(uint16_t)(ELF_PH_TYPE(buf) > 4 ? 0 : ELF_PH_TYPE(buf));
         printf("%-7s ",types[idx]);
-        printf("0x%08x ",(unsigned int)offset);
-        printf("0x%08x ",(unsigned int)paddr);
-        printf("0x%08x ",(unsigned int)vaddr);
-        printf("0x%08x ",(unsigned int)file_size);
-        printf("0x%08x ",(unsigned int)mem_size);
+        printf("0x%08x ",(unsigned int)ELF_PH_OFFSET(buf));
+        printf("0x%08x ",(unsigned int)ELF_PH_PADDR(buf));
+        printf("0x%08x ",(unsigned int)ELF_PH_VADDR(buf));
+        printf("0x%08x ",(unsigned int)ELF_PH_FILESZ(buf));
+        printf("0x%08x ",(unsigned int)ELF_PH_MEMSZ(buf));
         (flags & PF_R) ? printf("R") : printf(" ");        
         (flags & PF_W) ? printf("W") : printf(" ");
         (flags & PF_X) ? printf("X") : printf(" ");
-        printf("   0x%08x\n",(unsigned int)align);
+        printf("   0x%08x\n",(unsigned int)ELF_PH_ALIGN(buf));
         num++;
     }   
     return ELFIO_E_OK;
@@ -176,12 +147,8 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
     Elf32_Off hdr_offs;
     Elf32_Half num;
     Elf32_Half num_entries;    
-    Elf32_Shdr *buf;
-    Elf32_Word type;
-    Elf32_Off offset;
-    Elf32_Addr vaddr,paddr,file_size,mem_size;
-    Elf32_Word flags,align;
-    uint16_t idx;
+    Elf32_Shdr *buf;    
+    Elf32_Word flags;    
 
     ELFIO_WEAK_PARAM_CHECK(str);
 
@@ -198,55 +165,38 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
     printf("===============================================================================\n");
     printf("Section header table:\n");
     printf("===============================================================================\n");
-    printf("Nr.    Type      Addr.      Offset     Size\n");
+    printf("Nr.    Type      Addr.      Offset     Size       ES     Link   AL   Info\n");
+	printf("       Name                            Flags\n");
     printf("===============================================================================\n");
 
     while (num<num_entries) {
-        buf=str->program_sections+num;
-
-        type=ELF_SH_TYPE(buf);
-        printf("[%04u] ",num);
-        printf("%-10s",ElfInfo_getSectionType(type));
+        buf=str->section_headers+num;
+        printf("[%04X] ",num);
+        printf("%-10s",ElfInfo_GetSectionType(ELF_SH_TYPE(buf)));
         
         printf("0x%08x ",(unsigned int)ELF_SH_ADDR(buf));
         printf("0x%08x ",(unsigned int)ELF_SH_OFFSET(buf));
         printf("0x%08x ",(unsigned int)ELF_SH_SIZE(buf));
-#if 0
-       ELF_SH_NAME(buf)
-
-       ELF_SH_FLAGS(buf)       
-       
-       ELF_SH_LINK(buf)
-       ELF_SH_INFO(buf)
-       ELF_SH_ADDRALIGN(buf)
-       ELF_SH_ENTSIZE(buf)
-     
-
-       vaddr=ELF_PH_VADDR(buf);
-        paddr=ELF_PH_PADDR(buf);
-        file_size=ELF_PH_FILESZ(buf);
-        mem_size=ELF_PH_MEMSZ(buf);
-        flags=ELF_PH_FLAGS(buf);
-        align=ELF_PH_ALIGN(buf);
-        idx=(uint16_t)(type > 4 ? 0 : type);
-        printf("%-7s ",types[idx]);
-        printf("0x%08x ",(unsigned int)offset);
-        printf("0x%08x ",(unsigned int)paddr);
-        printf("0x%08x ",(unsigned int)vaddr);
-        printf("0x%08x ",(unsigned int)file_size);
-        printf("0x%08x ",(unsigned int)mem_size);
-        (flags & PF_R) ? printf("R") : printf(" ");        
-        (flags & PF_W) ? printf("W") : printf(" ");
-        (flags & PF_X) ? printf("X") : printf(" ");
-        printf("   0x%08x\n",(unsigned int)align);
-#endif
-        printf("\n");
+		printf("0x%04x ",(unsigned int)ELF_SH_ENTSIZE(buf));
+		printf("0x%04x ",(unsigned int)ELF_SH_LINK(buf));
+		printf("0x%02x ",(unsigned int)ELF_SH_ADDRALIGN(buf));
+		printf("0x%08x\n",(unsigned int)ELF_SH_INFO(buf));
+		
+		printf("       ");
+		printf("%-32s",ElfInfo_GetSectionName(str,ELF_SH_NAME(buf)));
+		
+		flags=ELF_SH_FLAGS(buf);
+		(flags & SHF_ALLOC) ? printf("A") : printf(" ");		
+		(flags & SHF_WRITE) ? printf("W") : printf(" ");                
+        (flags & SHF_EXECINSTR) ? printf("X") : printf(" ");
+		/*(flags & SHF_MASKPROC) ? printf("S") : printf(" "); */	/* todo: Handle this!!! */
+		printf("\n");
         num++;
     }   
     return ELFIO_E_OK;
 }
 
-const char *ElfInfo_getSectionType(Elf32_Word section_type)
+const char *ElfInfo_GetSectionType(Elf32_Word section_type)
 {
     const char *res;
 
@@ -281,4 +231,11 @@ const char *ElfInfo_getSectionType(Elf32_Word section_type)
         }
     }
     return res;
+}
+
+
+const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx)
+{
+	/* todo: Range-Checking!!! */
+    return &ElfIO_GetSection(str,str->header->e_shstrndx)->data[idx];
 }

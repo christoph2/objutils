@@ -30,7 +30,8 @@
 
 #include <stdio.h>
 #include "config.h"
-#include "elf.h"
+#include "Elf.h"
+#include "MemSect.h"
 
 #define ELFIO_MAX_FILENAME_LEN	((uint8_t)0xff)
 
@@ -56,7 +57,8 @@ typedef struct tagElfIo_Struct {
     ElfIo_Mode mode;
     Elf32_Ehdr * header;
     Elf32_Phdr * program_headers;
-    Elf32_Shdr * program_sections;
+    Elf32_Shdr * section_headers;
+    MemorySection *sections;
     uint8_t guard;
     Elf_EndianessType encoding;
 } ElfIo_Struct;
@@ -71,6 +73,10 @@ ElfIo_StatusType ElfIo_Deinit(ElfIo_Struct *str);
 
 ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str);
 ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str);
+ElfIo_StatusType ElfIo_ReadSections(ElfIo_Struct const * str);
+
+Elf32_Shdr * ElfIO_GetSectionHeader(ElfIo_Struct const * str,Elf32_Word idx);
+MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx);
 
 char const * ElfIo_GetMachineName(ElfIo_Struct const * str);
 
