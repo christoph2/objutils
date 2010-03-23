@@ -27,12 +27,18 @@
  */
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ElfInfo.h"
 
 
 static const char *ElfInfo_GetSectionType(Elf32_Word section_type);
+static const char *GetSymbolBinding(uint8_t value);
+static const char *GetSymbolType(uint8_t value);
+static void GetSpecialSectionName(Elf32_Half section,char *name);
+
 const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx);
+
 
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
 {
@@ -46,9 +52,7 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     Elf32_Half type_id;    
     Elf32_Half ehsize;
     uint8_t clss;
-    uint8_t data;
-    uint8_t abi;
-    uint8_t abi_version;
+    uint8_t data;    
 
     ELFIO_WEAK_PARAM_CHECK(str);
 
@@ -60,9 +64,7 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     machine_id=ELF_MACHINE(str->header);    
     ehsize=ELF_EHSIZE(str->header); /* should be used for validation ! */        
     clss=ELF_CLASS(str->header);
-    data=ELF_DATA(str->header);
-    abi=ELF_OSABI(str->header);
-    abi_version=ELF_ABIVERSION(str->header);
+    data=ELF_DATA(str->header);    
 
     printf("===============================================================================\n");
     printf("ELF file header:\n");
@@ -85,8 +87,8 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     printf("Class:\t\t\t\t0x%08x - %s\n",(unsigned int)clss,classes[idx]);
     idx=data > 2 ? 0 : data;
     printf("Endianess:\t\t\t0x%08x - %s\n",(unsigned int)data,encodings[idx]);
-    printf("ELF-ABI:\t\t\t0x%08x\n",(unsigned int)abi);
-    printf("ELF-ABI-Version:\t\t0x%08x\n",(unsigned int)abi_version);
+    printf("ELF-ABI:\t\t\t0x%08x\n",(unsigned int)ELF_OSABI(str->header));
+    printf("ELF-ABI-Version:\t\t0x%08x\n",(unsigned int)ELF_ABIVERSION(str->header));
 
     return ELFIO_E_OK;
 }
@@ -144,7 +146,6 @@ ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str)
 
 ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
 {
-    Elf32_Off hdr_offs;
     Elf32_Half num;
     Elf32_Half num_entries;    
     Elf32_Shdr *buf;    
@@ -155,8 +156,6 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
     if (str->mode!=ELFIO_READ) {
         return ELFIO_E_STATE;
     }
-
-    hdr_offs=ELF_SHOFF(str->header);
 
     num=0;
     num_entries=ELF_SHNUM(str->header);
@@ -172,19 +171,16 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
     while (num<num_entries) {
         buf=str->section_headers+num;
         printf("[%04X] ",num);
-        printf("%-10s",ElfInfo_GetSectionType(ELF_SH_TYPE(buf)));
-        
+        printf("%-10s",ElfInfo_GetSectionType(ELF_SH_TYPE(buf)));        
         printf("0x%08x ",(unsigned int)ELF_SH_ADDR(buf));
-        printf("0x%08x ",(unsigned int)ELF_SH_OFFSET(buf));
+        printf("0x%08x ",(unsigned int)ELF_SH_OFFSET(buf)); /* Offset only needed internally. */
         printf("0x%08x ",(unsigned int)ELF_SH_SIZE(buf));
 		printf("0x%04x ",(unsigned int)ELF_SH_ENTSIZE(buf));
 		printf("0x%04x ",(unsigned int)ELF_SH_LINK(buf));
 		printf("0x%02x ",(unsigned int)ELF_SH_ADDRALIGN(buf));
 		printf("0x%08x\n",(unsigned int)ELF_SH_INFO(buf));
-		
 		printf("       ");
-		printf("%-32s",ElfInfo_GetSectionName(str,ELF_SH_NAME(buf)));
-		
+		printf("%-32s",ElfInfo_GetSectionName(str,ELF_SH_NAME(buf)));		
 		flags=ELF_SH_FLAGS(buf);
 		(flags & SHF_ALLOC) ? printf("A") : printf(" ");		
 		(flags & SHF_WRITE) ? printf("W") : printf(" ");                
@@ -194,6 +190,59 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
         num++;
     }   
     return ELFIO_E_OK;
+}
+
+
+
+ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
+{
+    Elf32_Half i;
+    Elf32_Half num_entries;
+    Elf32_Shdr * section_header;
+    Elf32_Sym * symtab;
+    Elf32_Sym sym;        
+    size_t num_symbols;
+    size_t j;
+    char section_name[64];
+
+    ELFIO_WEAK_PARAM_CHECK(str);
+
+    if (str->mode!=ELFIO_READ) {
+        return ELFIO_E_STATE;
+    }
+
+    i=0;
+    num_entries=ELF_SHNUM(str->header);
+
+    printf("\n\n");
+    printf("===============================================================================\n");
+    printf("Symbols:\n");
+    printf("===============================================================================\n");
+    printf("Value      Size   Type    Bind   Ndx\n");
+    printf("===============================================================================\n");
+
+    while (i<num_entries) {
+        section_header=&str->section_headers[i];
+        if ((section_header->sh_type==SHT_SYMTAB) || (section_header->sh_type==SHT_DYNSYM)) {
+            assert(section_header->sh_entsize==sizeof(Elf32_Sym));            
+            symtab=(Elf32_Sym *)ElfIO_GetSection(str,i)->data;
+            num_symbols=section_header->sh_size/section_header->sh_entsize;
+
+            for (j=0;j<num_symbols;++j) {
+                sym=symtab[j];  /* todo: Fkt.: 'GetSymbol(str,tab,idx)' */
+                printf("0x%08x ",sym.st_value);
+                printf("0x%04x ",sym.st_size);                                
+                printf("%-7s ",GetSymbolType(ELF32_ST_TYPE(sym.st_info)));
+                printf("%-6s ",GetSymbolBinding(ELF32_ST_BIND(sym.st_info)));
+                GetSpecialSectionName(sym.st_shndx,section_name);
+                printf("%-8s",section_name);
+
+                printf("\n");
+            }
+            
+        }
+        ++i;
+    }
 }
 
 const char *ElfInfo_GetSectionType(Elf32_Word section_type)
@@ -233,6 +282,52 @@ const char *ElfInfo_GetSectionType(Elf32_Word section_type)
     return res;
 }
 
+const char *GetSymbolBinding(uint8_t value)
+{
+    const char * bindings[]={
+        "LOCAL","GLOBAL","WEAK","PROC","UNK"
+    };
+
+    if ((value>=STB_LOCAL) && (value<=STB_WEAK)) {
+        return bindings[value];
+    } else if ((value>=STB_LOPROC) && (value<=STB_HIPROC)) {
+        return bindings[3];
+    } else {
+        return bindings[4];
+    }
+
+}
+
+
+const char *GetSymbolType(uint8_t value)
+{
+    const char * types[]={
+        "NOTYPE","OBJECT","FUNC","SECTION","FILE","PROC","UNKNOWN"
+    };
+
+    if ((value>=STT_NOTYPE) && (value<=STT_FILE)) {
+        return types[value];
+    } else if ((value>=STT_LOPROC) && (value<=STT_HIPROC)) {
+        return types[5];
+    } else {
+        return types[6];
+    }
+}
+
+void GetSpecialSectionName(Elf32_Half section,char *name)
+{
+    if (section==SHN_UNDEF) {
+        strcpy(name,"UNDEF");
+    } else if ((section>=SHN_LOPROC) && (section<=SHN_HIPROC)) {
+        strcpy(name,"PROCS");
+    } else if (section==SHN_ABS) {
+        strcpy(section,"ABS");
+    } else if (section==SHN_COMMON) {
+        strcpy(section,"COMMON");
+    } else {
+        sprintf(name,"0x%08x",section);
+    }
+}
 
 const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx)
 {
