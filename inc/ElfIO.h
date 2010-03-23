@@ -77,6 +77,7 @@ ElfIo_StatusType ElfIo_ReadSections(ElfIo_Struct const * str);
 
 Elf32_Shdr * ElfIO_GetSectionHeader(ElfIo_Struct const * str,Elf32_Word idx);
 MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx);
+Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx);
 
 char const * ElfIo_GetMachineName(ElfIo_Struct const * str);
 

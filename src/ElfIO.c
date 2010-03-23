@@ -217,7 +217,7 @@ ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode 
             }
 
             if (ElfIo_CheckHostEndianess()!=str->encoding) {
-                /* Convert Endianess. */
+                /* Adjust Endianess. */
                 ELF_TYPE(str->header)       = ElfIo_Convert16U(ELF_TYPE(str->header));
                 ELF_MACHINE(str->header)    = ElfIo_Convert16U(ELF_MACHINE(str->header));
                 ELF_VER(str->header)        = ElfIo_Convert32U(ELF_VER(str->header));
@@ -336,7 +336,7 @@ ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str)
     Elf32_Off hdr_offs;
     Elf32_Half num;
     Elf32_Half num_entries;
-    Elf32_Phdr *buf;
+    Elf32_Phdr *header;
    int res;
 
     ELFIO_WEAK_PARAM_CHECK(str);
@@ -356,21 +356,22 @@ ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str)
     num_entries=ELF_PHNUM(str->header);
 
     while (num<num_entries) {
-        buf=str->program_headers+num;
-        res=fread((void*)buf,sizeof(Elf32_Phdr),1,str->stream);
+        header=str->program_headers+num;
+        res=fread((void*)header,sizeof(Elf32_Phdr),1,str->stream);
         if (res==0) {
             return ELFIO_E_FILEIO;
         }
 
         if (ElfIo_CheckHostEndianess()!=str->encoding) {
-            ELF_PH_TYPE(buf)   = ElfIo_Convert32U(ELF_PH_TYPE(buf));
-            ELF_PH_OFFSET(buf) = ElfIo_Convert32U(ELF_PH_OFFSET(buf));
-            ELF_PH_VADDR(buf)  = ElfIo_Convert32U(ELF_PH_VADDR(buf));
-            ELF_PH_PADDR(buf)  = ElfIo_Convert32U(ELF_PH_PADDR(buf));
-            ELF_PH_FILESZ(buf) = ElfIo_Convert32U(ELF_PH_FILESZ(buf));
-            ELF_PH_MEMSZ(buf)  = ElfIo_Convert32U(ELF_PH_MEMSZ(buf));
-            ELF_PH_FLAGS(buf)  = ElfIo_Convert32U(ELF_PH_FLAGS(buf));
-            ELF_PH_ALIGN(buf)  = ElfIo_Convert32U(ELF_PH_ALIGN(buf));
+            /* Adjust Endianess. */
+            ELF_PH_TYPE(header)   = ElfIo_Convert32U(ELF_PH_TYPE(header));
+            ELF_PH_OFFSET(header) = ElfIo_Convert32U(ELF_PH_OFFSET(header));
+            ELF_PH_VADDR(header)  = ElfIo_Convert32U(ELF_PH_VADDR(header));
+            ELF_PH_PADDR(header)  = ElfIo_Convert32U(ELF_PH_PADDR(header));
+            ELF_PH_FILESZ(header) = ElfIo_Convert32U(ELF_PH_FILESZ(header));
+            ELF_PH_MEMSZ(header)  = ElfIo_Convert32U(ELF_PH_MEMSZ(header));
+            ELF_PH_FLAGS(header)  = ElfIo_Convert32U(ELF_PH_FLAGS(header));
+            ELF_PH_ALIGN(header)  = ElfIo_Convert32U(ELF_PH_ALIGN(header));
         }
         num++;
     }
@@ -384,7 +385,7 @@ ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
     Elf32_Off hdr_offs;
     Elf32_Half num;
     Elf32_Half num_entries;
-    Elf32_Shdr *buf;
+    Elf32_Shdr *section_header;
     int res;
 
     ELFIO_WEAK_PARAM_CHECK(str);
@@ -404,23 +405,24 @@ ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
     num_entries=ELF_SHNUM(str->header);
 
     while (num<num_entries) {
-        buf=str->section_headers+num;
-        res=fread((void*)buf,sizeof(Elf32_Shdr),1,str->stream);
+        section_header=str->section_headers+num;
+        res=fread((void*)section_header,sizeof(Elf32_Shdr),1,str->stream);
         if (res==0) {
             return ELFIO_E_FILEIO;
         }
 
         if (ElfIo_CheckHostEndianess()!=str->encoding) {
-            ELF_SH_NAME(buf)        = ElfIo_Convert32U(ELF_SH_NAME(buf));
-            ELF_SH_TYPE(buf)        = ElfIo_Convert32U(ELF_SH_TYPE(buf));
-            ELF_SH_FLAGS(buf)       = ElfIo_Convert32U(ELF_SH_FLAGS(buf));
-            ELF_SH_ADDR(buf)        = ElfIo_Convert32U(ELF_SH_ADDR(buf));
-            ELF_SH_OFFSET(buf)      = ElfIo_Convert32U(ELF_SH_OFFSET(buf));
-            ELF_SH_SIZE(buf)        = ElfIo_Convert32U(ELF_SH_SIZE(buf));
-            ELF_SH_LINK(buf)        = ElfIo_Convert32U(ELF_SH_LINK(buf));
-            ELF_SH_INFO(buf)        = ElfIo_Convert32U(ELF_SH_INFO(buf));
-            ELF_SH_ADDRALIGN(buf)   = ElfIo_Convert32U(ELF_SH_ADDRALIGN(buf));
-            ELF_SH_ENTSIZE(buf)     = ElfIo_Convert32U(ELF_SH_ENTSIZE(buf));
+            /* Adjust Endianess. */
+            ELF_SH_NAME(section_header)        = ElfIo_Convert32U(ELF_SH_NAME(section_header));
+            ELF_SH_TYPE(section_header)        = ElfIo_Convert32U(ELF_SH_TYPE(section_header));
+            ELF_SH_FLAGS(section_header)       = ElfIo_Convert32U(ELF_SH_FLAGS(section_header));
+            ELF_SH_ADDR(section_header)        = ElfIo_Convert32U(ELF_SH_ADDR(section_header));
+            ELF_SH_OFFSET(section_header)      = ElfIo_Convert32U(ELF_SH_OFFSET(section_header));
+            ELF_SH_SIZE(section_header)        = ElfIo_Convert32U(ELF_SH_SIZE(section_header));
+            ELF_SH_LINK(section_header)        = ElfIo_Convert32U(ELF_SH_LINK(section_header));
+            ELF_SH_INFO(section_header)        = ElfIo_Convert32U(ELF_SH_INFO(section_header));
+            ELF_SH_ADDRALIGN(section_header)   = ElfIo_Convert32U(ELF_SH_ADDRALIGN(section_header));
+            ELF_SH_ENTSIZE(section_header)     = ElfIo_Convert32U(ELF_SH_ENTSIZE(section_header));
         }
         num++;
     }
@@ -474,6 +476,21 @@ MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx)
     return (MemorySection * )&str->sections[idx];
 }
 
+
+Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx)
+{
+    /* todo: Range check!!! */    
+//    return (Elf32_Sym *)ElfIO_GetSection(str,section)->data[idx];
+    Elf32_Sym *symtab;
+    Elf32_Sym sym;
+
+    //return (Elf32_Sym *)ElfIO_GetSection(str,section)->data;
+    return ((Elf32_Sym *)ElfIO_GetSection(str,section)->data)[idx];
+    /*
+    sym=symtab[idx];
+    return symtab;
+    */
+}
 
 void ElfIo_ExitUnimplemented(char * const feature)
 {

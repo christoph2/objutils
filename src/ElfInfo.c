@@ -39,7 +39,6 @@ static void GetSpecialSectionName(Elf32_Half section,char *name);
 
 const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx);
 
-
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
 {
     const char *types[]={"Processor-specific.","No file type.","Relocatable file.",
@@ -199,8 +198,7 @@ ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
     Elf32_Half i;
     Elf32_Half num_entries;
     Elf32_Shdr * section_header;
-    Elf32_Sym * symtab;
-    Elf32_Sym sym;        
+    Elf32_Sym sym;
     size_t num_symbols;
     size_t j;
     char section_name[64];
@@ -225,11 +223,11 @@ ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
         section_header=&str->section_headers[i];
         if ((section_header->sh_type==SHT_SYMTAB) || (section_header->sh_type==SHT_DYNSYM)) {
             assert(section_header->sh_entsize==sizeof(Elf32_Sym));            
-            symtab=(Elf32_Sym *)ElfIO_GetSection(str,i)->data;
             num_symbols=section_header->sh_size/section_header->sh_entsize;
 
             for (j=0;j<num_symbols;++j) {
-                sym=symtab[j];  /* todo: Fkt.: 'GetSymbol(str,tab,idx)' */
+//                sym=symtab[j];  /* todo: Fkt.: 'GetSymbol(str,tab,idx)' */
+                sym=ElfIO_GetSymbol(str,i,j);
                 printf("0x%08x ",sym.st_value);
                 printf("0x%04x ",sym.st_size);                                
                 printf("%-7s ",GetSymbolType(ELF32_ST_TYPE(sym.st_info)));
