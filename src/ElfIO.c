@@ -477,19 +477,22 @@ MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx)
 }
 
 
-Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx)
+const Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx)
 {
     /* todo: Range check!!! */    
-//    return (Elf32_Sym *)ElfIO_GetSection(str,section)->data[idx];
-    Elf32_Sym *symtab;
+//    Elf32_Sym *symtab;
     Elf32_Sym sym;
 
-    //return (Elf32_Sym *)ElfIO_GetSection(str,section)->data;
-    return ((Elf32_Sym *)ElfIO_GetSection(str,section)->data)[idx];
-    /*
-    sym=symtab[idx];
-    return symtab;
-    */
+    sym=((Elf32_Sym *)ElfIO_GetSection(str,section)->data)[idx];
+
+    if (ElfIo_CheckHostEndianess()!=str->encoding) {    // todo: Endianess der Symbole konvertieren!!!
+        sym.st_name=ElfIo_Convert32U(sym.st_name);
+        sym.st_value=ElfIo_Convert32U(sym.st_value);
+        sym.st_size=ElfIo_Convert32U(sym.st_size);
+        sym.st_shndx=ElfIo_Convert32U(sym.st_shndx);
+    }
+
+    return sym;
 }
 
 void ElfIo_ExitUnimplemented(char * const feature)

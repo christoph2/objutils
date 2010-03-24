@@ -35,9 +35,10 @@
 static const char *ElfInfo_GetSectionType(Elf32_Word section_type);
 static const char *GetSymbolBinding(uint8_t value);
 static const char *GetSymbolType(uint8_t value);
-static void GetSpecialSectionName(Elf32_Half section,char *name);
+char const * GetSpecialSectionName(Elf32_Half section);
 
 const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx);
+const char *ElfInfo_GetSymbolName(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx);
 
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
 {
@@ -71,23 +72,23 @@ ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str)
     idx=type_id > 4u ? 0u : type_id+1;
     printf("File-Type:\t\t\t    0x%04x - %s\n",type_id,types[idx]);
     printf("Machine-ID:\t\t\t    0x%04x - %s\n",machine_id,ElfIo_GetMachineName(str));
-    printf("Version:\t\t\t0x%08x - ",(unsigned int)ELF_VER(str->header));
+    printf("Version:\t\t\t0x%08x - ",(uint32_t)ELF_VER(str->header));
     printf( ELF_VER(str->header)==0u ? "Invalid.\n" : "Current.\n");
-    printf("Entry-Point:\t\t\t0x%08x\n",(unsigned int)ELF_ENTRY(str->header));
-    printf("Start of program headers:\t0x%08x\n",(unsigned int)ELF_PHOFF(str->header));
-    printf("Start of section headers:\t0x%08x\n",(unsigned int)ELF_SHOFF(str->header));
-    printf("Flags:\t\t\t\t0x%08x\n",(unsigned int)ELF_FLAGS(str->header));
-    printf("PHT entry size:\t\t\t0x%08x\n",(unsigned int)ELF_PHENTSIZE(str->header));
-    printf("Number of PHT entries:\t\t0x%08x\n",(unsigned int)ELF_PHNUM(str->header));
-    printf("SHT entry size:\t\t\t0x%08x\n",(unsigned int)ELF_SHENTSIZE(str->header));
-    printf("Number of SHT entries:\t\t0x%08x\n",(unsigned int)ELF_SHNUM(str->header));
-    printf("String table index:\t\t0x%08x\n",(unsigned int)ELF_SHSTRNDX(str->header));
+    printf("Entry-Point:\t\t\t0x%08x\n",(uint32_t)ELF_ENTRY(str->header));
+    printf("Start of program headers:\t0x%08x\n",(uint32_t)ELF_PHOFF(str->header));
+    printf("Start of section headers:\t0x%08x\n",(uint32_t)ELF_SHOFF(str->header));
+    printf("Flags:\t\t\t\t0x%08x\n",(uint32_t)ELF_FLAGS(str->header));
+    printf("PHT entry size:\t\t\t0x%08x\n",(uint32_t)ELF_PHENTSIZE(str->header));
+    printf("Number of PHT entries:\t\t0x%08x\n",(uint32_t)ELF_PHNUM(str->header));
+    printf("SHT entry size:\t\t\t0x%08x\n",(uint32_t)ELF_SHENTSIZE(str->header));
+    printf("Number of SHT entries:\t\t0x%08x\n",(uint32_t)ELF_SHNUM(str->header));
+    printf("String table index:\t\t0x%08x\n",(uint32_t)ELF_SHSTRNDX(str->header));
     idx=clss > 2 ? 0 : clss;
-    printf("Class:\t\t\t\t0x%08x - %s\n",(unsigned int)clss,classes[idx]);
+    printf("Class:\t\t\t\t0x%08x - %s\n",(uint32_t)clss,classes[idx]);
     idx=data > 2 ? 0 : data;
-    printf("Endianess:\t\t\t0x%08x - %s\n",(unsigned int)data,encodings[idx]);
-    printf("ELF-ABI:\t\t\t0x%08x\n",(unsigned int)ELF_OSABI(str->header));
-    printf("ELF-ABI-Version:\t\t0x%08x\n",(unsigned int)ELF_ABIVERSION(str->header));
+    printf("Endianess:\t\t\t0x%08x - %s\n",(uint32_t)data,encodings[idx]);
+    printf("ELF-ABI:\t\t\t0x%08x\n",(uint32_t)ELF_OSABI(str->header));
+    printf("ELF-ABI-Version:\t\t0x%08x\n",(uint32_t)ELF_ABIVERSION(str->header));
 
     return ELFIO_E_OK;
 }
@@ -128,15 +129,15 @@ ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str)
         flags=ELF_PH_FLAGS(buf);        
         idx=(uint16_t)(ELF_PH_TYPE(buf) > 4 ? 0 : ELF_PH_TYPE(buf));
         printf("%-7s ",types[idx]);
-        printf("0x%08x ",(unsigned int)ELF_PH_OFFSET(buf));
-        printf("0x%08x ",(unsigned int)ELF_PH_PADDR(buf));
-        printf("0x%08x ",(unsigned int)ELF_PH_VADDR(buf));
-        printf("0x%08x ",(unsigned int)ELF_PH_FILESZ(buf));
-        printf("0x%08x ",(unsigned int)ELF_PH_MEMSZ(buf));
+        printf("0x%08x ",(uint32_t)ELF_PH_OFFSET(buf));
+        printf("0x%08x ",(uint32_t)ELF_PH_PADDR(buf));
+        printf("0x%08x ",(uint32_t)ELF_PH_VADDR(buf));
+        printf("0x%08x ",(uint32_t)ELF_PH_FILESZ(buf));
+        printf("0x%08x ",(uint32_t)ELF_PH_MEMSZ(buf));
         (flags & PF_R) ? printf("R") : printf(" ");        
         (flags & PF_W) ? printf("W") : printf(" ");
         (flags & PF_X) ? printf("X") : printf(" ");
-        printf("   0x%08x\n",(unsigned int)ELF_PH_ALIGN(buf));
+        printf("   0x%08x\n",(uint32_t)ELF_PH_ALIGN(buf));
         num++;
     }   
     return ELFIO_E_OK;
@@ -171,13 +172,13 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
         buf=str->section_headers+num;
         printf("[%04X] ",num);
         printf("%-10s",ElfInfo_GetSectionType(ELF_SH_TYPE(buf)));        
-        printf("0x%08x ",(unsigned int)ELF_SH_ADDR(buf));
-        printf("0x%08x ",(unsigned int)ELF_SH_OFFSET(buf)); /* Offset only needed internally. */
-        printf("0x%08x ",(unsigned int)ELF_SH_SIZE(buf));
-		printf("0x%04x ",(unsigned int)ELF_SH_ENTSIZE(buf));
-		printf("0x%04x ",(unsigned int)ELF_SH_LINK(buf));
-		printf("0x%02x ",(unsigned int)ELF_SH_ADDRALIGN(buf));
-		printf("0x%08x\n",(unsigned int)ELF_SH_INFO(buf));
+        printf("0x%08x ",(uint32_t)ELF_SH_ADDR(buf));
+        printf("0x%08x ",(uint32_t)ELF_SH_OFFSET(buf)); /* Offset only needed internally. */
+        printf("0x%08x ",(uint32_t)ELF_SH_SIZE(buf));
+		printf("0x%04x ",(uint32_t)ELF_SH_ENTSIZE(buf));
+		printf("0x%04x ",(uint32_t)ELF_SH_LINK(buf));
+		printf("0x%02x ",(uint32_t)ELF_SH_ADDRALIGN(buf));
+		printf("0x%08x\n",(uint32_t)ELF_SH_INFO(buf));
 		printf("       ");
 		printf("%-32s",ElfInfo_GetSectionName(str,ELF_SH_NAME(buf)));		
 		flags=ELF_SH_FLAGS(buf);
@@ -192,7 +193,6 @@ ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str)
 }
 
 
-
 ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
 {
     Elf32_Half i;
@@ -201,7 +201,8 @@ ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
     Elf32_Sym sym;
     size_t num_symbols;
     size_t j;
-    char section_name[64];
+    char const * section_name;
+    uint32_t section_idx;
 
     ELFIO_WEAK_PARAM_CHECK(str);
 
@@ -217,6 +218,7 @@ ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
     printf("Symbols:\n");
     printf("===============================================================================\n");
     printf("Value      Size   Type    Bind   Ndx\n");
+    printf("Name\n");
     printf("===============================================================================\n");
 
     while (i<num_entries) {
@@ -224,24 +226,29 @@ ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str)
         if ((section_header->sh_type==SHT_SYMTAB) || (section_header->sh_type==SHT_DYNSYM)) {
             assert(section_header->sh_entsize==sizeof(Elf32_Sym));            
             num_symbols=section_header->sh_size/section_header->sh_entsize;
+            section_idx=section_header->sh_link;            
 
             for (j=0;j<num_symbols;++j) {
-//                sym=symtab[j];  /* todo: Fkt.: 'GetSymbol(str,tab,idx)' */
                 sym=ElfIO_GetSymbol(str,i,j);
-                printf("0x%08x ",sym.st_value);
-                printf("0x%04x ",sym.st_size);                                
+                printf("0x%08x ",(uint32_t)sym.st_value);
+                printf("0x%08x ",(uint32_t)sym.st_size);                                
                 printf("%-7s ",GetSymbolType(ELF32_ST_TYPE(sym.st_info)));
                 printf("%-6s ",GetSymbolBinding(ELF32_ST_BIND(sym.st_info)));
-                GetSpecialSectionName(sym.st_shndx,section_name);
-                printf("%-8s",section_name);
-
-                printf("\n");
+                
+                section_name=GetSpecialSectionName(sym.st_shndx);
+                if (section_name) {
+                    printf("%-8s",section_name);
+                } else {
+                    printf("0x%08x ",(uint32_t)sym.st_shndx);
+                }                
+                printf("\n%s\n",ElfInfo_GetSymbolName(str,section_idx,sym.st_name));
             }
-            
         }
         ++i;
     }
+    return ELFIO_E_OK;
 }
+
 
 const char *ElfInfo_GetSectionType(Elf32_Word section_type)
 {
@@ -280,6 +287,7 @@ const char *ElfInfo_GetSectionType(Elf32_Word section_type)
     return res;
 }
 
+
 const char *GetSymbolBinding(uint8_t value)
 {
     const char * bindings[]={
@@ -312,23 +320,34 @@ const char *GetSymbolType(uint8_t value)
     }
 }
 
-void GetSpecialSectionName(Elf32_Half section,char *name)
+char const * GetSpecialSectionName(Elf32_Half section)
 {
+    const char * SpecialSections[]={
+        "UNDEF","PROC","ABS","COMMON",(char const*)NULL
+    };
     if (section==SHN_UNDEF) {
-        strcpy(name,"UNDEF");
+        return SpecialSections[0];
     } else if ((section>=SHN_LOPROC) && (section<=SHN_HIPROC)) {
-        strcpy(name,"PROCS");
+        return SpecialSections[1];
     } else if (section==SHN_ABS) {
-        strcpy(section,"ABS");
+        return SpecialSections[2];
     } else if (section==SHN_COMMON) {
-        strcpy(section,"COMMON");
+        return SpecialSections[3];
     } else {
-        sprintf(name,"0x%08x",section);
+        return SpecialSections[4];
     }
 }
+
 
 const char *ElfInfo_GetSectionName(ElfIo_Struct const * str,Elf32_Word idx)
 {
 	/* todo: Range-Checking!!! */
     return &ElfIO_GetSection(str,str->header->e_shstrndx)->data[idx];
+}
+
+
+const char *ElfInfo_GetSymbolName(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx)
+{
+	/* todo: Range-Checking!!! */
+    return &ElfIO_GetSection(str,section)->data[idx];
 }

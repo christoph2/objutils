@@ -15,6 +15,7 @@ prog_source=Split("""
 """)
 
 cflags='-O3 -Wall -fomit-frame-pointer'
+##cflags='-g'
 
 sources=prog_source
 
@@ -23,7 +24,7 @@ env.VariantDir('build','src',duplicate=0)
 
 yol_lib=env.Library("#lib/yOBJl",source=lib_source)
 
-target=env.Program(target="#/bin/yol-elf_info",source=sources,LIBS=[yol_lib])
+target=env.Program(target="#/bin/yol-elf-info",source=sources,LIBS=[yol_lib])
 
 """
 unix > swig -python example.i
