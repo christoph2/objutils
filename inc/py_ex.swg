@@ -25,60 +25,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if !defined(__ELFIO_H)
-#define __ELFIO_H
-
-#include <stdio.h>
-#include "config.h"
-#include "Elf.h"
-#include "MemSect.h"
-#include "Utl.h"
-
-#define ELFIO_MAX_FILENAME_LEN	((uint8_t)0xff)
-
-typedef enum tagElfIo_StatusType {
-    ELFIO_E_OK,
-    ELFIO_E_FILEIO,
-    ELFIO_E_INVALID,
-    ELFIO_E_STATE,
-    ELFIO_E_VALUE,
-    ELFIO_E_LIMIT
-} ElfIo_StatusType;
-
-typedef enum tagElfIo_Mode {
-    ELFIO_INVALID_MODE,
-    ELFIO_READ,
-    ELFIO_WRITE
-} ElfIo_Mode;
-
-typedef struct tagElfIo_Struct {
-    FILE * stream;
-    char const * file_name;
-    bool file_opened;
-    ElfIo_Mode mode;
-    Elf32_Ehdr * header;
-    Elf32_Phdr * program_headers;
-    Elf32_Shdr * section_headers;
-    MemorySection *sections;
-    uint8_t guard;
-    Utl_EndianessType encoding;
-} ElfIo_Struct;
+#if !defined(__ELF_INFO_H)
+#define __ELF_INFO_H
 
 
-#define ELFIO_WEAK_PARAM_CHECK(pstr)	(assert((pstr)->guard==sizeof(ElfIo_Struct)))
+%module example
 
-ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode mode);
-ElfIo_StatusType ElfIo_Deinit(ElfIo_Struct *str);
+%{
+#include "ElfIO.h"
 
-ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str);
-ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str);
-ElfIo_StatusType ElfIo_ReadSections(ElfIo_Struct const * str);
+ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str);
+ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str);
+ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str);
+%}
 
-Elf32_Shdr * ElfIO_GetSectionHeader(ElfIo_Struct const * str,Elf32_Word idx);
-MemorySection * ElfIO_GetSection(ElfIo_Struct const * str,Elf32_Word idx);
-const Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf32_Word idx);
+ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str);
+ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str);
+ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str);
 
-void ElfIo_ExitUnimplemented(char * const feature);
-void ElfIo_ExitError(char *s, ...);
+#endif /* __ELF_INFO_H */
 
-#endif /* __ELFIO_H */

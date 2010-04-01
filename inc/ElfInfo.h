@@ -31,9 +31,11 @@
 #include "ElfIO.h"
 
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str);
+char const * ElfInfo_GetMachineName(ElfIo_Struct const * str);
 ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str);
 ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str);
 ElfIo_StatusType ElfIo_PrintSymbols(ElfIo_Struct const * str);
+ElfIo_StatusType ElfIo_PrintNotes(ElfIo_Struct const * str);
 
 #endif /* __ELF_INFO_H */
 

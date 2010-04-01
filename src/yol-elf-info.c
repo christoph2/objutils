@@ -88,6 +88,7 @@ int main(int argc,char **argv)
     (void)ElfInfo_PrintProgramTable(&str);
     (void)ElfIo_PrintSectionHeaderTable(&str);
     (void)ElfIo_PrintSymbols(&str);
+	(void)ElfIo_PrintNotes(&str);
 
     (void)ElfIo_Deinit(&str);
 

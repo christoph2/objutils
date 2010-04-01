@@ -28,7 +28,7 @@
 #if !defined(__UTL_H)
 #define __UTL_H
 
-#include "std_types.h"
+#include "StdTypes.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -36,11 +36,12 @@ extern "C"
 #endif  /* __cplusplus */
 
 typedef enum tagUtl_EndianessType {
+	UTL_INVALID_ENCODING,
     UTL_BIG_ENDIAN,
     UTL_LITTLE_ENDIAN
 } Utl_EndianessType;
 
-Utl_EndianessType Utl_CheckEndianess(void);
+Utl_EndianessType Utl_CheckHostEndianess(void);
 
 bool Utl_BitGet(uint16_t w,uint8_t num);
 uint16_t Utl_BitSet(uint16_t w,uint8_t num);

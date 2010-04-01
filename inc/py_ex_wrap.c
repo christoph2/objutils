@@ -2511,6 +2511,8 @@ static swig_module_info swig_module = {swig_types, 3, 0, 0, 0, 0};
 #define SWIG_as_voidptrptr(a) ((void)SWIG_as_voidptr(*a),(void**)(a)) 
 
 
+#include "ElfIO.h"
+
 ElfIo_StatusType ElfInfo_PrintHeader(ElfIo_Struct const * str);
 ElfIo_StatusType ElfInfo_PrintProgramTable(ElfIo_Struct const * str);
 ElfIo_StatusType ElfIo_PrintSectionHeaderTable(ElfIo_Struct const * str);

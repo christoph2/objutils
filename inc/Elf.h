@@ -234,13 +234,13 @@ RESERVED 22-35 Reserved for future use
 #define ELFDATA2LSB     ((uint8_t)1)        /* Little-Endian.           */
 #define ELFDATA2MSB     ((uint8_t)2)        /* Big-Endian.              */
 
-
+#if 0
 typedef enum tagElf_EndianessType {
     ELF_INVALID_ENCODING,
     ELF_BIG_ENDIAN,
     ELF_LITTLE_ENDIAN
 } Elf_EndianessType;
-
+#endif
 
 /*
 ** 

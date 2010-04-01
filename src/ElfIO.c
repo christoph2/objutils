@@ -34,116 +34,16 @@
 #include <errno.h>
 
 
-/* todo: OpenBSD-'l'-Fixes! */
 #define STRNCPY strncpy
 #define STRNCAT strncat
+
+/*
+**	todo: Variant using Memory-Mapped-Files.
+*/
 
 static uint16_t ElfIo_Convert16U(uint16_t w);
 static uint32_t ElfIo_Convert32U(uint32_t dw);
 static int32_t ElfIo_Convert32S(int32_t dw);
-
-static const  char *Elf_MachineNames[]={
-    "Unknown machine.",
-    "No machine.",
-    "AT&T WE 32100.",
-    "SPARC.",
-    "Intel 80386.",
-    "Motorola 68000.",
-    "Motorola 88000.",
-    "Reserved for future use.",
-    "Intel 80860.",
-    "MIPS I Architecture.",
-    "IBM System/370 Processor.",
-    "MIPS RS3000 Little-endian.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Hewlett-Packard PA-RISC.",
-    "Reserved for future use.",
-    "Fujitsu VPP500.",
-    "Enhanced instruction set SPARC.",
-    "Intel 80960.",
-    "PowerPC.",
-    "64-bit PowerPC.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "NEC V800.",
-    "Fujitsu FR20.",
-    "TRW RH-32.",
-    "Motorola RCE.",
-    "Advanced RISC Machines ARM.",
-    "Digital Alpha.",
-    "Hitachi SH.",
-    "SPARC Version 9.",
-    "Siemens Tricore embedded processor.",
-    "Argonaut RISC Core, Argonaut Technologies Inc.",
-    "Hitachi H8/300.",
-    "Hitachi H8/300H.",
-    "Hitachi H8S.",
-    "Hitachi H8/500.",
-    "Intel IA-64 processor architecture.",
-    "Stanford MIPS-X.",
-    "Motorola ColdFire.",
-    "Motorola M68HC12.",
-    "Fujitsu MMA Multimedia Accelerator.",
-    "Siemens PCP.",
-    "Sony nCPU embedded RISC processor.",
-    "Denso NDR1 microprocessor.",
-    "Motorola Star*Core processor.",
-    "Toyota ME16 processor. ",
-    "STMicroelectronics ST100 processor.",
-    "Advanced Logic Corp. TinyJ embedded processor family.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Reserved for future use.",
-    "Siemens FX66 microcontroller.",
-    "STMicroelectronics ST9+ 8/16 bit microcontroller.",
-    "STMicroelectronics ST7 8-bit microcontroller.",
-    "Motorola MC68HC16 Microcontroller.",
-    "Motorola MC68HC11 Microcontroller.",
-    "Motorola MC68HC08 Microcontroller.",
-    "Motorola MC68HC05 Microcontroller.",
-    "Silicon Graphics SVx.",
-    "STMicroelectronics ST19 8-bit microcontroller.",
-    "Digital VAX.",
-    "Axis Communications 32-bit embedded processor.",
-    "Infineon Technologies 32-bit embedded processor.",
-    "Element 14 64-bit DSP Processor.",
-    "LSI Logic 16-bit DSP Processor.",
-    "Donald Knuth's educational 64-bit processor.",
-    "Harvard University machine-independent object files .",
-    "SiTera Prism."
-};
-
-
-#define ELF_NUM_OF_MACHINES (SIZEOF_ARRAY(Elf_MachineNames)-1)
-
-
-Elf_EndianessType ElfIo_CheckHostEndianess(void)
-{
-    const uint16_t foo=0xaa55u;
-    uint8_t const * const ptr=(uint8_t * const)&foo;
-    
-    if (0[ptr]==0xaa) {
-        return ELF_BIG_ENDIAN;   
-    } else {
-        return ELF_LITTLE_ENDIAN;
-    }
-}
 
 
 ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode mode)
@@ -206,17 +106,17 @@ ElfIo_StatusType ElfIo_Init(ElfIo_Struct *str,char * const file_name,ElfIo_Mode 
 
             switch (ELF_DATA(str->header)) {
                 case ELFDATA2LSB:
-                    str->encoding=ELF_LITTLE_ENDIAN;
-                        break;
+                    str->encoding=UTL_LITTLE_ENDIAN;
+					break;
                 case ELFDATA2MSB:
-                    str->encoding=ELF_BIG_ENDIAN;                    
-                        break;
+                    str->encoding=UTL_BIG_ENDIAN;                    
+					break;
                 default:
-                    str->encoding=ELF_INVALID_ENCODING;
+                    str->encoding=UTL_INVALID_ENCODING;
                     return ELFIO_E_INVALID;
             }
 
-            if (ElfIo_CheckHostEndianess()!=str->encoding) {
+            if (Utl_CheckHostEndianess()!=str->encoding) {
                 /* Adjust Endianess. */
                 ELF_TYPE(str->header)       = ElfIo_Convert16U(ELF_TYPE(str->header));
                 ELF_MACHINE(str->header)    = ElfIo_Convert16U(ELF_MACHINE(str->header));
@@ -310,27 +210,6 @@ int32_t ElfIo_Convert32S(int32_t dw)
 }
 
 
-char const * ElfIo_GetMachineName(ElfIo_Struct const * str)
-{
-    Elf32_Half table_index=0U;
-    char const * ptr;
-
-    ELFIO_WEAK_PARAM_CHECK(str);
-
-    table_index=ELF_MACHINE(str->header);
-
-    if (table_index >= ELF_NUM_OF_MACHINES) {
-        table_index=0U;
-    } else {
-        table_index++;
-    }
-
-    ptr=Elf_MachineNames[table_index];
- 
-    return ptr;
-}
-
-
 ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str)
 {
     Elf32_Off hdr_offs;
@@ -362,7 +241,7 @@ ElfIo_StatusType ElfIo_ReadProgramTable(ElfIo_Struct const * str)
             return ELFIO_E_FILEIO;
         }
 
-        if (ElfIo_CheckHostEndianess()!=str->encoding) {
+        if (Utl_CheckHostEndianess()!=str->encoding) {
             /* Adjust Endianess. */
             ELF_PH_TYPE(header)   = ElfIo_Convert32U(ELF_PH_TYPE(header));
             ELF_PH_OFFSET(header) = ElfIo_Convert32U(ELF_PH_OFFSET(header));
@@ -411,7 +290,7 @@ ElfIo_StatusType ElfIo_ReadSectionHeaderTable(ElfIo_Struct const * str)
             return ELFIO_E_FILEIO;
         }
 
-        if (ElfIo_CheckHostEndianess()!=str->encoding) {
+        if (Utl_CheckHostEndianess()!=str->encoding) {
             /* Adjust Endianess. */
             ELF_SH_NAME(section_header)        = ElfIo_Convert32U(ELF_SH_NAME(section_header));
             ELF_SH_TYPE(section_header)        = ElfIo_Convert32U(ELF_SH_TYPE(section_header));
@@ -485,7 +364,7 @@ const Elf32_Sym ElfIO_GetSymbol(ElfIo_Struct const * str,Elf32_Word section,Elf3
 
     sym=((Elf32_Sym *)ElfIO_GetSection(str,section)->data)[idx];
 
-    if (ElfIo_CheckHostEndianess()!=str->encoding) {    // todo: Endianess der Symbole konvertieren!!!
+    if (Utl_CheckHostEndianess()!=str->encoding) {    // todo: Endianess der Symbole konvertieren!!!
         sym.st_name=ElfIo_Convert32U(sym.st_name);
         sym.st_value=ElfIo_Convert32U(sym.st_value);
         sym.st_size=ElfIo_Convert32U(sym.st_size);
