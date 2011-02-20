@@ -22,19 +22,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#if !defined(__MEM_SECT_H)
-#define __MEM_SECT_H
+#if !defined(__MOSTEC_H)
+#define __MOSTEC_H
 
-#include "StdTypes.h"
+#include "TextFile.h"
 
-typedef struct tagMemorySection {
-    uint32_t start_address;
-    uint32_t length;
-    uint8_t *data;
-} MemorySection;
-
-MemorySection * MemorySection_Init(uint32_t length);
-void MemorySection_Deinit(MemorySection * ms);
-
-#endif /* __MEM_SECT_H */
-
+#endif /* __MOSTEC_H */

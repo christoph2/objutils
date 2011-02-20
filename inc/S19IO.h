@@ -22,19 +22,40 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#if !defined(__MEM_SECT_H)
-#define __MEM_SECT_H
+#if !defined(__S19IO_H)
+#define __S19IO_H
 
-#include "StdTypes.h"
+#include "TextFile.h"
 
-typedef struct tagMemorySection {
-    uint32_t start_address;
-    uint32_t length;
-    uint8_t *data;
-} MemorySection;
+typedef enum tagS19Io_StatusType {
+    S19IO_E_OK,
+    S19IO_E_FILEIO,
+    S19IO_E_INVALID,
+    S19IO_E_STATE,
+    S19IO_E_VALUE,
+    S19IO_E_LIMIT
+} S19Io_StatusType;
 
-MemorySection * MemorySection_Init(uint32_t length);
-void MemorySection_Deinit(MemorySection * ms);
+typedef enum tagS19Io_Mode {
+    S19IO_INVALID_MODE,
+    S19IO_READ,
+    S19IO_WRITE
+} S19Io_Mode;
 
-#endif /* __MEM_SECT_H */
+typedef struct tagS19Io_Struct {
+    FILE * stream;
+    char const * file_name;
+    bool file_opened;
+    uint8_t guard;
+    S19Io_Mode mode;
+} S19Io_Struct;
+
+S19Io_StatusType S19Io_Init(S19Io_Struct * str,char * const file_name,S19Io_Mode mode);
+bool S19Io_LineScanning(char const * line,TxtIo_LineInfoType *info);
+
+#if 0
+ElfIo_StatusType ElfIo_Deinit(S19Io_Struct *str);
+#endif
+
+#endif /* __S19IO_H */
 
