@@ -24,8 +24,8 @@ CC2VMC
 65530 202 54540 130 6 65535 65535 65535 65535 65535 65535 65535 65535 65535 65535 65535
 """
 
-VMC_FILE = re.compile(r'''CC2VMC\s(?P<numberOfConstantBytes>\d+)\s(?P<numberOfCodeWords>\d+)\s\s
-    (?P<constBytes>(\d+\s)+.*?)\s\s(?P<codeWords>(\d+\s)+.*)''', re.VERBOSE | re.M | re.DOTALL)
+VMC_FILE = re.compile(r'''CC2VMC\s(?P<numberOfConstantBytes>\d+)\s(?P<numberOfCodeWords>\d+)[\n]{2}
+    (?P<constBytes>(\d+\s)+.*?)[\n]{2}(?P<codeWords>(\d+\s)+.*)''', re.VERBOSE | re.M | re.DOTALL)
 
 def bswap(value):
     hi = (value & 0xff00) >> 8
