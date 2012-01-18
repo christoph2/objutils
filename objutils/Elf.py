@@ -1,6 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+__version__ = "0.1.0"
+
+__copyright__ = """
+    pyObjUtils - Object file library for Python.
+
+   (C) 2010-2012 by Christoph Schueler <github.com/Christoph2,
+                                        cpu12.gems@googlemail.com>
+
+   All Rights Reserved
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+"""
+
 from _Enum import Enum
 from collections import namedtuple
 import sys
@@ -147,13 +172,11 @@ class ELFMachineType(object):
     EM_960          = 19     # Intel 80960.
     EM_PPC          = 20     # PowerPC.
     EM_PPC64        = 21     # 64-bit PowerPC.
-    '''
-22 => [ :S390, 'IBM S390' ],
-23 => [ :SPU, 'Sony/Toshiba/IBM SPU' ],
-    '''
+    EM_S390         = 22     # IBM S390.
+    EM_SPU          = 23     # Sony/Toshiba/IBM SPU.
 
     '''
-    RESERVED 22-35 Reserved for future use
+    RESERVED 24-35 Reserved for future use
     '''
 
     EM_V800         = 36     # NEC V800.
@@ -173,7 +196,7 @@ class ELFMachineType(object):
     EM_IA_64        = 50     # Intel IA-64 processor architecture.
     EM_MIPS_X       = 51     # Stanford MIPS-X.
     EM_COLDFIRE     = 52     # Motorola ColdFire.
-    EM_68HC12       = 53     # Motorola M68HC12.
+    EM_68HC12       = 53     # Motorola M68HC12.    # could also be 0x4D12 (s. HC12EABI)
     EM_MMA          = 54     # Fujitsu MMA Multimedia Accelerator.
     EM_PCP          = 55     # Siemens PCP.
     EM_NCPU         = 56     # Sony nCPU embedded RISC processor.
@@ -203,16 +226,16 @@ class ELFMachineType(object):
     EM_MMIX         = 80     # Donald Knuth's educational 64-bit processor.
     EM_HUANY        = 81     # Harvard University machine-independent object files .
     EM_PRISM        = 82     # SiTera Prism.
-#    '''
-#            83 => [ :AVR, 'Atmel AVR 8-bit microcontroller' ],
-#            84 => [ :FR30, 'Fujitsu FR30' ],
-#            85 => [ :D10V, 'Mitsubishi D10V' ],
-#            86 => [ :D30V, 'Mitsubishi D30V' ],
-#            87 => [ :V850, 'NEC v850' ],
-#            88 => [ :M32R, 'Mitsubishi M32R' ],
-#            89 => [ :MN10300, 'Matsushita MN10300' ],
-#            90 => [ :MN10200, 'Matsushita MN10200' ],
-#            91 => [ :PJ, 'picoJava' ],
+    EM_AVR          = 83     # Atmel AVR 8-bit microcontroller.
+    EM_FR30         = 84     # Fujitsu FR30.
+    EM_D10V         = 85     # Mitsubishi D10V.
+    EM_D30V         = 86     # Mitsubishi D30V.
+    EM_V850         = 87     # NEC v850.
+    EM_M32R         = 88     # Mitsubishi M32R.
+    EM_MN10300      = 89     # Matsushita MN10300.
+    EM_MN10200      = 90     # Matsushita MN10200.
+    EM_PJ           = 91     # picoJava.
+
 #            92 => [ :OpenRISC, 'OpenRISC 32-bit embedded processor' ],
 #            93 => [ :ARC_A5, 'ARC Cores Tangent-A5' ],
 #            94 => [ :Xtensa, 'Tensilica Xtensa Architecture' ],
@@ -303,6 +326,8 @@ ELF_MACHINE_NAMES={
     ELFMachineType.EM_960          : "Intel 80960.",
     ELFMachineType.EM_PPC          : "PowerPC.",
     ELFMachineType.EM_PPC64        : "64-bit PowerPC.",
+    ELFMachineType.EM_S390         : "IBM S390.",
+    ELFMachineType.EM_SPU          : "Sony/Toshiba/IBM SPU.",
     ELFMachineType.EM_V800         : "NEC V800.",
     ELFMachineType.EM_FR20         : "Fujitsu FR20.",
     ELFMachineType.EM_RH32         : "TRW RH-32.",
@@ -349,7 +374,16 @@ ELF_MACHINE_NAMES={
     ELFMachineType.EM_ZSP          : "LSI Logic 16-bit DSP Processor.",
     ELFMachineType.EM_MMIX         : "Donald Knuth's educational 64-bit processor.",
     ELFMachineType.EM_HUANY        : "Harvard University machine-independent object files .",
-    ELFMachineType.EM_PRISM        : "SiTera Prism."
+    ELFMachineType.EM_PRISM        : "SiTera Prism.",
+    ELFMachineType.EM_AVR          : 'Atmel AVR 8-bit microcontroller',
+    ELFMachineType.EM_FR30         : 'Fujitsu FR30',
+    ELFMachineType.EM_D10V         : 'Mitsubishi D10V',
+    ELFMachineType.EM_D30V         : 'Mitsubishi D30V',
+    ELFMachineType.EM_V850         : 'NEC v850',
+    ELFMachineType.EM_M32R         : 'Mitsubishi M32R',
+    ELFMachineType.EM_MN10300      : 'Matsushita MN10300',
+    ELFMachineType.EM_MN10200      : 'Matsushita MN10200',
+    ELFMachineType.EM_PJ           : 'picoJava',
 }
 
 
@@ -574,15 +608,15 @@ ELF_PHDR_SIZE = struct.calcsize(PHDR_FMT)
 Elf32_Phdr=namedtuple("Elf32_Phdr","p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
 
 
-PT_NULL             =0
-PT_LOAD             =1
-PT_DYNAMIC          =2
-PT_INTERP           =3
-PT_NOTE             =4
-PT_SHLIB            =5
-PT_PHDR             =6
-PT_LOPROC           =0x70000000
-PT_HIPROC           =0x7fffffff
+PT_NULL             = 0
+PT_LOAD             = 1
+PT_DYNAMIC          = 2
+PT_INTERP           = 3
+PT_NOTE             = 4
+PT_SHLIB            = 5
+PT_PHDR             = 6
+PT_LOPROC           = 0x70000000
+PT_HIPROC           = 0x7fffffff
 
 PF_X                = 0x1           # Execute.
 PF_W                = 0x2           # Write.
@@ -803,7 +837,6 @@ class ELFSectionHeaderTable(object):
         self.parent=parent
         parent.inFile.seek(atPosition,os.SEEK_SET)
         data=parent.inFile.read(ELF_SECTION_SIZE)
-        self.image=str()    # self.image=bytearray()
 
         elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix,SEC_FMT),data)
         d=Elf32_Shdr(*elfProgramHeaderTable)
@@ -814,8 +847,9 @@ class ELFSectionHeaderTable(object):
         if self.shType not in (SHT_NOBITS,SHT_NULL) and self.shSize>0:
             pos=self.shOffset
             parent.inFile.seek(pos,os.SEEK_SET)
-            #self.image=bytearray(parent.inFile.read(self.shSize))
             self.image=parent.inFile.read(self.shSize)
+        else:
+            self.image=None
 
         if self.shType in (SHT_SYMTAB,SHT_DYNSYM):
             self.symbols={}
@@ -825,6 +859,9 @@ class ELFSectionHeaderTable(object):
                 symData=struct.unpack("%s%s" % (parent.byteorderPrefix,SYMTAB_FMT),data)
                 sym=Elf32_Sym(*symData)
                 self.symbols[idx]=sym
+
+        if self.shType in (SHT_REL,SHT_RELA):
+            pass
 
     shAddress=Alias("sh_addr")
     shAddressAlign=Alias("sh_addralign")
@@ -865,33 +902,41 @@ class ELFSectionHeaderTable(object):
         #print self.parent
 
 
+class ELFInvalidHeaderError(Exception): pass
+
 class ELFProgramHeaderTable(object):
     def __init__(self,parent,atPosition=0):
         parent.inFile.seek(atPosition,os.SEEK_SET)
         data=parent.inFile.read(ELF_PHDR_SIZE)
 
-        elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix,PHDR_FMT),data)
+        try:
+            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix,PHDR_FMT),data)
+        except struct.error:
+            raise ELFInvalidHeaderError()
+
         d=Elf32_Phdr(*elfProgramHeaderTable)
         self.data=Null()
         for key,value in ((d._fields[i],d[i]) for i in range(len(d))):
             setattr(self.data,key,value)
+        parent.inFile.seek(d.p_offset,os.SEEK_SET)
+        self.image=parent.inFile.read(d.p_filesz)
+        if d.p_type in (PT_DYNAMIC,PT_INTERP,PT_NOTE,PT_SHLIB,PT_PHDR):
+            pass
 
     @property
     def phTypeName(self):
         NAMES={
-            0: "NO_TYPE",
-            1: "RELOC",
-            2: "EXEC",
-            3: "SHARED",
-            4: "CORE"
+            0 : 'NULL',
+            1 : 'LOAD',
+            2 : 'DYNAMIC',
+            3 : 'INTERP',
+            4 : 'NOTE',
+            5 : 'SHLIB',
+            6 : 'PHDR'
         }
-        try:
-            type_=ELFType(self.phType)
-        except AttributeError:
-            return "RES"
-        if type_<=ELFType.ET_CORE:
+        if self.phType in NAMES:
             return NAMES.get(self.phType)
-        elif ELFType.ET_LOPROC < type_ <=ELFType.ET_HIPROC:
+        elif PT_LOPROC <= self.phType <= PT_HIPROC:
             return "PROCESSOR SPECIFIC"
         else:
             return "RES"
@@ -905,6 +950,24 @@ class ELFProgramHeaderTable(object):
     phFlags=Alias("p_flags")
     phAlign=Alias("p_align")
 
+def getSpecialSectionName(section):
+    if section == SHN_UNDEF:
+        return "UNDEF"
+    elif section == SHN_ABS:
+        return "ABS"
+    elif section == SHN_COMMON:
+        return "COMMON"
+    elif SHN_LOPROC <= section <= SHN_HIPROC:
+        return "PROC"
+    elif SHN_COMMON < section <= SHN_HIRESERVE:
+        return "RES"
+    else:
+        return None
+
+class Object(object):
+    def __init__(self,copyFrom):
+        for key,value in copyFrom._asdict().items():
+            setattr(self,key,value)
 
 class Reader(object):
     def __init__(self,inFile):
@@ -928,6 +991,29 @@ class Reader(object):
             for _ in range(self.header.elfNumberOfSHs):
                 self.sectionHeaders.append(ELFSectionHeaderTable(self,pos))
                 pos+=self.header.elfSHTEntrySize
+
+        for idx,sectionHeader in enumerate(self.sectionHeaders):
+            if sectionHeader.shType in (SHT_SYMTAB,SHT_DYNSYM):
+                for _,symbol in sectionHeader.symbols.items():
+                    o=Object(symbol)
+                    o.sectionName=getSpecialSectionName(symbol.st_shndx)
+            elif sectionHeader.shType in (SHT_REL,SHT_RELA):
+                symtab = sectionHeader.shLink
+                sectionToModify = sectionHeader.shInfo
+                if sectionHeader.shType == SHT_REL:
+                    entry = Elf32_Rel
+                    entrySize = ELF_RELOCATION_SIZE
+                else:
+                    entry = Elf32_Rela
+                    entrySize = ELF_RELOCATION_A_SIZE
+                img = sectionHeader.image
+                offset =0
+                for pos in range(len(img) / entrySize):
+                    ddd = img[offset : offset + entrySize]
+                    offset += entrySize
+
+            elif sectionHeader==SHT_NOTE:
+                pass
 
     def getString(self,tableIndex,entry):
         if (tableIndex,entry) in self._stringCache:
