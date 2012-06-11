@@ -42,7 +42,7 @@ Segment-Types: generic,code,const,bss,... (s. ELF!?)
 '''
 
 """
-todo:   Create a base class for Reader/Writer common functionality.
+TODO:   Create a base class for Reader/Writer common functionality.
         FactoryMethods ???
         Logger!!!
         Parameter ['exceptionsOnErrors'].
@@ -107,7 +107,7 @@ class SegmentType(object):
             raise IndexError()
 
     def __repr__(self):
-        return "Segment (address: '0X%X' len: '%d' data: '%s')" % (self.address, self.length, self.data)
+        return "Segment (address: '0X%X' len: '%d')" % (self.address, self.length)
 
 
 class InvalidRecordTypeError(Exception): pass
@@ -258,4 +258,3 @@ class Reader(object):
 
     def parseData(self, line, formatType):
         return True
-
