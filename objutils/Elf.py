@@ -28,16 +28,17 @@ __copyright__ = """
 
 from _Enum import Enum
 from collections import namedtuple
-import sys
+import mmap
 import os
+import sys
 import types
 import struct
+
 
 #
 #   Reference:
 #   ----------
-#   Tool Interface Standard (TIS)
-#   Executable and Linking Format (ELF) Specification Version 1.2
+#   Tool Interface Standard (TIS): Executable and Linking Format (ELF) Specification Version 1.2
 #
 
 
@@ -60,15 +61,15 @@ typedef uint32_t    Elf32_Word;     /*  4       4       Unsigned large integer  
 ##
 ##
 
-EI_NIDENT=16        # Size of e_ident[].
+EI_NIDENT = 16        # Size of e_ident[].
 
-HDR_FMT="B"*EI_NIDENT+"HHIIIIIHHHHHH"
+HDR_FMT = "B" * EI_NIDENT + "HHIIIIIHHHHHH"
 
-ELF_HEADER_SIZE=struct.calcsize(HDR_FMT)
+ELF_HEADER_SIZE = struct.calcsize(HDR_FMT)
 
-assert(struct.calcsize(HDR_FMT)==52)    # todo: Unittest!!!
+assert(struct.calcsize(HDR_FMT) == 52)    # todo: Unittest!!!
 
-Elf32_Ehdr=namedtuple("Elf32_Ehdr","""e_ident0 e_ident1 e_ident2 e_ident3 e_ident4 e_ident5 e_ident6
+Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_ident0 e_ident1 e_ident2 e_ident3 e_ident4 e_ident5 e_ident6
     e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15
     e_type e_machine e_version e_entry e_phoff e_shoff e_flags e_ehsize e_phentsize e_phnum
     e_shentsize e_shnum e_shstrndx""")
@@ -108,33 +109,7 @@ class ELFType(object):
     #ET_HIPROC   ((Elf32_Half)0xffff)    /* Processor-specific.      */
 
 
-'''
-
-  class OsAbi < Value
-    fill(
-             0 => [ :SysV, 'UNIX System V ABI' ],
-             1 => [ :HPUX, 'HP-UX' ],
-             2 => [ :NetBSD, 'NetBSD' ],
-             3 => [ :Linux, 'Linux' ],
-             4 => [ :Hurd, 'Hurd' ],
-             6 => [ :Solaris, 'Solaris' ],
-             7 => [ :Aix, 'IBM AIX' ],
-             8 => [ :Irix, 'SGI Irix' ],
-             9 => [ :FreeBSD, 'FreeBSD' ],
-            10 => [ :Tru64, 'Compaq TRU64 UNIX' ],
-            11 => [ :Modesto, 'Novell Modesto' ],
-            12 => [ :OpenBSD, 'OpenBSD' ],
-            13 => [ :OpenVMS, 'OpenVMS' ],
-            14 => [ :NSK, 'Hewlett-Packard Non-Stop Kernel' ],
-            15 => [ :AROS, 'AROS' ],
-            16 => [ :FenixOS, 'FenixOS' ],
-            97 => [ :ARM, 'ARM' ],
-           255 => [ :Standalone, 'Standalone (embedded) application' ]
-         )
-  end
-'''
-
-ELF_TYPE_NAMES={
+ELF_TYPE_NAMES = {
     ELFType.ET_NONE : "No file type.",
     ELFType.ET_REL  : "Relocatable file.",
     ELFType.ET_EXEC : "Executable file.",
@@ -145,245 +120,312 @@ ELF_TYPE_NAMES={
 
 @Enum
 class ELFMachineType(object):
-    EM_NONE         = 0      # No machine.
-    EM_M32          = 1      # AT&T WE 32100.
-    EM_SPARC        = 2      # SPARC.
-    EM_386          = 3      # Intel 80386.
-    EM_68K          = 4      # Motorola 68000.
-    EM_88K          = 5      # Motorola 88000.
+    EM_NONE         =  0      # No machine.
+    EM_M32          =  1      # AT&T WE 32100.
+    EM_SPARC        =  2      # SPARC.
+    EM_386          =  3      # Intel 80386.
+    EM_68K          =  4      # Motorola 68000.
+    EM_88K          =  5      # Motorola 88000.
 
     '''
     RESERVED 6 Reserved for future use
     '''
 
-    EM_860          = 7      # Intel 80860.
-    EM_MIPS         = 8      # MIPS I Architecture.
-    EM_S370         = 9      # IBM System/370 Processor.
-    EM_MIPS_RS3_LE  = 10     # MIPS RS3000 Little-endian.
+    EM_860          =  7      # Intel 80860.
+    EM_MIPS         =  8      # MIPS I Architecture.
+    EM_S370         =  9      # IBM System/370 Processor.
+    EM_MIPS_RS3_LE  =  10     # MIPS RS3000 Little-endian.
 
     '''
     RESERVED 11-14 Reserved for future use
     '''
 
-    EM_PARISC       = 15     # Hewlett-Packard PA-RISC.
-    RESERVED        = 16     # Reserved for future use.
-    EM_VPP500       = 17     # Fujitsu VPP500.
-    EM_SPARC32PLUS  = 18     # Enhanced instruction set SPARC.
-    EM_960          = 19     # Intel 80960.
-    EM_PPC          = 20     # PowerPC.
-    EM_PPC64        = 21     # 64-bit PowerPC.
-    EM_S390         = 22     # IBM S390.
-    EM_SPU          = 23     # Sony/Toshiba/IBM SPU.
+    EM_PARISC       =  15     # Hewlett-Packard PA-RISC.
+    RESERVED        =  16     # Reserved for future use.
+    EM_VPP500       =  17     # Fujitsu VPP500.
+    EM_SPARC32PLUS  =  18     # Enhanced instruction set SPARC.
+    EM_960          =  19     # Intel 80960.
+    EM_PPC          =  20     # PowerPC.
+    EM_PPC64        =  21     # 64-bit PowerPC.
+    EM_S390         =  22     # IBM S390.
+    EM_SPU          =  23     # Sony/Toshiba/IBM SPU.
 
     '''
     RESERVED 24-35 Reserved for future use
     '''
 
-    EM_V800         = 36     # NEC V800.
-    EM_FR20         = 37     # Fujitsu FR20.
-    EM_RH32         = 38     # TRW RH-32.
-    EM_RCE          = 39     # Motorola RCE.
-    EM_ARM          = 40     # Advanced RISC Machines ARM.
-    EM_ALPHA        = 41     # Digital Alpha.
-    EM_SH           = 42     # Hitachi SH.
-    EM_SPARCV9      = 43     # SPARC Version 9.
-    EM_TRICORE      = 44     # Siemens Tricore embedded processor.
-    EM_ARC          = 45     # Argonaut RISC Core, Argonaut Technologies Inc.
-    EM_H8_300       = 46     # Hitachi H8/300.
-    EM_H8_300H      = 47     # Hitachi H8/300H.
-    EM_H8S          = 48     # Hitachi H8S.
-    EM_H8_500       = 49     # Hitachi H8/500.
-    EM_IA_64        = 50     # Intel IA-64 processor architecture.
-    EM_MIPS_X       = 51     # Stanford MIPS-X.
-    EM_COLDFIRE     = 52     # Motorola ColdFire.
-    EM_68HC12       = 53     # Motorola M68HC12.    # could also be 0x4D12 (s. HC12EABI)
-    EM_MMA          = 54     # Fujitsu MMA Multimedia Accelerator.
-    EM_PCP          = 55     # Siemens PCP.
-    EM_NCPU         = 56     # Sony nCPU embedded RISC processor.
-    EM_NDR1         = 57     # Denso NDR1 microprocessor.
-    EM_STARCORE     = 58     # Motorola Star*Core processor.
-    EM_ME16         = 59     # Toyota ME16 processor.
-    EM_ST100        = 60     # STMicroelectronics ST100 processor.
-    EM_TINYJ        = 61     # Advanced Logic Corp. TinyJ embedded processor family.
-    EM_X8664        = 62     # AMD x86-64 architecture.
-    EM_PDSP         = 63     # Sony DSP Processor.
-    EM_PDP10        = 64     # DEC PDP-10
-    EM_PDP11        = 65     # DEC PDP-11
-    EM_FX66         = 66     # Siemens FX66 microcontroller.
-    EM_ST9PLUS      = 67     # STMicroelectronics ST9+ 8/16 bit microcontroller.
-    EM_ST7          = 68     # STMicroelectronics ST7 8-bit microcontroller.
-    EM_68HC16       = 69     # Motorola MC68HC16 Microcontroller.
-    EM_68HC11       = 70     # Motorola MC68HC11 Microcontroller.
-    EM_68HC08       = 71     # Motorola MC68HC08 Microcontroller.
-    EM_68HC05       = 72     # Motorola MC68HC05 Microcontroller.
-    EM_SVX          = 73     # Silicon Graphics SVx.
-    EM_ST19         = 74     # STMicroelectronics ST19 8-bit microcontroller.
-    EM_VAX          = 75     # Digital VAX.
-    EM_CRIS         = 76     # Axis Communications 32-bit embedded processor.
-    EM_JAVELIN      = 77     # Infineon Technologies 32-bit embedded processor.
-    EM_FIREPATH     = 78     # Element 14 64-bit DSP Processor.
-    EM_ZSP          = 79     # LSI Logic 16-bit DSP Processor.
-    EM_MMIX         = 80     # Donald Knuth's educational 64-bit processor.
-    EM_HUANY        = 81     # Harvard University machine-independent object files .
-    EM_PRISM        = 82     # SiTera Prism.
-    EM_AVR          = 83     # Atmel AVR 8-bit microcontroller.
-    EM_FR30         = 84     # Fujitsu FR30.
-    EM_D10V         = 85     # Mitsubishi D10V.
-    EM_D30V         = 86     # Mitsubishi D30V.
-    EM_V850         = 87     # NEC v850.
-    EM_M32R         = 88     # Mitsubishi M32R.
-    EM_MN10300      = 89     # Matsushita MN10300.
-    EM_MN10200      = 90     # Matsushita MN10200.
-    EM_PJ           = 91     # picoJava.
+    EM_V800         =  36     # NEC V800.
+    EM_FR20         =  37     # Fujitsu FR20.
+    EM_RH32         =  38     # TRW RH-32.
+    EM_RCE          =  39     # Motorola RCE.
+    EM_ARM          =  40     # Advanced RISC Machines ARM.
+    EM_ALPHA        =  41     # Digital Alpha.
+    EM_SH           =  42     # Hitachi SH.
+    EM_SPARCV9      =  43     # SPARC Version 9.
+    EM_TRICORE      =  44     # Siemens Tricore embedded processor.
+    EM_ARC          =  45     # Argonaut RISC Core, Argonaut Technologies Inc.
+    EM_H8_300       =  46     # Hitachi H8/300.
+    EM_H8_300H      =  47     # Hitachi H8/300H.
+    EM_H8S          =  48     # Hitachi H8S.
+    EM_H8_500       =  49     # Hitachi H8/500.
+    EM_IA_64        =  50     # Intel IA-64 processor architecture.
+    EM_MIPS_X       =  51     # Stanford MIPS-X.
+    EM_COLDFIRE     =  52     # Motorola ColdFire.
+    EM_68HC12       =  53     # Motorola M68HC12.    # could also be 0x4D12 (s. HC12EABI)
+    EM_MMA          =  54     # Fujitsu MMA Multimedia Accelerator.
+    EM_PCP          =  55     # Siemens PCP.
+    EM_NCPU         =  56     # Sony nCPU embedded RISC processor.
+    EM_NDR1         =  57     # Denso NDR1 microprocessor.
+    EM_STARCORE     =  58     # Motorola Star*Core processor.
+    EM_ME16         =  59     # Toyota ME16 processor.
+    EM_ST100        =  60     # STMicroelectronics ST100 processor.
+    EM_TINYJ        =  61     # Advanced Logic Corp. TinyJ embedded processor family.
+    EM_X8664        =  62     # AMD x86-64 architecture.
+    EM_PDSP         =  63     # Sony DSP Processor.
+    EM_PDP10        =  64     # DEC PDP-10
+    EM_PDP11        =  65     # DEC PDP-11
+    EM_FX66         =  66     # Siemens FX66 microcontroller.
+    EM_ST9PLUS      =  67     # STMicroelectronics ST9+ 8/16 bit microcontroller.
+    EM_ST7          =  68     # STMicroelectronics ST7 8-bit microcontroller.
+    EM_68HC16       =  69     # Motorola MC68HC16 Microcontroller.
+    EM_68HC11       =  70     # Motorola MC68HC11 Microcontroller.
+    EM_68HC08       =  71     # Motorola MC68HC08 Microcontroller.
+    EM_68HC05       =  72     # Motorola MC68HC05 Microcontroller.
+    EM_SVX          =  73     # Silicon Graphics SVx.
+    EM_ST19         =  74     # STMicroelectronics ST19 8-bit microcontroller.
+    EM_VAX          =  75     # Digital VAX.
+    EM_CRIS         =  76     # Axis Communications 32-bit embedded processor.
+    EM_JAVELIN      =  77     # Infineon Technologies 32-bit embedded processor.
+    EM_FIREPATH     =  78     # Element 14 64-bit DSP Processor.
+    EM_ZSP          =  79     # LSI Logic 16-bit DSP Processor.
+    EM_MMIX         =  80     # Donald Knuth's educational 64-bit processor.
+    EM_HUANY        =  81     # Harvard University machine-independent object files .
+    EM_PRISM        =  82     # SiTera Prism.
+    EM_AVR          =  83     # Atmel AVR 8-bit microcontroller.
+    EM_FR30         =  84     # Fujitsu FR30.
+    EM_D10V         =  85     # Mitsubishi D10V.
+    EM_D30V         =  86     # Mitsubishi D30V.
+    EM_V850         =  87     # NEC v850.
+    EM_M32R         =  88     # Mitsubishi M32R.
+    EM_MN10300      =  89     # Matsushita MN10300.
+    EM_MN10200      =  90     # Matsushita MN10200.
+    EM_PJ           =  91     # picoJava.
+    EM_OPENRISC     =  92     # OpenRISC 32-bit embedded processor.
+    EM_ARC_A5       =  93     # ARC Cores Tangent-A5.
+    EM_XTENSA       =  94     # Tensilica Xtensa Architecture.
+    EM_VIDEOCORE    =  95     # Alphamosaic VideoCore processor.
+    EM_TMM_GPP      =  96     # Thompson Multimedia General Purpose Processor.
+    EM_NS32K        =  97     # National Semiconductor 32000 series.
+    EM_TPC          =  98     # Tenor Network TPC processor.
+    EM_SNP1K        =  99     # Trebia SNP 1000 processor.
+    EM_ST200        = 100     # STMicroelectronics ST200 microcontroller.
+    EM_IP2K         = 101     # Ubicom IP2022 micro controller.
+    EM_MAX          = 102     # MAX Processor.
+    EM_CR           = 103     # National Semiconductor CompactRISC.
+    EM_F2MC16       = 104     # Fujitsu F2MC16.
+    EM_MSP430       = 105     # TI msp430 micro controller.
+    EM_BLACKFIN     = 106     # ADI Blackfin.
+    EM_SE_C33       = 107     # S1C33 Family of Seiko Epson processors.
+    EM_SEP          = 108     # Sharp embedded microprocessor.
+    EM_ARCA         = 109     # Arca RISC Microprocessor.
+    EM_UNICORE      = 110     # Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University.
+    EM_EXCESS       = 111     # eXcess: 16/32/64-bit configurable embedded CPU.
+    EM_DXP          = 112     # Icera Semiconductor Inc. Deep Execution Processor.
+    EM_ALTERA_NIOS2 = 113     # Altera Nios II soft-core processor.
+    EM_CRX          = 114     # National Semiconductor CRX.
+    EM_XGATE        = 115     # Motorola XGATE embedded processor.
+    EM_C166         = 116     # Infineon C16x/XC16x processor.
+    EM_M16C         = 117     # Renesas M16C series microprocessors.
+    EM_DSPIC30F     = 118     # Microchip Technology dsPIC30F Digital Signal Controller.
+    EM_CE           = 119     # Freescale Communication Engine RISC core.
+    EM_M32C         = 120     # Renesas M32C series microprocessors.
+    EM_TSK3000      = 131     # Altium TSK3000 core.
+    EM_RS08         = 132     # Freescale RS08 embedded processor.
+    EM_ECOG2        = 134     # Cyan Technology eCOG2 microprocessor.
+    EM_SCORE        = 135     # Sunplus Score.
+    EM_SCORE7       = 135     # Sunplus S+core7 RISC processor.
+    EM_DSP24        = 136     # New Japan Radio (NJR) 24-bit DSP Processor.
+    EM_VIDEOCORE3   = 137     # Broadcom VideoCore III processor.
+    EM_LATTICEMICO32= 138     # RISC processor for Lattice FPGA architecture.
+    EM_SE_C17       = 139     # Seiko Epson C17 family.
+    EM_TI_C6000     = 140     # Texas Instruments TMS320C6000 DSP family.
+    EM_TI_C2000     = 141     # Texas Instruments TMS320C2000 DSP family.
+    EM_TI_C5500     = 142     # Texas Instruments TMS320C55x DSP family.
+    EM_MMDSP_PLUS   = 160     # STMicroelectronics 64bit VLIW Data Signal Processor.
+    EM_CYPRESS_M8C  = 161     # Cypress M8C microprocessor.
+    EM_R32C         = 162     # Renesas R32C series microprocessors.
+    EM_TRIMEDIA     = 163     # NXP Semiconductors TriMedia architecture family.
+    EM_QDSP6        = 164     # QUALCOMM DSP6 Processor.
+    EM_I8051        = 165     # Intel 8051 and variants.
+    EM_STXP7X       = 166     # STMicroelectronics STxP7x family.
+    EM_NDS32        = 167     # Andes Technology compact code size embedded RISC processor family.
+    EM_ECOG1        = 168     # Cyan Technology eCOG1X family.
+    EM_ECOG1X       = 168     # Cyan Technology eCOG1X family.
+    EM_MAXQ30       = 169     # Dallas Semiconductor MAXQ30 Core Micro-controllers.
+    EM_XIMO16       = 170     # New Japan Radio (NJR) 16-bit DSP Processor.
+    EM_MANIK        = 171     # M2000 Reconfigurable RISC Microprocessor.
+    EM_CRAYNV2      = 172     # Cray Inc. NV2 vector architecture.
+    EM_RX           = 173     # Renesas RX family.
+    EM_METAG        = 174     # Imagination Technologies META processor architecture.
+    EM_MCST_ELBRUS  = 175     # MCST Elbrus general purpose hardware architecture.
+    EM_ECOG16       = 176     # Cyan Technology eCOG16 family.
+    EM_CR16         = 177     # National Semiconductor CompactRISC 16-bit processor.
+    EM_ETPU         = 178     # Freescale Extended Time Processing Unit.
+    EM_SLE9X        = 179     # Infineon Technologies SLE9X core.
+    EM_L1OM         = 180     # Intel L1OM.
+    EM_AVR32        = 185     # Atmel Corporation 32-bit microprocessor family.
+    EM_STM8         = 186     # STMicroeletronics STM8 8-bit microcontroller.
+    EM_TILE64       = 187     # Tilera TILE64 multicore architecture family.
+    EM_TILEPRO      = 188     # Tilera TILEPro multicore architecture family.
+    EM_MICROBLAZE   = 189     # Xilinx MicroBlaze 32-bit RISC soft processor core.
+    EM_CUDA         = 190     # NVIDIA CUDA architecture.
 
-#            92 => [ :OpenRISC, 'OpenRISC 32-bit embedded processor' ],
-#            93 => [ :ARC_A5, 'ARC Cores Tangent-A5' ],
-#            94 => [ :Xtensa, 'Tensilica Xtensa Architecture' ],
-#            95 => [ :VideoCore, 'Alphamosaic VideoCore processor' ],
-#            96 => [ :TMM_GPP, 'Thompson Multimedia General Purpose Processor' ],
-#            97 => [ :NS32K, 'National Semiconductor 32000 series' ],
-#            98 => [ :TPC, 'Tenor Network TPC processor' ],
-#            99 => [ :SNP1K, 'Trebia SNP 1000 processor' ],
-#           100 => [ :ST200, 'STMicroelectronics ST200 microcontroller' ],
-#           101 => [ :IP2K, 'Ubicom IP2022 micro controller' ],
-#           102 => [ :MAX, 'MAX Processor' ],
-#           103 => [ :CR, 'National Semiconductor CompactRISC' ],
-#           104 => [ :F2MC16, 'Fujitsu F2MC16' ],
-#           105 => [ :MSP430, 'TI msp430 micro controller' ],
-#           106 => [ :Blackfin, 'ADI Blackfin' ],
-#           107 => [ :SE_C33, 'S1C33 Family of Seiko Epson processors' ],
-#           108 => [ :SEP, 'Sharp embedded microprocessor' ],
-#           109 => [ :ARCA, 'Arca RISC Microprocessor' ],
-#           110 => [ :UNICORE, 'Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University' ],
-#           111 => [ :EXCESS, 'eXcess: 16/32/64-bit configurable embedded CPU' ],
-#           112 => [ :DXP, 'Icera Semiconductor Inc. Deep Execution Processor' ],
-#           113 => [ :Altera_Nios2, 'Altera Nios II soft-core processor' ],
-#           114 => [ :CRX, 'National Semiconductor CRX' ],
-#           115 => [ :XGATE, 'Motorola XGATE embedded processor' ],
-#           116 => [ :C166, 'Infineon C16x/XC16x processor' ],
-#           117 => [ :M16C, 'Renesas M16C series microprocessors' ],
-#           118 => [ :DSPIC30F, 'Microchip Technology dsPIC30F Digital Signal Controller' ],
-#           119 => [ :CE, 'Freescale Communication Engine RISC core' ],
-#           120 => [ :M32C, 'Renesas M32C series microprocessors' ],
-#           131 => [ :TSK3000, 'Altium TSK3000 core' ],
-#           132 => [ :RS08, 'Freescale RS08 embedded processor' ],
-#           134 => [ :ECOG2, 'Cyan Technology eCOG2 microprocessor' ],
-#           135 => [ :Score, 'Sunplus Score' ],
-#           135 => [ :Score7, 'Sunplus S+core7 RISC processor' ],
-#           136 => [ :DSP24, 'New Japan Radio (NJR) 24-bit DSP Processor' ],
-#           137 => [ :VideoCore3, 'Broadcom VideoCore III processor' ],
-#           138 => [ :LatticeMICO32, 'RISC processor for Lattice FPGA architecture' ],
-#           139 => [ :SE_C17, 'Seiko Epson C17 family' ],
-#           140 => [ :TI_C6000, 'Texas Instruments TMS320C6000 DSP family' ],
-#           141 => [ :TI_C2000, 'Texas Instruments TMS320C2000 DSP family' ],
-#           142 => [ :TI_C5500, 'Texas Instruments TMS320C55x DSP family' ],
-#           160 => [ :MMDSP_PLUS, 'STMicroelectronics 64bit VLIW Data Signal Processor' ],
-#           161 => [ :Cypress_M8C, 'Cypress M8C microprocessor' ],
-#           162 => [ :R32C, 'Renesas R32C series microprocessors' ],
-#           163 => [ :TriMedia, 'NXP Semiconductors TriMedia architecture family' ],
-#           164 => [ :QDSP6, 'QUALCOMM DSP6 Processor' ],
-#           165 => [ :I8051, 'Intel 8051 and variants' ],
-#           166 => [ :STXP7X, 'STMicroelectronics STxP7x family' ],
-#           167 => [ :NDS32, 'Andes Technology compact code size embedded RISC processor family' ],
-#           168 => [ :ECOG1, 'Cyan Technology eCOG1X family' ],
-#           168 => [ :ECOG1X, 'Cyan Technology eCOG1X family' ],
-#           169 => [ :MAXQ30, 'Dallas Semiconductor MAXQ30 Core Micro-controllers' ],
-#           170 => [ :XIMO16, 'New Japan Radio (NJR) 16-bit DSP Processor' ],
-#           171 => [ :MANIK, 'M2000 Reconfigurable RISC Microprocessor' ],
-#           172 => [ :CRAYNV2, 'Cray Inc. NV2 vector architecture' ],
-#           173 => [ :RX, 'Renesas RX family' ],
-#           174 => [ :METAG, 'Imagination Technologies META processor architecture' ],
-#           175 => [ :MCST_ELBRUS, 'MCST Elbrus general purpose hardware architecture' ],
-#           176 => [ :ECOG16, 'Cyan Technology eCOG16 family' ],
-#           177 => [ :CR16, 'National Semiconductor CompactRISC 16-bit processor' ],
-#           178 => [ :ETPU, 'Freescale Extended Time Processing Unit' ],
-#           179 => [ :SLE9X, 'Infineon Technologies SLE9X core' ],
-#           180 => [ :L1OM, 'Intel L1OM' ],
-#           185 => [ :AVR32, 'Atmel Corporation 32-bit microprocessor family' ],
-#           186 => [ :STM8, 'STMicroeletronics STM8 8-bit microcontroller' ],
-#           187 => [ :TILE64, 'Tilera TILE64 multicore architecture family' ],
-#           188 => [ :TILEPro, 'Tilera TILEPro multicore architecture family' ],
-#           189 => [ :MicroBlaze, 'Xilinx MicroBlaze 32-bit RISC soft processor core' ],
-#           190 => [ :CUDA, 'NVIDIA CUDA architecture' ],
-#           0x9026 => [ :Alpha, 'DEC Alpha' ]
-#    '''
 
-ELF_MACHINE_NAMES={
-    ELFMachineType.EM_NONE         : "No machine.",
-    ELFMachineType.EM_M32          : "AT&T WE 32100.",
-    ELFMachineType.EM_SPARC        : "SPARC.",
-    ELFMachineType.EM_386          : "Intel 80386.",
-    ELFMachineType.EM_68K          : "Motorola 68000.",
-    ELFMachineType.EM_88K          : "Motorola 88000.",
-    ELFMachineType.EM_860          : "Intel 80860.",
-    ELFMachineType.EM_MIPS         : "MIPS I Architecture.",
-    ELFMachineType.EM_S370         : "IBM System/370 Processor.",
-    ELFMachineType.EM_MIPS_RS3_LE  : "MIPS RS3000 Little-endian.",
-    ELFMachineType.EM_PARISC       : "Hewlett-Packard PA-RISC.",
-    ELFMachineType.RESERVED        : "Reserved for future use.",
-    ELFMachineType.EM_VPP500       : "Fujitsu VPP500.",
-    ELFMachineType.EM_SPARC32PLUS  : "Enhanced instruction set SPARC.",
-    ELFMachineType.EM_960          : "Intel 80960.",
-    ELFMachineType.EM_PPC          : "PowerPC.",
-    ELFMachineType.EM_PPC64        : "64-bit PowerPC.",
-    ELFMachineType.EM_S390         : "IBM S390.",
-    ELFMachineType.EM_SPU          : "Sony/Toshiba/IBM SPU.",
-    ELFMachineType.EM_V800         : "NEC V800.",
-    ELFMachineType.EM_FR20         : "Fujitsu FR20.",
-    ELFMachineType.EM_RH32         : "TRW RH-32.",
-    ELFMachineType.EM_RCE          : "Motorola RCE.",
-    ELFMachineType.EM_ARM          : "Advanced RISC Machines ARM.",
-    ELFMachineType.EM_ALPHA        : "Digital Alpha.",
-    ELFMachineType.EM_SH           : "Hitachi SH.",
-    ELFMachineType.EM_SPARCV9      : "SPARC Version 9.",
-    ELFMachineType.EM_TRICORE      : "Siemens Tricore embedded processor.",
-    ELFMachineType.EM_ARC          : "Argonaut RISC Core, Argonaut Technologies Inc.",
-    ELFMachineType.EM_H8_300       : "Hitachi H8/300.",
-    ELFMachineType.EM_H8_300H      : "Hitachi H8/300H.",
-    ELFMachineType.EM_H8S          : "Hitachi H8S.",
-    ELFMachineType.EM_H8_500       : "Hitachi H8/500.",
-    ELFMachineType.EM_IA_64        : "Intel IA-64 processor architecture.",
-    ELFMachineType.EM_MIPS_X       : "Stanford MIPS-X.",
-    ELFMachineType.EM_COLDFIRE     : "Motorola ColdFire.",
-    ELFMachineType.EM_68HC12       : "Motorola M68HC12.",
-    ELFMachineType.EM_MMA          : "Fujitsu MMA Multimedia Accelerator.",
-    ELFMachineType.EM_PCP          : "Siemens PCP.",
-    ELFMachineType.EM_NCPU         : "Sony nCPU embedded RISC processor.",
-    ELFMachineType.EM_NDR1         : "Denso NDR1 microprocessor.",
-    ELFMachineType.EM_STARCORE     : "Motorola Star*Core processor.",
-    ELFMachineType.EM_ME16         : "Toyota ME16 processor.",
-    ELFMachineType.EM_ST100        : "STMicroelectronics ST100 processor.",
-    ELFMachineType.EM_TINYJ        : "Advanced Logic Corp. TinyJ embedded processor family.",
-    ELFMachineType.EM_X8664        : "AMD x86-64 architecture.",
-    ELFMachineType.EM_PDSP         : "Sony DSP Processor.",
-    ELFMachineType.EM_PDP10        : "DEC PDP-10",
-    ELFMachineType.EM_PDP11        : "DEC PDP-11",
-    ELFMachineType.EM_FX66         : "Siemens FX66 microcontroller.",
-    ELFMachineType.EM_ST9PLUS      : "STMicroelectronics ST9+ 8/16 bit microcontroller.",
-    ELFMachineType.EM_ST7          : "STMicroelectronics ST7 8-bit microcontroller.",
-    ELFMachineType.EM_68HC16       : "Motorola MC68HC16 Microcontroller.",
-    ELFMachineType.EM_68HC11       : "Motorola MC68HC11 Microcontroller.",
-    ELFMachineType.EM_68HC08       : "Motorola MC68HC08 Microcontroller.",
-    ELFMachineType.EM_68HC05       : "Motorola MC68HC05 Microcontroller.",
-    ELFMachineType.EM_SVX          : "Silicon Graphics SVx.",
-    ELFMachineType.EM_ST19         : "STMicroelectronics ST19 8-bit microcontroller.",
-    ELFMachineType.EM_VAX          : "Digital VAX.",
-    ELFMachineType.EM_CRIS         : "Axis Communications 32-bit embedded processor.",
-    ELFMachineType.EM_JAVELIN      : "Infineon Technologies 32-bit embedded processor.",
-    ELFMachineType.EM_FIREPATH     : "Element 14 64-bit DSP Processor.",
-    ELFMachineType.EM_ZSP          : "LSI Logic 16-bit DSP Processor.",
-    ELFMachineType.EM_MMIX         : "Donald Knuth's educational 64-bit processor.",
-    ELFMachineType.EM_HUANY        : "Harvard University machine-independent object files .",
-    ELFMachineType.EM_PRISM        : "SiTera Prism.",
-    ELFMachineType.EM_AVR          : 'Atmel AVR 8-bit microcontroller',
-    ELFMachineType.EM_FR30         : 'Fujitsu FR30',
-    ELFMachineType.EM_D10V         : 'Mitsubishi D10V',
-    ELFMachineType.EM_D30V         : 'Mitsubishi D30V',
-    ELFMachineType.EM_V850         : 'NEC v850',
-    ELFMachineType.EM_M32R         : 'Mitsubishi M32R',
-    ELFMachineType.EM_MN10300      : 'Matsushita MN10300',
-    ELFMachineType.EM_MN10200      : 'Matsushita MN10200',
-    ELFMachineType.EM_PJ           : 'picoJava',
+ELF_MACHINE_NAMES = {
+    ELFMachineType.EM_NONE          : "No machine.",
+    ELFMachineType.EM_M32           : "AT&T WE 32100.",
+    ELFMachineType.EM_SPARC         : "SPARC.",
+    ELFMachineType.EM_386           : "Intel 80386.",
+    ELFMachineType.EM_68K           : "Motorola 68000.",
+    ELFMachineType.EM_88K           : "Motorola 88000.",
+    ELFMachineType.EM_860           : "Intel 80860.",
+    ELFMachineType.EM_MIPS          : "MIPS I Architecture.",
+    ELFMachineType.EM_S370          : "IBM System/370 Processor.",
+    ELFMachineType.EM_MIPS_RS3_LE   : "MIPS RS3000 Little-endian.",
+    ELFMachineType.EM_PARISC        : "Hewlett-Packard PA-RISC.",
+    ELFMachineType.RESERVED         : "Reserved for future use.",
+    ELFMachineType.EM_VPP500        : "Fujitsu VPP500.",
+    ELFMachineType.EM_SPARC32PLUS   : "Enhanced instruction set SPARC.",
+    ELFMachineType.EM_960           : "Intel 80960.",
+    ELFMachineType.EM_PPC           : "PowerPC.",
+    ELFMachineType.EM_PPC64         : "64-bit PowerPC.",
+    ELFMachineType.EM_S390          : "IBM S390.",
+    ELFMachineType.EM_SPU           : "Sony/Toshiba/IBM SPU.",
+    ELFMachineType.EM_V800          : "NEC V800.",
+    ELFMachineType.EM_FR20          : "Fujitsu FR20.",
+    ELFMachineType.EM_RH32          : "TRW RH-32.",
+    ELFMachineType.EM_RCE           : "Motorola RCE.",
+    ELFMachineType.EM_ARM           : "Advanced RISC Machines ARM.",
+    ELFMachineType.EM_ALPHA         : "Digital Alpha.",
+    ELFMachineType.EM_SH            : "Hitachi SH.",
+    ELFMachineType.EM_SPARCV9       : "SPARC Version 9.",
+    ELFMachineType.EM_TRICORE       : "Siemens Tricore embedded processor.",
+    ELFMachineType.EM_ARC           : "Argonaut RISC Core, Argonaut Technologies Inc.",
+    ELFMachineType.EM_H8_300        : "Hitachi H8/300.",
+    ELFMachineType.EM_H8_300H       : "Hitachi H8/300H.",
+    ELFMachineType.EM_H8S           : "Hitachi H8S.",
+    ELFMachineType.EM_H8_500        : "Hitachi H8/500.",
+    ELFMachineType.EM_IA_64         : "Intel IA-64 processor architecture.",
+    ELFMachineType.EM_MIPS_X        : "Stanford MIPS-X.",
+    ELFMachineType.EM_COLDFIRE      : "Motorola ColdFire.",
+    ELFMachineType.EM_68HC12        : "Motorola M68HC12.",
+    ELFMachineType.EM_MMA           : "Fujitsu MMA Multimedia Accelerator.",
+    ELFMachineType.EM_PCP           : "Siemens PCP.",
+    ELFMachineType.EM_NCPU          : "Sony nCPU embedded RISC processor.",
+    ELFMachineType.EM_NDR1          : "Denso NDR1 microprocessor.",
+    ELFMachineType.EM_STARCORE      : "Motorola Star*Core processor.",
+    ELFMachineType.EM_ME16          : "Toyota ME16 processor.",
+    ELFMachineType.EM_ST100         : "STMicroelectronics ST100 processor.",
+    ELFMachineType.EM_TINYJ         : "Advanced Logic Corp. TinyJ embedded processor family.",
+    ELFMachineType.EM_X8664         : "AMD x86-64 architecture.",
+    ELFMachineType.EM_PDSP          : "Sony DSP Processor.",
+    ELFMachineType.EM_PDP10         : "DEC PDP-10",
+    ELFMachineType.EM_PDP11         : "DEC PDP-11",
+    ELFMachineType.EM_FX66          : "Siemens FX66 microcontroller.",
+    ELFMachineType.EM_ST9PLUS       : "STMicroelectronics ST9+ 8/16 bit microcontroller.",
+    ELFMachineType.EM_ST7           : "STMicroelectronics ST7 8-bit microcontroller.",
+    ELFMachineType.EM_68HC16        : "Motorola MC68HC16 Microcontroller.",
+    ELFMachineType.EM_68HC11        : "Motorola MC68HC11 Microcontroller.",
+    ELFMachineType.EM_68HC08        : "Motorola MC68HC08 Microcontroller.",
+    ELFMachineType.EM_68HC05        : "Motorola MC68HC05 Microcontroller.",
+    ELFMachineType.EM_SVX           : "Silicon Graphics SVx.",
+    ELFMachineType.EM_ST19          : "STMicroelectronics ST19 8-bit microcontroller.",
+    ELFMachineType.EM_VAX           : "Digital VAX.",
+    ELFMachineType.EM_CRIS          : "Axis Communications 32-bit embedded processor.",
+    ELFMachineType.EM_JAVELIN       : "Infineon Technologies 32-bit embedded processor.",
+    ELFMachineType.EM_FIREPATH      : "Element 14 64-bit DSP Processor.",
+    ELFMachineType.EM_ZSP           : "LSI Logic 16-bit DSP Processor.",
+    ELFMachineType.EM_MMIX          : "Donald Knuth's educational 64-bit processor.",
+    ELFMachineType.EM_HUANY         : "Harvard University machine-independent object files .",
+    ELFMachineType.EM_PRISM         : "SiTera Prism.",
+    ELFMachineType.EM_AVR           : 'Atmel AVR 8-bit microcontroller',
+    ELFMachineType.EM_FR30          : 'Fujitsu FR30',
+    ELFMachineType.EM_D10V          : 'Mitsubishi D10V',
+    ELFMachineType.EM_D30V          : 'Mitsubishi D30V',
+    ELFMachineType.EM_V850          : 'NEC v850',
+    ELFMachineType.EM_M32R          : 'Mitsubishi M32R',
+    ELFMachineType.EM_MN10300       : 'Matsushita MN10300',
+    ELFMachineType.EM_MN10200       : 'Matsushita MN10200',
+    ELFMachineType.EM_PJ            : 'picoJava',
+    ELFMachineType.EM_OPENRISC      : 'OpenRISC 32-bit embedded processor.',
+    ELFMachineType.EM_ARC_A5        : 'ARC Cores Tangent-A5.',
+    ELFMachineType.EM_XTENSA        : 'Tensilica Xtensa Architecture.',
+    ELFMachineType.EM_VIDEOCORE     : 'Alphamosaic VideoCore processor.',
+    ELFMachineType.EM_TMM_GPP       : 'Thompson Multimedia General Purpose Processor.',
+    ELFMachineType.EM_NS32K         : 'National Semiconductor 32000 series.',
+    ELFMachineType.EM_TPC           : 'Tenor Network TPC processor.',
+    ELFMachineType.EM_SNP1K         : 'Trebia SNP 1000 processor.',
+    ELFMachineType.EM_ST200         : 'STMicroelectronics ST200 microcontroller.',
+    ELFMachineType.EM_IP2K          : 'Ubicom IP2022 micro controller.',
+    ELFMachineType.EM_MAX           : 'MAX Processor.',
+    ELFMachineType.EM_CR            : 'National Semiconductor CompactRISC.',
+    ELFMachineType.EM_F2MC16        : 'Fujitsu F2MC16.',
+    ELFMachineType.EM_MSP430        : 'TI msp430 micro controller.',
+    ELFMachineType.EM_BLACKFIN      : 'ADI Blackfin.',
+    ELFMachineType.EM_SE_C33        : 'S1C33 Family of Seiko Epson processors.',
+    ELFMachineType.EM_SEP           : 'Sharp embedded microprocessor.',
+    ELFMachineType.EM_ARCA          : 'Arca RISC Microprocessor.',
+    ELFMachineType.EM_UNICORE       : 'Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University.',
+    ELFMachineType.EM_EXCESS        : 'eXcess: 16/32/64-bit configurable embedded CPU.',
+    ELFMachineType.EM_DXP           : 'Icera Semiconductor Inc. Deep Execution Processor.',
+    ELFMachineType.EM_ALTERA_NIOS2  : 'Altera Nios II soft-core processor.',
+    ELFMachineType.EM_CRX           : 'National Semiconductor CRX.',
+    ELFMachineType.EM_XGATE         : 'Motorola XGATE embedded processor.',
+    ELFMachineType.EM_C166          : 'Infineon C16x/XC16x processor.',
+    ELFMachineType.EM_M16C          : 'Renesas M16C series microprocessors.',
+    ELFMachineType.EM_DSPIC30F      : 'Microchip Technology dsPIC30F Digital Signal Controller.',
+    ELFMachineType.EM_CE            : 'Freescale Communication Engine RISC core.',
+    ELFMachineType.EM_M32C          : 'Renesas M32C series microprocessors.',
+    ELFMachineType.EM_TSK3000       : 'Altium TSK3000 core.',
+    ELFMachineType.EM_RS08          : 'Freescale RS08 embedded processor.',
+    ELFMachineType.EM_ECOG2         : 'Cyan Technology eCOG2 microprocessor.',
+    ELFMachineType.EM_SCORE         : 'Sunplus Score.',
+    ELFMachineType.EM_SCORE7        : 'Sunplus S+core7 RISC processor.',
+    ELFMachineType.EM_DSP24         : 'New Japan Radio (NJR) 24-bit DSP Processor.',
+    ELFMachineType.EM_VIDEOCORE3    : 'Broadcom VideoCore III processor.',
+    ELFMachineType.EM_LATTICEMICO32 : 'RISC processor for Lattice FPGA architecture.',
+    ELFMachineType.EM_SE_C17        : 'Seiko Epson C17 family.',
+    ELFMachineType.EM_TI_C6000      : 'Texas Instruments TMS320C6000 DSP family.',
+    ELFMachineType.EM_TI_C2000      : 'Texas Instruments TMS320C2000 DSP family.',
+    ELFMachineType.EM_TI_C5500      : 'Texas Instruments TMS320C55x DSP family.',
+    ELFMachineType.EM_MMDSP_PLUS    : 'STMicroelectronics 64bit VLIW Data Signal Processor.',
+    ELFMachineType.EM_CYPRESS_M8C   : 'Cypress M8C microprocessor.',
+    ELFMachineType.EM_R32C          : 'Renesas R32C series microprocessors.',
+    ELFMachineType.EM_TRIMEDIA      : 'NXP Semiconductors TriMedia architecture family.',
+    ELFMachineType.EM_QDSP6         : 'QUALCOMM DSP6 Processor.',
+    ELFMachineType.EM_I8051         : 'Intel 8051 and variants.',
+    ELFMachineType.EM_STXP7X        : 'STMicroelectronics STxP7x family.',
+    ELFMachineType.EM_NDS32         : 'Andes Technology compact code size embedded RISC processor family.',
+    ELFMachineType.EM_ECOG1         : 'Cyan Technology eCOG1X family.',
+    ELFMachineType.EM_ECOG1X        : 'Cyan Technology eCOG1X family.',
+    ELFMachineType.EM_MAXQ30        : 'Dallas Semiconductor MAXQ30 Core Micro-controllers.',
+    ELFMachineType.EM_XIMO16        : 'New Japan Radio (NJR) 16-bit DSP Processor.',
+    ELFMachineType.EM_MANIK         : 'M2000 Reconfigurable RISC Microprocessor.',
+    ELFMachineType.EM_CRAYNV2       : 'Cray Inc. NV2 vector architecture.',
+    ELFMachineType.EM_RX            : 'Renesas RX family.',
+    ELFMachineType.EM_METAG         : 'Imagination Technologies META processor architecture.',
+    ELFMachineType.EM_MCST_ELBRUS   : 'MCST Elbrus general purpose hardware architecture.',
+    ELFMachineType.EM_ECOG16        : 'Cyan Technology eCOG16 family.',
+    ELFMachineType.EM_CR16          : 'National Semiconductor CompactRISC 16-bit processor.',
+    ELFMachineType.EM_ETPU          : 'Freescale Extended Time Processing Unit.',
+    ELFMachineType.EM_SLE9X         : 'Infineon Technologies SLE9X core.',
+    ELFMachineType.EM_L1OM          : 'Intel L1OM.',
+    ELFMachineType.EM_AVR32         : 'Atmel Corporation 32-bit microprocessor family.',
+    ELFMachineType.EM_STM8          : 'STMicroeletronics STM8 8-bit microcontroller.',
+    ELFMachineType.EM_TILE64        : 'Tilera TILE64 multicore architecture family.',
+    ELFMachineType.EM_TILEPRO       : 'Tilera TILEPro multicore architecture family.',
+    ELFMachineType.EM_MICROBLAZE    : 'Xilinx MicroBlaze 32-bit RISC soft processor core.',
+    ELFMachineType.EM_CUDA          : 'NVIDIA CUDA architecture.',
 }
 
 
@@ -399,9 +441,9 @@ EI_CLASS        = 4      # File class.
 EI_DATA         = 5      # Data encoding.
 EI_VERSION      = 6      # File version.
 EI_PAD          = 7      # Start of padding bytes.
-## todo: check!!!
 EI_OSABI        = 7      # Operating system/ABI identification.
 EI_ABIVERSION   = 8      # ABI version.
+# EI_NIDENT       = 16     # Size of e_ident[] - defined above.
 
 
 @Enum
@@ -411,7 +453,7 @@ class ELFClass(object):
     ELFCLASS64      = 2      # 64-bit objects.
 
 
-ELF_CLASS_NAMES={
+ELF_CLASS_NAMES = {
     ELFClass.ELFCLASSNONE   : "Invalid class.",
     ELFClass.ELFCLASS32     : "32-bit objects.",
     ELFClass.ELFCLASS64     : "64-bit objects."
@@ -424,7 +466,7 @@ class ELFDataEncoding(object):
     ELFDATA2MSB     = 2      # Big-Endian.
 
 
-ELF_BYTE_ORDER_NAMES={
+ELF_BYTE_ORDER_NAMES = {
     ELFDataEncoding.ELFDATANONE : "Invalid data encoding.",
     ELFDataEncoding.ELFDATA2LSB : "Little-Endian.",
     ELFDataEncoding.ELFDATA2MSB : "Big-Endian."
@@ -436,7 +478,7 @@ ELF_BYTE_ORDER_NAMES={
 ##
 ##
 
-SEC_FMT="IIIIIIIIII"
+SEC_FMT = "IIIIIIIIII"
 
 """
 typedef struct tagElf32_Shdr {
@@ -453,10 +495,11 @@ typedef struct tagElf32_Shdr {
 } Elf32_Shdr;
 """
 
-ELF_SECTION_SIZE=struct.calcsize(SEC_FMT)
+ELF_SECTION_SIZE = struct.calcsize(SEC_FMT)
 
-Elf32_Shdr=namedtuple("Elf32_Shdr","""sh_name sh_type sh_flags sh_addr sh_offset sh_size
-    sh_link sh_info sh_addralign sh_entsize""")
+Elf32_Shdr=namedtuple("Elf32_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
+    sh_link sh_info sh_addralign sh_entsize"""
+)
 
 
 # Section Indices.
@@ -515,7 +558,7 @@ SHF_MASKPROC    = 0xf0000000
 ##
 ##
 
-SYMTAB_FMT="IIIBBH"
+SYMTAB_FMT = "IIIBBH"
 
 """"
 typedef struct tagElf32_Sym {
@@ -528,12 +571,11 @@ typedef struct tagElf32_Sym {
 } Elf32_Sym;
 """
 
-Elf32_Sym=namedtuple("Elf32_Sym","st_name st_value st_size st_info st_other st_shndx")
+Elf32_Sym = namedtuple("Elf32_Sym", "st_name st_value st_size st_info st_other st_shndx")
 
 ELF_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT)
 
-STN_UNDEF   = 0
-
+STN_UNDEF           = 0
 
 STB_LOCAL           = 0
 STB_GLOBAL          = 1
@@ -556,10 +598,9 @@ STT_HIPROC          = 15
 ##   ELF Relocation.
 ##
 ##
+REL_FMT = "II"
 
-REL_FMT="II"
-
-RELA_FMT="IIi"
+RELA_FMT = "IIi"
 
 """
 typedef struct tagElf32_Rel {
@@ -579,16 +620,15 @@ typedef struct tagElf32_Rela {
 ELF_RELOCATION_SIZE     = struct.calcsize(REL_FMT)
 ELF_RELOCATION_A_SIZE   = struct.calcsize(RELA_FMT)
 
-Elf32_Rel=namedtuple("Elf32_Rel","r_offset r_info")
-Elf32_Rela=namedtuple("Elf32_Rela","r_offset r_info r_addend")
+Elf32_Rel   = namedtuple("Elf32_Rel", "r_offset r_info")
+Elf32_Rela  = namedtuple("Elf32_Rela", "r_offset r_info r_addend")
 
 ##
 ##
 ##   ELF Program Header
 ##
 ##
-
-PHDR_FMT="IIIIIIII"
+PHDR_FMT = "IIIIIIII"
 
 """
 typedef struct tagElf32_Phdr {
@@ -603,9 +643,9 @@ typedef struct tagElf32_Phdr {
 } Elf32_Phdr;
 """
 
-ELF_PHDR_SIZE = struct.calcsize(PHDR_FMT)
+ELF_PHDR_SIZE   = struct.calcsize(PHDR_FMT)
 
-Elf32_Phdr=namedtuple("Elf32_Phdr","p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
+Elf32_Phdr      = namedtuple("Elf32_Phdr", "p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
 
 
 PT_NULL             = 0
@@ -715,35 +755,35 @@ typedef enum tagElf_EndianessType {
 
 
 class Alias(object):
-    def __init__(self,key,convert=False):
-        self.key=key
-        self.convert=convert
+    def __init__(self,key, convert = False):
+        self.key = key
+        self.convert = convert
 
-    def __get__(self,obj,objtype=None):
+    def __get__(self, obj, objtype = None):
         if obj is None:
             return self
-        data=getattr(obj,'data')
-        value=getattr(data,self.key)
+        data = getattr(obj, 'data')
+        value = getattr(data, self.key)
         return value
 
-    def __set__(self,obj,value):
-        data=getattr(obj,'data')
-        setattr(data,self.key,value)
-        c=getattr(data,self.key)
+    def __set__(self, obj, value):
+        data = getattr(obj, 'data')
+        setattr(data, self.key,value)
+        c = getattr(data, self.key)
 
     def __delete__(self, obj):
         raise AttributeError("can't delete attribute")
 
 
 def byteorder():
-    bo=sys.byteorder
-    if bo=='little':
+    bo = sys.byteorder
+    if bo == 'little':
         return ELFDataEncoding('ELFDATA2LSB')
-    elif bo=='big':
+    elif bo == 'big':
         return ELFDataEncoding('ELFDATA2MSB')
 
 
-BYTEORDER_PREFIX={
+BYTEORDER_PREFIX = {
     ELFDataEncoding.ELFDATA2LSB : '<',  # Little-Endian.
     ELFDataEncoding.ELFDATA2MSB : '>'   # Big-Endian.
 }
@@ -754,129 +794,129 @@ class Null(object): pass
 
 class ELFHeader(object):
     def __init__(self,parent):
-        self.parent=parent
+        self.parent = parent
         parent.inFile.seek(0,os.SEEK_SET)
-        data=parent.inFile.read(ELF_HEADER_SIZE)
+        data = parent.inFile.read(ELF_HEADER_SIZE)
 
-        elfHeader=struct.unpack(HDR_FMT,data)
+        elfHeader = struct.unpack(HDR_FMT,data)
         if not self._checkMagic(elfHeader):
             # todo: Error-Handling!!!
             return
 
-        d=Elf32_Ehdr(*elfHeader)
-        self.byteorderPrefix=BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
-        parent.byteorderPrefix=self.byteorderPrefix
+        d = Elf32_Ehdr(*elfHeader)
+        self.byteorderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
+        parent.byteorderPrefix = self.byteorderPrefix
 
         # Unpack again, /w corrected byte-order.
-        elfHeader=struct.unpack("%s%s" % (self.byteorderPrefix,HDR_FMT),data)
-        d=Elf32_Ehdr(*elfHeader)
+        elfHeader = struct.unpack("%s%s" % (self.byteorderPrefix, HDR_FMT), data)
+        d = Elf32_Ehdr(*elfHeader)
 
-        self.data=Null()
-        for key,value in ((d._fields[i],d[i]) for i in range(len(d))):
-            setattr(self.data,key,value)
+        self.data = Null()
+        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
+            setattr(self.data, key, value)
 
-        if not (self.elfEHSize==ELF_HEADER_SIZE):
+        if not (self.elfEHSize == ELF_HEADER_SIZE):
             # todo: Error-Handling!!!
             return
-        if not (self.elfPHTEntrySize==ELF_PHDR_SIZE):
+        if not (self.elfPHTEntrySize == ELF_PHDR_SIZE):
             # todo: Error-Handling!!!
             return
-        if not (self.elfSHTEntrySize==ELF_SECTION_SIZE):
+        if not (self.elfSHTEntrySize == ELF_SECTION_SIZE):
             # todo: Error-Handling!!!
             return
 
-        self.hasStringTable=not (self.elfStringTableIndex==SHN_UNDEF)
+        self.hasStringTable = not (self.elfStringTableIndex == SHN_UNDEF)
 
-    def _checkMagic(self,header):
-        return ((header[EI_MAG0]==0x7f) and (header[EI_MAG1]==ord('E'))
-            and (header[EI_MAG2]==ord('L')) and (header[EI_MAG3]==ord('F')))
+    def _checkMagic(self, header):
+        return ((header[EI_MAG0] == 0x7f) and (header[EI_MAG1] == ord('E'))
+            and (header[EI_MAG2] == ord('L')) and (header[EI_MAG3] == ord('F')))
 
     @property
     def elfTypeName(self):
-        return ELF_TYPE_NAMES.get(ELFType(self.elfType),"Processor-specific.")
+        return ELF_TYPE_NAMES.get(ELFType(self.elfType), "Processor-specific.")
 
     @property
     def elfMachineName(self):
-        return ELF_MACHINE_NAMES.get(ELFMachineType(self.elfMachine),"*** unknown ***")
+        return ELF_MACHINE_NAMES.get(ELFMachineType(self.elfMachine), "*** unknown ***")
 
     @property
     def elfClassName(self):
-        return ELF_CLASS_NAMES.get(ELFClass(self.elfClass),"*** unknown ***")
+        return ELF_CLASS_NAMES.get(ELFClass(self.elfClass), "*** unknown ***")
 
     @property
     def elfByteOrderName(self):
-        return ELF_BYTE_ORDER_NAMES.get(ELFDataEncoding(self.elfByteOrder),"*** unknown ***")
+        return ELF_BYTE_ORDER_NAMES.get(ELFDataEncoding(self.elfByteOrder), "*** unknown ***")
 
     # Install pretty names.
-    elfClass=Alias("e_ident4")
-    elfByteOrder=Alias("e_ident5")
-    elfVersion=Alias("e_ident6")
-    elfOsAbi=Alias("e_ident7")
-    elfAbiVersion=Alias("e_ident8")
-    elfType=Alias("e_type")
-    elfMachine=Alias("e_machine")
-    elfEntryPoint=Alias("e_entry")
-    elfProgramHeaderTableOffset=Alias("e_phoff")
-    elfSectionHeaderTableOffset=Alias("e_shoff")
-    elfFlags=Alias("e_flags")
-    elfEHSize=Alias("e_ehsize")
-    elfPHTEntrySize=Alias("e_phentsize")
-    elfNumberOfPHs=Alias("e_phnum")
-    elfSHTEntrySize=Alias("e_shentsize")
-    elfNumberOfSHs=Alias("e_shnum")
-    elfStringTableIndex=Alias("e_shstrndx")
+    elfClass                    = Alias("e_ident4")
+    elfByteOrder                = Alias("e_ident5")
+    elfVersion                  = Alias("e_ident6")
+    elfOsAbi                    = Alias("e_ident7")
+    elfAbiVersion               = Alias("e_ident8")
+    elfType                     = Alias("e_type")
+    elfMachine                  = Alias("e_machine")
+    elfEntryPoint               = Alias("e_entry")
+    elfProgramHeaderTableOffset = Alias("e_phoff")
+    elfSectionHeaderTableOffset = Alias("e_shoff")
+    elfFlags                    = Alias("e_flags")
+    elfEHSize                   = Alias("e_ehsize")
+    elfPHTEntrySize             = Alias("e_phentsize")
+    elfNumberOfPHs              = Alias("e_phnum")
+    elfSHTEntrySize             = Alias("e_shentsize")
+    elfNumberOfSHs              = Alias("e_shnum")
+    elfStringTableIndex         = Alias("e_shstrndx")
 
 
 class ELFSymbol(object):
-    def __init__(self,parent,data):
+    def __init__(self, parent, data):
         pass
 
 
 class ELFSectionHeaderTable(object):
-    def __init__(self,parent,atPosition=0):
-        self.parent=parent
-        parent.inFile.seek(atPosition,os.SEEK_SET)
+    def __init__(self, parent, atPosition=0):
+        self.parent = parent
+        parent.inFile.seek(atPosition, os.SEEK_SET)
         data=parent.inFile.read(ELF_SECTION_SIZE)
 
-        elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix,SEC_FMT),data)
-        d=Elf32_Shdr(*elfProgramHeaderTable)
-        self.data=Null()
-        for key,value in ((d._fields[i],d[i]) for i in range(len(d))):
-            setattr(self.data,key,value)
+        elfProgramHeaderTable = struct.unpack("%s%s" % (parent.byteorderPrefix, SEC_FMT), data)
+        d = Elf32_Shdr(*elfProgramHeaderTable)
+        self.data = Null()
+        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
+            setattr(self.data, key, value)
 
-        if self.shType not in (SHT_NOBITS,SHT_NULL) and self.shSize>0:
-            pos=self.shOffset
-            parent.inFile.seek(pos,os.SEEK_SET)
-            self.image=parent.inFile.read(self.shSize)
+        if self.shType not in (SHT_NOBITS, SHT_NULL) and self.shSize > 0:
+            pos = self.shOffset
+            parent.inFile.seek(pos, os.SEEK_SET)
+            self.image = parent.inFile.read(self.shSize)
         else:
-            self.image=None
+            self.image = None
 
-        if self.shType in (SHT_SYMTAB,SHT_DYNSYM):
-            self.symbols={}
-            for idx,symbol in enumerate(range(self.shSize/ELF_SYM_TABLE_SIZE)):
-                offset=idx*ELF_SYM_TABLE_SIZE
-                data=self.image[offset:offset+ELF_SYM_TABLE_SIZE]
-                symData=struct.unpack("%s%s" % (parent.byteorderPrefix,SYMTAB_FMT),data)
-                sym=Elf32_Sym(*symData)
-                self.symbols[idx]=sym
+        if self.shType in (SHT_SYMTAB, SHT_DYNSYM):
+            self.symbols = {}
+            for idx, symbol in enumerate(range(self.shSize / ELF_SYM_TABLE_SIZE)):
+                offset = idx * ELF_SYM_TABLE_SIZE
+                data=self.image[offset : offset + ELF_SYM_TABLE_SIZE]
+                symData = struct.unpack("%s%s" % (parent.byteorderPrefix, SYMTAB_FMT), data)
+                sym = Elf32_Sym(*symData)
+                self.symbols[idx] = sym
 
-        if self.shType in (SHT_REL,SHT_RELA):
+        if self.shType in (SHT_REL, SHT_RELA):
             pass
 
-    shAddress=Alias("sh_addr")
-    shAddressAlign=Alias("sh_addralign")
-    shEntitySize=Alias("sh_entsize")
-    shFlags=Alias("sh_flags")
-    shInfo=Alias("sh_info")
-    shLink=Alias("sh_link")
-    shNameIdx=Alias("sh_name")
-    shOffset=Alias("sh_offset")
-    shSize=Alias("sh_size")
-    shType=Alias("sh_type")
+    shAddress       = Alias("sh_addr")
+    shAddressAlign  = Alias("sh_addralign")
+    shEntitySize    = Alias("sh_entsize")
+    shFlags         = Alias("sh_flags")
+    shInfo          = Alias("sh_info")
+    shLink          = Alias("sh_link")
+    shNameIdx       = Alias("sh_name")
+    shOffset        = Alias("sh_offset")
+    shSize          = Alias("sh_size")
+    shType          = Alias("sh_type")
 
     @property
     def shTypeName(self):
-        TYPES={
+        TYPES = {
             SHT_NULL        : "NULL",
             SHT_PROGBITS    : "PROGBITS",
             SHT_SYMTAB      : "SYMTAB",
@@ -894,7 +934,7 @@ class ELFSectionHeaderTable(object):
             SHT_LOUSER      : "LOUSER",
             SHT_HIUSER      : "HIUSER"
         }
-        return TYPES.get(self.shType,"UNKNOWN")
+        return TYPES.get(self.shType, "UNKNOWN")
 
     @property
     def shName(self):
@@ -905,27 +945,27 @@ class ELFSectionHeaderTable(object):
 class ELFInvalidHeaderError(Exception): pass
 
 class ELFProgramHeaderTable(object):
-    def __init__(self,parent,atPosition=0):
-        parent.inFile.seek(atPosition,os.SEEK_SET)
-        data=parent.inFile.read(ELF_PHDR_SIZE)
+    def __init__(self, parent, atPosition = 0):
+        parent.inFile.seek(atPosition, os.SEEK_SET)
+        data = parent.inFile.read(ELF_PHDR_SIZE)
 
         try:
-            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix,PHDR_FMT),data)
+            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix, PHDR_FMT), data)
         except struct.error:
             raise ELFInvalidHeaderError()
 
-        d=Elf32_Phdr(*elfProgramHeaderTable)
-        self.data=Null()
-        for key,value in ((d._fields[i],d[i]) for i in range(len(d))):
-            setattr(self.data,key,value)
-        parent.inFile.seek(d.p_offset,os.SEEK_SET)
-        self.image=parent.inFile.read(d.p_filesz)
-        if d.p_type in (PT_DYNAMIC,PT_INTERP,PT_NOTE,PT_SHLIB,PT_PHDR):
+        d = Elf32_Phdr(*elfProgramHeaderTable)
+        self.data = Null()
+        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
+            setattr(self.data, key, value)
+        parent.inFile.seek(d.p_offset, os.SEEK_SET)
+        self.image = parent.inFile.read(d.p_filesz)
+        if d.p_type in (PT_DYNAMIC, PT_INTERP, PT_NOTE, PT_SHLIB, PT_PHDR):
             pass
 
     @property
     def phTypeName(self):
-        NAMES={
+        NAMES = {
             0 : 'NULL',
             1 : 'LOAD',
             2 : 'DYNAMIC',
@@ -941,14 +981,15 @@ class ELFProgramHeaderTable(object):
         else:
             return "RES"
 
-    phType=Alias("p_type")
-    phOffset=Alias("p_offset")
-    phVirtualAddress=Alias("p_vaddr")
-    phPhysicalAddress=Alias("p_paddr")
-    phFileSize=Alias("p_filesz")
-    phMemSize=Alias("p_memsz")
-    phFlags=Alias("p_flags")
-    phAlign=Alias("p_align")
+    phType              = Alias("p_type")
+    phOffset            = Alias("p_offset")
+    phVirtualAddress    = Alias("p_vaddr")
+    phPhysicalAddress   = Alias("p_paddr")
+    phFileSize          = Alias("p_filesz")
+    phMemSize           = Alias("p_memsz")
+    phFlags             = Alias("p_flags")
+    phAlign             = Alias("p_align")
+
 
 def getSpecialSectionName(section):
     if section == SHN_UNDEF:
@@ -964,40 +1005,42 @@ def getSpecialSectionName(section):
     else:
         return None
 
+
 class Object(object):
-    def __init__(self,copyFrom):
-        for key,value in copyFrom._asdict().items():
-            setattr(self,key,value)
+    def __init__(self, copyFrom):
+        for key, value in copyFrom._asdict().items():
+            setattr(self, key, value)
+
 
 class Reader(object):
-    def __init__(self,inFile):
-        if not hasattr(inFile,'read'):
+    def __init__(self, inFile, readContent = True):
+        if not hasattr(inFile, 'read'):
             raise TypeError("Need a file-like object.")
-        self.inFile=inFile
-        self.header=ELFHeader(self)
+        self.inFile = inFile
+        self.header = ELFHeader(self)
 
-        self.programHeaders=[]
-        self.sectionHeaders=[]
-        self._stringCache={}
+        self.programHeaders = []
+        self.sectionHeaders = []
+        self._stringCache = {}
 
-        pos=self.header.data.e_phoff
+        pos = self.header.data.e_phoff
         if pos:
             for _ in range(self.header.elfNumberOfPHs):
-                self.programHeaders.append(ELFProgramHeaderTable(self,pos))
-                pos+=self.header.elfPHTEntrySize
+                self.programHeaders.append(ELFProgramHeaderTable(self, pos))
+                pos += self.header.elfPHTEntrySize
 
-        pos=self.header.data.e_shoff
+        pos = self.header.data.e_shoff
         if pos:
             for _ in range(self.header.elfNumberOfSHs):
-                self.sectionHeaders.append(ELFSectionHeaderTable(self,pos))
-                pos+=self.header.elfSHTEntrySize
+                self.sectionHeaders.append(ELFSectionHeaderTable(self, pos))
+                pos += self.header.elfSHTEntrySize
 
-        for idx,sectionHeader in enumerate(self.sectionHeaders):
-            if sectionHeader.shType in (SHT_SYMTAB,SHT_DYNSYM):
-                for _,symbol in sectionHeader.symbols.items():
-                    o=Object(symbol)
-                    o.sectionName=getSpecialSectionName(symbol.st_shndx)
-            elif sectionHeader.shType in (SHT_REL,SHT_RELA):
+        for idx, sectionHeader in enumerate(self.sectionHeaders):
+            if sectionHeader.shType in (SHT_SYMTAB, SHT_DYNSYM):
+                for _, symbol in sectionHeader.symbols.items():
+                    o = Object(symbol)
+                    o.sectionName = getSpecialSectionName(symbol.st_shndx)
+            elif sectionHeader.shType in (SHT_REL, SHT_RELA):
                 symtab = sectionHeader.shLink
                 sectionToModify = sectionHeader.shInfo
                 if sectionHeader.shType == SHT_REL:
@@ -1007,23 +1050,22 @@ class Reader(object):
                     entry = Elf32_Rela
                     entrySize = ELF_RELOCATION_A_SIZE
                 img = sectionHeader.image
-                offset =0
+                offset = 0
                 for pos in range(len(img) / entrySize):
                     ddd = img[offset : offset + entrySize]
                     offset += entrySize
-
-            elif sectionHeader==SHT_NOTE:
+            elif sectionHeader == SHT_NOTE:
                 pass
 
-    def getString(self,tableIndex,entry):
-        if (tableIndex,entry) in self._stringCache:
-            return self._stringCache[(tableIndex,entry)]
+    def getString(self, tableIndex, entry):
+        if (tableIndex, entry) in self._stringCache:
+            return self._stringCache[(tableIndex, entry)]
         else:
             # self.header.elfStringTableIndex
-            unterminatedString=self.sectionHeaders[tableIndex].image[entry:]
+            unterminatedString = self.sectionHeaders[tableIndex].image[entry : ]
 #            if not unterminatedString:
 #                return ''
-            terminatedString=unterminatedString[:unterminatedString.index('\x00')]
-            self._stringCache[(tableIndex,entry)]=terminatedString
+            terminatedString = unterminatedString[ : unterminatedString.index('\x00')]
+            self._stringCache[(tableIndex,entry)] = terminatedString
             return terminatedString
 
