@@ -258,3 +258,4 @@ class Reader(object):
 
     def parseData(self, line, formatType):
         return True
+
