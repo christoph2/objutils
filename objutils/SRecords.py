@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2012 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -26,7 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import HexFile
+import objutils.HexFile as HexFile
 import cStringIO
 import re
 
@@ -109,13 +109,13 @@ class Reader(HexFile.Reader):
             pass
         elif formatType == S7:
             startAddress = line.address
-            print "32-Bit Start-Address: ", hex(startAddress)
+            #print "32-Bit Start-Address: ", hex(startAddress)
         elif formatType == S8:
             startAddress = line.address
-            print "24-Bit Start-Address: ", hex(startAddress)
+            #print "24-Bit Start-Address: ", hex(startAddress)
         elif formatType == S9:
             startAddress=line.address
-            print "16-Bit Start-Address: ", hex(startAddress)
+            #print "16-Bit Start-Address: ", hex(startAddress)
 
     def _stripSymbols(self, symbolTables):
         self.symbols=[]

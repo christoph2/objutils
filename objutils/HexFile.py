@@ -211,7 +211,8 @@ class Reader(object):
                             # print chunk
                             segments.append(SegmentType(container.address, container.length, container.chunk))
                         else:
-                            print container # Sonderfälle als 'processingInstructions' speichern!!!
+			    pass
+                            #print container # Sonderfälle als 'processingInstructions' speichern!!!
         segments.sort(key = itemgetter(0))
         prevSegment = SegmentType()
         while segments:
@@ -226,6 +227,7 @@ class Reader(object):
         lastSeg = resultSegments[-1]
         # deduce Adressspace from last segment.
         self.addressSpace = self._addressSpace(lastSeg.address + lastSeg.length)
+	## TODO: Add start-address, if available.
         return resultSegments
 
     def _addressSpace(self, value):

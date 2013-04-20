@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2012 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -29,7 +29,7 @@ __copyright__ = """
 import cStringIO as StringIO
 import operator
 import re
-import HexFile
+import objutils.HexFile as HexFile
 
 
 TEST = """$kL&@h%%,:,B.\?00EPuX0K3rO0JI))
