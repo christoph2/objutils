@@ -33,6 +33,7 @@ from operator import itemgetter
 import re
 import sys
 import types
+from objutils.Segment import Segment
 
 
 '''
@@ -88,27 +89,6 @@ TYPE_FROM_RECORD=0
 atoi = partial(int, base = 16)
 
 BYTES = re.compile('([0-9a-zA-Z]{2})')
-
-
-class SegmentType(object):
-    def __init__(self, address = 0, length = 0, data = bytearray()):
-        self.address = address
-        self.length = length
-        self.data = data
-
-    def __getitem__(self, key):
-        if key == 0:
-            return self.address
-        elif key == 1:
-            return self.length
-        elif key == 2:
-            return self.data
-        else:
-            raise IndexError()
-
-    def __repr__(self):
-        return "Segment (address: '0X%X' len: '%d')" % (self.address, self.length)
-
 
 class InvalidRecordTypeError(Exception): pass
 class InvalidRecordLengthError(Exception): pass
@@ -209,7 +189,7 @@ class Reader(object):
                         self.specialProcessing(container, formatType)
                         if self.isDataLine(container, formatType):
                             # print chunk
-                            segments.append(SegmentType(container.address, container.length, container.chunk))
+                            segments.append(Segment(container.address, container.length, container.chunk))
                         else:
                             pass
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
@@ -219,7 +199,7 @@ class Reader(object):
     def joinSegments(self, segments):
         resultSegments = []
         segments.sort(key = itemgetter(0))
-        prevSegment = SegmentType()
+        prevSegment = Segment()
         while segments:
             segment = segments.pop(0)
             if segment.address == prevSegment.address + prevSegment.length and resultSegments:
@@ -227,7 +207,7 @@ class Reader(object):
                 resultSegments[-1].length += segment.length
             else:
                 # Create a new Segment.
-                resultSegments.append(SegmentType(segment.address, segment.length, segment.data))
+                resultSegments.append(Segment(segment.address, segment.length, segment.data))
             prevSegment = segment
         lastSeg = resultSegments[-1]
         # deduce Adressspace from last segment.

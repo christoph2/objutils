@@ -26,3 +26,23 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+
+class Segment(object):
+    def __init__(self, address = 0, length = 0, data = bytearray()):
+        self.address = address
+        self.length = length
+        self.data = data
+
+    def __getitem__(self, key):
+        if key == 0:
+            return self.address
+        elif key == 1:
+            return self.length
+        elif key == 2:
+            return self.data
+        else:
+            raise IndexError()
+
+    def __repr__(self):
+        return "Segment (address: '0X%X' len: '%d')" % (self.address, self.length)
+
