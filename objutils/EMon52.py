@@ -30,7 +30,7 @@ import objutils.HexFile as HexFile
 import cStringIO
 
 FORMATS=(
-    (HexFile.TYPE_FROM_RECORD, "LL AAAA:DDCCCC"),
+    (HexFile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
 )
 
 DATA                        = 0
@@ -55,8 +55,8 @@ class Codec(object):
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile, dataSep = None):
-        super(Reader,self).__init__(FORMATS, Codec(inFile), dataSep)
+    def __init__(self, inFile):
+        super(Reader,self).__init__(FORMATS, Codec(inFile), " ")
 
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
