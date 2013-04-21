@@ -39,7 +39,7 @@ FORMATS=(
     (EOF,       "/AAAA00BB"),
 )
 
-class Reader(HexFile.Reader):
+class Reader(HexFile.Reader): # TODO: Subclass Tek.Reader!!!
     def __init__(self,  inFile):
         super(Reader,self).__init__(FORMATS, inFile)
 

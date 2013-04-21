@@ -6,7 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2012 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -87,7 +87,7 @@ TYPE_FROM_RECORD=0
 
 atoi = partial(int, base = 16)
 
-BYTES=re.compile('([0-9a-zA-Z]{2})')
+BYTES = re.compile('([0-9a-zA-Z]{2})')
 
 
 class SegmentType(object):
@@ -119,8 +119,8 @@ class FormatParser(object):
     def __init__(self, fmt, dataSep = None):
         self.fmt = fmt
         self.translatedFmt = []
-        if dataSep == ' ':
-            dataSep = '\s'
+        #if dataSep == ' ':
+        #    dataSep = '\s'
         self.dataSep = dataSep
 
     def parse(self):
@@ -154,7 +154,8 @@ class FormatParser(object):
             elif groupNumber == DATA:
                 "(?P<chunk>[0-9a-zA-Z]*)"
                 if self.dataSep is not None:
-                    expr = "(?P<chunk>([0-9a-zA-Z]{2}%s)*)" % (self.dataSep, )
+                    #expr = "(?P<chunk>([0-9a-zA-Z]{2}%s)*)" % (self.dataSep, )
+                    expr = "(?P<chunk>[0-9a-zA-Z%s]*)" % (self.dataSep, )
                 else:
                     #expr="(%s*)" % expr
                     pass
@@ -213,8 +214,7 @@ class Reader(object):
                             pass
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
 
-        resultSegments = self.joinSegments(segments)
-        return resultSegments
+        return self.joinSegments(segments)
 
     def joinSegments(self, segments):
         resultSegments = []
