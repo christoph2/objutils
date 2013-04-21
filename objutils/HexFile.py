@@ -33,7 +33,7 @@ from operator import itemgetter
 import re
 import sys
 import types
-from objutils.Segment import Segment
+from objutils.Segment import Segment, joinSegments
 
 
 '''
@@ -194,26 +194,7 @@ class Reader(object):
                             pass
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
 
-        return self.joinSegments(segments)
-
-    def joinSegments(self, segments):
-        resultSegments = []
-        segments.sort(key = itemgetter(0))
-        prevSegment = Segment()
-        while segments:
-            segment = segments.pop(0)
-            if segment.address == prevSegment.address + prevSegment.length and resultSegments:
-                resultSegments[-1].data.extend(segment.data)
-                resultSegments[-1].length += segment.length
-            else:
-                # Create a new Segment.
-                resultSegments.append(Segment(segment.address, segment.length, segment.data))
-            prevSegment = segment
-        lastSeg = resultSegments[-1]
-        # deduce Adressspace from last segment.
-        self.addressSpace = self._addressSpace(lastSeg.address + lastSeg.length)
-        ## TODO: Add start-address, if available.
-        return resultSegments
+        return joinSegments(segments)
 
     def _addressSpace(self, value):
         if value < 2**16:

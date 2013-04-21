@@ -26,6 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from operator import itemgetter
 
 class Segment(object):
     def __init__(self, address = 0, length = 0, data = bytearray()):
@@ -46,3 +47,19 @@ class Segment(object):
     def __repr__(self):
         return "Segment (address: '0X%X' len: '%d')" % (self.address, self.length)
 
+
+def joinSegments(segments):
+    resultSegments = []
+    segments.sort(key = itemgetter(0))
+    prevSegment = Segment()
+    while segments:
+        segment = segments.pop(0)
+        if segment.address == prevSegment.address + prevSegment.length and resultSegments:
+            resultSegments[-1].data.extend(segment.data)
+            resultSegments[-1].length += segment.length
+        else:
+            # Create a new Segment.
+            resultSegments.append(Segment(segment.address, segment.length, segment.data))
+        prevSegment = segment
+    lastSeg = resultSegments[-1]
+    return resultSegments
