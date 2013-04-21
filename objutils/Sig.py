@@ -37,6 +37,8 @@ FORMATS=(
 )
 
 class Reader(HexFile.Reader):
+    def __init__(self, inFile, dataSep = None):
+        super(Reader, self).__init__(FORMATS, inFile, dataSep)
 
     def checkByte(self,checksum,b):
         checksum^=b
