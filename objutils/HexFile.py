@@ -165,7 +165,7 @@ class FormatParser(object):
         self.translatedFmt.append((groupNumber, length, expr))
 
 
-class Cont(object): pass
+class Container(object): pass
 
 class Reader(object):
     aligment = 0  # 2**n
@@ -184,12 +184,11 @@ class Reader(object):
 
     def read(self):
         segments = []
-        resultSegments = []
         for line in self.inFile.readlines():
             for formatType, format in self.formats:
                 match = format.match(line)
                 if match:
-                    container = Cont()
+                    container = Container()
                     dict_ = match.groupdict()
                     if dict_ != {}:
                         # Handle scalar values.
@@ -211,8 +210,14 @@ class Reader(object):
                             # print chunk
                             segments.append(SegmentType(container.address, container.length, container.chunk))
                         else:
-			    pass
+                            pass
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
+
+        resultSegments = self.joinSegments(segments)
+        return resultSegments
+
+    def joinSegments(self, segments):
+        resultSegments = []
         segments.sort(key = itemgetter(0))
         prevSegment = SegmentType()
         while segments:
@@ -227,7 +232,7 @@ class Reader(object):
         lastSeg = resultSegments[-1]
         # deduce Adressspace from last segment.
         self.addressSpace = self._addressSpace(lastSeg.address + lastSeg.length)
-	## TODO: Add start-address, if available.
+        ## TODO: Add start-address, if available.
         return resultSegments
 
     def _addressSpace(self, value):
