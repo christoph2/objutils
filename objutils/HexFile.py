@@ -29,11 +29,12 @@ __copyright__ = """
 import logging
 import heapq
 from functools import partial
-from operator import itemgetter
 import re
 import sys
 import types
 from objutils.Segment import Segment, joinSegments
+from objutils.Image import Image
+from operator import itemgetter
 
 
 '''
@@ -194,7 +195,7 @@ class Reader(object):
                             pass
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
 
-        return joinSegments(segments)
+        return Image(joinSegments(segments))
 
     def _addressSpace(self, value):
         if value < 2**16:
