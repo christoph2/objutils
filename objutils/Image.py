@@ -26,6 +26,11 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+## Adress-space constants.
+AS_16   = 0
+AS_24   = 1
+AS_32   = 2
+AS_64   = 3
 
 class Image(object):
     def __init__(self, segments):
