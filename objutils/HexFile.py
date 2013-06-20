@@ -26,6 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import abc
 import logging
 import heapq
 from functools import partial
@@ -147,7 +148,13 @@ class FormatParser(object):
         self.translatedFmt.append((groupNumber, length, expr))
 
 
-class Container(object): pass
+class Container(object):
+    def __init__(self):
+        self.processingInstructions = []
+
+    def addPI(self, pi):
+        self.processingInstructions.append(pi)
+
 
 class Reader(object):
     aligment = 0  # 2**n
@@ -193,6 +200,7 @@ class Reader(object):
                             segments.append(Segment(container.address, container.length, container.chunk))
                         else:
                             pass
+                            #print "*** PI:", container.processingInstructions
                             #print container # Sonderfälle als 'processingInstructions' speichern!!!
 
         return Image(joinSegments(segments))
@@ -227,4 +235,68 @@ class Reader(object):
 
     def parseData(self, line, formatType):
         return True
+
+
+
+
+class Writer(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, outFile, bytesPerRow = 16, header = None, startAddress = None):
+        self.outFile = outFile
+        self.bytesPerRow = bytesPerRow
+        self.header = header
+        self.startAddress = startAddress
+
+    def addressSpace(self, segment):
+        top = segment.address + len(segment.data)
+        if top <= 0xffff:
+            aspace = Image.AS_16
+        elif top <= 0xffffff:
+            aspace = Image.AS_24
+        elif top <= 0xffffffff:
+            aspace = Image.AS_32
+        else:
+            aspace = Image.AS_64    # Unlikely and not really supported.
+        return aspace
+
+    def write(self, image):
+        checksum = 0
+        self.writeHeader()
+
+        addressSpace = self.addressSpace(image.segments[-1])
+
+        for segment in image.segments:
+            self.writeBlock(segment)
+
+        self.writeFooter(checksum)
+
+
+    @abc.abstractmethod
+    def writeHeader(self):
+        pass
+
+    @abc.abstractmethod
+    def writeFooter(self, checksum):
+        pass
+
+    @abc.abstractmethod
+    def writeBlock(self, block):
+        self.outFile.write("$A%04X," %segment.address)
+        for idx, b in enumerate(segment.data):
+            if (idx % self.bytesPerRow) == 0:
+                self.outFile.write("\n")
+
+            self.outFile.write("%02X " % b)
+            checksum += b
+        self.outFile.write("\n")
+
+    @abc.abstractmethod
+    def writeLine(self, type_, address, data):
+        pass
+
+    def wordToBytes(self, word):
+        h = (word & 0xff00) >> 8
+        l = word & 0x00ff
+        return h, l
 
