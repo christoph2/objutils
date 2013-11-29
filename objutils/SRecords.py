@@ -26,29 +26,32 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.HexFile as HexFile
 import cStringIO
+from functools import partial
 import re
+from objutils.checksums import lrc, COMPLEMENT_ONES
+import objutils.HexFile as HexFile
 
-S0=1
-S1=2
-S2=3
-S3=4
-S5=5
-S7=6
-S8=7
-S9=8
-SYM=9
+
+S0  = 1
+S1  = 2
+S2  = 3
+S3  = 4
+S5  = 5
+S7  = 6
+S8  = 7
+S9  = 8
+SYM = 9
 
 FORMATS=(
-    (S0,"S0LLAAAADDCC"),
-    (S1,"S1LLAAAADDCC"),
-    (S2,"S2LLAAAAAADDCC"),
-    (S3,"S3LLAAAAAAAADDCC"),
-    (S5,"S5LLAAAACC"),
-    (S7,"S7LLAAAAAAAACC"),
-    (S8,"S8LLAAAAAACC"),
-    (S9,"S9LLAAAACC"),
+    (S0, "S0LLAAAADDCC"),
+    (S1, "S1LLAAAADDCC"),
+    (S2, "S2LLAAAAAADDCC"),
+    (S3, "S3LLAAAAAAAADDCC"),
+    (S5, "S5LLAAAACC"),
+    (S7, "S7LLAAAAAAAACC"),
+    (S8, "S8LLAAAAAACC"),
+    (S9, "S9LLAAAACC"),
 )
 
 BIAS = {
@@ -82,7 +85,7 @@ class Reader(HexFile.Reader):
         if formatType in (S0, S1, S5, S9):
             checkSumOfAddress=((line.address & 0xff00) >> 8) + (line.address & 0xff)
         elif formatType in (S2, S8):
-            checkSumOfAddress = ((line.address & 0xff0000)>>16) + ((line.address & 0xff00) >> 8) + \
+            checkSumOfAddress = ((line.address & 0xff0000) >> 16) + ((line.address & 0xff00) >> 8) + \
                 (line.address & 0xff)
         elif formatType in (S3, S7):
             checkSumOfAddress=(((line.address & 0xff000000) >> 24)+((line.address & 0xff0000) >> 16) + \
@@ -95,8 +98,8 @@ class Reader(HexFile.Reader):
             checksum = (~(sum([line.length,checkSumOfAddress]))) & 0xff
         if line.checksum != checksum:
             raise HexFile.InvalidRecordChecksumError()
-        line.length-=BIAS[formatType]   # calculate actual data length.
-        if line.length and (line.length != len(line.chunk)):
+        line.length -= BIAS[formatType]   # calculate actual data length.
+        if hasattr(line, 'chunk') and line.length and (line.length != len(line.chunk)):
             raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def isDataLine(self, line, formatType):
@@ -128,5 +131,58 @@ class Reader(HexFile.Reader):
                     gd = ma.groupdict()
                     sb.append((gd['symbol'], int(gd['value'], 16)))
             self.symbols.append(sb)
-        print self.symbols
+        #print self.symbols
+
+
+reader = Reader(file(r'C:\projekte\csProjects\yOBJl\tests\CWFirst.abs.s19'))
+data = reader.read()
+
+TEST = '''S00600004844521B
+S1130000285F245F2212226A000424290008237C2A
+S11300100002000800082629001853812341001813
+S113002041E900084E42234300182342000824A952
+S107003000144ED492
+S5030004F8
+S9030000FC'''
+
+r = Reader(cStringIO.StringIO(TEST))
+data = r.read()
+#print data.segments[0].data
+
+"""
+• If SRECORD = S1, the S Record file gets the extension .s1.
+• If SRECORD = S2, the S Record file gets the extension .s2.
+• If SRECORD = S3, the S Record file gets the extension .s3.
+• If SRECORD is not set, the S Record file gets the extension .sx.
+"""
+
+class Writer(HexFile.Writer):
+    checksum = partial(lrc, width = 8, comp = COMPLEMENT_ONES)
+
+
+    def writeHeader(self):
+        pass
+
+    def writeFooter(self, checksum):
+        pass
+
+    def writeBlock(self, block):
+        pass
+
+    def writeLine(self, type_, address, data):
+        length = len(data) + 3
+        h, l = self.wordToBytes((address))
+        checksum = self.checksum(list((length, h, l)) + list(data))
+        ## buildLine()
+        line = ""
+        for b in data:
+            line += "%02X" % b
+
+        self.outFile.write("S%u%02X%04X%s%02X" % (type_, length, address, line, checksum))
+
+
+##import sys
+
+##wr = Writer(sys.stdout)
+##wr.writeLine(9, 0xaffe, (1, 2, 3, 4, 5))
 

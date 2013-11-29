@@ -793,12 +793,12 @@ class Null(object): pass
 
 
 class ELFHeader(object):
-    def __init__(self,parent):
+    def __init__(self, parent):
         self.parent = parent
-        parent.inFile.seek(0,os.SEEK_SET)
+        parent.inFile.seek(0, os.SEEK_SET)
         data = parent.inFile.read(ELF_HEADER_SIZE)
 
-        elfHeader = struct.unpack(HDR_FMT,data)
+        elfHeader = struct.unpack(HDR_FMT, data)
         if not self._checkMagic(elfHeader):
             # todo: Error-Handling!!!
             return

@@ -26,8 +26,10 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from functools import partial
 import operator
 import objutils.HexFile as HexFile
+from objutils.checksums import lrc, COMPLEMENT_TWOS
 
 FORMATS=(
     (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
@@ -81,29 +83,68 @@ class Reader(HexFile.Reader):
     def specialProcessing(self, line, formatType):
         if line.type == DATA:
             line.address = self._addressCalculator(line.address)
+            #line.addPI(('address', line.address))
         elif line.type == EXTENDED_SEGMENT_ADDRESS:
             seg = ((line.chunk[0]) << 8) | (line.chunk[1])
+            line.addPI(('segment', seg))
             self._addressCalculator = curry(operator.add, seg << 4)
             print "EXTENDED_SEGMENT_ADDRESS: ", hex(seg)
         elif line.type == START_SEGMENT_ADDRESS:
             cs = ((line.chunk[0]) << 8) | (line.chunk[1])
             ip = ((line.chunk[2]) << 8) | (line.chunk[3])
+            line.addPI(('cs', cs))
+            line.addPI(('ip', ip))
             print "START_SEGMENT_ADDRESS: %s:%s" % (hex(cs), hex(ip))
         elif line.type == EXTENDED_LINEAR_ADDRESS:
             seg = ((line.chunk[0]) << 8) | (line.chunk[1])
+            line.addPI(('segment', seg))
             self._addressCalculator = curry(operator.add, seg << 16)
             print "EXTENDED_LINEAR_ADDRESS: ", hex(seg)
         elif line.type == START_LINEAR_ADDRESS:
             eip = ((line.chunk[0]) << 24) | ((line.chunk[1]) << 16) | ((line.chunk[2]) << 8) | (line.chunk[3])
+            line.addPI(('eip', eip))
             print "START_LINEAR_ADDRESS: ", hex(eip)
+        elif line.type == EOF:
+            print "/// EOF"
+        else:
+            print "???"
 
     _addressCalculator = identity
 
-def main():
-    inf = file(r"../tests/Hc12dg128.hex")
-    fee = Reader(FORMATS, inf).read()
-    print fee
 
-if __name__ == '__main__':
-    main()
+":10010000214601360121470136007EFE09D2190140"
+":10010000214601360121470136007EFE09D2190140"
+
+": 10 0100  00      21 46 01 36 01 21 47 01 36 00 7E FE 09 D2 19 01      40"
+
+class Writer(HexFile.Writer):
+    checksum = partial(lrc, width = 8, comp = COMPLEMENT_TWOS)
+
+    def writeHeader(self):
+        pass
+
+    def writeFooter(self, checksum):
+        pass
+
+    def writeBlock(self, block):
+        pass
+
+    def writeLine(self, type_, address, data):
+        length = len(data)
+        h, l = self.wordToBytes((address))
+        checksum = self.checksum(list((length, h, l)) + list(data))
+        ## buildLine()
+        line = ""
+        for b in data:
+            line += "%02X" % b
+
+        self.outFile.write(":%02X%04X%02X%s%02X" % (length, address, type_, line, checksum))
+
+import sys
+
+data = [0x21, 0x46, 0x01, 0x36, 0x01, 0x21, 0x47, 0x01, 0x36, 0x00, 0x7E, 0xFE, 0x09, 0xD2, 0x19, 0x01]
+
+wr = Writer(sys.stdout)
+wr.writeLine(0, 0x0100, data)
+
 
