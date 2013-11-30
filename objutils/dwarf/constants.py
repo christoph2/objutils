@@ -811,8 +811,8 @@ DW_DSC_label                    = 0x00
 DW_DSC_range                    = 0x01
 
 DSC_MAP = {
-    DW_DSC_label                : "DW_DSC_label";
-    DW_DSC_range                : "DW_DSC_range";
+    DW_DSC_label                : "DW_DSC_label",
+    DW_DSC_range                : "DW_DSC_range",
 }
 
 
