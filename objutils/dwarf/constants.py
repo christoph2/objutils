@@ -27,6 +27,21 @@ __copyright__ = """
 """
 
 
+class Base(object):
+
+    def __init__(self, value):
+        self._value = value
+
+    def _getValue(self):
+        return self._value
+
+    def __str__(self):
+        return "< %s::%s >" % (self.__class__.__name__, self.MAP.get(self._value, self._value))
+
+    __repr__ = __str__
+
+    value = property(_getValue)
+
 ##
 ## Tag encodings
 ##
@@ -158,6 +173,9 @@ TAG_MAP = {
     DW_TAG_hi_user                  : "DW_TAG_hi_user",
 }
 
+class Tag(Base):
+    MAP = TAG_MAP
+
 ##
 ## Child determination encodings.
 ##
@@ -169,6 +187,8 @@ CHILDREN_MAP = {
     DW_CHILDREN_yes             : "DW_CHILDREN_yes",
 }
 
+class Children(Base):
+    MAP = CHILDREN_MAP
 
 ##
 ## Attribute encodings.
@@ -365,6 +385,8 @@ ATTR_MAP = {
     DW_AT_hi_user                   : "DW_AT_hi_user",
 }
 
+class AttributeEncoding(Base):
+    MAP = ATTR_MAP
 
 ##
 ## Attribute form encodings.
@@ -423,6 +445,8 @@ FORM_MAP = {
     DW_FORM_ref_sig8            : "DW_FORM_ref_sig8",
 }
 
+class AttributeForm(Base):
+    MAP = FORM_MAP
 
 ##
 ## DWARF operation encodings.
@@ -569,6 +593,9 @@ OPERATION_MAP = {
     DW_OP_hi_user               : "DW_OP_hi_user",
 }
 
+class Operation(Base):
+    MAP = OPERATION_MAP
+
 
 ##
 ## Base type encoding values.
@@ -613,6 +640,9 @@ ATE_MAP = {
     DW_ATE_hi_user              : "DW_ATE_hi_user",
 }
 
+class BaseTypeEncoding(Base):
+    MAP = ATE_MAP
+
 
 ##
 ## Decimal sign encodings.
@@ -631,6 +661,8 @@ DS_MAP = {
     DW_DS_trailing_separate     : "DW_DS_trailing_separate",
 }
 
+class DecimalSign(Base):
+    MAP = DS_MAP
 
 ##
 ## Endianity encoding.
@@ -649,6 +681,8 @@ END_MAP = {
     DW_END_hi_user              : "DW_END_hi_user",
 }
 
+class Endianity(Base):
+    MAP = END_MAP
 
 ##
 ## Accessibility encodings.
@@ -663,6 +697,8 @@ ACCESS_MAP = {
     DW_ACCESS_private           : "DW_ACCESS_private",
 }
 
+class Accessibility(Base):
+    MAP = ACCESS_MAP
 
 ##
 ## Visibility encodings.
@@ -677,6 +713,9 @@ VIS_MAP = {
     DW_VIS_qualified            : "DW_VIS_qualified",
 }
 
+class Visibility(Base):
+    MAP = VIS_MAP
+
 ##
 ## Virtuality encodings.
 ##
@@ -689,6 +728,9 @@ VIRTUALITY_MAP = {
     DW_VIRTUALITY_virtual       : "DW_VIRTUALITY_virtual",
     DW_VIRTUALITY_pure_virtual  : "DW_VIRTUALITY_pure_virtual",
 }
+
+class Virtuality(Base):
+    MAP = VIRTUALITY_MAP
 
 
 ##
@@ -742,6 +784,9 @@ LANG_MAP = {
     DW_LANG_hi_user             : "DW_LANG_hi_user",
 }
 
+class Language(Base):
+    MAP = LANG_MAP
+
 ##
 ## Identifier case encodings.
 ##
@@ -757,6 +802,8 @@ ID_MAP = {
     DW_ID_case_insensitive      : "DW_ID_case_insensitive",
 }
 
+class IdentifierCase(Base):
+    MAP = ID_MAP
 
 ##
 ## Calling convention encodings.
@@ -775,6 +822,8 @@ CC_MAP = {
     DW_CC_hi_user               : "DW_CC_hi_user",
 }
 
+class CallingConvention(Base):
+    MAP = CC_MAP
 
 ##
 ## Inline encodings.
@@ -791,6 +840,9 @@ INL_MAP = {
     DW_INL_declared_inlined     : "DW_INL_declared_inlined",
 }
 
+class Inline(Base):
+    MAP = INL_MAP
+
 
 ##
 ## Ordering encodings.
@@ -803,6 +855,9 @@ ORD_MAP = {
     DW_ORD_col_major            : "DW_ORD_col_major",
 }
 
+class Ordering(Base):
+    MAP = ORD_MAP
+
 
 ##
 ##  Discriminant descriptor encodings.
@@ -814,6 +869,9 @@ DSC_MAP = {
     DW_DSC_label                : "DW_DSC_label",
     DW_DSC_range                : "DW_DSC_range",
 }
+
+class DiscriminantDescriptor(Base):
+    MAP = DSC_MAP
 
 
 ##
@@ -847,6 +905,9 @@ LNS_MAP = {
     DW_LNS_set_isa              : "DW_LNS_set_isa",
 }
 
+class LineNumberStandard(Base):
+    MAP = LNS_MAP
+
 
 ##
 ##  Line Number Extended Opcode Encodings.
@@ -868,6 +929,9 @@ LNE_MAP = {
 }
 
 
+class LineNumberExtended(Base):
+    MAP = LNE_MAP
+
 ##
 ## Macro Information.
 ##
@@ -884,6 +948,9 @@ MACINFO_MAP = {
     DW_MACINFO_end_file         : "DW_MACINFO_end_file",
     DW_MACINFO_vendor_ext       : "DW_MACINFO_vendor_ext",
 }
+
+class MacroInformation(Base):
+    MAP = MACINFO_MAP
 
 ##
 ## Segmented Addresses.
