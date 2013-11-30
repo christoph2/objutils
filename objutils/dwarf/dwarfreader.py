@@ -53,14 +53,16 @@ class DwarfReader(PlainBinaryReader):
     def sleb(self):
         result = 0
         shift = 0
+        idx =0
         while True:
             bval = self.nextByte()
             result |= ((bval & 0x7f) << shift)
             shift += 7
+            idx += 1
             if bval & 0x80 == 0:
                 break
         if (shift < 32) or (bval & 0x40) == 0x40:
-            mask = - (1 << (len(values) * 7))
+            mask = - (1 << (idx * 7))
             result |= mask
         return result
 
