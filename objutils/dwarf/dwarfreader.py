@@ -64,3 +64,19 @@ class DwarfReader(PlainBinaryReader):
             result |= mask
         return result
 
+    def _block(self, size):
+        _BLOCK_SIZE_READER = {1: self.u8, 2: self.u16, 4: self.u32, -1: self.uleb}
+        return [self.u8() for _ in range(_BLOCK_SIZE_READER[size]())]
+
+    def block1(self):
+        return self._block(1)
+
+    def block2(self):
+        return self._block(2)
+
+    def block4(self):
+        return self._block(4)
+
+    def block(self):
+        return self._block(-1)
+
