@@ -27,3 +27,6 @@ __copyright__ = """
 """
 
 class FileCorruptedError(Exception): pass
+
+class PrematureEndOfFileError(Exception): pass
+
