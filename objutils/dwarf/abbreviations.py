@@ -31,7 +31,7 @@ from operator import itemgetter, attrgetter
 
 from objutils.dwarf import constants, dwarfreader
 
-AbbreviationEntry = namedtuple('Abbreviation', 'code, tag, children, attrs')
+AbbreviationEntry = namedtuple('Abbreviation', 'tag, children, attrs')
 
 SET_OFFSET      = 1
 IGNORE_OFFSET   = 2
@@ -41,7 +41,7 @@ def processAbbreviations(section):
     dr = dwarfreader.DwarfReader(image)
     totalSize = len(image)
     abbrevs = {}
-    abbrevEntries = []
+    abbrevEntries = {}
     offsetState = SET_OFFSET
     while dr.pos < totalSize:
         if offsetState == SET_OFFSET:
@@ -49,8 +49,8 @@ def processAbbreviations(section):
             offsetState = IGNORE_OFFSET
         code = dr.uleb()
         if code == 0:
-            abbrevs[offset] = sorted(abbrevEntries, key = attrgetter('code'))
-            abbrevEntries = []
+            abbrevs[offset] = abbrevEntries
+            abbrevEntries = {}
             offsetState = SET_OFFSET
             continue
         tagValue = dr.uleb()
@@ -65,6 +65,6 @@ def processAbbreviations(section):
             if attrValue == 0 and formValue == 0:
                 break
             attrSpecs.append((attr, form))
-        abbrevEntries.append(AbbreviationEntry(code, tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs))
+        abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
     return abbrevs
 
