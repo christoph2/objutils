@@ -63,6 +63,9 @@ class PlainBinaryReader(object):
     def u32(self):
         return self.value('L', 4)
 
+    def u64(self):
+        return self.value('Q', 8)
+
     def s8(self):
         return self.value('b', 1)
 
@@ -71,6 +74,9 @@ class PlainBinaryReader(object):
 
     def s32(self):
         return self.value('l', 4)
+
+    def s64(self):
+        return self.value('q', 8)
 
     def asciiz(self):
         result = []
