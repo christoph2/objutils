@@ -47,6 +47,9 @@ class PlainBinaryReader(object):
     def _setPos(self, pos):
         self.image.seek(pos, os.SEEK_SET)
 
+    def reset(self):
+        self.pos = 0
+
     def nextByte(self):
         return self.u8()
 
