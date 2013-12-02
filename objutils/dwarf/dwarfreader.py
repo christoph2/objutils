@@ -70,6 +70,8 @@ FORM_READERS = {
 }
 
 AbbreviationEntry = namedtuple('Abbreviation', 'tag, children, attrs')
+InfoHeader = namedtuple('InfoHeader', 'length dwarfVersion abbrevOffs targetAddrSize')
+
 
 SET_OFFSET      = 1
 IGNORE_OFFSET   = 2
@@ -131,8 +133,20 @@ def makeAttrName(value):
 class DebugSectionReader(object):
 
     def __init__(self, sections):
+        print sections.keys()
         self.sections = sections
+        self.instantiateReaders()
         self.abbrevs = {}
+        self.infoHeaders = []
+        self.scanDebugInfoHeaders()
+
+    def instantiateReaders(self):
+        self.readers = {}
+        for name, section in self.sections.items():
+            self.readers[name] = DwarfReader(section.image)
+
+    def getReader(self, name):
+        return  self.readers[name]
 
     def process(self):
         self.processAbbreviations()
@@ -140,13 +154,12 @@ class DebugSectionReader(object):
         #print self.abbrevs
 
     def processAbbreviations(self):
-        image = self.sections['.debug_abbrev'].image
-        dr = DwarfReader(image)
-        totalSize = len(image)
+        dr = self.getReader('.debug_abbrev')
         abbrevs = {}
         abbrevEntries = {}
         offsetState = SET_OFFSET
-        while dr.pos < totalSize:
+        while dr.pos < dr.size:
+            startPos = dr.pos
             if offsetState == SET_OFFSET:
                 offset = dr.pos
                 offsetState = IGNORE_OFFSET
@@ -160,6 +173,8 @@ class DebugSectionReader(object):
             tag = constants.TAG_MAP.get(tagValue, tagValue)
             children = dr.u8()
             attrSpecs = []
+            if dr.pos == 0x69:
+                pass
             while True:
                 attrValue = dr.uleb()
                 attr = constants.AttributeEncoding(attrValue)
@@ -167,14 +182,18 @@ class DebugSectionReader(object):
                 form = constants.AttributeForm(formValue)
                 if attrValue == 0 and formValue == 0:
                     break
+                #print (attr, form)
                 attrSpecs.append((attr, form))
             abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
+            print startPos, abbrevEntries[code]
+        #if abbrevs == {}:   # NOTBEHELF!!!
+        #    abbrevs[offset] = abbrevEntries
         self.abbrevs = abbrevs
+        dr.reset()
 
     def processInfoSection(self):
-        image = self.sections['.debug_info'].image
-        dr = DwarfReader(image)
-        while dr.pos < len(image):
+        dr = self.getReader('.debug_info')
+        while dr.pos < dr.size:
             length = dr.u32()
             stopPosition = dr.pos + length
             dwarfVersion = dr.u16()
@@ -196,4 +215,20 @@ class DebugSectionReader(object):
                     reader = FORM_READERS[form.value]
                     attrValue = getattr(dr, reader)()
                     print "%s ==> '%s'" % (attribute, attrValue)
+        dr.reset()
+
+    def scanDebugInfoHeaders(self):
+        dr = self.getReader('.debug_info')
+        result = []
+        while dr.pos < dr.size:
+            length = dr.u32()
+
+            nextPosition = dr.pos + length
+            dwarfVersion = dr.u16()
+            abbrevOffs = dr.u32()
+            targetAddrSize = dr.u8()
+            dr.pos = nextPosition
+            result.append(InfoHeader(length, dwarfVersion, abbrevOffs, targetAddrSize))
+        dr.reset()
+        self.infoHeaders = result
 
