@@ -37,7 +37,10 @@ class PlainBinaryReader(object):
     BIG_ENDIAN      = '>'
 
     def __init__(self, image, endianess = "@"):
-        self.image = image # StringIO.StringIO(image)
+        self.image = image
+        self.image.seek(0, os.SEEK_END)
+        self._size = self.image.tell()
+        self.image.seek(0, os.SEEK_SET)
         self.endianess = endianess
         self.pos = 0
 
@@ -46,6 +49,9 @@ class PlainBinaryReader(object):
 
     def _setPos(self, pos):
         self.image.seek(pos, os.SEEK_SET)
+
+    def _getSize(self):
+        return self._size
 
     def reset(self):
         self.pos = 0
@@ -92,6 +98,7 @@ class PlainBinaryReader(object):
         return ''.join(chr(c) for c in result)
 
     pos = property(_getPos, _setPos)
+    size = property(_getSize)
 
 
 
