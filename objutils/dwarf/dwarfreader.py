@@ -46,7 +46,7 @@ FORM_READERS = {
     constants.DW_FORM_data2:        'u16',
     constants.DW_FORM_data4:        'u32',
     constants.DW_FORM_data8:        'u64',
-    constants.DW_FORM_addr:         'u32',  ## TODO: Target word size!!!
+    constants.DW_FORM_addr:         'addr',
     constants.DW_FORM_block:        'block',
     constants.DW_FORM_block1:       'block1',
     constants.DW_FORM_block2:       'block2',
@@ -81,6 +81,7 @@ class DwarfReader(PlainBinaryReader):
 
     def __init__(self, image):
         super(DwarfReader, self).__init__(StringIO.StringIO(image), DwarfReader.BIG_ENDIAN)
+        self.wordSize = None
 
     def uleb(self):
         result = 0
@@ -124,6 +125,19 @@ class DwarfReader(PlainBinaryReader):
 
     def block(self):
         return self._block(-1)
+
+    def addr(self):
+        if self.wordSize == 1:
+            return self.u8()
+        elif self.wordSize == 2:
+            return self.u16()
+        elif self.wordSize == 4:
+            return self.u32()
+        elif self.wordSize == 8:
+            return self.u64()
+        else:
+            pass        # TODO: Error handling!
+
 
 
 def makeAttrName(value):
@@ -200,6 +214,7 @@ class DebugSectionReader(object):
             abbrevOffs = dr.u32()
             abbrevs = self.abbrevs[abbrevOffs]
             targetAddrSize = dr.u8()
+            dr.wordSize = targetAddrSize
 
             while dr.pos < stopPosition:
                 number = dr.uleb()
