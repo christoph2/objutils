@@ -240,8 +240,9 @@ class DebugSectionReader(object):
                     reader = FORM_READERS[form.value]
                     attrValue = getattr(dr, reader)()
                     if attribute.value in (constants.DW_AT_return_addr, ):
-                        dr = Dissector(attrValue, targetAddrSize)
-                        data = dr.run()
+                        dis = Dissector(attrValue, targetAddrSize)
+                        data = dis.run()
+                        print "\t", data
                     print "%s ==> '%s'" % (attribute, attrValue)
         dr.reset()
 

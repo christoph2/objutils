@@ -126,6 +126,27 @@ MACHINE_WORD = (
     constants.DW_OP_addr,
 )
 
+class Operation(object):
+
+    def __init__(self, opcode, operands):
+        self._operands = operands
+        self._opcode = opcode
+
+    def _getOperands(self):
+        return self._operands
+
+    def _getOpcode(self):
+        return self._opcode
+
+    def __str__(self):
+        return "< Operation 0x%02x %s >" % (self.opcode, self.operands)
+
+    __repr__ = __str__
+
+    opcode = property(_getOpcode)
+    operands = property(_getOperands)
+
+
 class Dissector(object):
 
     def __init__(self, block, wordSize):
@@ -144,7 +165,7 @@ class Dissector(object):
 
     def lookupDecoder(self, opcode):
         result = None
-        if opcode in self._cache: 
+        if opcode in self._cache:
             result = self._cache[opcode]
         else:
             for enc, func in self.ENCODINGS.items():
@@ -169,7 +190,10 @@ class Dissector(object):
         pass
 
     def readSingleSLeb(self):
-        pass
+        length = self.getLEBLength()
+        arr = self.slice(length)
+        res = encoding.decodeSLEB(arr)
+        return res
 
     def readULebFollowedBySLeb(self):
         pass
@@ -183,11 +207,11 @@ class Dissector(object):
     def readMachineWord(self):
         return self.arrayToNumber(self.slice(self.wordSize))
 
-    def getLEB(self, values):
-        for idx, bval in enumerate(values, 1):
+    def getLEBLength(self):
+        for idx, bval in enumerate(self.block, 1):
              if bval & 0x80 == 0:
                  break
-        return values[ : idx], idx
+        return idx
 
     def slice(self, len):
         arr =  self.block[ : len]
@@ -218,22 +242,3 @@ def getLEB(values):
 
 leb, endIndex = getLEB([199, 155, 127])
 
-class Operation(object):
-
-    def __init__(self, opcode, operands):
-        self._operands = operands
-        self._opcode = opcode
-
-    def _getOperands(self):
-        return self._operands
-
-    def _getOpcode(self):
-        return self._opcode
-
-    def __str__(self):
-        return "< Operation 0x%02x %s >" % (self.opcode, self.operands)
-
-    __repr__ = __str__
-
-    opcode = property(_getOpcode)
-    operands = property(_getOperands)
