@@ -36,7 +36,7 @@ class Base(object):
         return self._value
 
     def __str__(self):
-        return "< %s::%s >" % (self.__class__.__name__, self.MAP.get(self._value, self._value))
+        return "< %s >" % (self.MAP.get(self._value, self._value))
 
     __repr__ = __str__
 
