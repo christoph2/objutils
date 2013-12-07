@@ -37,6 +37,7 @@ import struct
 from objutils.readers import PlainBinaryReader
 
 from objutils.dwarf import constants
+from objutils.dwarf.locinfo import Dissector
 
 FORM_READERS = {
     constants.DW_FORM_string:       'asciiz',
@@ -109,6 +110,15 @@ class DwarfReader(PlainBinaryReader):
             mask = - (1 << (idx * 7))
             result |= mask
         return result
+
+    def asciiz(self):
+        result = []
+        while True:
+            bval = self.nextByte()
+            if bval == 0:
+                break
+            result.append(bval)
+        return ''.join(chr(x) for x in result)
 
     def _block(self, size):
         _BLOCK_SIZE_READER = {1: self.u8, 2: self.u16, 4: self.u32, -1: self.uleb}
@@ -199,7 +209,7 @@ class DebugSectionReader(object):
                 #print (attr, form)
                 attrSpecs.append((attr, form))
             abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
-            print startPos, abbrevEntries[code]
+            #print startPos, abbrevEntries[code]
         #if abbrevs == {}:   # NOTBEHELF!!!
         #    abbrevs[offset] = abbrevEntries
         self.abbrevs = abbrevs
@@ -229,6 +239,9 @@ class DebugSectionReader(object):
                     attribute, form = attr
                     reader = FORM_READERS[form.value]
                     attrValue = getattr(dr, reader)()
+                    if attribute.value in (constants.DW_AT_return_addr, ):
+                        dr = Dissector(attrValue, targetAddrSize)
+                        data = dr.run()
                     print "%s ==> '%s'" % (attribute, attrValue)
         dr.reset()
 
