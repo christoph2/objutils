@@ -187,7 +187,10 @@ class Dissector(object):
         return self.arrayToNumber(self.slice(8))
 
     def readSingleULeb(self):
-        pass
+        length = self.getLEBLength()
+        arr = self.slice(length)
+        res = encoding.decodeULEB(arr)
+        return res
 
     def readSingleSLeb(self):
         length = self.getLEBLength()
@@ -196,13 +199,19 @@ class Dissector(object):
         return res
 
     def readULebFollowedBySLeb(self):
-        pass
+        uleb = self.readSingleULeb()
+        sleb = self.readSingleSLeb()
+        return (uleb, sleb)
 
     def readULebFollowedByULeb(self):
-        pass
+        uleb1 = self.readSingleULeb()
+        uleb2 = self.readSingleULeb()
+        return (uleb1, uleb2)
 
     def readULebFollowedByBlock(self):
-        pass
+        length = self.readSingleULeb()
+        block = self.slice(length)
+        return (uleb, block)
 
     def readMachineWord(self):
         return self.arrayToNumber(self.slice(self.wordSize))
