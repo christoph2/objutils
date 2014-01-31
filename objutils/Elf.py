@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -792,6 +792,9 @@ BYTEORDER_PREFIX = {
 class Null(object): pass
 
 
+class FormatError(Exception): pass
+
+
 class ELFHeader(object):
     def __init__(self, parent):
         self.parent = parent
@@ -800,8 +803,7 @@ class ELFHeader(object):
 
         elfHeader = struct.unpack(HDR_FMT, data)
         if not self._checkMagic(elfHeader):
-            # todo: Error-Handling!!!
-            return
+            raise FormatError("Wrong magic bytes.")
 
         d = Elf32_Ehdr(*elfHeader)
         self.byteorderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
@@ -816,14 +818,11 @@ class ELFHeader(object):
             setattr(self.data, key, value)
 
         if not (self.elfEHSize == ELF_HEADER_SIZE):
-            # todo: Error-Handling!!!
-            return
+            raise FormatError("Wrong header size.")
         if not (self.elfPHTEntrySize == ELF_PHDR_SIZE):
-            # todo: Error-Handling!!!
-            return
+            raise FormatError("Wrong p-header size.")
         if not (self.elfSHTEntrySize == ELF_SECTION_SIZE):
-            # todo: Error-Handling!!!
-            return
+            raise FormatError("Wrong section size.")
 
         self.hasStringTable = not (self.elfStringTableIndex == SHN_UNDEF)
 
@@ -942,8 +941,6 @@ class ELFSectionHeaderTable(object):
         #print self.parent
 
 
-class ELFInvalidHeaderError(Exception): pass
-
 class ELFProgramHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
         parent.inFile.seek(atPosition, os.SEEK_SET)
@@ -952,7 +949,7 @@ class ELFProgramHeaderTable(object):
         try:
             elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix, PHDR_FMT), data)
         except struct.error:
-            raise ELFInvalidHeaderError()
+            raise FormatError("Wrong program header table.")
 
         d = Elf32_Phdr(*elfProgramHeaderTable)
         self.data = Null()
