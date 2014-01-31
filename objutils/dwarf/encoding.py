@@ -132,6 +132,15 @@ class testDecodeSLEB(unittest.TestCase):
             self.assertEquals(decodeSLEB(value), result)
 
 
+def sint(value, nbytes):
+    mask = 2 ** ((nbytes * 8) - 1)
+    if value >=mask:
+        return (~value) + 1
+    else:
+        return value
+
+print sint(-144, 2)
+
 def main():
     unittest.main()
 
