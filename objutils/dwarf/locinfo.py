@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -33,7 +33,38 @@ import objutils.dwarf.encoding as encoding
 
 
 NO_OPERANDS = (
-    #constants.DW_OP_reg0 - constants.DW_OP_reg31
+    constants.DW_OP_reg0,
+    constants.DW_OP_reg1,
+    constants.DW_OP_reg2,
+    constants.DW_OP_reg3,
+    constants.DW_OP_reg4,
+    constants.DW_OP_reg5,
+    constants.DW_OP_reg6,
+    constants.DW_OP_reg7,
+    constants.DW_OP_reg8,
+    constants.DW_OP_reg9,
+    constants.DW_OP_reg10,
+    constants.DW_OP_reg11,
+    constants.DW_OP_reg12,
+    constants.DW_OP_reg13,
+    constants.DW_OP_reg14,
+    constants.DW_OP_reg15,
+    constants.DW_OP_reg16,
+    constants.DW_OP_reg17,
+    constants.DW_OP_reg18,
+    constants.DW_OP_reg19,
+    constants.DW_OP_reg20,
+    constants.DW_OP_reg21,
+    constants.DW_OP_reg22,
+    constants.DW_OP_reg23,
+    constants.DW_OP_reg24,
+    constants.DW_OP_reg25,
+    constants.DW_OP_reg26,
+    constants.DW_OP_reg27,
+    constants.DW_OP_reg28,
+    constants.DW_OP_reg29,
+    constants.DW_OP_reg30,
+    constants.DW_OP_reg31,
     constants.DW_OP_deref,
     constants.DW_OP_dup,
     constants.DW_OP_drop,
@@ -61,7 +92,38 @@ NO_OPERANDS = (
     constants.DW_OP_le,
     constants.DW_OP_lt,
     constants.DW_OP_ne,
-#    constants.DW_OP_lit0 -  constants.DW_OP_lit31
+    constants.DW_OP_lit0,
+    constants.DW_OP_lit1,
+    constants.DW_OP_lit2,
+    constants.DW_OP_lit3,
+    constants.DW_OP_lit4,
+    constants.DW_OP_lit5,
+    constants.DW_OP_lit6,
+    constants.DW_OP_lit7,
+    constants.DW_OP_lit8,
+    constants.DW_OP_lit9,
+    constants.DW_OP_lit10,
+    constants.DW_OP_lit11,
+    constants.DW_OP_lit12,
+    constants.DW_OP_lit13,
+    constants.DW_OP_lit14,
+    constants.DW_OP_lit15,
+    constants.DW_OP_lit16,
+    constants.DW_OP_lit17,
+    constants.DW_OP_lit18,
+    constants.DW_OP_lit19,
+    constants.DW_OP_lit20,
+    constants.DW_OP_lit21,
+    constants.DW_OP_lit22,
+    constants.DW_OP_lit23,
+    constants.DW_OP_lit24,
+    constants.DW_OP_lit25,
+    constants.DW_OP_lit26,
+    constants.DW_OP_lit27,
+    constants.DW_OP_lit28,
+    constants.DW_OP_lit29,
+    constants.DW_OP_lit30,
+    constants.DW_OP_lit31,
     constants.DW_OP_nop,
     constants.DW_OP_push_object_address,
     constants.DW_OP_form_tls_address,
@@ -106,7 +168,38 @@ SINGLE_ULEB = (
 
 SINGLE_SLEB = (
     constants.DW_OP_consts,
-    #constants.DW_OP_breg0 -     constants.DW_OP_breg31
+    constants.DW_OP_breg0,
+    constants.DW_OP_breg1,
+    constants.DW_OP_breg2,
+    constants.DW_OP_breg3,
+    constants.DW_OP_breg4,
+    constants.DW_OP_breg5,
+    constants.DW_OP_breg6,
+    constants.DW_OP_breg7,
+    constants.DW_OP_breg8,
+    constants.DW_OP_breg9,
+    constants.DW_OP_breg10,
+    constants.DW_OP_breg11,
+    constants.DW_OP_breg12,
+    constants.DW_OP_breg13,
+    constants.DW_OP_breg14,
+    constants.DW_OP_breg15,
+    constants.DW_OP_breg16,
+    constants.DW_OP_breg17,
+    constants.DW_OP_breg18,
+    constants.DW_OP_breg19,
+    constants.DW_OP_breg20,
+    constants.DW_OP_breg21,
+    constants.DW_OP_breg22,
+    constants.DW_OP_breg23,
+    constants.DW_OP_breg24,
+    constants.DW_OP_breg25,
+    constants.DW_OP_breg26,
+    constants.DW_OP_breg27,
+    constants.DW_OP_breg28,
+    constants.DW_OP_breg29,
+    constants.DW_OP_breg30,
+    constants.DW_OP_breg31,
     constants.DW_OP_fbreg,
 )
 
@@ -129,7 +222,7 @@ MACHINE_WORD = (
 class Operation(object):
 
     def __init__(self, opcode, operands):
-        self._operands = operands
+        self._operands = list([operands])
         self._opcode = opcode
 
     def _getOperands(self):
@@ -139,7 +232,11 @@ class Operation(object):
         return self._opcode
 
     def __str__(self):
-        return "< Operation 0x%02x %s >" % (self.opcode, self.operands)
+        operands = ', '.join([str(o) for o in self.operands])
+        if operands == '[]':
+            return "<Operation %s>" % (constants.OPERATION_MAP[self.opcode], )
+        else:
+            return "<Operation %s(%s)>" % (constants.OPERATION_MAP[self.opcode], operands)
 
     __repr__ = __str__
 
@@ -165,13 +262,20 @@ class Dissector(object):
 
     def lookupDecoder(self, opcode):
         result = None
+        if opcode == 0x58:
+            pass
         if opcode in self._cache:
             result = self._cache[opcode]
         else:
             for enc, func in self.ENCODINGS.items():
                 if opcode in enc:
+                    if enc == NO_OPERANDS:
+                        pass
                     result = func
                     self._cache[opcode] = func
+                    break
+        if result is None:
+            pass
         return result
 
     def readByte(self):
@@ -216,18 +320,23 @@ class Dissector(object):
     def readMachineWord(self):
         return self.arrayToNumber(self.slice(self.wordSize))
 
+    def void(self):
+        return []
+
     def getLEBLength(self):
         for idx, bval in enumerate(self.block, 1):
              if bval & 0x80 == 0:
                  break
         return idx
 
-    def slice(self, len):
-        arr =  self.block[ : len]
-        self.block = self.block[ len: ]
+    def slice(self, length):
+        arr =  self.block[ : length]
+        if len(arr) != length:
+            return None
+        self.block = self.block[ length : ]
         return arr
 
-    ENCODINGS = {NO_OPERANDS : None, SINGLE_BYTE: readByte, DUAL_BYTES: readDualBytes, FOUR_BYTES: readFourBytes,
+    ENCODINGS = {NO_OPERANDS : void, SINGLE_BYTE: readByte, DUAL_BYTES: readDualBytes, FOUR_BYTES: readFourBytes,
         EIGHT_BYTES: readEightByte, SINGLE_ULEB: readSingleULeb, SINGLE_SLEB: readSingleSLeb,
         ULEB128_FOLLOWED_BY_SLEB128: readULebFollowedBySLeb, ULEB128_FOLLOWED_BY_ULEB128: readULebFollowedByULeb,
         ULEB128_FOLLOWED_BY_BLOCK: readULebFollowedByBlock, MACHINE_WORD: readMachineWord
