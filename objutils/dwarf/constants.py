@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -495,12 +495,99 @@ DW_OP_lt                        = 0x2d
 DW_OP_ne                        = 0x2e
 DW_OP_lit0                      = 0x30
 DW_OP_lit1                      = 0x31
+DW_OP_lit2                      = 0x32
+DW_OP_lit3                      = 0x33
+DW_OP_lit4                      = 0x34
+DW_OP_lit5                      = 0x35
+DW_OP_lit6                      = 0x36
+DW_OP_lit7                      = 0x37
+DW_OP_lit8                      = 0x38
+DW_OP_lit9                      = 0x39
+DW_OP_lit10                     = 0x3a
+DW_OP_lit11                     = 0x3b
+DW_OP_lit12                     = 0x3c
+DW_OP_lit13                     = 0x3d
+DW_OP_lit14                     = 0x3e
+DW_OP_lit15                     = 0x3f
+DW_OP_lit16                     = 0x40
+DW_OP_lit17                     = 0x41
+DW_OP_lit18                     = 0x42
+DW_OP_lit19                     = 0x43
+DW_OP_lit20                     = 0x44
+DW_OP_lit21                     = 0x45
+DW_OP_lit22                     = 0x46
+DW_OP_lit23                     = 0x47
+DW_OP_lit24                     = 0x48
+DW_OP_lit25                     = 0x49
+DW_OP_lit26                     = 0x4a
+DW_OP_lit27                     = 0x4b
+DW_OP_lit28                     = 0x4c
+DW_OP_lit29                     = 0x4d
+DW_OP_lit30                     = 0x4e
 DW_OP_lit31                     = 0x4f
 DW_OP_reg0                      = 0x50
 DW_OP_reg1                      = 0x51
+DW_OP_reg2                      = 0x52
+DW_OP_reg3                      = 0x53
+DW_OP_reg4                      = 0x54
+DW_OP_reg5                      = 0x55
+DW_OP_reg6                      = 0x56
+DW_OP_reg7                      = 0x57
+DW_OP_reg8                      = 0x58
+DW_OP_reg9                      = 0x59
+DW_OP_reg10                     = 0x5a
+DW_OP_reg11                     = 0x5b
+DW_OP_reg12                     = 0x5c
+DW_OP_reg13                     = 0x5d
+DW_OP_reg14                     = 0x5e
+DW_OP_reg15                     = 0x5f
+DW_OP_reg16                     = 0x60
+DW_OP_reg17                     = 0x61
+DW_OP_reg18                     = 0x62
+DW_OP_reg19                     = 0x63
+DW_OP_reg20                     = 0x64
+DW_OP_reg21                     = 0x65
+DW_OP_reg22                     = 0x66
+DW_OP_reg23                     = 0x67
+DW_OP_reg24                     = 0x68
+DW_OP_reg25                     = 0x69
+DW_OP_reg26                     = 0x6a
+DW_OP_reg27                     = 0x6b
+DW_OP_reg28                     = 0x6c
+DW_OP_reg29                     = 0x6d
+DW_OP_reg30                     = 0x6e
 DW_OP_reg31                     = 0x6f
 DW_OP_breg0                     = 0x70
 DW_OP_breg1                     = 0x71
+DW_OP_breg2                     = 0x72
+DW_OP_breg3                     = 0x73
+DW_OP_breg4                     = 0x74
+DW_OP_breg5                     = 0x75
+DW_OP_breg6                     = 0x76
+DW_OP_breg7                     = 0x77
+DW_OP_breg8                     = 0x78
+DW_OP_breg9                     = 0x79
+DW_OP_breg10                    = 0x7a
+DW_OP_breg11                    = 0x7b
+DW_OP_breg12                    = 0x7c
+DW_OP_breg13                    = 0x7d
+DW_OP_breg14                    = 0x7e
+DW_OP_breg15                    = 0x7f
+DW_OP_breg16                    = 0x80
+DW_OP_breg17                    = 0x81
+DW_OP_breg18                    = 0x82
+DW_OP_breg19                    = 0x83
+DW_OP_breg20                    = 0x84
+DW_OP_breg21                    = 0x85
+DW_OP_breg22                    = 0x86
+DW_OP_breg23                    = 0x87
+DW_OP_breg24                    = 0x88
+DW_OP_breg25                    = 0x89
+DW_OP_breg26                    = 0x8a
+DW_OP_breg27                    = 0x8b
+DW_OP_breg28                    = 0x8c
+DW_OP_breg29                    = 0x8d
+DW_OP_breg30                    = 0x8e
 DW_OP_breg31                    = 0x8f
 DW_OP_regx                      = 0x90
 DW_OP_fbreg                     = 0x91
@@ -566,12 +653,99 @@ OPERATION_MAP = {
     DW_OP_ne                    : "DW_OP_ne",
     DW_OP_lit0                  : "DW_OP_lit0",
     DW_OP_lit1                  : "DW_OP_lit1",
+    DW_OP_lit2                  : "DW_OP_lit2",
+    DW_OP_lit3                  : "DW_OP_lit3",
+    DW_OP_lit4                  : "DW_OP_lit4",
+    DW_OP_lit5                  : "DW_OP_lit5",
+    DW_OP_lit6                  : "DW_OP_lit6",
+    DW_OP_lit7                  : "DW_OP_lit7",
+    DW_OP_lit8                  : "DW_OP_lit8",
+    DW_OP_lit9                  : "DW_OP_lit9",
+    DW_OP_lit10                 : "DW_OP_lit10",
+    DW_OP_lit11                 : "DW_OP_lit11",
+    DW_OP_lit12                 : "DW_OP_lit12",
+    DW_OP_lit13                 : "DW_OP_lit13",
+    DW_OP_lit14                 : "DW_OP_lit14",
+    DW_OP_lit15                 : "DW_OP_lit15",
+    DW_OP_lit16                 : "DW_OP_lit16",
+    DW_OP_lit17                 : "DW_OP_lit17",
+    DW_OP_lit18                 : "DW_OP_lit18",
+    DW_OP_lit19                 : "DW_OP_lit19",
+    DW_OP_lit20                 : "DW_OP_lit20",
+    DW_OP_lit21                 : "DW_OP_lit21",
+    DW_OP_lit22                 : "DW_OP_lit22",
+    DW_OP_lit23                 : "DW_OP_lit23",
+    DW_OP_lit24                 : "DW_OP_lit24",
+    DW_OP_lit25                 : "DW_OP_lit25",
+    DW_OP_lit26                 : "DW_OP_lit26",
+    DW_OP_lit27                 : "DW_OP_lit27",
+    DW_OP_lit28                 : "DW_OP_lit28",
+    DW_OP_lit29                 : "DW_OP_lit29",
+    DW_OP_lit30                 : "DW_OP_lit30",
     DW_OP_lit31                 : "DW_OP_lit31",
     DW_OP_reg0                  : "DW_OP_reg0",
     DW_OP_reg1                  : "DW_OP_reg1",
+    DW_OP_reg2                  : "DW_OP_reg2",
+    DW_OP_reg3                  : "DW_OP_reg3",
+    DW_OP_reg4                  : "DW_OP_reg4",
+    DW_OP_reg5                  : "DW_OP_reg5",
+    DW_OP_reg6                  : "DW_OP_reg6",
+    DW_OP_reg7                  : "DW_OP_reg7",
+    DW_OP_reg8                  : "DW_OP_reg8",
+    DW_OP_reg9                  : "DW_OP_reg9",
+    DW_OP_reg10                 : "DW_OP_reg10",
+    DW_OP_reg11                 : "DW_OP_reg11",
+    DW_OP_reg12                 : "DW_OP_reg12",
+    DW_OP_reg13                 : "DW_OP_reg13",
+    DW_OP_reg14                 : "DW_OP_reg14",
+    DW_OP_reg15                 : "DW_OP_reg15",
+    DW_OP_reg16                 : "DW_OP_reg16",
+    DW_OP_reg17                 : "DW_OP_reg17",
+    DW_OP_reg18                 : "DW_OP_reg18",
+    DW_OP_reg19                 : "DW_OP_reg19",
+    DW_OP_reg20                 : "DW_OP_reg20",
+    DW_OP_reg21                 : "DW_OP_reg21",
+    DW_OP_reg22                 : "DW_OP_reg22",
+    DW_OP_reg23                 : "DW_OP_reg23",
+    DW_OP_reg24                 : "DW_OP_reg24",
+    DW_OP_reg25                 : "DW_OP_reg25",
+    DW_OP_reg26                 : "DW_OP_reg26",
+    DW_OP_reg27                 : "DW_OP_reg27",
+    DW_OP_reg28                 : "DW_OP_reg28",
+    DW_OP_reg29                 : "DW_OP_reg29",
+    DW_OP_reg30                 : "DW_OP_reg30",
     DW_OP_reg31                 : "DW_OP_reg31",
     DW_OP_breg0                 : "DW_OP_breg0",
     DW_OP_breg1                 : "DW_OP_breg1",
+    DW_OP_breg2                 : "DW_OP_breg2",
+    DW_OP_breg3                 : "DW_OP_breg3",
+    DW_OP_breg4                 : "DW_OP_breg4",
+    DW_OP_breg5                 : "DW_OP_breg5",
+    DW_OP_breg6                 : "DW_OP_breg6",
+    DW_OP_breg7                 : "DW_OP_breg7",
+    DW_OP_breg8                 : "DW_OP_breg8",
+    DW_OP_breg9                 : "DW_OP_breg9",
+    DW_OP_breg10                : "DW_OP_breg10",
+    DW_OP_breg11                : "DW_OP_breg11",
+    DW_OP_breg12                : "DW_OP_breg12",
+    DW_OP_breg13                : "DW_OP_breg13",
+    DW_OP_breg14                : "DW_OP_breg14",
+    DW_OP_breg15                : "DW_OP_breg15",
+    DW_OP_breg16                : "DW_OP_breg16",
+    DW_OP_breg17                : "DW_OP_breg17",
+    DW_OP_breg18                : "DW_OP_breg18",
+    DW_OP_breg19                : "DW_OP_breg19",
+    DW_OP_breg20                : "DW_OP_breg20",
+    DW_OP_breg21                : "DW_OP_breg21",
+    DW_OP_breg22                : "DW_OP_breg22",
+    DW_OP_breg23                : "DW_OP_breg23",
+    DW_OP_breg24                : "DW_OP_breg24",
+    DW_OP_breg25                : "DW_OP_breg25",
+    DW_OP_breg26                : "DW_OP_breg26",
+    DW_OP_breg27                : "DW_OP_breg27",
+    DW_OP_breg28                : "DW_OP_breg28",
+    DW_OP_breg28                : "DW_OP_breg28",
+    DW_OP_breg30                : "DW_OP_breg30",
     DW_OP_breg31                : "DW_OP_breg31",
     DW_OP_regx                  : "DW_OP_regx",
     DW_OP_fbreg                 : "DW_OP_fbreg",
