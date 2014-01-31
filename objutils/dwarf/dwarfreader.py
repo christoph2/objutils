@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -60,7 +60,7 @@ FORM_READERS = {
     constants.DW_FORM_ref8:         'u64',
     constants.DW_FORM_ref_udata:    'uleb',
     ###
-    constants.DW_FORM_strp:         '', # TODO: This is a offset into string table (.debug_str)!!!
+    constants.DW_FORM_strp:         'strp', # TODO: This is a offset into string table (.debug_str)!!!
     constants.DW_FORM_indirect:     '', # TODO: uleb value, that represents its form!
     constants.DW_FORM_sec_offset:   '', # This is an offset into the .debug_line/.debug_loc /.debug_macinfo section, p. 162ff
     constants.DW_FORM_exprloc:      '', # This is an unsigned LEB128 length followed by the number of information
@@ -80,9 +80,10 @@ IGNORE_OFFSET   = 2
 
 class DwarfReader(PlainBinaryReader):
 
-    def __init__(self, image):
+    def __init__(self, image, imageReader):
         super(DwarfReader, self).__init__(StringIO.StringIO(image), DwarfReader.BIG_ENDIAN)
         self.wordSize = None
+        self.imageReader = imageReader
 
     def uleb(self):
         result = 0
@@ -148,6 +149,25 @@ class DwarfReader(PlainBinaryReader):
         else:
             pass        # TODO: Error handling!
 
+    def strp(self):
+        section = self.imageReader.sections['.debug_str'].image
+        offset = self.u32()
+
+        result = [] # TODO: Refactor (s. asciiz)!
+        idx = 0
+        while True:
+            try:
+                bval = section[offset + idx]
+            except IndexError as e: # TODO: Genau analysieren!!!
+                print e
+                break
+            if bval == '\0':
+                break
+            idx += 1
+            result.append(bval)
+        rstr = ''.join(x for x in result)
+
+        return rstr
 
 
 def makeAttrName(value):
@@ -162,20 +182,25 @@ class DebugSectionReader(object):
         self.instantiateReaders()
         self.abbrevs = {}
         self.infoHeaders = []
-        self.scanDebugInfoHeaders()
+        if self.sections.has_key('.debug_info'):
+            self.scanDebugInfoHeaders()
 
     def instantiateReaders(self):
         self.readers = {}
         for name, section in self.sections.items():
-            self.readers[name] = DwarfReader(section.image)
+            if section.image is not None:
+                self.readers[name] = DwarfReader(section.image, self)
 
     def getReader(self, name):
         return  self.readers[name]
 
     def process(self):
-        self.processAbbreviations()
-        self.processInfoSection()
-        #print self.abbrevs
+        if self.sections.has_key('.debug_abbrev'):
+            self.processAbbreviations()
+        if self.sections.has_key('.debug_info'):
+            self.processInfoSection()
+        if self.sections.has_key('.debug_pubnames'):
+            self.processPubNames()
 
     def processAbbreviations(self):
         dr = self.getReader('.debug_abbrev')
@@ -231,7 +256,10 @@ class DebugSectionReader(object):
                 if number == 0:
                     print "<*** EMPTY ***>"
                     continue
-                entry = abbrevs[number]
+                try:
+                    entry = abbrevs[number]
+                except KeyError as e:   # TODO: genau analysieren!!!
+                    continue
                 print "=" * 80
                 print entry.tag, entry.children
                 print "=" * 80
@@ -239,12 +267,31 @@ class DebugSectionReader(object):
                     attribute, form = attr
                     reader = FORM_READERS[form.value]
                     attrValue = getattr(dr, reader)()
-                    if attribute.value in (constants.DW_AT_return_addr, ):
+                    if attribute.value in (constants.DW_AT_return_addr, constants.DW_AT_location, # constants.DW_AT_frame_base,
+                        constants.DW_AT_data_member_location):
                         dis = Dissector(attrValue, targetAddrSize)
-                        data = dis.run()
-                        print "\t", data
+                        attrValue = dis.run()
                     print "%s ==> '%s'" % (attribute, attrValue)
         dr.reset()
+
+    def processPubNames(self):  # TODO: NameLookupTable
+        dr = self.getReader('.debug_pubnames')  # '.debug_pubtypes'
+        while dr.pos < dr.size:
+            length = dr.u32()
+            stopPosition = dr.pos + length
+            dwarfVersion = dr.u16()
+            debugInfoOffs = dr.u32()
+            debugInfoLen = dr.u32()
+            print "Length: %u Offset: 0x%04x Size: %u" % (length, debugInfoOffs, debugInfoLen)
+
+            while dr.pos < stopPosition:
+                #tb = dr.u8()
+                entryOffset = dr.u32()
+                if not entryOffset:
+                    break
+                entryName = dr.asciiz()
+                print "0x%04x '%s'" % (entryOffset, entryName)
+
 
     def scanDebugInfoHeaders(self):
         dr = self.getReader('.debug_info')
