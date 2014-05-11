@@ -253,12 +253,18 @@ class Dissector(object):
         self._cache = {}
 
     def run(self):
-        result = []
-        while self.block:
-            opcode = self.block.pop(0)
-            decoder = self.lookupDecoder(opcode)
-            result.append(Operation(opcode, decoder(self)))
-        return result
+        if isinstance(self.block, list):
+            result = []
+            while self.block:
+                opcode = self.block.pop(0)
+                decoder = self.lookupDecoder(opcode)
+                try:
+                    result.append(Operation(opcode, decoder(self)))
+                except TypeError as e:
+                    print "*** EXECPTION: %s" % e
+            return result
+        else:
+            return self.block   # TODO: Nur bis zu entgültigen Klärung!!!
 
     def lookupDecoder(self, opcode):
         result = None
