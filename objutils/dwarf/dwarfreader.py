@@ -259,6 +259,7 @@ class DebugSectionReader(object):
                 try:
                     entry = abbrevs[number]
                 except KeyError as e:   # TODO: genau analysieren!!!
+                    print "ENTRY NOT FOUND: %u [%s]" % (number, e)
                     continue
                 print "=" * 80
                 print entry.tag, entry.children
