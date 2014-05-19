@@ -63,10 +63,8 @@ class Reader(HexFile.Reader): # TODO: Subclass Tek.Reader!!!
         elif formatType == SYMBOL:
             chunk = line.chunk
             print chunk
-            '''
             if line.checksum!=checksum:
                 raise HexFile.InvalidRecordChecksumError()
-            '''
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
