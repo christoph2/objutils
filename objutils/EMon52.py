@@ -69,3 +69,9 @@ class Reader(HexFile.Reader):
     def isDataLine(self, line, formatType):
         return True
 
+
+class Writer(HexFile.Writer):
+
+    def composeRow(self, address, length, row):
+        checksum = sum(row) % 65536
+        return "%02X %04X:%s %04X" % (length, address, Writer.hexBytes(row), checksum)
