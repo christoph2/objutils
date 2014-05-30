@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -27,11 +27,10 @@ __copyright__ = """
 """
 
 import itertools
-import string
 
-def slicer(iteratable, sliceLength, converter = None):
+def slicer(iterable, sliceLength, converter = None):
     if converter is None:
-        converter = type(iteratable)
-    length = len(iteratable)
-    return [converter(iteratable[i : i + sliceLength]) for i in range(0, length, sliceLength)]
+        converter = type(iterable)
+    length = len(iterable)
+    return [converter(iterable[item : item + sliceLength]) for item in range(0, length, sliceLength)]
 

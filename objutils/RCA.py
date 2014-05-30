@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -54,3 +54,16 @@ class Reader(HexFile.Reader):
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
+
+
+class Writer(HexFile.Writer):
+    SEPARATOR = "%s\x0d\x0a" % ('\x00' * 48)
+
+    def composeRow(self, address, length, row):
+        return "%04X %s;" % (address, Writer.hexBytes(row))
+
+    def composeHeader(self):
+        return "%s!M" % Writer.SEPARATOR
+
+    def composeFooter(self):
+        return "%s" % Writer.SEPARATOR
