@@ -29,9 +29,9 @@ __copyright__ = """
 import itertools
 import string
 
-def slicer(iteratable, sliceLength, resultType = None):
-    if resultType is None:
-        resultType = type(iteratable)
+def slicer(iteratable, sliceLength, converter = None):
+    if converter is None:
+        converter = type(iteratable)
     length = len(iteratable)
-    return [resultType(iteratable[i : i + sliceLength]) for i in range(0, length, sliceLength)]
+    return [converter(iteratable[i : i + sliceLength]) for i in range(0, length, sliceLength)]
 
