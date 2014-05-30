@@ -242,6 +242,9 @@ class Writer(object):
 
     def dumps(self, image, rowLength = 16):
         result = []
+        header = self.composeHeader()
+        if header:
+            result.append(header)
         for segment in image:
             address = segment.address
             rows = slicer(segment.data, rowLength, lambda x:  [int(y) for y in x])
@@ -249,12 +252,22 @@ class Writer(object):
                 length = len(row)
                 result.append(self.composeRow(address, length, row))
                 address += rowLength
+        footer = self.composeFooter()
+        if footer:
+            result.append(footer)
         return '\n'.join(result)
 
     def composeRow(self, address, length, row):
         raise NotImplementedError()
 
+    def composeHeader(self):
+        return None
+
+    def composeFooter(self):
+        return None
+
     @staticmethod
-    def hexBytes(row):
-        return ' '.join(["%02X" % x for x in row])
+    def hexBytes(row, spaced = False):
+        spacer = ' ' if spaced else ''
+        return spacer.join(["%02X" % x for x in row])
 
