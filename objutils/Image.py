@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -42,4 +42,10 @@ class Image(object):
             result.append(repr(segment))
         return '\n'.join(result)
 
+    def __iter__(self):
+        return iter(self.segments)
+
+    def next(self):
+        for segment in self.segments:
+            yield segment
 
