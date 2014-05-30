@@ -240,6 +240,10 @@ class Reader(object):
 
 class Writer(object):
 
+
+    def dump(self, fp, image, rowLength = 16):
+        fp.write(dumps(image, rowLength))
+
     def dumps(self, image, rowLength = 16):
         result = []
         header = self.composeHeader()
