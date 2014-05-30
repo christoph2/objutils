@@ -161,6 +161,7 @@ class Reader(object):
     aligment = 0  # 2**n
 
     def __init__(self, formats, inFile, dataSep = None):
+        self.meta = {} # Format specific meta data.
         if not hasattr(inFile, 'readlines'):
             raise TypeError("Need a file-like object.")
         self.inFile = inFile
