@@ -33,8 +33,9 @@ AS_32   = 2
 AS_64   = 3
 
 class Image(object):
-    def __init__(self, segments):
+    def __init__(self, segments, meta = {}):
         self.segments = segments
+        self.meta = meta
 
     def __repr__(self):
         result = []
