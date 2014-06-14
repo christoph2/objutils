@@ -267,6 +267,11 @@ class Writer(object):
     def composeFooter(self, meta):
         return None
 
+    def wordToBytes(self, word):
+        h = (word & 0xff00) >> 8
+        l = word & 0x00ff
+        return h, l
+
     @staticmethod
     def hexBytes(row, spaced = False):
         spacer = ' ' if spaced else ''
