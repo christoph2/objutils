@@ -62,8 +62,8 @@ class Writer(HexFile.Writer):
     def composeRow(self, address, length, row):
         return "%04X %s;" % (address, Writer.hexBytes(row))
 
-    def composeHeader(self):
+    def composeHeader(self, meta):
         return "%s!M" % Writer.SEPARATOR
 
-    def composeFooter(self):
+    def composeFooter(self, meta):
         return "%s" % Writer.SEPARATOR
