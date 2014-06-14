@@ -43,6 +43,9 @@ class Image(object):
             result.append(repr(segment))
         return '\n'.join(result)
 
+    def __len__(self):
+        return len(self.segments)
+
     def __iter__(self):
         return iter(self.segments)
 
