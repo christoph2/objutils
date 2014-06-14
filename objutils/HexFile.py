@@ -26,6 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from collections import defaultdict, namedtuple
 import logging
 from functools import partial
 import re
@@ -97,13 +98,12 @@ class InvalidRecordTypeError(Exception): pass
 class InvalidRecordLengthError(Exception): pass
 class InvalidRecordChecksumError(Exception): pass
 
+MetaRecord = namedtuple('MetaRecord', 'formatType address chunk')
 
 class FormatParser(object):
     def __init__(self, fmt, dataSep = None):
         self.fmt = fmt
         self.translatedFmt = []
-        #if dataSep == ' ':
-        #    dataSep = '\s'
         self.dataSep = dataSep
 
     def parse(self):
@@ -137,10 +137,8 @@ class FormatParser(object):
             elif groupNumber == DATA:
                 "(?P<chunk>[0-9a-zA-Z]*)"
                 if self.dataSep is not None:
-                    #expr = "(?P<chunk>([0-9a-zA-Z]{2}%s)*)" % (self.dataSep, )
                     expr = "(?P<chunk>[0-9a-zA-Z%s]*)" % (self.dataSep, )
                 else:
-                    #expr="(%s*)" % expr
                     pass
             elif groupNumber == UNPARSED:
                 print expr
@@ -161,7 +159,6 @@ class Reader(object):
     aligment = 0  # 2**n
 
     def __init__(self, formats, inFile, dataSep = None):
-        self.meta = {} # Format specific meta data.
         if not hasattr(inFile, 'readlines'):
             raise TypeError("Need a file-like object.")
         self.inFile = inFile
@@ -175,6 +172,7 @@ class Reader(object):
 
     def read(self):
         segments = []
+        metaData = defaultdict(list)
         for line in self.inFile.readlines():
             for formatType, format in self.formats:
                 match = format.match(line)
@@ -201,11 +199,9 @@ class Reader(object):
                             # print chunk
                             segments.append(Segment(container.address, container.length, container.chunk))
                         else:
-                            pass
-                            #print "*** PI:", container.processingInstructions
-                            #print container # Sonderfälle als 'processingInstructions' speichern!!!
-
-        return Image(joinSegments(segments))
+                            chunk = container.chunk if hasattr(container, 'chunk') else None
+                            metaData[formatType].append(MetaRecord(formatType, container.address, chunk))
+        return Image(joinSegments(segments), metaData)
 
     def _addressSpace(self, value):
         if value < 2**16:
@@ -247,7 +243,7 @@ class Writer(object):
 
     def dumps(self, image, rowLength = 16):
         result = []
-        header = self.composeHeader()
+        header = self.composeHeader(image.meta)
         if header:
             result.append(header)
         for segment in image:
@@ -257,7 +253,7 @@ class Writer(object):
                 length = len(row)
                 result.append(self.composeRow(address, length, row))
                 address += rowLength
-        footer = self.composeFooter()
+        footer = self.composeFooter(image.meta)
         if footer:
             result.append(footer)
         return '\n'.join(result)
@@ -265,10 +261,10 @@ class Writer(object):
     def composeRow(self, address, length, row):
         raise NotImplementedError()
 
-    def composeHeader(self):
+    def composeHeader(self, meta):
         return None
 
-    def composeFooter(self):
+    def composeFooter(self, meta):
         return None
 
     @staticmethod
