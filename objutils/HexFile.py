@@ -238,11 +238,15 @@ class Reader(object):
 class Writer(object):
 
 
-    def dump(self, fp, image, rowLength = 16):
+    def dump(self, fp, image, rowLength = 16, **kws):
         fp.write(dumps(image, rowLength))
 
-    def dumps(self, image, rowLength = 16):
+    def dumps(self, image, rowLength = 16, **kws):
         result = []
+
+        if kws:
+            self.initParameters(**kws)
+
         header = self.composeHeader(image.meta)
         if header:
             result.append(header)
@@ -254,9 +258,22 @@ class Writer(object):
                 result.append(self.composeRow(address, length, row))
                 address += rowLength
         footer = self.composeFooter(image.meta)
+        if kws:
+            self.cleanupParameters()
         if footer:
             result.append(footer)
         return '\n'.join(result)
+
+    def initParameters(self, **kws):
+        """Callout for parameter initialisation.
+        """
+        pass
+
+    def cleanupParameters(self):
+        """Callout for parameter cleanup.
+        """
+        pass
+
 
     def composeRow(self, address, length, row):
         raise NotImplementedError()
