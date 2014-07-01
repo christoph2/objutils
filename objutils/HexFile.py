@@ -256,6 +256,8 @@ class Writer(object):
         if kws:
             params = self.saveParameters(**kws)
 
+        self.preProcessing(image)
+
         header = self.composeHeader(image.meta)
         if header:
             result.append(header)
@@ -272,6 +274,9 @@ class Writer(object):
         if footer:
             result.append(footer)
         return '\n'.join(result)
+
+    def preProcessing(self, image):
+        pass
 
     def saveParameters(self, **kws):
         params = {}
