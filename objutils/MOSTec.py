@@ -64,7 +64,7 @@ class Writer(HexFile.Writer):
         addressBytes = HexFile.intToArray(address)
 
         checksum = ((sum([length] + addressBytes) + sum(row))) % 65536
-        line = ";%02X%04X%s%02X" % (length, address, Writer.hexBytes(row), checksum)
+        line = ";%02X%04X%s%04X" % (length, address, Writer.hexBytes(row), checksum)
         return line
 
     def composeFooter(self, meta):
