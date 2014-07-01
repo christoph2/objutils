@@ -29,6 +29,7 @@ __copyright__ = """
 from collections import defaultdict, namedtuple
 import logging
 from functools import partial
+import math
 import re
 import sys
 import types
@@ -97,6 +98,7 @@ BYTES = re.compile('([0-9a-zA-Z]{2})')
 class InvalidRecordTypeError(Exception): pass
 class InvalidRecordLengthError(Exception): pass
 class InvalidRecordChecksumError(Exception): pass
+class AddressRangeToLargeError(Exception): pass
 
 MetaRecord = namedtuple('MetaRecord', 'formatType address chunk')
 
@@ -245,6 +247,7 @@ class Reader(object):
 
 
 class Writer(object):
+    # TODO: Address-Range oder so als Class-Parameter!!!
 
 
     def dump(self, fp, image, rowLength = 16, **kws):
@@ -252,6 +255,9 @@ class Writer(object):
 
     def dumps(self, image, rowLength = 16, **kws):
         result = []
+
+        if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
+            raise AddressRangeToLargeError('could not encode image.')
 
         if kws:
             params = self.saveParameters(**kws)
@@ -274,6 +280,11 @@ class Writer(object):
         if footer:
             result.append(footer)
         return '\n'.join(result)
+
+    def calculateAddressBits(self, image):
+        lastSegment = sorted(image.segments, key = lambda s: s.address)[-1]
+        highestAddress = lastSegment.address + lastSegment.length
+        return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
 
     def preProcessing(self, image):
         pass
