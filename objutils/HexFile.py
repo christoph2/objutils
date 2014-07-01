@@ -100,6 +100,15 @@ class InvalidRecordChecksumError(Exception): pass
 
 MetaRecord = namedtuple('MetaRecord', 'formatType address chunk')
 
+
+def intToArray(value):
+    result = []
+    while value:
+        result.append(value & 0xff)
+        value >>= 8
+    return list(reversed(result))
+
+
 class FormatParser(object):
     def __init__(self, fmt, dataSep = None):
         self.fmt = fmt
