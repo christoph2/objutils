@@ -143,6 +143,7 @@ class Reader(HexFile.Reader):
 
 class Writer(HexFile.Writer):
     recordType = None
+    MAX_ADDRESS_BITS = 32
 
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_ONES)
 

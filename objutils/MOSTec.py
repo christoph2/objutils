@@ -58,7 +58,8 @@ class Reader(HexFile.Reader):
 
 
 class Writer(HexFile.Writer):
-    recordType = 1
+
+    MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
         addressBytes = HexFile.intToArray(address)
