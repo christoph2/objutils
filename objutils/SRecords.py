@@ -185,6 +185,14 @@ class Writer(HexFile.Writer):
         # Dito., but there really can be only one start-address!
         # S5
         result.append(self.srecord(5, 0, self.recordCount))
-        # S9
+        if S9 in meta:
+            s9 = meta[S9][0]
+            result.append(self.srecord(9, 0, s9.address))
+        if S8 in meta:
+            s8 = meta[S8][0]
+            result.append(self.srecord(8, 0, s8.address))
+        if S7 in meta:
+            s7 = meta[S7][0]
+            result.append(self.srecord(7, 0, s7.address))
         return '\n'.join(result)
 
