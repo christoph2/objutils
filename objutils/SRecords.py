@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -107,18 +107,25 @@ class Reader(HexFile.Reader):
 
     def specialProcessing(self, line, formatType):
         if formatType == S0:
+            #print "S0: [%s]" % line.chunk
             pass
         elif formatType == S5:
-            pass
+            print "S5: [%s]" % line.chunk
         elif formatType == S7:
             startAddress = line.address
+            #print "Startaddress[S7]: %u" % startAddress
             #print "32-Bit Start-Address: ", hex(startAddress)
+            pass
         elif formatType == S8:
             startAddress = line.address
+            #print "Startaddress[S8]: %u" % startAddress
             #print "24-Bit Start-Address: ", hex(startAddress)
+            pass
         elif formatType == S9:
-            startAddress=line.address
+            startAddress = line.address
+            #print "Startaddress[S9]: %u" % startAddress
             #print "16-Bit Start-Address: ", hex(startAddress)
+            pass
 
     def _stripSymbols(self, symbolTables):
         self.symbols=[]
@@ -134,55 +141,50 @@ class Reader(HexFile.Reader):
         #print self.symbols
 
 
-reader = Reader(file(r'C:\projekte\csProjects\yOBJl\tests\CWFirst.abs.s19'))
-data = reader.read()
-
-TEST = '''S00600004844521B
-S1130000285F245F2212226A000424290008237C2A
-S11300100002000800082629001853812341001813
-S113002041E900084E42234300182342000824A952
-S107003000144ED492
-S5030004F8
-S9030000FC'''
-
-r = Reader(cStringIO.StringIO(TEST))
-data = r.read()
-#print data.segments[0].data
-
-"""
-• If SRECORD = S1, the S Record file gets the extension .s1.
-• If SRECORD = S2, the S Record file gets the extension .s2.
-• If SRECORD = S3, the S Record file gets the extension .s3.
-• If SRECORD is not set, the S Record file gets the extension .sx.
-"""
-
 class Writer(HexFile.Writer):
+    recordType = None
+
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_ONES)
 
-
-    def writeHeader(self):
-        pass
-
-    def writeFooter(self, checksum):
-        pass
-
-    def writeBlock(self, block):
-        pass
-
-    def writeLine(self, type_, address, data):
-        length = len(data) + 3
-        h, l = self.wordToBytes((address))
-        checksum = self.checksum(list((length, h, l)) + list(data))
-        ## buildLine()
-        line = ""
-        for b in data:
-            line += "%02X" % b
-
-        self.outFile.write("S%u%02X%04X%s%02X" % (type_, length, address, line, checksum))
+    def preProcessing(self, image):
+        if self.recordType is None:
+            lastSegment = sorted(image.segments, key = lambda s: s.address)[-1]
+            highestAddress = lastSegment.address + lastSegment.length
+            if highestAddress <= 0x000000ffff:
+                self.recordType = 1
+            elif highestAddress <= 0x00ffffff:
+                self.recordType = 2
+            elif highestAddress <= 0xffffffff:
+                self.recordType = 3
+        self.addressMask = "%%0%uX" % ((self.recordType + 1) * 2, )
+        self.offset = self.recordType + 2
 
 
-##import sys
+    def srecord(self, recordType, length, address, data = []):
+        length += self.offset
+        # TODO: handle Record-Types!!!
+        addressBytes = HexFile.intToArray(address)
+        checksum = self.checksum( (addressBytes + [length]) + list(data))
+        mask = "S%%u%%02X%s%%s%%02X" % self.addressMask
+        return mask % (recordType, length, address, Writer.hexBytes(data), checksum)
 
-##wr = Writer(sys.stdout)
-##wr.writeLine(9, 0xaffe, (1, 2, 3, 4, 5))
+    def composeRow(self, address, length, row):
+        self.recordCount += 1
+        return self.srecord(self.recordType, length, address, row)
+
+    def composeHeader(self, meta):
+        self.recordCount = 0
+        result = []
+        if S0 in meta:  # Usually only one S0 record, but be tolerant.
+            for meta in meta[S0]:
+                result.append(self.srecord(0, len(meta.chunk), meta.address, meta.chunk))
+        return '\n'.join(result)
+
+    def composeFooter(self, meta):
+        result = []
+        # Dito., but there really can be only one start-address!
+        # S5
+        result.append(self.srecord(5, 0, self.recordCount))
+        # S9
+        return '\n'.join(result)
 
