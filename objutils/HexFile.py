@@ -245,7 +245,7 @@ class Writer(object):
         result = []
 
         if kws:
-            self.initParameters(**kws)
+            params = self.saveParameters(**kws)
 
         header = self.composeHeader(image.meta)
         if header:
@@ -259,20 +259,25 @@ class Writer(object):
                 address += rowLength
         footer = self.composeFooter(image.meta)
         if kws:
-            self.cleanupParameters()
+            self.restoreParameters(params)
         if footer:
             result.append(footer)
         return '\n'.join(result)
 
-    def initParameters(self, **kws):
-        """Callout for parameter initialisation.
-        """
-        pass
+    def saveParameters(self, **kws):
+        params = {}
+        for k, v in kws.items():
+            try:
+                params[k] = getattr(self, k)
+            except AttributeError:
+                raise AttributeError("Invalid keyword argument '%s'." % k)
+            else:
+                setattr(self, k, v)
+        return params
 
-    def cleanupParameters(self):
-        """Callout for parameter cleanup.
-        """
-        pass
+    def restoreParameters(self, params):
+        for k, v in params.items():
+            setattr(self, k, v)
 
 
     def composeRow(self, address, length, row):
