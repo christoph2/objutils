@@ -30,6 +30,7 @@ from functools import partial
 import operator
 import objutils.HexFile as HexFile
 from objutils.checksums import lrc, COMPLEMENT_TWOS
+from objutils.utils import identity
 
 FORMATS=(
     (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
@@ -42,23 +43,6 @@ START_SEGMENT_ADDRESS       = 3
 EXTENDED_LINEAR_ADDRESS     = 4
 START_LINEAR_ADDRESS        = 5
 
-
-class curry:
-    def __init__(self, fun, *args, **kwargs):
-        self.fun = fun
-        self.pending = args[:]
-        self.kwargs = kwargs.copy()
-
-    def __call__(self, *args, **kwargs):
-        if kwargs and self.kwargs:
-            kw = self.kwargs.copy()
-            kw.update(kwargs)
-        else:
-            kw = kwargs or self.kwargs
-        return self.fun(*(self.pending + args), **kw)
-
-
-identity=lambda self,x: x
 
 class Reader(HexFile.Reader):
     def __init__(self, inFile):
