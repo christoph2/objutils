@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -44,4 +44,32 @@ def lrc(data, width, comp = COMPLEMENT_NONE):
         cs = ((cs ^ 0xff) + 1) & ((2 ** width) - 1)
 
     return cs
+
+
+def rolb(value):
+    value &= 0xff
+    carry = (value & 0x80) == 0x80
+    value = (value << 1) & 0xff
+    value |= 1 if carry else 0
+    return value
+
+def rorb(value):
+    value &= 0xff
+    carry = (value & 0x01) == 0x01
+    value = value >> 1
+    value |= 0x80 if carry else 0
+    return value
+
+
+print hex(rorb(0x55))
+print hex(rorb(0xaa))
+
+
+def rotatedXOR(values, width):
+    cs = 0
+    for value in values:
+        cs ^= value
+        cs = rolb(cs)
+    return cs  % (2 ** width)
+
 
