@@ -37,7 +37,7 @@ from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
-from objutils.slicer import slicer
+from objutils.utils import slicer
 
 
 

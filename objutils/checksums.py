@@ -60,16 +60,13 @@ def rorb(value):
     value |= 0x80 if carry else 0
     return value
 
+ROTATE_LEFT = rolb
+ROTATE_RIGHT = rorb
 
-print hex(rorb(0x55))
-print hex(rorb(0xaa))
-
-
-def rotatedXOR(values, width):
+def rotatedXOR(values, width, rotator):
     cs = 0
     for value in values:
         cs ^= value
-        cs = rolb(cs)
+        cs = rotator(cs)
     return cs  % (2 ** width)
-
 
