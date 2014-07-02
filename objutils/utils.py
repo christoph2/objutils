@@ -44,6 +44,18 @@ def makeList(*args):
             result.append(arg)
     return result
 
+
+def intToArray(value):
+    result = []
+    while value:
+        result.append(value & 0xff)
+        value >>= 8
+    if result:
+        return list(reversed(result))
+    else:
+        return [0]
+
+
 class Curry:
     def __init__(self, fun, *args, **kwargs):
         self.fun = fun

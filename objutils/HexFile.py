@@ -102,15 +102,6 @@ class AddressRangeToLargeError(Exception): pass
 
 MetaRecord = namedtuple('MetaRecord', 'formatType address chunk')
 
-
-def intToArray(value):
-    result = []
-    while value:
-        result.append(value & 0xff)
-        value >>= 8
-    return list(reversed(result))
-
-
 class FormatParser(object):
     def __init__(self, fmt, dataSep = None):
         self.fmt = fmt
@@ -247,8 +238,6 @@ class Reader(object):
 
 
 class Writer(object):
-    # TODO: Address-Range oder so als Class-Parameter!!!
-
 
     def dump(self, fp, image, rowLength = 16, **kws):
         fp.write(dumps(image, rowLength))
