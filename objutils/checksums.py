@@ -31,22 +31,26 @@ COMPLEMENT_ONES = 1
 COMPLEMENT_TWOS = 2
 
 def lrc(data, width, comp = COMPLEMENT_NONE):
-    """    Longitudinal redundancy check.
+    """Longitudinal redundancy check.
     """
 
-    cs = sum(data) % (2 ** width)
+    mask = (2 ** width)
+
+    cs = sum(data) % mask
 
     if comp == COMPLEMENT_NONE:
         pass
     elif comp == COMPLEMENT_ONES:
-        cs ^= 0xff
+        cs ^= (mask - 1)
     elif comp == COMPLEMENT_TWOS:
-        cs = ((cs ^ 0xff) + 1) & ((2 ** width) - 1)
+        cs = ((cs ^ (mask - 1)) + 1) % mask
 
     return cs
 
 
 def rolb(value):
+    """Rotate byte left.
+    """
     value &= 0xff
     carry = (value & 0x80) == 0x80
     value = (value << 1) & 0xff
@@ -54,6 +58,8 @@ def rolb(value):
     return value
 
 def rorb(value):
+    """Rotate byte right.
+    """
     value &= 0xff
     carry = (value & 0x01) == 0x01
     value = value >> 1
@@ -64,6 +70,8 @@ ROTATE_LEFT = rolb
 ROTATE_RIGHT = rorb
 
 def rotatedXOR(values, width, rotator):
+    """Rotated XOR cipher.
+    """
     cs = 0
     for value in values:
         cs ^= value
