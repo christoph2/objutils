@@ -78,3 +78,10 @@ def rotatedXOR(values, width, rotator):
         cs = rotator(cs)
     return cs  % (2 ** width)
 
+def nibbleSum(data):
+    result = 0
+    for d in data:
+        hn = (d & 0xf0) >> 4
+        ln = d & 0x0f
+        result +=  hn + ln
+    return result % 256

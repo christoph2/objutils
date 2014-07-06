@@ -29,6 +29,7 @@ __copyright__ = """
 import cStringIO
 import re
 import objutils.HexFile as HexFile
+import objutils.utils as utils
 
 DATA=1
 EOF=2
@@ -41,11 +42,11 @@ FORMATS=(
 
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 
+
 class Reader(HexFile.Reader):
-    def __init__(self, inFile, dataSep=None):
 
+    def __init__(self, inFile, dataSep = None):
         data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)
-
         super(Reader, self).__init__(FORMATS, cStringIO.StringIO(data) , dataSep)
 
     def checkLine(self, line, formatType):
@@ -58,6 +59,7 @@ class Reader(HexFile.Reader):
 
 class Writer(HexFile.Writer):
     SEPARATOR = "%s\x0d\x0a" % ('\x00' * 48)
+    MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
         return "%04X %s;" % (address, Writer.hexBytes(row))
@@ -67,3 +69,4 @@ class Writer(HexFile.Writer):
 
     def composeFooter(self, meta):
         return "%s" % Writer.SEPARATOR
+

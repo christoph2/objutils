@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -27,6 +27,8 @@ __copyright__ = """
 """
 
 import objutils.HexFile as HexFile
+import objutils.utils as utils
+import objutils.checksums as checksums
 
 DATA    = 1
 EOF     = 2
@@ -40,27 +42,33 @@ class Reader(HexFile.Reader):
     def __init__(self, inFile):
         super(Reader,self).__init__(FORMATS, inFile)
 
-    def nibbleSum(self, accu, b):
-        hn = (b & 0xf0) >> 4
-        ln = b & 0x0f
-        s = hn + ln
-        return accu + s
-
     def checkLine(self, line, formatType):
         if formatType == DATA:
             if line.length != len(line.chunk):
                 raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             addrChecksum = 0
-            for b in [(line.address & 0xff00) >> 8,line.address & 0xff, line.length]:
-                addrChecksum = self.nibbleSum(addrChecksum, b)
-            if line.addrChecksum != addrChecksum:
+            addressChecksum = checksums.nibbleSum(utils.makeList(utils.intToArray(line.address), line.length))
+            if line.addrChecksum != addressChecksum:
                 raise HexFile.InvalidRecordChecksumError()
-            checksum = 0
-            for b in line.chunk:
-                checksum = self.nibbleSum(checksum, b)
+            checksum = checksums.nibbleSum(line.chunk)
             if line.checksum != checksum:
                 raise HexFile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
+
+
+class Writer(HexFile.Writer):
+
+    MAX_ADDRESS_BITS = 16
+
+    def composeRow(self, address, length, row):
+        addressChecksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), length))
+
+        dataChecksum = checksums.nibbleSum(row)
+        line = "/%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        return line
+
+#    def composeFooter(self, meta):
+#        return ";00"
 

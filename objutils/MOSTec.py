@@ -28,7 +28,9 @@ __copyright__ = """
 
 
 import objutils.HexFile as HexFile
-import cStringIO
+import objutils.utils as utils
+import objutils.checksums as checksums
+
 
 DATA    = 1
 EOF     = 2
@@ -47,9 +49,7 @@ class Reader(HexFile.Reader):
         if formatType == DATA:
             if line.length != len(line.chunk):
                 raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-            # todo: factor out checksum calculation from line!!!
-            checksum = ((sum([line.length, (line.address & 0xff00) >> 8, line.address & 0xff]) +
-                sum(line.chunk)) & 0xffff)
+            checksum = checksums.lrc(utils.makeList(utils.intToArray(line.address), line.length, line.chunk), 16, checksums.COMPLEMENT_NONE)
             if line.checksum != checksum:
                 raise HexFile.InvalidRecordChecksumError()
 
@@ -62,9 +62,7 @@ class Writer(HexFile.Writer):
     MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
-        addressBytes = HexFile.intToArray(address)
-
-        checksum = ((sum([length] + addressBytes) + sum(row))) % 65536
+        checksum = checksums.lrc(utils.makeList(utils.intToArray(address), length, row), 16, checksums.COMPLEMENT_NONE)
         line = ";%02X%04X%s%04X" % (length, address, Writer.hexBytes(row), checksum)
         return line
 

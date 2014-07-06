@@ -30,7 +30,9 @@ import cStringIO
 from functools import partial
 import re
 from objutils.checksums import lrc, COMPLEMENT_ONES
+from objutils.utils import makeList
 import objutils.HexFile as HexFile
+import objutils.utils as utils
 
 
 S0  = 1
@@ -164,8 +166,8 @@ class Writer(HexFile.Writer):
     def srecord(self, recordType, length, address, data = []):
         length += self.offset
         # TODO: handle Record-Types!!!
-        addressBytes = HexFile.intToArray(address)
-        checksum = self.checksum( (addressBytes + [length]) + list(data))
+        addressBytes = utils.intToArray(address)
+        checksum = self.checksum(makeList(addressBytes, length, data))
         mask = "S%%u%%02X%s%%s%%02X" % self.addressMask
         return mask % (recordType, length, address, Writer.hexBytes(data), checksum)
 
