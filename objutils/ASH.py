@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -30,13 +29,17 @@ __copyright__ = """
 ##  ASCII hex-space format.
 ##
 
+
 import cStringIO
 from functools import partial
 import re
 import sys
+import objutils.HexFile as HexFile
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from objutils.checksums import lrc, COMPLEMENT_NONE
+
+from objutils.registry import register
 
 STX = '\x02'
 ETX = '\x03'
@@ -61,13 +64,12 @@ ADDRESS = re.compile(r'\$A(?P<value>[0-9a-zA-Z]{2,8}),\s*')
 
 checksum = partial(lrc, width = 16)
 
-class Reader(object):
-    def __init__(self, inFile, dataSeparator = ' '):
-        self.inFile = inFile
+class Reader(HexFile.Reader):
+    def __init__(self, dataSeparator = ' '):
         self.dataSeparator = dataSeparator
 
-    def read(self):
-        lines = self.inFile.read()
+    def read(self, fp):
+        lines = fp.read()
         ma = DATA.match(lines)
 
         chunks = ma.groupdict()['chunks'].strip()
@@ -147,6 +149,8 @@ class Writer(object):
         pass
 
 
+register('ash', Reader, Writer)
+
 
 S19 = """S321000000007FD243A67FF343A63FC0003F3BDE700C3BE0000193FE00007FFA02A6A8
 S3210000001C93FE00047FFB02A693FE00087FD242A67FF342A648001F040000000074
@@ -156,8 +160,8 @@ S32100000054000000000000000000000000000000000000000000000000000000008A"""
 
 def main():
     inf = cStringIO.StringIO(ASCII_HEX)
-    hr = Reader(inf)
-    data = hr.read()
+    hr = Reader()
+    data = hr.load(inf)
     print data
     wr = Writer(sys.stdout)
     wr.write(data)

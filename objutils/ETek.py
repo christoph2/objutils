@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,7 +26,8 @@ __copyright__ = """
 """
 
 import objutils.HexFile as HexFile
-import cStringIO
+from objutils.registry import register
+
 
 DATA    = 1
 SYMBOL  = 2
@@ -40,8 +40,8 @@ FORMATS=(
 )
 
 class Reader(HexFile.Reader): # TODO: Subclass Tek.Reader!!!
-    def __init__(self,  inFile):
-        super(Reader,self).__init__(FORMATS, inFile)
+    def __init__(self):
+        super(Reader,self).__init__(FORMATS)
 
     def nibbleSum(self, accu, b):
         hn = (b & 0xf0) >> 4
@@ -71,4 +71,7 @@ class Reader(HexFile.Reader): # TODO: Subclass Tek.Reader!!!
 
     def parseData(self, line, formatType):
         return formatType != SYMBOL
+
+
+register('etek', Reader, Writer)
 

@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,7 +26,7 @@ __copyright__ = """
 """
 
 import objutils.HexFile as HexFile
-import cStringIO
+from objutils.registry import register
 
 FORMATS=(
     (HexFile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
@@ -75,3 +74,6 @@ class Writer(HexFile.Writer):
     def composeRow(self, address, length, row):
         checksum = sum(row) % 65536
         return "%02X %04X:%s %04X" % (length, address, Writer.hexBytes(row, spaced = True), checksum)
+
+register('emon52', Reader, Writer)
+

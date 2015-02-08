@@ -6,8 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -32,6 +31,12 @@ from functools import partial
 import math
 import re
 import sys
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
+
 import types
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
@@ -160,10 +165,7 @@ class Container(object):
 class Reader(object):
     aligment = 0  # 2**n
 
-    def __init__(self, formats, inFile, dataSep = None):
-        if not hasattr(inFile, 'readlines'):
-            raise TypeError("Need a file-like object.")
-        self.inFile = inFile
+    def __init__(self, formats, dataSep = None):
         if isinstance(formats, types.StringType):
             self.formats = [FormatParser(formats, dataSep).parse()]
         elif isinstance(formats,(types.ListType, types.TupleType)):
@@ -172,10 +174,16 @@ class Reader(object):
                 self.formats.append((formatType, FormatParser(format, dataSep).parse()))
         self.logger = logging.getLogger("object.utils")
 
-    def read(self):
+    def load(self, fp, **kws):
+        return self.read(fp)
+
+    def loads(self, image, **kws):
+        return self.load(StringIO.StringIO(image))
+
+    def read(self, fp):
         segments = []
         metaData = defaultdict(list)
-        for line in self.inFile.readlines():
+        for line in fp.readlines():
             for formatType, format in self.formats:
                 match = format.match(line)
                 if match:

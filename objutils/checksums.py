@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -25,6 +24,8 @@ __copyright__ = """
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
+
+import operator
 
 COMPLEMENT_NONE = 0
 COMPLEMENT_ONES = 1
@@ -65,6 +66,8 @@ def rorb(value):
     value = value >> 1
     value |= 0x80 if carry else 0
     return value
+
+xor = lambda frame, invert = True: reduce(operator.xor, frame, 0xff if invert else 0x00)
 
 ROTATE_LEFT = rolb
 ROTATE_RIGHT = rorb

@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -33,7 +32,7 @@ from objutils.checksums import lrc, COMPLEMENT_ONES
 from objutils.utils import makeList
 import objutils.HexFile as HexFile
 import objutils.utils as utils
-
+from objutils.registry import register
 
 S0  = 1
 S1  = 2
@@ -71,16 +70,22 @@ SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)",re
 SYMBOL = re.compile(r'\s+(?P<symbol>.*?)\s+\$(?P<value>.+)',re.MULTILINE|re.DOTALL)
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile, dataSep=None):
-        data = inFile.read()
-        ## todo: extract Symbols and wipe them out.
+    def __init__(self, dataSep=None):
+        super(Reader, self).__init__(FORMATS, dataSep)
 
+    def load(self, fp, **kws):
+        data = self.read(fp)
+
+
+        ## todo: extract Symbols and wipe them out.
+        """
         symbolTables = SYMBOLTABLE.findall(data)
         if symbolTables:
             self._stripSymbols(symbolTables)
         records = SYMBOLTABLE.sub('', data).strip()
-        inf = cStringIO.StringIO(records)
-        super(Reader, self).__init__(FORMATS, inf, dataSep)
+        """
+
+        return data
 
     def checkLine(self, line, formatType):
         # todo: Fkt.!!!
@@ -112,7 +117,8 @@ class Reader(HexFile.Reader):
             #print "S0: [%s]" % line.chunk
             pass
         elif formatType == S5:
-            print "S5: [%s]" % line.chunk
+            #print "S5: [%s]" % line.chunk
+            startAddress = line.address
         elif formatType == S7:
             startAddress = line.address
             #print "Startaddress[S7]: %u" % startAddress
@@ -199,3 +205,5 @@ class Writer(HexFile.Writer):
             result.append(self.srecord(7, 0, s7.address))
         return '\n'.join(result)
 
+
+register('srec', Reader, Writer)

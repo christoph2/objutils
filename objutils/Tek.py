@@ -6,8 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
-                                        cpu12.gems@googlemail.com>
+   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -30,6 +29,8 @@ import objutils.HexFile as HexFile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
+from objutils.registry import register
+
 DATA    = 1
 EOF     = 2
 
@@ -39,8 +40,8 @@ FORMATS=(
 )
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile):
-        super(Reader,self).__init__(FORMATS, inFile)
+    def __init__(self):
+        super(Reader,self).__init__(FORMATS)
 
     def checkLine(self, line, formatType):
         if formatType == DATA:
@@ -72,3 +73,4 @@ class Writer(HexFile.Writer):
 #    def composeFooter(self, meta):
 #        return ";00"
 
+register('tek', Reader, Writer)

@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -31,6 +31,7 @@ import objutils.HexFile as HexFile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
+from objutils.registry import register
 
 DATA    = 1
 EOF     = 2
@@ -68,4 +69,7 @@ class Writer(HexFile.Writer):
 
     def composeFooter(self, meta):
         return ";00"
+
+
+register('mostec', Reader, Writer)
 

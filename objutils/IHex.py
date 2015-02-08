@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -32,6 +32,8 @@ import objutils.HexFile as HexFile
 from objutils.checksums import lrc, COMPLEMENT_TWOS
 from objutils.utils import identity
 
+from objutils.registry import register
+
 FORMATS=(
     (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
 )
@@ -45,8 +47,8 @@ START_LINEAR_ADDRESS        = 5
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile):
-        super(Reader,self).__init__(FORMATS, inFile)
+    def __init__(self):
+        super(Reader,self).__init__(FORMATS)
         self.segmentAddress=0
 
     def checkLine(self, line, formatType):
@@ -124,3 +126,4 @@ class Writer(HexFile.Writer):
 
         self.outFile.write(":%02X%04X%02X%s%02X" % (length, address, type_, line, checksum))
 
+register('ihex', Reader, Writer)
