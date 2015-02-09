@@ -58,36 +58,32 @@ from collections import namedtuple
 from objutils.registry import getCodec
 
 def load(codecName, *args, **kws):
-    codec = getCodec(codecName)
-    reader = codec.reader
+    reader = getCodec(codecName).reader
 
     return reader.load(*args, **kws)
 
 def loads(codecName, *args, **kws):
-    codec = getCodec(codecName)
-    reader = codec.reader
+    reader = getCodec(codecName).reader
 
     return reader.loads(*args, **kws)
 
 def dump(codecName, *args, **kws):
-    codec = getCodec(codecName)
-    writer = codec.writer
+    writer = getCodec(codecName).writer
 
     writer.dump(*args, **kws)
 
 def dumps(codecName, *args, **kws):
-    codec = getCodec(codecName)
-    writer = codec.writer
+    writer = getCodec(codecName).writer
 
     return writer.dumps(*args, **kws)
 
 def _importer():
     import objutils.Sig
     import objutils.SRecords
-    import objutils.ASH
+    #import objutils.ASH
     import objutils.EMon52
     import objutils.Elf
-    import objutils.ETek
+    #import objutils.ETek
     import objutils.FPC
     import objutils.IEEE695
     import objutils.IHex

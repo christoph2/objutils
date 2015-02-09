@@ -28,10 +28,6 @@ __copyright__ = """
 import objutils.HexFile as HexFile
 from objutils.registry import register
 
-FORMATS=(
-    (HexFile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
-)
-
 DATA                        = 0
 EOF                         = 1
 EXTENDED_SEGMENT_ADDRESS    = 2
@@ -54,8 +50,11 @@ class Codec(object):
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile):
-        super(Reader,self).__init__(FORMATS, Codec(inFile), " ")
+
+    FORMAT_SPEC = (
+        (HexFile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
+    )
+    DATA_SEPARATOR =  " "
 
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
@@ -70,6 +69,8 @@ class Reader(HexFile.Reader):
 
 
 class Writer(HexFile.Writer):
+
+    MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
         checksum = sum(row) % 65536

@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -30,24 +30,23 @@ import cStringIO
 import re
 import objutils.HexFile as HexFile
 import objutils.utils as utils
+from objutils.registry import register
 
-DATA=1
-EOF=2
+DATA    = 1
+EOF     = 2
 
 
-FORMATS=(
-    (DATA,"AAAA DD;"),
-    (EOF,":0000")
-)
 
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 
 
 class Reader(HexFile.Reader):
 
-    def __init__(self, inFile, dataSep = None):
-        data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)
-        super(Reader, self).__init__(FORMATS, cStringIO.StringIO(data) , dataSep)
+    #data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)  # FIXME!!!
+    FORMAT_SPEC = (
+        (DATA, "AAAA DD;"),
+        (EOF, ":0000")
+    )
 
     def checkLine(self, line, formatType):
         if formatType == DATA:
@@ -69,4 +68,7 @@ class Writer(HexFile.Writer):
 
     def composeFooter(self, meta):
         return "%s" % Writer.SEPARATOR
+
+
+register('rca', Reader, Writer)
 

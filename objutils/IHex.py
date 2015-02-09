@@ -34,10 +34,6 @@ from objutils.utils import identity
 
 from objutils.registry import register
 
-FORMATS=(
-    (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
-)
-
 DATA                        = 0
 EOF                         = 1
 EXTENDED_SEGMENT_ADDRESS    = 2
@@ -47,8 +43,12 @@ START_LINEAR_ADDRESS        = 5
 
 
 class Reader(HexFile.Reader):
+    FORMAT_SPEC = (
+        (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
+        )
+
     def __init__(self):
-        super(Reader,self).__init__(FORMATS)
+        super(Reader,self).__init__()
         self.segmentAddress=0
 
     def checkLine(self, line, formatType):
@@ -73,7 +73,7 @@ class Reader(HexFile.Reader):
         elif line.type == EXTENDED_SEGMENT_ADDRESS:
             seg = ((line.chunk[0]) << 8) | (line.chunk[1])
             line.addPI(('segment', seg))
-            self._addressCalculator = curry(operator.add, seg << 4)
+            self._addressCalculator = partial(operator.add, seg << 4)
             print "EXTENDED_SEGMENT_ADDRESS: ", hex(seg)
         elif line.type == START_SEGMENT_ADDRESS:
             cs = ((line.chunk[0]) << 8) | (line.chunk[1])
@@ -84,7 +84,7 @@ class Reader(HexFile.Reader):
         elif line.type == EXTENDED_LINEAR_ADDRESS:
             seg = ((line.chunk[0]) << 8) | (line.chunk[1])
             line.addPI(('segment', seg))
-            self._addressCalculator = curry(operator.add, seg << 16)
+            self._addressCalculator = partial(operator.add, seg << 16)
             print "EXTENDED_LINEAR_ADDRESS: ", hex(seg)
         elif line.type == START_LINEAR_ADDRESS:
             eip = ((line.chunk[0]) << 24) | ((line.chunk[1]) << 16) | ((line.chunk[2]) << 8) | (line.chunk[3])
@@ -127,3 +127,4 @@ class Writer(HexFile.Writer):
         self.outFile.write(":%02X%04X%02X%s%02X" % (length, address, type_, line, checksum))
 
 register('ihex', Reader, Writer)
+

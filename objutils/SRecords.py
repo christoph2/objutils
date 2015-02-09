@@ -44,17 +44,6 @@ S8  = 7
 S9  = 8
 SYM = 9
 
-FORMATS=(
-    (S0, "S0LLAAAADDCC"),
-    (S1, "S1LLAAAADDCC"),
-    (S2, "S2LLAAAAAADDCC"),
-    (S3, "S3LLAAAAAAAADDCC"),
-    (S5, "S5LLAAAACC"),
-    (S7, "S7LLAAAAAAAACC"),
-    (S8, "S8LLAAAAAACC"),
-    (S9, "S9LLAAAACC"),
-)
-
 BIAS = {
     S0 : 3,
     S1 : 3,
@@ -70,8 +59,16 @@ SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)",re
 SYMBOL = re.compile(r'\s+(?P<symbol>.*?)\s+\$(?P<value>.+)',re.MULTILINE|re.DOTALL)
 
 class Reader(HexFile.Reader):
-    def __init__(self, dataSep=None):
-        super(Reader, self).__init__(FORMATS, dataSep)
+    FORMAT_SPEC = (
+        (S0, "S0LLAAAADDCC"),
+        (S1, "S1LLAAAADDCC"),
+        (S2, "S2LLAAAAAADDCC"),
+        (S3, "S3LLAAAAAAAADDCC"),
+        (S5, "S5LLAAAACC"),
+        (S7, "S7LLAAAAAAAACC"),
+        (S8, "S8LLAAAAAACC"),
+        (S9, "S9LLAAAACC"),
+    )
 
     def load(self, fp, **kws):
         data = self.read(fp)

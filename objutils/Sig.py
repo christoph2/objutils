@@ -33,15 +33,13 @@ from objutils.registry import register
 DATA=1
 EOF=2
 
-FORMATS=(
-    (DATA,":AAAALLBBDDCC"),
-    (EOF,":00")
-)
 
 class Reader(HexFile.Reader):
 
-    def __init__(self, dataSep = None):
-        super(Reader, self).__init__(FORMATS, dataSep)
+    FORMAT_SPEC = (
+        (DATA, ":AAAALLBBDDCC"),
+        (EOF, ":00")
+    )
 
     def checkLine(self, line, formatType):
         if formatType==DATA:

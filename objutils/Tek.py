@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -34,14 +34,12 @@ from objutils.registry import register
 DATA    = 1
 EOF     = 2
 
-FORMATS=(
-    (DATA,  "/AAAALLBBDDCC"),
-    (EOF,   "/AAAA00BB"),
-)
-
 class Reader(HexFile.Reader):
-    def __init__(self):
-        super(Reader,self).__init__(FORMATS)
+
+    FORMAT_SPEC = (
+        (DATA,  "/AAAALLBBDDCC"),
+        (EOF,   "/AAAA00BB"),
+    )
 
     def checkLine(self, line, formatType):
         if formatType == DATA:
@@ -74,3 +72,4 @@ class Writer(HexFile.Writer):
 #        return ";00"
 
 register('tek', Reader, Writer)
+

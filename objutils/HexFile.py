@@ -163,16 +163,17 @@ class Container(object):
 
 
 class Reader(object):
-    aligment = 0  # 2**n
+    ALIGMENT = 0  # 2**n
+    DATA_SEPARATOR = None
+    logger = logging.getLogger("object.utils")
 
-    def __init__(self, formats, dataSep = None):
-        if isinstance(formats, types.StringType):
-            self.formats = [FormatParser(formats, dataSep).parse()]
-        elif isinstance(formats,(types.ListType, types.TupleType)):
+    def __init__(self):
+        if isinstance(self.FORMAT_SPEC, types.StringType):
+            self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
+        elif isinstance(self.FORMAT_SPEC,(types.ListType, types.TupleType)):
             self.formats = []
-            for formatType, format in formats:
-                self.formats.append((formatType, FormatParser(format, dataSep).parse()))
-        self.logger = logging.getLogger("object.utils")
+            for formatType, format in self.FORMAT_SPEC:
+                self.formats.append((formatType, FormatParser(format, self.DATA_SEPARATOR).parse()))
 
     def load(self, fp, **kws):
         return self.read(fp)
