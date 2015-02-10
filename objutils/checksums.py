@@ -88,3 +88,4 @@ def nibbleSum(data):
         ln = d & 0x0f
         result +=  hn + ln
     return result % 256
+

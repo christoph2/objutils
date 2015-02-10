@@ -51,7 +51,7 @@ def _importer():
     #import objutils.ASH
     import objutils.EMon52
     import objutils.Elf
-    #import objutils.ETek
+    import objutils.ETek
     import objutils.FPC
     import objutils.IEEE695
     import objutils.IHex

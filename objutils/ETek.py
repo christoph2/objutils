@@ -29,48 +29,57 @@ import objutils.HexFile as HexFile
 from objutils.registry import register
 
 
+import objutils.checksums as checksums
+import objutils.utils as utils
+
+
 DATA    = 1
 SYMBOL  = 2
 EOF     = 3
 
-FORMATS=(
-    (DATA,      "%LL6CCAAAADD"),
-    (SYMBOL,    "%LL3CCU"),
-    (EOF,       "/AAAA00BB"),
-)
 
-class Reader(HexFile.Reader): # TODO: Subclass Tek.Reader!!!
-    def __init__(self):
-        super(Reader,self).__init__(FORMATS)
+class Reader(HexFile.Reader):
 
-    def nibbleSum(self, accu, b):
-        hn = (b & 0xf0) >> 4
-        ln = b & 0x0f
-        s = hn + ln
-        return accu + s
+    FORMAT_SPEC = (
+        (DATA,      "%LL6CCAAAAADD"),
+        (SYMBOL,    "%LL3CCU"),
+        (EOF,      "%LL8CCAAAAADD"),
+    )
 
     def checkLine(self, line, formatType):
         if formatType == DATA:
-            line.length = (line.length - 10) / 2
+            line.length = (line.length / 2) - 5
+            checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(line.address), 6, ((line.length + 5) * 2), line.chunk))
             if line.length != len(line.chunk):
                 raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-            ns = 0
-            for b in [(line.address & 0xff00) >> 8, line.address & 0xff, line.length]:
-                ns = self.nibbleSum(ns, b)
-            for b in line.chunk:
-                ns = self.nibbleSum(ns, b)
-            checksum = ( ~ (sum(line.chunk)) + line.length + (line.address >> 8) + (line.address & 0xff) ) & 0xff
-        elif formatType == SYMBOL:
-            chunk = line.chunk
-            print chunk
             if line.checksum!=checksum:
                 raise HexFile.InvalidRecordChecksumError()
+        elif formatType == SYMBOL:
+            checksum = checksums.nibbleSum(utils.makeList(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
+            chunk = line.chunk.strip()
+            address = int(chunk[-4 : ], 16)
+            line.address = address
+            #if line.checksum!=checksum:
+            #    raise HexFile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
 
     def parseData(self, line, formatType):
         return formatType != SYMBOL
+
+class Writer(HexFile.Writer):
+
+    MAX_ADDRESS_BITS = 24
+
+    def composeRow(self, address, length, row):
+        checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), 6, ((length + 5) * 2), row))
+
+        line = "%%%02X6%02X%04X%s" % ((length + 5) * 2, checksum, address, Writer.hexBytes(row), )
+        return line
+
+#    def composeFooter(self, meta):
+#        return ";00"
 
 
 register('etek', Reader, Writer)
