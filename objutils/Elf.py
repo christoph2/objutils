@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -805,11 +805,10 @@ class ELFHeader(object):
             raise FormatError("Wrong magic bytes.")
 
         d = Elf32_Ehdr(*elfHeader)
-        self.byteorderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
-        parent.byteorderPrefix = self.byteorderPrefix
+        self.byteOrderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
 
         # Unpack again, /w corrected byte-order.
-        elfHeader = struct.unpack("%s%s" % (self.byteorderPrefix, HDR_FMT), data)
+        elfHeader = struct.unpack("%s%s" % (self.byteOrderPrefix, HDR_FMT), data)
         d = Elf32_Ehdr(*elfHeader)
 
         self.data = Null()
@@ -876,7 +875,7 @@ class ELFSectionHeaderTable(object):
         parent.inFile.seek(atPosition, os.SEEK_SET)
         data=parent.inFile.read(ELF_SECTION_SIZE)
 
-        elfProgramHeaderTable = struct.unpack("%s%s" % (parent.byteorderPrefix, SEC_FMT), data)
+        elfProgramHeaderTable = struct.unpack("%s%s" % (parent.byteOrderPrefix, SEC_FMT), data)
         d = Elf32_Shdr(*elfProgramHeaderTable)
         self.data = Null()
         for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
@@ -894,7 +893,7 @@ class ELFSectionHeaderTable(object):
             for idx, symbol in enumerate(range(self.shSize / ELF_SYM_TABLE_SIZE)):
                 offset = idx * ELF_SYM_TABLE_SIZE
                 data=self.image[offset : offset + ELF_SYM_TABLE_SIZE]
-                symData = struct.unpack("%s%s" % (parent.byteorderPrefix, SYMTAB_FMT), data)
+                symData = struct.unpack("%s%s" % (parent.byteOrderPrefix, SYMTAB_FMT), data)
                 sym = Elf32_Sym(*symData)
                 self.symbols[idx] = sym
 
@@ -946,7 +945,7 @@ class ELFProgramHeaderTable(object):
         data = parent.inFile.read(ELF_PHDR_SIZE)
 
         try:
-            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteorderPrefix, PHDR_FMT), data)
+            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteOrderPrefix, PHDR_FMT), data)
         except struct.error:
             raise FormatError("Wrong program header table.")
 
@@ -1065,3 +1064,6 @@ class Reader(object):
             self._stringCache[(tableIndex,entry)] = terminatedString
             return terminatedString
 
+    @property
+    def byteOrderPrefix(self):
+        return self.header.byteOrderPrefix

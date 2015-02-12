@@ -3,7 +3,7 @@
 
 __version__ = "0.1.0"
 
-__copyright__ = """
+__copyright__ = """/
     pyObjUtils - Object file library for Python.
 
    (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
@@ -73,15 +73,39 @@ FORM_READERS = {
 AbbreviationEntry = namedtuple('Abbreviation', 'tag, children, attrs')
 InfoHeader = namedtuple('InfoHeader', 'length dwarfVersion abbrevOffs targetAddrSize')
 
+DW_LNS_extended_op = 0
 
 SET_OFFSET      = 1
 IGNORE_OFFSET   = 2
 
 
+class LNSregisters(object):
+    """Registers of Line number information State-machine.
+    """
+    address  = 0
+    op_index = 0
+    fileNumber = 1
+    line = 1
+    column = 0
+    is_stmt = False     # determined by default_is_stmt in the line number program header
+    basic_block = False
+    end_sequence = False
+    prologue_end = False
+    epilogue_begin = False
+    isa = 0
+    discriminator = 0
+    #
+    offset = 0
+
+    def __init__(self, is_stmt, offset):
+        self.is_stmt = is_stmt
+        self.offset = offset
+
+
 class DwarfReader(PlainBinaryReader):
 
-    def __init__(self, image, imageReader):
-        super(DwarfReader, self).__init__(StringIO.StringIO(image), DwarfReader.BIG_ENDIAN)
+    def __init__(self, image, imageReader, byteOrderPrefix):
+        super(DwarfReader, self).__init__(StringIO.StringIO(image), byteOrderPrefix)
         self.wordSize = None
         self.imageReader = imageReader
 
@@ -147,7 +171,7 @@ class DwarfReader(PlainBinaryReader):
         elif self.wordSize == 8:
             return self.u64()
         else:
-            pass        # TODO: Error handling!
+            return self.u32()        # TODO: Error handling!
 
     def strp(self):
         section = self.imageReader.sections['.debug_str'].image
@@ -176,7 +200,8 @@ def makeAttrName(value):
 
 class DebugSectionReader(object):
 
-    def __init__(self, sections):
+    def __init__(self, sections, byteorderPrefix):
+        self.byteorderPrefix = byteorderPrefix
         print sections.keys()
         self.sections = sections
         self.instantiateReaders()
@@ -189,12 +214,14 @@ class DebugSectionReader(object):
         self.readers = {}
         for name, section in self.sections.items():
             if section.image is not None:
-                self.readers[name] = DwarfReader(section.image, self)
+                self.readers[name] = DwarfReader(section.image, self, self.byteorderPrefix)
 
     def getReader(self, name):
         return  self.readers[name]
 
     def process(self):
+        if self.sections.has_key('.debug_line'):
+            self.processLineSection()
         if self.sections.has_key('.debug_abbrev'):
             self.processAbbreviations()
         if self.sections.has_key('.debug_info'):
@@ -224,14 +251,19 @@ class DebugSectionReader(object):
             attrSpecs = []
             if dr.pos == 0x69:
                 pass
+            print "   %u      %s    [%s]" % (code, tag, "has children" if children == constants.DW_CHILDREN_yes else "no children")
             while True:
                 attrValue = dr.uleb()
                 attr = constants.AttributeEncoding(attrValue)
                 formValue = dr.uleb()
                 form = constants.AttributeForm(formValue)
                 if attrValue == 0 and formValue == 0:
+                    print "    DW_AT value: 0     DW_FORM value: 0"
                     break
-                #print (attr, form)
+                if attr.value in attr.MAP:
+                    print "    %s %s" % (attr.MAP[attr.value], form.MAP[form.value])
+                else:
+                    print "    Unknown AT value: %x %s" % (attr.value, form.MAP[form.value])
                 attrSpecs.append((attr, form))
             abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
             #print startPos, abbrevEntries[code]
@@ -243,15 +275,19 @@ class DebugSectionReader(object):
     def processInfoSection(self):
         dr = self.getReader('.debug_info')
         while dr.pos < dr.size:
+            sectionHeaderStart = dr.pos
             length = dr.u32()
             stopPosition = dr.pos + length
             dwarfVersion = dr.u16()
             abbrevOffs = dr.u32()
-            abbrevs = self.abbrevs[abbrevOffs]
+            abbrevs = self.abbrevs.get(abbrevOffs, None)
+            if abbrevs is None:
+                print "Error: Invalid Abbreviations"
             targetAddrSize = dr.u8()
             dr.wordSize = targetAddrSize
 
             while dr.pos < stopPosition:
+                entryOffset = dr.pos
                 number = dr.uleb()
                 if number == 0:
                     print "<*** EMPTY ***>"
@@ -261,10 +297,9 @@ class DebugSectionReader(object):
                 except KeyError as e:   # TODO: genau analysieren!!!
                     print "ENTRY NOT FOUND: %u [%s]" % (number, e)
                     continue
-                print "=" * 80
-                print entry.tag, entry.children
-                print "=" * 80
+                print "<%x><%x>: Abbrev Number: %u (%s)" % (sectionHeaderStart, entryOffset, number, entry.tag,)
                 for attr in entry.attrs:
+                    offset = dr.pos
                     attribute, form = attr
                     reader = FORM_READERS[form.value]
                     attrValue = getattr(dr, reader)()
@@ -272,27 +307,31 @@ class DebugSectionReader(object):
                         constants.DW_AT_data_member_location):
                         dis = Dissector(attrValue, targetAddrSize)
                         attrValue = dis.run()
-                    print "%s ==> '%s'" % (attribute, attrValue)
+                    print "   <%x>   %18s    : %s" % (offset, attribute, attrValue)
         dr.reset()
 
     def processPubNames(self):  # TODO: NameLookupTable
         dr = self.getReader('.debug_pubnames')  # '.debug_pubtypes'
+        print "Contents of the .debug_pubnames section:"
         while dr.pos < dr.size:
             length = dr.u32()
             stopPosition = dr.pos + length
             dwarfVersion = dr.u16()
             debugInfoOffs = dr.u32()
             debugInfoLen = dr.u32()
-            print "Length: %u Offset: 0x%04x Size: %u" % (length, debugInfoOffs, debugInfoLen)
-
+            print "  Length:                              %u" % (length,  )
+            print "  Version:                             %u" % (dwarfVersion, )
+            print "  Offset into .debug_info section:     0x%x" % (debugInfoOffs, )
+            print "  Size of area in .debug_info section: %u" % (debugInfoLen, )
+            print
+            print "    Offset      Name"
             while dr.pos < stopPosition:
                 #tb = dr.u8()
                 entryOffset = dr.u32()
                 if not entryOffset:
                     break
                 entryName = dr.asciiz()
-                print "0x%04x '%s'" % (entryOffset, entryName)
-
+                print "    %12s %s" % (hex(entryOffset), entryName)
 
     def scanDebugInfoHeaders(self):
         dr = self.getReader('.debug_info')
@@ -308,4 +347,176 @@ class DebugSectionReader(object):
             result.append(InfoHeader(length, dwarfVersion, abbrevOffs, targetAddrSize))
         dr.reset()
         self.infoHeaders = result
+
+    def processLineSection(self):
+        print "Raw dump of debug contents of section .debug_line:\n"
+        dr = self.getReader('.debug_line')
+        while dr.pos < dr.size:
+            sectionOffset = dr.pos
+            length = dr.u32()
+            stopPosition = dr.pos + length
+            dwarfVersion = dr.u16()
+            headerLength = dr.u32() # in the 64-bit DWARF format, this field is an 8-byte unsigned length!!!
+            minimumInstructionLength = dr.u8()
+            #maximumOperationsPerInstruction = dr.u8()  # DWARF4
+            defaultIsStmt = True if dr.u8() == 0x01 else False
+            lineBase = dr.s8()
+            lineRange = dr.u8()
+            # maximumLineIncrement = (lineBase + lineRange -1)
+            #
+            # If the desired line increment is greater than the maximum line
+            # increment, a standard opcode must be used instead of a special opcode.
+
+            opcodeBase = dr.u8()    # The number assigned to the first special opcode.
+
+            if not dwarfVersion in [2, 3, 5]:
+                #raise Excpetion("Invalid DWARF-Version: '%u'." % dwarfVersion)
+                return # We can't continue for now.
+
+            standardOpcodeLengths = []
+            for i in range(1, opcodeBase):
+                olen = dr.u8()
+                standardOpcodeLengths.append(olen)
+                #print "Opcode %u has %u args" % (i, olen)
+            includeDirectories = []
+            while True:
+                directory = dr.asciiz()
+                if directory:
+                    includeDirectories.append(directory)
+                else:
+                    # The last entry is followed by a single null byte.
+                    break
+
+            print "  Offset:                      %x" % (sectionOffset, )           # BYTE-ORDER??!!
+            print "  Length:                      %u" % (length, )
+            print "  DWARF Version:               %u" % (dwarfVersion)
+            print "  Prologue Length:             %u" % (headerLength, )            # BYTE-ORDER??!!
+            print "  Minimum Instruction Length:  %u" % (minimumInstructionLength, )
+            #print "  Maximum Operations per Instruction: %u" % (maximumOperationsPerInstruction, )
+            print "  Initial value of 'is_stmt':  %u" % (defaultIsStmt, )
+            print "  Line Base:                   %i" % (lineBase, )
+            print "  Line Range:                  %u" % (lineRange)
+            print "  Opcode Base:                 %u" % (opcodeBase)
+
+            print "\n  Opcodes:"
+            for idx, args in enumerate(standardOpcodeLengths, 1):
+                print "   Opcode %u has %u args" % (idx, args)
+
+            if includeDirectories:
+                #print "What now?"
+                 print " The Directory Table (offset 0x18):" # Cheeck: Offset!??
+                 for idx, directory in enumerate(includeDirectories, 1):
+                     print "  %u     %s" % (idx, directory)
+            else:
+                print " The Directory Table is empty."
+
+            " The File Name Table (offset 0x3c):"
+
+            fileNames = []
+            idx = 0
+            while True:
+                filename = dr.asciiz()
+                if filename:
+                    idx += 1
+                    directoryIndex = dr.uleb()
+                    timeOfLastModification = dr.uleb()
+                    fileLength = dr.uleb()
+                    fileNames.append(filename)
+                    print "%u %u %u %u %s" % (idx, directoryIndex, timeOfLastModification, fileLength, filename)
+                else:
+                    break
+
+            if dr.pos >= stopPosition:
+                continue
+
+            #statements = []
+            lineNumberProgram = []
+            address = 0
+            line = 1
+            while True:
+                regs = LNSregisters(defaultIsStmt, dr.pos)
+                print "[0x%08x]  " % dr.pos,
+                opcode = dr.u8()
+                if opcode >= opcodeBase:
+                    # Special opcodes.
+                    """
+                    1. Add a signed integer to the line register.
+                    2. Modify the operation pointer by incrementing the address and op_index registers as described below.
+
+                    """
+                    adjustedOpcode = opcode - opcodeBase
+                    addrIncr = (adjustedOpcode / lineRange)  * minimumInstructionLength
+                    lineIncr = lineBase + (adjustedOpcode % lineRange)
+                    address += addrIncr
+                    line += lineIncr
+                    regs.op_index = adjustedOpcode  # ???
+                    regs.basic_block = False
+                    regs.prologue_end = False
+                    regs.epilogue_begin = False
+                    regs.discriminator = 0
+                    print "Special opcode %u: advance Address by %u to 0x%x and Line by %u to %u" % (adjustedOpcode, addrIncr, address, lineIncr, line)
+
+                else:
+                    if opcode == DW_LNS_extended_op:
+                        # Extended opcodes.
+                        extOpLen = dr.uleb()
+                        extOp = dr.u8()
+
+                        if extOp == constants.DW_LNE_end_sequence:
+                            regs.end_sequence = True
+                            line = 1
+                            print "Extended opcode 1: End of Sequence"
+                        elif extOp == constants.DW_LNE_set_address:
+                            address = dr.addr()
+                            print "Extended opcode 2: set Address to 0x%x" % address
+                        elif extOp == constants.DW_LNE_define_file:
+                            raise Exception("FIX ME!!!")
+                        elif extOp == constants.DW_LNE_set_discriminator:
+                            raise Exception("FIX ME!!!")
+                        else:
+                            raise AttributeError("Unexpected extended opcode: '%u'" % opcode)
+                    else:
+                        # Standard opcodes.
+                        if opcode == constants.DW_LNS_copy:
+                            regs.basic_block = False
+                            print "Copy"
+                        elif opcode == constants.DW_LNS_advance_pc:
+                            addressIncr = dr.uleb() * minimumInstructionLength
+                            address += addressIncr
+                            print "Advance PC by %u to 0x%x" % (addressIncr, address)
+                        elif opcode == constants.DW_LNS_advance_line:
+                            lineIncr = dr.uleb()
+                            line += lineIncr
+                            print "Advance Line by %u to %u" % (lineIncr, line, )
+                        elif opcode == constants.DW_LNS_set_file:
+                            regs.fileNumber = dr.uleb()
+                            print "Set File Name to entry %u in the File Name Table" % (regs.fileNumber)
+                        elif opcode == constants.DW_LNS_set_column:
+                            regs.column = dr.uleb()
+                            print "Set column to %u" % regs.column
+                        elif opcode == constants.DW_LNS_negate_stmt:
+                            regs.is_stmt = not regs.is_stmt # NÄHER UNTERSUCHEN!!!
+                        elif opcode == constants.DW_LNS_set_basic_block:
+                            regs.basic_block = True
+                        elif opcode == constants.DW_LNS_const_add_pc:
+                            offset = ((255 - opcodeBase) / lineRange) * minimumInstructionLength
+                            address += offset
+                            print "Advance PC by constant %u to 0x%x" % (offset, address)
+                        elif opcode == constants.DW_LNS_fixed_advance_pc:
+                            address += dr.u16()
+                        elif opcode == constants.DW_LNS_set_prologue_end:
+                            pass
+                        elif opcode == constants.DW_LNS_set_epilogue_begin:
+                            pass
+                        elif opcode == constants.DW_LNS_set_isa:
+                            pass
+                        else:
+                            raise AttributeError("Unexpected standard opcode: '%u'" % opcode)
+                regs.line = line
+                regs.address = address
+                lineNumberProgram.append(regs)
+                if dr.pos >= stopPosition:
+                    #if regs.end_sequence == True:
+                    break
+
 

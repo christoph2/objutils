@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -36,12 +36,12 @@ class PlainBinaryReader(object):
     LITTLE_ENDIAN   = '<'
     BIG_ENDIAN      = '>'
 
-    def __init__(self, image, endianess = "@"):
+    def __init__(self, image, byteOrderPrefix = "@"):
         self.image = image
         self.image.seek(0, os.SEEK_END)
         self._size = self.image.tell()
         self.image.seek(0, os.SEEK_SET)
-        self.endianess = endianess
+        self.byteOrderPrefix = byteOrderPrefix
         self.pos = 0
 
     def _getPos(self):
@@ -60,7 +60,7 @@ class PlainBinaryReader(object):
         return self.u8()
 
     def value(self, conversionCode, size):
-        res, = struct.unpack('%c%c' % (self.endianess, conversionCode, ), self.image.read(size))
+        res, = struct.unpack('%c%c' % (self.byteOrderPrefix, conversionCode, ), self.image.read(size))
         return res
 
     def u8(self):
