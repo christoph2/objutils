@@ -55,8 +55,7 @@ class Reader(HexFile.Reader):
         if line.length != len(line.chunk):
             raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
         # todo: factor out checksum calculation from line!!!
-        checksum = (~(sum([line.type, line.length, (line.address & 0xff00) >> 8, line.address & 0xff])+
-            sum(line.chunk)) & 0xff) + 1
+        checksum = (~(sum([line.type, line.length, (line.address & 0xff00) >> 8, line.address & 0xff])+ sum(line.chunk)) + 1) & 0xff
         if line.checksum != checksum:
             raise HexFile.InvalidRecordChecksumError()
 
