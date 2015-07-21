@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """/
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -220,6 +220,8 @@ class DebugSectionReader(object):
         return  self.readers[name]
 
     def process(self):
+        for name, image in self.sections.items():
+            print name
         if self.sections.has_key('.debug_line'):
             self.processLineSection()
         if self.sections.has_key('.debug_abbrev'):
@@ -282,7 +284,8 @@ class DebugSectionReader(object):
             abbrevOffs = dr.u32()
             abbrevs = self.abbrevs.get(abbrevOffs, None)
             if abbrevs is None:
-                print "Error: Invalid Abbreviations"
+                print "*** Error: Invalid Abbreviations ***"
+                return
             targetAddrSize = dr.u8()
             dr.wordSize = targetAddrSize
 
@@ -421,7 +424,7 @@ class DebugSectionReader(object):
                     directoryIndex = dr.uleb()
                     timeOfLastModification = dr.uleb()
                     fileLength = dr.uleb()
-                    fileNames.append(filename)
+                    fileNames.append(filename)  # TODO: namedtuple.
                     print "%u %u %u %u %s" % (idx, directoryIndex, timeOfLastModification, fileLength, filename)
                 else:
                     break
@@ -470,7 +473,14 @@ class DebugSectionReader(object):
                             address = dr.addr()
                             print "Extended opcode 2: set Address to 0x%x" % address
                         elif extOp == constants.DW_LNE_define_file:
-                            raise Exception("FIX ME!!!")
+                            print "Extended opcode 3: define new File Table entry"
+                            fileName = dr.asciiz()
+                            directoryIndex = dr.uleb()
+                            timeOfLastModification = dr.uleb()
+                            fileLength = dr.uleb()
+                            # TODO: Append to filename-Table!!!
+                            print "Entry Dir     Time    Size    Name"
+                            print " 1    %u       %u       %u       %s" % (directoryIndex, timeOfLastModification, fileLength, fileName)
                         elif extOp == constants.DW_LNE_set_discriminator:
                             raise Exception("FIX ME!!!")
                         else:
@@ -498,16 +508,20 @@ class DebugSectionReader(object):
                             regs.is_stmt = not regs.is_stmt # NÄHER UNTERSUCHEN!!!
                         elif opcode == constants.DW_LNS_set_basic_block:
                             regs.basic_block = True
+                            print "Set basic block"
                         elif opcode == constants.DW_LNS_const_add_pc:
                             offset = ((255 - opcodeBase) / lineRange) * minimumInstructionLength
                             address += offset
                             print "Advance PC by constant %u to 0x%x" % (offset, address)
                         elif opcode == constants.DW_LNS_fixed_advance_pc:
-                            address += dr.u16()
+                            addrInc = dr.u16()
+                            address += addrInc
+                            print "Advance PC by fixed size amount %u to 0x%x" % (addrInc, address)
                         elif opcode == constants.DW_LNS_set_prologue_end:
-                            pass
+                            print "Set prologue_end to true"
+                            regs.prologue_end = True
                         elif opcode == constants.DW_LNS_set_epilogue_begin:
-                            pass
+                            print "Set epilogue_begin to true"
                         elif opcode == constants.DW_LNS_set_isa:
                             pass
                         else:
