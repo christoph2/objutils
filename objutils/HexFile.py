@@ -43,8 +43,7 @@ from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
 from objutils.utils import slicer
-
-
+from objutils.logger import logger
 
 '''
 MemoryBlocks
@@ -165,7 +164,8 @@ class Container(object):
 class Reader(object):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
-    logger = logging.getLogger("object.utils")
+    #logger = logging.getLogger("object.utils")
+    logger = logger
 
     def __init__(self):
         if isinstance(self.FORMAT_SPEC, types.StringType):
@@ -183,11 +183,14 @@ class Reader(object):
 
     def read(self, fp):
         segments = []
+        matched = False
+        self.valid = True
         metaData = defaultdict(list)
         for (lineNumber, line) in enumerate(fp.readlines(), 1):
             for formatType, format in self.formats:
                 match = format.match(line)
                 if match:
+                    matched = True
                     container = Container()
                     container.lineNumber = lineNumber
                     dict_ = match.groupdict()
@@ -213,7 +216,14 @@ class Reader(object):
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
                             metaData[formatType].append(MetaRecord(formatType, container.address, chunk))
-        return Image(joinSegments(segments), metaData)
+                    break
+            if not matched:
+                self.warn("Ignoring garbage line #%u" % lineNumber)
+        if segments:
+            return Image(joinSegments(segments), metaData, self.valid)
+        else:
+            self.error("File seems to be invalid.")
+            return Image([], valid = False)
 
     def _addressSpace(self, value):
         if value < 2**16:
@@ -226,6 +236,13 @@ class Reader(object):
             return THIRTYTWO_BITS
         else:
             raise ValueError("Unsupported Addressspace size.")
+
+    def error(self, msg):
+        self.logger.error(msg)
+        self.valid = False
+
+    def warn(self, msg):
+        self.logger.warn(msg)
 
     def probe(self):
         "Determine if valid object from first line." # if object is valid.

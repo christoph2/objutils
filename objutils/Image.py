@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -32,9 +32,10 @@ AS_32   = 2
 AS_64   = 3
 
 class Image(object):
-    def __init__(self, segments, meta = {}):
+    def __init__(self, segments, meta = {}, valid = False):
         self.segments = segments
         self.meta = meta
+        self.valid = valid
 
     def __repr__(self):
         result = []

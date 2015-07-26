@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -45,7 +45,7 @@ class Segment(object):
             raise IndexError()
 
     def __repr__(self):
-        return "Segment (address: '0X%X' len: '%d')" % (self.address, self.length)
+        return "Segment (address: '0X%08X' length: '%d')" % (self.address, self.length)
 
 
 def joinSegments(segments):
@@ -63,3 +63,4 @@ def joinSegments(segments):
         prevSegment = segment
     lastSeg = resultSegments[-1]
     return resultSegments
+
