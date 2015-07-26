@@ -6,7 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -184,11 +184,12 @@ class Reader(object):
     def read(self, fp):
         segments = []
         metaData = defaultdict(list)
-        for line in fp.readlines():
+        for (lineNumber, line) in enumerate(fp.readlines(), 1):
             for formatType, format in self.formats:
                 match = format.match(line)
                 if match:
                     container = Container()
+                    container.lineNumber = lineNumber
                     dict_ = match.groupdict()
                     if dict_ != {}:
                         # Handle scalar values.
