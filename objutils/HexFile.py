@@ -32,18 +32,24 @@ import math
 import re
 import sys
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
-
 import types
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
-from objutils.utils import slicer
+from objutils.utils import slicer, getPythonVersion
 from objutils.logger import logger
+
+PYTHON_VERSION = getPythonVersion()
+
+if PYTHON_VERSION.major == 3:
+    from io import StringIO
+else:
+    try:
+        import cStringIO as StringIO
+    except ImportError:
+        import StringIO
+
 
 '''
 MemoryBlocks
@@ -113,8 +119,6 @@ class FormatParser(object):
         self.dataSep = dataSep
 
     def parse(self):
-        if not isinstance(self.fmt, types.StringType):
-            raise TypeError
         group = ''
         prevCh = ''
         for ch in self.fmt:
@@ -147,7 +151,8 @@ class FormatParser(object):
                 else:
                     pass
             elif groupNumber == UNPARSED:
-                print expr
+                #print expr
+                pass
             else:
                 expr = expr % (length, )
         self.translatedFmt.append((groupNumber, length, expr))
