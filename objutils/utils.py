@@ -26,6 +26,7 @@ __copyright__ = """
 """
 
 import itertools
+import sys
 
 def slicer(iterable, sliceLength, converter = None):
     if converter is None:
@@ -71,4 +72,7 @@ class Curry:
 
 
 identity = lambda self,x: x
+
+def getPythonVersion():
+    return sys.version_info
 
