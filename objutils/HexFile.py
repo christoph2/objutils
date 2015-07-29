@@ -37,10 +37,9 @@ from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
-from objutils.utils import slicer, getPythonVersion
+from objutils.utils import slicer, PYTHON_VERSION
 from objutils.logger import logger
 
-PYTHON_VERSION = getPythonVersion()
 
 if PYTHON_VERSION.major == 3:
     from io import StringIO

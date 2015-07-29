@@ -76,3 +76,5 @@ identity = lambda self,x: x
 def getPythonVersion():
     return sys.version_info
 
+PYTHON_VERSION = getPythonVersion()
+
