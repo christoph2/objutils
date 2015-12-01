@@ -1,8 +1,8 @@
 
 import unittest
 
-from objutils.checksums import nibbleSum, lrc
-from objutils.checksums import COMPLEMENT_NONE, COMPLEMENT_ONES, COMPLEMENT_TWOS
+from objutils.checksums import nibbleSum, lrc, rotatedXOR
+from objutils.checksums import COMPLEMENT_NONE, COMPLEMENT_ONES, COMPLEMENT_TWOS, ROTATE_LEFT, ROTATE_RIGHT
 
 #print lrc(range(10), 8, COMPLEMENT_TWOS)
 #print lrc(range(100), 8, COMPLEMENT_TWOS)
@@ -39,6 +39,21 @@ class TestLRCs(unittest.TestCase):
 
     def testLRCCase6(self):
         self.assertEquals(lrc(range(100), 8, COMPLEMENT_TWOS), 170)
+
+
+class TestRXORs(unittest.TestCase):
+
+    def testRXORCase1(self):
+        self.assertEquals(rotatedXOR(range(10), 8, ROTATE_LEFT), 74)
+
+    def testRXORCase2(self):
+        self.assertEquals(rotatedXOR(range(100), 8, ROTATE_LEFT), 66)
+
+    def testRXORCase3(self):
+        self.assertEquals(rotatedXOR(range(10), 8, ROTATE_RIGHT), 186)
+
+    def testRXORCase4(self):
+        self.assertEquals(rotatedXOR(range(100), 8, ROTATE_RIGHT), 3)
 
 if __name__ == '__main__':
     unittest.main()
