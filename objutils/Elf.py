@@ -834,15 +834,15 @@ class ELFHeader(object):
 
     @property
     def elfMachineName(self):
-        return ELF_MACHINE_NAMES.get(ELFMachineType(self.elfMachine), "*** unknown ***")
+        return ELF_MACHINE_NAMES.get(ELFMachineType(self.elfMachine), "<unknown>")
 
     @property
     def elfClassName(self):
-        return ELF_CLASS_NAMES.get(ELFClass(self.elfClass), "*** unknown ***")
+        return ELF_CLASS_NAMES.get(ELFClass(self.elfClass), "<unknown>")
 
     @property
     def elfByteOrderName(self):
-        return ELF_BYTE_ORDER_NAMES.get(ELFDataEncoding(self.elfByteOrder), "*** unknown ***")
+        return ELF_BYTE_ORDER_NAMES.get(ELFDataEncoding(self.elfByteOrder), "<unknown>")
 
     # Install pretty names.
     elfClass                    = Alias("e_ident4")
@@ -873,6 +873,18 @@ class ELFHeader(object):
             result = "ELF64"
         else:
             result = "<unknown: %x>" % self.elfClass
+        return result
+
+    def elfDataEncodingAsString(self):
+        result = ""
+        if self.elfByteOrder == ELFDataEncoding.ELFDATANONE:
+            result = "none"
+        elif self.elfByteOrder == ELFDataEncoding.ELFDATA2LSB:
+            result = "2's complement, little endian"
+        elif self.elfByteOrder == ELFDataEncoding.ELFDATA2MSB:
+            result = "2's complement, big endian"
+        else:
+            result = "<unknown: %x>" % self.elfByteOrder
         return result
 
 
