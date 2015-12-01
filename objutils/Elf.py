@@ -798,9 +798,9 @@ class ELFHeader(object):
     def __init__(self, parent):
         self.parent = parent
         parent.inFile.seek(0, os.SEEK_SET)
-        data = parent.inFile.read(ELF_HEADER_SIZE)
+        self.rawData = parent.inFile.read(ELF_HEADER_SIZE)
 
-        elfHeader = struct.unpack(HDR_FMT, data)
+        elfHeader = struct.unpack(HDR_FMT, self.rawData)
         if not self._checkMagic(elfHeader):
             raise FormatError("Wrong magic bytes.")
 
@@ -808,7 +808,7 @@ class ELFHeader(object):
         self.byteOrderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
 
         # Unpack again, /w corrected byte-order.
-        elfHeader = struct.unpack("%s%s" % (self.byteOrderPrefix, HDR_FMT), data)
+        elfHeader = struct.unpack("%s%s" % (self.byteOrderPrefix, HDR_FMT), self.rawData)
         d = Elf32_Ehdr(*elfHeader)
 
         self.data = Null()
@@ -862,6 +862,18 @@ class ELFHeader(object):
     elfSHTEntrySize             = Alias("e_shentsize")
     elfNumberOfSHs              = Alias("e_shnum")
     elfStringTableIndex         = Alias("e_shstrndx")
+
+    def elfClassAsString(self):
+        result = ""
+        if self.elfClass == ELFClass.ELFCLASSNONE:
+            result = "none"
+        elif self.elfClass == ELFClass.ELFCLASS32:
+            result = "ELF32"
+        elif self.elfClass == ELFClass.ELFCLASS64:
+            result = "ELF64"
+        else:
+            result = "<unknown: %x>" % self.elfClass
+        return result
 
 
 class ELFSymbol(object):
