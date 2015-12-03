@@ -20,6 +20,6 @@ setup(
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
     packages = packagez('objutils'),
-    install_requires = ['enum'],
+    install_requires = ['enum34'],
 )
 
