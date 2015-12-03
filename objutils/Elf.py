@@ -26,6 +26,7 @@ __copyright__ = """
 """
 
 from objutils._Enum import Enum
+import enum
 from collections import namedtuple
 import mmap
 import os
@@ -92,20 +93,25 @@ typedef struct tagElf32_Ehdr {
 } Elf32_Ehdr;
 """
 
-@Enum
-class ELFType(object):
-    ET_NONE = 0
+class ELFType(enum.IntEnum):
+    ET_NONE     = 0
     " No file type."
-    ET_REL  = 1
+    ET_REL      = 1
     " Relocatable file."
-    ET_EXEC = 2
+    ET_EXEC     = 2
     " Executable file."
-    ET_DYN  = 3
+    ET_DYN      = 3
     " Shared object file."
-    ET_CORE = 4
+    ET_CORE     = 4
     " Core file."
-    #ET_LOPROC   ((Elf32_Half)0xff00)    /* Processor-specific.      */
-    #ET_HIPROC   ((Elf32_Half)0xffff)    /* Processor-specific.      */
+    ET_LOOS     = 0xFE00
+    "Operating system-specific "
+    ET_HIOS     = 0xFEFF
+    "Operating system-specific "
+    ET_LOPROC   = 0xff00
+    " Processor-specific."
+    ET_HIPROC   = 0xffff
+    "Processor-specific."
 
 
 ELF_TYPE_NAMES = {
@@ -470,6 +476,28 @@ ELF_BYTE_ORDER_NAMES = {
     ELFDataEncoding.ELFDATA2LSB : "Little-Endian.",
     ELFDataEncoding.ELFDATA2MSB : "Big-Endian."
 }
+
+class ELFAbiType(enum.IntEnum):
+    ELFOSABI_NONE         = 0   # UNIX System V ABI
+    ELFOSABI_HPUX         = 1   # HP-UX operating system
+    ELFOSABI_NETBSD       = 2   # NetBSD
+    ELFOSABI_GNU          = 3   # GNU
+    ELFOSABI_LINUX        = 3   # Alias for ELFOSABI_GNU
+    ELFOSABI_SOLARIS      = 6   # Solaris
+    ELFOSABI_AIX          = 7   # AIX
+    ELFOSABI_IRIX         = 8   # IRIX
+    ELFOSABI_FREEBSD      = 9   # FreeBSD
+    ELFOSABI_TRU64        = 10  # TRU64 UNIX
+    ELFOSABI_MODESTO      = 11  # Novell Modesto
+    ELFOSABI_OPENBSD      = 12  # OpenBSD
+    ELFOSABI_OPENVMS      = 13  # OpenVMS
+    ELFOSABI_NSK          = 14  # Hewlett-Packard Non-Stop Kernel
+    ELFOSABI_AROS         = 15  # AROS
+    ELFOSABI_FENIXOS      = 16  # FenixOS
+    ELFOSABI_C6000_ELFABI = 64  # Bare-metal TMS320C6000
+    ELFOSABI_C6000_LINUX  = 65  # Linux TMS320C6000
+    ELFOSABI_ARM          = 97  # ARM
+    ELFOSABI_STANDALONE   = 255 # Standalone (embedded) application
 
 ##
 ##
@@ -885,6 +913,84 @@ class ELFHeader(object):
             result = "2's complement, big endian"
         else:
             result = "<unknown: %x>" % self.elfByteOrder
+        return result
+
+    def getVersionAsString(self):
+        result = ""
+        if self.elfVersion == EV_CURRENT:
+            result = "(current)"
+        elif self.elfVersion != EV_NONE:
+            result = "<unknown: %lx>" % self.elfVersion
+        return result
+
+    def getAbiNameAsString(self):
+        result = ""
+        if self.elfOsAbi == ELFAbiType.ELFOSABI_NONE:
+            result = "UNIX - System V"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_HPUX:
+            result = "UNIX - HP-UX"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_NETBSD:
+            result = "UNIX - NetBSD"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_GNU:
+            result = "UNIX - GNU"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_SOLARIS:
+            result = "UNIX - Solaris"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_AIX:
+            result = "UNIX - AIX"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_IRIX:
+            result = "UNIX - IRIX"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_FREEBSD:
+            result = "UNIX - FreeBSD"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_TRU64:
+            result = "UNIX - TRU64"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_MODESTO:
+            result = "Novell - Modesto"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_OPENBSD:
+            result = "UNIX - OpenBSD"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_OPENVMS:
+            result = "VMS - OpenVMS"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_NSK:
+            result = "HP - Non-Stop Kernel"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_AROS:
+            result = "AROS"
+        elif self.elfOsAbi == ELFAbiType.ELFOSABI_FENIXOS:
+            result = "FenixOS"
+        elif self.elfOsAbi >= 64:
+            if self.elfMachine == ELFMachineType.EM_ARM:
+                if self.elfOsAbi == ELFAbiType.ELFOSABI_ARM:
+                    result = "ARM"
+            elif self.elfMachine in (ELFMachineType.EM_MSP430, ):
+                if self.elfOsAbi == ELFAbiType.ELFOSABI_STANDALONE:
+                    result = "Standalone App"
+            elif self.elfMachine == ELFMachineType.EM_TI_C6000:
+                if self.elfOsAbi == ELFAbiType.ELFOSABI_C6000_ELFABI:
+                    result = "Bare-metal C6000"
+                elif self.elfOsAbi == ELFAbiType.ELFOSABI_C6000_LINUX:
+                    result = "Linux C6000"
+        else:
+            result = "<unknown: %x>" % self.elfOsAbi
+        return result
+
+
+    def getElfTypeAsString(self):
+        result = ""
+        if self.elfType == ELFType.ET_NONE:
+            result = "NONE (None)"
+        elif self.elfType == ELFType.ET_REL:
+            result = "REL (Relocatable file)"
+        elif self.elfType == ELFType.ET_EXEC:
+            result = "EXEC (Executable file)"
+        elif self.elfType == ELFType.ET_DYN:
+            result = "DYN (Shared object file)"
+        elif self.elfType == ELFType.ET_CORE:
+            result = "CORE (Core file)"
+        else:
+            if self.elfType >= ELFType.ET_LOPROC and self.elfType <= ELFType.ET_HIPROC:
+                result = "Processor Specific: (%x)" % self.elfType
+            elif self.elfType >= ELFType.ET_LOOS and self.elfType <= ELFType.ET_HIOS:
+                result = "OS Specific: (%x)" % self.elfType
+            else:
+                result = "<unknown>: %x" % self.elfType
         return result
 
 
