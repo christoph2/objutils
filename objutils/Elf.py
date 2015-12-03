@@ -25,7 +25,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from objutils._Enum import Enum
 import enum
 from collections import namedtuple
 import mmap
@@ -123,8 +122,7 @@ ELF_TYPE_NAMES = {
 }
 
 
-@Enum
-class ELFMachineType(object):
+class ELFMachineType(enum.IntEnum):
     EM_NONE         =  0      # No machine.
     EM_M32          =  1      # AT&T WE 32100.
     EM_SPARC        =  2      # SPARC.
@@ -284,6 +282,36 @@ class ELFMachineType(object):
     EM_TILEPRO      = 188     # Tilera TILEPro multicore architecture family.
     EM_MICROBLAZE   = 189     # Xilinx MicroBlaze 32-bit RISC soft processor core.
     EM_CUDA         = 190     # NVIDIA CUDA architecture.
+    """
+    EM_AVR_OLD              = 0x1057  # AVR magic number.  Written in the absense of an ABI.
+    EM_MSP430_OLD           = 0x1059  # MSP430 magic number.  Written in the absense of everything.
+    EM_MT                   = 0x2530  # Morpho MT.   Written in the absense of an ABI.
+    EM_CYGNUS_FR30          = 0x3330  # FR30 magic number - no EABI available.
+    EM_OPENRISC_OLD         = 0x3426  # OpenRISC magic number.  Written in the absense of an ABI.
+    EM_DLX                  = 0x5aa5  # DLX magic number.  Written in the absense of an ABI.
+    EM_CYGNUS_FRV           = 0x5441  # FRV magic number - no EABI available??.
+    EM_XC16X                = 0x4688  # Infineon Technologies 16-bit microcontroller with C166-V2 core.
+    EM_CYGNUS_D10V          = 0x7650  # D10V backend magic number.  Written in the absence of an ABI.
+    EM_CYGNUS_D30V          = 0x7676  # D30V backend magic number.  Written in the absence of an ABI.
+    EM_IP2K_OLD             = 0x8217  # Ubicom IP2xxx;   Written in the absense of an ABI.
+    EM_OR32                 = 0x8472  # (Deprecated) Temporary number for the OpenRISC processor.
+    EM_CYGNUS_POWERPC       = 0x9025  # Cygnus PowerPC ELF backend.  Written in the absence of an ABI.
+    EM_ALPHA                = 0x9026  # Alpha backend magic number.  Written in the absence of an ABI.
+    EM_CYGNUS_M32R          = 0x9041  # Cygnus M32R ELF backend.  Written in the absence of an ABI.
+    EM_CYGNUS_V850          = 0x9080  # V850 backend magic number.  Written in the absense of an ABI.
+    EM_S390_OLD             = 0xa390  # old S/390 backend magic number. Written in the absence of an ABI.
+    EM_XTENSA_OLD           = 0xabc7  # Old, unofficial value for Xtensa.
+    EM_XSTORMY16            = 0xad45
+    EM_CYGNUS_MN10300       = 0xbeef  # mn10200 and mn10300 backend magic numbers. Written in the absense of an ABI.
+    EM_CYGNUS_MN10200       = 0xdead
+    EM_M32C_OLD             = 0xFEB0  # Renesas M32C and M16C.
+    EM_IQ2000               = 0xFEBA  # Vitesse IQ2000.
+    EM_NIOS32               = 0xFEBB  # NIOS magic number - no EABI available.
+    EM_CYGNUS_MEP           = 0xF00D  # Toshiba MeP
+    EM_MOXIE                = 0xFEED  # Moxie
+    EM_MICROBLAZE_OLD       = 0xbaab  # Old MicroBlaze
+    EM_ADAPTEVA_EPIPHANY    = 0x1223  # Adapteva's Epiphany architecture.
+    """
 
 
 ELF_MACHINE_NAMES = {
@@ -451,8 +479,7 @@ EI_ABIVERSION   = 8      # ABI version.
 # EI_NIDENT       = 16     # Size of e_ident[] - defined above.
 
 
-@Enum
-class ELFClass(object):
+class ELFClass(enum.IntEnum):
     ELFCLASSNONE    = 0      # Invalid class.
     ELFCLASS32      = 1      # 32-bit objects.
     ELFCLASS64      = 2      # 64-bit objects.
@@ -464,8 +491,8 @@ ELF_CLASS_NAMES = {
     ELFClass.ELFCLASS64     : "64-bit objects."
 }
 
-@Enum
-class ELFDataEncoding(object):
+
+class ELFDataEncoding(enum.IntEnum):
     ELFDATANONE     = 0      # Invalid data encoding.
     ELFDATA2LSB     = 1      # Little-Endian.
     ELFDATA2MSB     = 2      # Big-Endian.
