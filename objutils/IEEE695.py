@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -31,6 +31,8 @@ from collections import namedtuple
 from datetime import datetime
 import os
 import sys
+
+from objutils.logger import logger
 
 """
 $00-$7F     Simple number in the range 0 to 127, or 7-bit ASCII string with length 0 to 127.
@@ -300,10 +302,13 @@ class Section(object):
 
 
 class Reader(object):
-    def __init__(self,inFile):
+
+    logger = logger
+
+    def __init__(self, inFile):
         if not hasattr(inFile, 'read'):
             raise TypeError("Need a file-like object.")
-        self.inFile=inFile
+        self.inFile = inFile
         self.info = Info()
         self.info.ASWs={}
         self.fpos = 0
@@ -362,7 +367,6 @@ class Reader(object):
             elif cc == ME:
                 self.onME()
             else:
-                #print "UNKNOWN COMMAND: 0X%02X" % cc
                 raise NotImplementedError("0x%02X" % cc)
 
 
@@ -419,6 +423,8 @@ class Reader(object):
         elif typecode == 0xdf:
             # length: [0..65535]
             length = self.readWord(offset + 1)
+        else:
+            raise TypeError("Invalid typecode [%02x]." % typecode)
         result = self.inFile.read(length)
         self.fpos = self.inFile.tell()
         return result
@@ -462,7 +468,7 @@ class Reader(object):
         self.info.processor = self.readString(self.fpos)
         self.info.module = self.readString(self.fpos)
 
-        print "PROCESSOR: '%s' MODULE: '%s'." % (self.info.processor, self.info.module)
+        self.logger.debug("PROCESSOR: '%s' MODULE: '%s'." % (self.info.processor, self.info.module))
 
     def onAD(self):
         "$EC}{n1}{n2}[a]"
@@ -485,7 +491,7 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionSize = self.readNumber(self.fpos)
-            print "Section-Size: 0x%04x" % self.sections[sectionIndex].sectionSize
+            self.logger.debug("Section-Size: 0x%04x" % self.sections[sectionIndex].sectionSize)
         elif discr == ASA:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -502,12 +508,12 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].mauSize = self.readNumber(self.fpos)
-            print "MAU-Size: 0x%04x" % self.sections[sectionIndex].mauSize
+            self.logger.debug("MAU-Size: 0x%04x" % self.sections[sectionIndex].mauSize)
         elif discr == ASL:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionBaseAddr = self.readNumber(self.fpos)
-            print "Section-BaseAddr: 0x%04x" % self.sections[sectionIndex].sectionBaseAddr
+            self.logger.debug("Section-BaseAddr: 0x%04x" % self.sections[sectionIndex].sectionBaseAddr)
         elif discr == ASM:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -529,7 +535,7 @@ class Reader(object):
             if delim != 0xBE:
                 pass    # todo: FormatError!!!
             executionStartingAddr = self.readNumber(self.fpos)
-            print "STARTING-ADDRESS: 0x%04X" % executionStartingAddr
+            self.logger.debug("STARTING-ADDRESS: 0x%04X" % executionStartingAddr)
             delim = self.readByte(self.fpos)
             if delim != 0xBF:
                 pass    # todo: FormatError!!!
@@ -546,7 +552,7 @@ class Reader(object):
         self.nnRecords[symbolType].name = symbolName
         self.nnRecords[symbolType].atn = {}
 
-        #print "Symbol-Type: 0x%02x Name: '%s'" % (symbolType, symbolName)
+        #self.logger.debug("Symbol-Type: 0x%02x Name: '%s'" % (symbolType, symbolName))
 
     def onNX(self):
         "{$E9}{n1}{Id}"
@@ -710,7 +716,7 @@ class Reader(object):
             contextIndex = self.readNumber(self.fpos)
 
         self.sections[sectionIndex] = Section(sectionType, sectionName, parentSectionIndex)
-        print "SECTION [%s:%s]" % (sectionType, sectionName)
+        self.logger.debug("SECTION [%s:%s]" % (sectionType, sectionName))
         # SA, ASA, ASB, ASF, ASL, ASM, ASR, and ASS records must appear after the ST record they refer to.
         '''
         ASP absolute code
@@ -752,7 +758,7 @@ class Reader(object):
         info.nameIndex = nameIndex
         info.symbolName = symbolName
         self.symbols[nameIndex] = info
-        print "SYMBOL: %s" % symbolName # followed by ASI.
+        self.logger.debug("SYMBOL: %s" % symbolName) # followed by ASI.
 
     def onBB(self):
         blockType = self.readByte(self.fpos)
@@ -768,7 +774,7 @@ class Reader(object):
             moduleName = self.readString(self.fpos)
             info.moduleName = moduleName
             info.name = "BB1"
-            print "MODULE-NAME: %s" % moduleName
+            self.logger.debug("MODULE-NAME: %s" % moduleName)
         elif blockType == BB2:
             self.blockType.append(2)
             zeroLengthName = self.readString(self.fpos)
@@ -862,7 +868,7 @@ class Reader(object):
         parent = self.diParents[-1]
         parent.add(info)
         self.diParents.append(info)
-        print " " * len(self.diParents), "BB%u" % blockType
+        self.logger.debug(" " * len(self.diParents), "BB%u" % blockType)
 
     def onBE(self):
         blockType = self.blockType.pop()
@@ -890,15 +896,15 @@ class Reader(object):
         "{$E5}{n1}"
         sectionIndex = self.readNumber(self.fpos)
         sec = self.sections[sectionIndex]
-        print "Data for section: '%s'. %u bytes of data to follow." % (
+        self.logger.debug("Data for section: '%s'. %u bytes of data to follow." % (
             sec.sectionName, sec.sectionSize
-        )
+        ))
 
     def onLD(self):
         "{$ED}{n1}{...}"
         numberOfMAUs = self.readNumber(self.fpos)
         data = self.inFile.read((numberOfMAUs * self.info.numberOfBits) / 8)
-        print "reading %u bytes" % len(data)
+        self.logger.debug("reading %u bytes" % len(data))
 
 
         # SB ASP LD
@@ -911,7 +917,7 @@ class Reader(object):
     def onME(self):
         "Module End Record Type"
         self.finished = True
-        print "%u Data-Bytes." % self._nb
+        self.logger.debug("%u Data-Bytes." % self._nb)
 
 
 ## $C0-$DA Variable letters (null, A-Z).
