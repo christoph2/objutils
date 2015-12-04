@@ -41,24 +41,13 @@ import struct
 #
 
 
-'''
-/*                              Basic ELF Datatypes                                 */
-/*                  Name                Size    Align   Purpose                     */
-/* ================================================================================ */
-typedef uint32_t    Elf32_Addr;     /*  4       4       Unsigned program address    */
-typedef uint16_t    Elf32_Half;     /*  2       2       Unsigned medium integer     */
-typedef uint32_t    Elf32_Off;      /*  4       4       Unsigned file offset        */
-typedef int32_t     Elf32_Sword;    /*  4       4       Signed large integer        */
-typedef uint32_t    Elf32_Word;     /*  4       4       Unsigned large integer      */
-/*                  unsigned char       1       1       Unsigned small integer      */
-'''
-
-
 ##
 ##
 ##   ELF Header.
 ##
 ##
+
+ELF_MAGIC = '\x7fELF'
 
 EI_NIDENT = 16        # Size of e_ident[].
 
@@ -72,25 +61,6 @@ Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_ident0 e_ident1 e_ident2 e_ident3 e_i
     e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15
     e_type e_machine e_version e_entry e_phoff e_shoff e_flags e_ehsize e_phentsize e_phnum
     e_shentsize e_shnum e_shstrndx""")
-
-"""
-typedef struct tagElf32_Ehdr {
-    uint8_t     e_ident[EI_NIDENT];
-    Elf32_Half  e_type;
-    Elf32_Half  e_machine;
-    Elf32_Word  e_version;
-    Elf32_Addr  e_entry;
-    Elf32_Off   e_phoff;
-    Elf32_Off   e_shoff;
-    Elf32_Word  e_flags;
-    Elf32_Half  e_ehsize;
-    Elf32_Half  e_phentsize;
-    Elf32_Half  e_phnum;
-    Elf32_Half  e_shentsize;
-    Elf32_Half  e_shnum;
-    Elf32_Half  e_shstrndx;
-} Elf32_Ehdr;
-"""
 
 class ELFType(enum.IntEnum):
     ET_NONE     = 0
@@ -466,6 +436,9 @@ EV_NONE         = 0      # Invalid version.
 EV_CURRENT      = 1      # Current version.
 
 
+##
+## Offsets into file header.
+##
 EI_MAG0         = 0      # File identification.
 EI_MAG1         = 1      # File identification.
 EI_MAG2         = 2      # File identification.
@@ -534,21 +507,6 @@ class ELFAbiType(enum.IntEnum):
 
 SEC_FMT = "IIIIIIIIII"
 
-"""
-typedef struct tagElf32_Shdr {
-    Elf32_Word  sh_name;
-    Elf32_Word  sh_type;
-    Elf32_Word  sh_flags;
-    Elf32_Addr  sh_addr;
-    Elf32_Off   sh_offset;
-    Elf32_Word  sh_size;
-    Elf32_Word  sh_link;
-    Elf32_Word  sh_info;
-    Elf32_Word  sh_addralign;
-    Elf32_Word  sh_entsize;
-} Elf32_Shdr;
-"""
-
 ELF_SECTION_SIZE = struct.calcsize(SEC_FMT)
 
 Elf32_Shdr=namedtuple("Elf32_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
@@ -614,17 +572,6 @@ SHF_MASKPROC    = 0xf0000000
 
 SYMTAB_FMT = "IIIBBH"
 
-""""
-typedef struct tagElf32_Sym {
-    Elf32_Word  st_name;
-    Elf32_Addr  st_value;
-    Elf32_Word  st_size;
-    uint8_t     st_info;
-    uint8_t     st_other;
-    Elf32_Half  st_shndx;
-} Elf32_Sym;
-"""
-
 Elf32_Sym = namedtuple("Elf32_Sym", "st_name st_value st_size st_info st_other st_shndx")
 
 ELF_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT)
@@ -656,21 +603,6 @@ REL_FMT = "II"
 
 RELA_FMT = "IIi"
 
-"""
-typedef struct tagElf32_Rel {
-    Elf32_Addr  r_offset;
-    Elf32_Word  r_info;
-} Elf32_Rel;
-"""
-
-"""
-typedef struct tagElf32_Rela {
-    Elf32_Addr  r_offset;
-    Elf32_Word  r_info;
-    Elf32_Sword r_addend;
-} Elf32_Rela;
-"""
-
 ELF_RELOCATION_SIZE     = struct.calcsize(REL_FMT)
 ELF_RELOCATION_A_SIZE   = struct.calcsize(RELA_FMT)
 
@@ -683,19 +615,6 @@ Elf32_Rela  = namedtuple("Elf32_Rela", "r_offset r_info r_addend")
 ##
 ##
 PHDR_FMT = "IIIIIIII"
-
-"""
-typedef struct tagElf32_Phdr {
-    Elf32_Word  p_type;
-    Elf32_Off   p_offset;
-    Elf32_Addr  p_vaddr;
-    Elf32_Addr  p_paddr;
-    Elf32_Word  p_filesz;
-    Elf32_Word  p_memsz;
-    Elf32_Word  p_flags;
-    Elf32_Word  p_align;
-} Elf32_Phdr;
-"""
 
 ELF_PHDR_SIZE   = struct.calcsize(PHDR_FMT)
 
@@ -717,98 +636,9 @@ PF_W                = 0x2           # Write.
 PF_R                = 0x4           # Read.
 PF_MASKPROC         = 0xf0000000    # Unspecified.
 
-##
-##
-##
-##
-##
-'''
-#define ELF_IDENT(hptr,ofs)         ((hptr)->e_ident[(ofs)])
-    #define ELF_MAG0(hptr)          (ELF_IDENT((hptr),EI_MAG0))
-    #define ELF_MAG1(hptr)          (ELF_IDENT((hptr),EI_MAG1))
-    #define ELF_MAG2(hptr)          (ELF_IDENT((hptr),EI_MAG2))
-    #define ELF_MAG3(hptr)          (ELF_IDENT((hptr),EI_MAG3))
-    #define ELF_CLASS(hptr)         (ELF_IDENT((hptr),EI_CLASS))
-    #define ELF_DATA(hptr)          (ELF_IDENT((hptr),EI_DATA))
-    #define ELF_VERSION(hptr)       (ELF_IDENT((hptr),EI_VERSION))
-    #define ELF_PAD(hptr)           (ELF_IDENT((hptr),EI_PAD))
-    #define ELF_OSABI(hptr)         (ELF_IDENT((hptr),EI_OSABI))
-    #define ELF_ABIVERSION(hptr)    (ELF_IDENT((hptr),EI_ABIVERSION))
-    #define ELF_NIDENT(hptr)        (ELF_IDENT((hptr),EI_NIDENT))
-
-#define ELF_TYPE(hptr)              ((hptr)->e_type)
-#define ELF_MACHINE(hptr)           ((hptr)->e_machine)
-#define ELF_VER(hptr)               ((hptr)->e_version)
-#define ELF_ENTRY(hptr)             ((hptr)->e_entry)
-#define ELF_PHOFF(hptr)             ((hptr)->e_phoff)
-#define ELF_SHOFF(hptr)             ((hptr)->e_shoff)
-#define ELF_FLAGS(hptr)             ((hptr)->e_flags)
-#define ELF_EHSIZE(hptr)            ((hptr)->e_ehsize)
-#define ELF_PHENTSIZE(hptr)         ((hptr)->e_phentsize)
-#define ELF_PHNUM(hptr)             ((hptr)->e_phnum)
-#define ELF_SHENTSIZE(hptr)         ((hptr)->e_shentsize)
-#define ELF_SHNUM(hptr)             ((hptr)->e_shnum)
-#define ELF_SHSTRNDX(hptr)          ((hptr)->e_shstrndx)
-
-#define ELF_IS_EXECUTABLE(hdr)  (ELF_TYPE((hdr))==ET_EXEC || ELF_TYPE((hdr))==ET_DYN)
-
-#if 0
-typedef enum tagElf_EndianessType {
-    ELF_INVALID_ENCODING,
-    ELF_BIG_ENDIAN,
-    ELF_LITTLE_ENDIAN
-} Elf_EndianessType;
-#endif
-
-#define ELF_SH_NAME(shr)         ((shr)->sh_name)
-#define ELF_SH_TYPE(shr)         ((shr)->sh_type)
-#define ELF_SH_FLAGS(shr)        ((shr)->sh_flags)
-#define ELF_SH_ADDR(shr)         ((shr)->sh_addr)
-#define ELF_SH_OFFSET(shr)       ((shr)->sh_offset)
-#define ELF_SH_SIZE(shr)         ((shr)->sh_size)
-#define ELF_SH_LINK(shr)         ((shr)->sh_link)
-#define ELF_SH_INFO(shr)         ((shr)->sh_info)
-#define ELF_SH_ADDRALIGN(shr)    ((shr)->sh_addralign)
-#define ELF_SH_ENTSIZE(shr)      ((shr)->sh_entsize)
-
-/*
-**
-**  ELF Symbol Table.
-**
-*/
-
-#define ELF32_ST_BIND(i)    ((i) >> 4)
-#define ELF32_ST_TYPE(i)    ((i) & 0xf)
-#define ELF32_ST_INFO(b,t)  (((b) << 4) + ((t) & 0xf))
-
-
-/*
-**
-**  Relocation.
-**
-*/
-#define ELF32_R_SYM(i)      ((i) >> 8)
-#define ELF32_R_TYPE(i)     ((unsigned char)(i))
-#define ELF32_R_INFO(s,t)   (((s) << 8)+(unsigned char)(t))
-
-/*
-**
-**  Program Header.
-**
-*/
-
-#define ELF_PH_TYPE(phr)    ((phr)->p_type)
-#define ELF_PH_OFFSET(phr)  ((phr)->p_offset)
-#define ELF_PH_VADDR(phr)   ((phr)->p_vaddr)
-#define ELF_PH_PADDR(phr)   ((phr)->p_paddr)
-#define ELF_PH_FILESZ(phr)  ((phr)->p_filesz)
-#define ELF_PH_MEMSZ(phr)   ((phr)->p_memsz)
-#define ELF_PH_FLAGS(phr)   ((phr)->p_flags)
-#define ELF_PH_ALIGN(phr)   ((phr)->p_align)
-'''
-
 
 class Alias(object):
+    # Install more convenient names.
     def __init__(self,key, convert = False):
         self.key = key
         self.convert = convert
@@ -816,8 +646,7 @@ class Alias(object):
     def __get__(self, obj, objtype = None):
         if obj is None:
             return self
-        data = getattr(obj, 'data')
-        value = getattr(data, self.key)
+        value = getattr(obj, self.key)
         return value
 
     def __set__(self, obj, value):
@@ -829,21 +658,10 @@ class Alias(object):
         raise AttributeError("can't delete attribute")
 
 
-def byteorder():
-    bo = sys.byteorder
-    if bo == 'little':
-        return ELFDataEncoding('ELFDATA2LSB')
-    elif bo == 'big':
-        return ELFDataEncoding('ELFDATA2MSB')
-
-
 BYTEORDER_PREFIX = {
     ELFDataEncoding.ELFDATA2LSB : '<',  # Little-Endian.
     ELFDataEncoding.ELFDATA2MSB : '>'   # Big-Endian.
 }
-
-
-class Null(object): pass
 
 
 class FormatError(Exception): pass
@@ -855,20 +673,15 @@ class ELFHeader(object):
         parent.inFile.seek(0, os.SEEK_SET)
         self.rawData = parent.inFile.read(ELF_HEADER_SIZE)
 
-        elfHeader = struct.unpack(HDR_FMT, self.rawData)
-        if not self._checkMagic(elfHeader):
-            raise FormatError("Wrong magic bytes.")
+        if self.rawData[ : 4] != ELF_MAGIC:
+            raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
 
-        d = Elf32_Ehdr(*elfHeader)
-        self.byteOrderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(d.e_ident5)]
+        self.byteOrderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(ord(self.rawData[EI_DATA]))]
 
-        # Unpack again, /w corrected byte-order.
         elfHeader = struct.unpack("%s%s" % (self.byteOrderPrefix, HDR_FMT), self.rawData)
         d = Elf32_Ehdr(*elfHeader)
-
-        self.data = Null()
-        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
-            setattr(self.data, key, value)
+        for name, value in d._asdict().items():
+            setattr(self, name, value)
 
         if not (self.elfEHSize == ELF_HEADER_SIZE):
             raise FormatError("Wrong header size.")
@@ -879,9 +692,6 @@ class ELFHeader(object):
 
         self.hasStringTable = not (self.elfStringTableIndex == SHN_UNDEF)
 
-    def _checkMagic(self, header):
-        return ((header[EI_MAG0] == 0x7f) and (header[EI_MAG1] == ord('E'))
-            and (header[EI_MAG2] == ord('L')) and (header[EI_MAG3] == ord('F')))
 
     @property
     def elfTypeName(self):
@@ -1034,9 +844,8 @@ class ELFSectionHeaderTable(object):
 
         elfProgramHeaderTable = struct.unpack("%s%s" % (parent.byteOrderPrefix, SEC_FMT), data)
         d = Elf32_Shdr(*elfProgramHeaderTable)
-        self.data = Null()
-        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
-            setattr(self.data, key, value)
+        for name, value in d._asdict().items():
+            setattr(self, name, value)
 
         if self.shType not in (SHT_NOBITS, SHT_NULL) and self.shSize > 0:
             pos = self.shOffset
@@ -1093,7 +902,6 @@ class ELFSectionHeaderTable(object):
     @property
     def shName(self):
         pass
-        #print self.parent
 
 
 class ELFProgramHeaderTable(object):
@@ -1107,9 +915,8 @@ class ELFProgramHeaderTable(object):
             raise FormatError("Wrong program header table.")
 
         d = Elf32_Phdr(*elfProgramHeaderTable)
-        self.data = Null()
-        for key, value in ((d._fields[i], d[i]) for i in range(len(d))):
-            setattr(self.data, key, value)
+        for name, value in d._asdict().items():
+            setattr(self, name, value)
         parent.inFile.seek(d.p_offset, os.SEEK_SET)
         self.image = parent.inFile.read(d.p_filesz)
         if d.p_type in (PT_DYNAMIC, PT_INTERP, PT_NOTE, PT_SHLIB, PT_PHDR):
@@ -1175,13 +982,15 @@ class Reader(object):
         self.sectionHeaders = []
         self._stringCache = {}
 
-        pos = self.header.data.e_phoff
+        #pos = self.header.data.e_phoff
+        pos = self.header.e_phoff
         if pos:
             for _ in range(self.header.elfNumberOfPHs):
                 self.programHeaders.append(ELFProgramHeaderTable(self, pos))
                 pos += self.header.elfPHTEntrySize
 
-        pos = self.header.data.e_shoff
+        #pos = self.header.data.e_shoff
+        pos = self.header.e_shoff
         if pos:
             for _ in range(self.header.elfNumberOfSHs):
                 self.sectionHeaders.append(ELFSectionHeaderTable(self, pos))
