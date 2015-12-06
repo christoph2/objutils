@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,6 +27,9 @@ __copyright__ = """
 
 from collections import namedtuple
 
+class CodecDoesNotExistError(Exception): pass
+class CodecAlreadyExistError(Exception): pass
+
 Codec = namedtuple("Codec", "reader writer")
 codecs = {}
 
@@ -39,12 +42,12 @@ def getFormats():
 def getCodec(codecName):
     codec = codecs.get(codecName, None)
     if codec is None:
-        raise AttributeError("Codec '%s' doesn't exist." % codecName)
+        raise CodecDoesNotExistError(codecName)
     return codec
 
 def register(name, readerClass, writerClass):
     if name in codecs:
-        raise AttributeError("Duplicate codec name '%s'." % name)
+        raise CodecAlreadyExistError(name)
     codecs[name] = Codec(readerClass(), writerClass())
 
 
