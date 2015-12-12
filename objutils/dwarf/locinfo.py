@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -342,13 +342,14 @@ class Dissector(object):
         self.block = self.block[ length : ]
         return arr
 
+    def arrayToNumber(self, arr):
+        return reduce(lambda x, y: (x * 256) + y, arr)
+
     ENCODINGS = {NO_OPERANDS : void, SINGLE_BYTE: readByte, DUAL_BYTES: readDualBytes, FOUR_BYTES: readFourBytes,
         EIGHT_BYTES: readEightByte, SINGLE_ULEB: readSingleULeb, SINGLE_SLEB: readSingleSLeb,
         ULEB128_FOLLOWED_BY_SLEB128: readULebFollowedBySLeb, ULEB128_FOLLOWED_BY_ULEB128: readULebFollowedByULeb,
         ULEB128_FOLLOWED_BY_BLOCK: readULebFollowedByBlock, MACHINE_WORD: readMachineWord
     }
-
-    arrayToNumber = lambda self, arr: reduce(lambda x, y: (x * 256) + y, arr)
 
 
 d=Dissector([0x03, 0x00, 0x00, 0x40,0x39], 4)
