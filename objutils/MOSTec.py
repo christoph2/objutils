@@ -68,6 +68,5 @@ class Writer(HexFile.Writer):
     def composeFooter(self, meta):
         return ";00"
 
-
 register('mostec', Reader, Writer)
 

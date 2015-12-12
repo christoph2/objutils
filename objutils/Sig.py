@@ -25,8 +25,8 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.HexFile as HexFile
-import objutils.utils as utils
+import objutils.HexFile
+from objutils import utils
 import objutils.checksums as checksums
 from objutils.registry import register
 
@@ -34,7 +34,7 @@ DATA=1
 EOF=2
 
 
-class Reader(HexFile.Reader):
+class Reader(objutils.HexFile.Reader):
 
     FORMAT_SPEC = (
         (DATA, ":AAAALLBBDDCC"),
@@ -55,7 +55,7 @@ class Reader(HexFile.Reader):
     def isDataLine(self,line,formatType):
         return formatType==DATA
 
-class Writer(HexFile.Writer):
+class Writer(objutils.HexFile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
