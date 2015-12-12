@@ -51,11 +51,11 @@ ELF_MAGIC = '\x7fELF'
 
 EI_NIDENT = 16        # Size of e_ident[].
 
-HDR_FMT = "B" * EI_NIDENT + "HHIIIIIHHHHHH"
+HDR_FMT32 = "B" * EI_NIDENT + "HHIIIIIHHHHHH"
 
-ELF_HEADER_SIZE = struct.calcsize(HDR_FMT)
+ELF_HEADER_SIZE32 = struct.calcsize(HDR_FMT32)
 
-assert(struct.calcsize(HDR_FMT) == 52)    # todo: Unittest!!!
+assert(struct.calcsize(HDR_FMT32) == 52)    # todo: Unittest!!!
 
 Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_ident0 e_ident1 e_ident2 e_ident3 e_ident4 e_ident5 e_ident6
     e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15
@@ -73,6 +73,8 @@ class ELFType(enum.IntEnum):
     " Shared object file."
     ET_CORE     = 4
     " Core file."
+    ET_NUM      = 5
+    "Number of defined types "
     ET_LOOS     = 0xFE00
     "Operating system-specific "
     ET_HIOS     = 0xFEFF
@@ -252,7 +254,6 @@ class ELFMachineType(enum.IntEnum):
     EM_TILEPRO      = 188     # Tilera TILEPro multicore architecture family.
     EM_MICROBLAZE   = 189     # Xilinx MicroBlaze 32-bit RISC soft processor core.
     EM_CUDA         = 190     # NVIDIA CUDA architecture.
-    """
     EM_AVR_OLD              = 0x1057  # AVR magic number.  Written in the absense of an ABI.
     EM_MSP430_OLD           = 0x1059  # MSP430 magic number.  Written in the absense of everything.
     EM_MT                   = 0x2530  # Morpho MT.   Written in the absense of an ABI.
@@ -281,7 +282,6 @@ class ELFMachineType(enum.IntEnum):
     EM_MOXIE                = 0xFEED  # Moxie
     EM_MICROBLAZE_OLD       = 0xbaab  # Old MicroBlaze
     EM_ADAPTEVA_EPIPHANY    = 0x1223  # Adapteva's Epiphany architecture.
-    """
 
 
 ELF_MACHINE_NAMES = {
@@ -308,7 +308,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_FR20          : "Fujitsu FR20.",
     ELFMachineType.EM_RH32          : "TRW RH-32.",
     ELFMachineType.EM_RCE           : "Motorola RCE.",
-    ELFMachineType.EM_ARM           : "Advanced RISC Machines ARM.",
+    ELFMachineType.EM_ARM           : "ARM",
     ELFMachineType.EM_ALPHA         : "Digital Alpha.",
     ELFMachineType.EM_SH            : "Hitachi SH.",
     ELFMachineType.EM_SPARCV9       : "SPARC Version 9.",
@@ -429,6 +429,34 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_TILEPRO       : 'Tilera TILEPro multicore architecture family.',
     ELFMachineType.EM_MICROBLAZE    : 'Xilinx MicroBlaze 32-bit RISC soft processor core.',
     ELFMachineType.EM_CUDA          : 'NVIDIA CUDA architecture.',
+    ELFMachineType.EM_AVR_OLD       : 'AVR',
+    ELFMachineType.EM_MSP430_OLD    : 'MSP430',
+    ELFMachineType.EM_MT            : 'Morpho MT',
+    ELFMachineType.EM_CYGNUS_FR30   : 'Cygnus FR30',
+    ELFMachineType.EM_OPENRISC_OLD  : 'OpenRISC',
+    ELFMachineType.EM_DLX           : 'DLX',
+    ELFMachineType.EM_CYGNUS_FRV    : 'Cygnus FRV',
+    ELFMachineType.EM_XC16X         : 'Infineon C166-V2 core.',
+    ELFMachineType.EM_CYGNUS_D10V   : 'Cygnus D10V',
+    ELFMachineType.EM_CYGNUS_D30V   : 'Cygnus D30V',
+    ELFMachineType.EM_IP2K_OLD      : 'Ubicom IP2xxx',
+    ELFMachineType.EM_OR32          : 'OpenRISC 32',
+    ELFMachineType.EM_CYGNUS_POWERPC: 'Cygnus PowerPC',
+    ELFMachineType.EM_ALPHA         : 'Alpha',
+    ELFMachineType.EM_CYGNUS_M32R   : 'Cygnus M32R',
+    ELFMachineType.EM_CYGNUS_V850   : 'Cygnus V850',
+    ELFMachineType.EM_S390_OLD      : 'S/390',
+    ELFMachineType.EM_XTENSA_OLD    : 'Xtensa',
+    ELFMachineType.EM_XSTORMY16     : 'Xstormy16',
+    ELFMachineType.EM_CYGNUS_MN10300: 'Cygnus mn10200 or mn10300',
+    ELFMachineType.EM_CYGNUS_MN10200: 'Cygnus mn10200',
+    ELFMachineType.EM_M32C_OLD      : 'Renesas M32C or M16C.',
+    ELFMachineType.EM_IQ2000        : 'Vitesse IQ2000.',
+    ELFMachineType.EM_NIOS32        : 'NIOS',
+    ELFMachineType.EM_CYGNUS_MEP    : 'Toshiba MeP',
+    ELFMachineType.EM_MOXIE         : 'Moxie',
+    ELFMachineType.EM_MICROBLAZE_OLD: 'Old MicroBlaze',
+    ELFMachineType.EM_ADAPTEVA_EPIPHANY : "Adapteva Epiphany",
 }
 
 
@@ -494,7 +522,7 @@ class ELFAbiType(enum.IntEnum):
     ELFOSABI_NSK          = 14  # Hewlett-Packard Non-Stop Kernel
     ELFOSABI_AROS         = 15  # AROS
     ELFOSABI_FENIXOS      = 16  # FenixOS
-    ELFOSABI_C6000_ELFABI = 64  # Bare-metal TMS320C6000
+    ELFOSABI_C6000_ELFABI = 64  # Bare-metal TMS320C6000; alt:  ELFOSABI_ARM_AEABI
     ELFOSABI_C6000_LINUX  = 65  # Linux TMS320C6000
     ELFOSABI_ARM          = 97  # ARM
     ELFOSABI_STANDALONE   = 255 # Standalone (embedded) application
@@ -505,11 +533,11 @@ class ELFAbiType(enum.IntEnum):
 ##
 ##
 
-SEC_FMT = "IIIIIIIIII"
+SEC_FMT32 = "IIIIIIIIII"
 
-ELF_SECTION_SIZE = struct.calcsize(SEC_FMT)
+ELF_SECTION_SIZE32 = struct.calcsize(SEC_FMT32)
 
-Elf32_Shdr=namedtuple("Elf32_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
+Elf32_Shdr = namedtuple("Elf32_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
     sh_link sh_info sh_addralign sh_entsize"""
 )
 
@@ -533,6 +561,8 @@ SHN_ABS         = 0xfff1
 SHN_COMMON      = 0xfff2
     # SHN_COMMON Symbols defined relative to this section are common symbols, such as
     # FORTRAN COMMON or unallocated C external variables.
+SHN_XINDEX      = 0xffff
+    # Index is in extra table.
 SHN_HIRESERVE   = 0xffff
     # SHN_HIRESERVE This value specifies the upper bound of the range of reserved indexes.
     # The system reserves indexes between SHN_LORESERVE and SHN_HIRESERVE, inclusive;
@@ -540,29 +570,67 @@ SHN_HIRESERVE   = 0xffff
     # table does not contain entries for the  reserved indexes.
 
 
-SHT_NULL        = 0
-SHT_PROGBITS    = 1
-SHT_SYMTAB      = 2
-SHT_STRTAB      = 3
-SHT_RELA        = 4
-SHT_HASH        = 5
-SHT_DYNAMIC     = 6
-SHT_NOTE        = 7
-SHT_NOBITS      = 8
-SHT_REL         = 9
-SHT_SHLIB       = 10
-SHT_DYNSYM      = 11
-SHT_LOPROC      = 0x70000000
-SHT_HIPROC      = 0x7fffffff
-SHT_LOUSER      = 0x80000000
-SHT_HIUSER      = 0xffffffff
+SHT_NULL            = 0             # Section header table entry unused.
+SHT_PROGBITS        = 1             # Program data.
+SHT_SYMTAB          = 2             # Symbol table.
+SHT_STRTAB          = 3             # String table.
+SHT_RELA            = 4             # Relocation entries with addends.
+SHT_HASH            = 5             # Symbol hash table.
+SHT_DYNAMIC         = 6             # Dynamic linking information.
+SHT_NOTE            = 7             # Notes.
+SHT_NOBITS          = 8             # Program space with no data (bss).
+SHT_REL             = 9             # Relocation entries, no addends.
+SHT_SHLIB           = 10            # Reserved.
+SHT_DYNSYM          = 11            # Dynamic linker symbol table.
+SHT_INIT_ARRAY      = 14            # Array of constructors.
+SHT_FINI_ARRAY      = 15            # Array of destructors.
+SHT_PREINIT_ARRAY   = 16            # Array of pre-constructors.
+SHT_GROUP           = 17            # Section group.
+SHT_SYMTAB_SHNDX    = 18            # Extended section indeces.
+SHT_NUM             = 19            # Number of defined types.
+SHT_LOOS            = 0x60000000    # Start OS-specific.
+SHT_GNU_ATTRIBUTES  = 0x6ffffff5    # Object attributes.
+SHT_GNU_HASH        = 0x6ffffff6    # GNU-style hash table.
+SHT_GNU_LIBLIST     = 0x6ffffff7    # Prelink library list
+SHT_CHECKSUM        = 0x6ffffff8    # Checksum for DSO content.
+SHT_LOSUNW          = 0x6ffffffa    # Sun-specific low bound.
+SHT_SUNW_move       = 0x6ffffffa
+SHT_SUNW_COMDAT     = 0x6ffffffb
+SHT_SUNW_syminfo    = 0x6ffffffc
+SHT_GNU_verdef      = 0x6ffffffd    # Version definition section.
+SHT_GNU_verneed     = 0x6ffffffe    # Version needs section.
+SHT_GNU_versym      = 0x6fffffff    # Version symbol table.
+SHT_HISUNW          = 0x6fffffff    # Sun-specific high bound.
+SHT_HIOS            = 0x6fffffff    # End OS-specific type.
+SHT_LOPROC          = 0x70000000    # Start of processor-specific.
 
+SHT_ARM_EXIDX       = 0x70000001    # Section holds ARM unwind info.
+SHT_ARM_PREEMPTMAP  = 0x70000002    # Section pre-emption details.
+SHT_ARM_ATTRIBUTES  = 0x70000003    # Section holds attributes.
+SHT_ARM_DEBUGOVERLAY    = 0x70000004    # Section holds overlay debug info.
+SHT_ARM_OVERLAYSECTION  = 0x70000005    # Section holds GDB and overlay integration info.
 
-SHF_WRITE       = 0x1
-SHF_ALLOC       = 0x2
-SHF_EXECINSTR   = 0x4
-SHF_MASKPROC    = 0xf0000000
+SHT_HIPROC          = 0x7fffffff    # End of processor-specific.
+SHT_LOUSER          = 0x80000000    # Start of application-specific.
+SHT_HIUSER          = 0xffffffff    # End of application-specific.
 
+SHF_WRITE               = 0x1           # Writable.
+SHF_ALLOC               = 0x2           # Occupies memory during execution
+SHF_EXECINSTR           = 0x4           # Executable.
+
+SHF_MERGE               = 16            # Might be merged
+SHF_STRINGS             = 32            # Contains nul-terminated strings
+SHF_INFO_LINK           = 64            # `sh_info' contains SHT index
+SHF_LINK_ORDER          = 128           # Preserve order after combining
+SHF_OS_NONCONFORMING    = 256           # Non-standard OS specific handling required
+SHF_GROUP               = 512           # Section is member of a group.
+SHF_TLS                 = 1024          # Section hold thread-local data.
+SHF_MASKOS              = 0x0ff00000    # OS-specific.
+
+SHF_MASKPROC            = 0xf0000000    # Processor-specific.
+
+SHF_ORDERED             = 1073741824L   # Special ordering requirement (Solaris).
+SHF_EXCLUDE             = 2147483648L   # Section is excluded unless referenced or allocated (Solaris).
 
 ##
 ##
@@ -614,27 +682,41 @@ Elf32_Rela  = namedtuple("Elf32_Rela", "r_offset r_info r_addend")
 ##   ELF Program Header
 ##
 ##
-PHDR_FMT = "IIIIIIII"
+PHDR_FMT32 = "IIIIIIII"
 
-ELF_PHDR_SIZE   = struct.calcsize(PHDR_FMT)
+ELF_PHDR_SIZE32   = struct.calcsize(PHDR_FMT32)
 
 Elf32_Phdr      = namedtuple("Elf32_Phdr", "p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
 
 
-PT_NULL             = 0
-PT_LOAD             = 1
-PT_DYNAMIC          = 2
-PT_INTERP           = 3
-PT_NOTE             = 4
-PT_SHLIB            = 5
-PT_PHDR             = 6
-PT_LOPROC           = 0x70000000
-PT_HIPROC           = 0x7fffffff
+PT_NULL             = 0             # Program header table entry unused.
+PT_LOAD             = 1             # Loadable program segment.
+PT_DYNAMIC          = 2             # Dynamic linking information.
+PT_INTERP           = 3             # Program interpreter.
+PT_NOTE             = 4             # Auxiliary information.
+PT_SHLIB            = 5             # Reserved.
+PT_PHDR             = 6             # Entry for header table itself.
+PT_TLS              = 7             # Thread-local storage segment
+PT_NUM              = 8             # Number of defined types
+PT_LOOS             = 0x60000000    # Start of OS-specific
+PT_GNU_EH_FRAME     = 0x6474e550    # GCC .eh_frame_hdr segment
+PT_GNU_STACK        = 0x6474e551    # Indicates stack executability
+PT_GNU_RELRO        = 0x6474e552    # Read-only after relocation
+PT_LOSUNW           = 0x6ffffffa
+PT_SUNWBSS          = 0x6ffffffa    # Sun Specific segment
+PT_SUNWSTACK        = 0x6ffffffb    # Stack segment
+PT_HISUNW           = 0x6fffffff
+PT_HIOS             = 0x6fffffff    # End of OS-specific
+PT_LOPROC           = 0x70000000    # Start of processor-specific.
+PT_HIPROC           = 0x7fffffff    # End of processor-specific
+
 
 PF_X                = 0x1           # Execute.
 PF_W                = 0x2           # Write.
 PF_R                = 0x4           # Read.
 PF_MASKPROC         = 0xf0000000    # Unspecified.
+
+PN_XNUM             = 0xffff        # Extended numbering.
 
 
 class Alias(object):
@@ -671,23 +753,24 @@ class ELFHeader(object):
     def __init__(self, parent):
         self.parent = parent
         parent.inFile.seek(0, os.SEEK_SET)
-        self.rawData = parent.inFile.read(ELF_HEADER_SIZE)
+        self.rawData = parent.inFile.read(ELF_HEADER_SIZE32)
 
         if self.rawData[ : 4] != ELF_MAGIC:
             raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
 
+        self.is64Bit = (self.rawData[EI_CLASS] ==  ELFClass.ELFCLASS64)
         self.byteOrderPrefix = BYTEORDER_PREFIX[ELFDataEncoding(ord(self.rawData[EI_DATA]))]
 
-        elfHeader = struct.unpack("%s%s" % (self.byteOrderPrefix, HDR_FMT), self.rawData)
+        elfHeader = struct.unpack("{0}{1}".format(self.byteOrderPrefix, HDR_FMT32), self.rawData)
         d = Elf32_Ehdr(*elfHeader)
         for name, value in d._asdict().items():
             setattr(self, name, value)
 
-        if not (self.elfEHSize == ELF_HEADER_SIZE):
+        if not (self.elfEHSize == ELF_HEADER_SIZE32):
             raise FormatError("Wrong header size.")
-        if not (self.elfPHTEntrySize == ELF_PHDR_SIZE):
+        if not (self.elfPHTEntrySize == ELF_PHDR_SIZE32):
             raise FormatError("Wrong p-header size.")
-        if not (self.elfSHTEntrySize == ELF_SECTION_SIZE):
+        if not (self.elfSHTEntrySize == ELF_SECTION_SIZE32):
             raise FormatError("Wrong section size.")
 
         self.hasStringTable = not (self.elfStringTableIndex == SHN_UNDEF)
@@ -737,7 +820,7 @@ class ELFHeader(object):
         elif self.elfClass == ELFClass.ELFCLASS64:
             result = "ELF64"
         else:
-            result = "<unknown: %x>" % self.elfClass
+            result = "<unknown: {0:x}>".format(self.elfClass)
         return result
 
     def elfDataEncodingAsString(self):
@@ -749,7 +832,7 @@ class ELFHeader(object):
         elif self.elfByteOrder == ELFDataEncoding.ELFDATA2MSB:
             result = "2's complement, big endian"
         else:
-            result = "<unknown: %x>" % self.elfByteOrder
+            result = "<unknown: {0:x}>".format(self.elfByteOrder)
         return result
 
     def getVersionAsString(self):
@@ -757,7 +840,7 @@ class ELFHeader(object):
         if self.elfVersion == EV_CURRENT:
             result = "(current)"
         elif self.elfVersion != EV_NONE:
-            result = "<unknown: %lx>" % self.elfVersion
+            result = "<unknown: {0:lx}>".format(self.elfVersion)
         return result
 
     def getAbiNameAsString(self):
@@ -796,7 +879,7 @@ class ELFHeader(object):
             if self.elfMachine == ELFMachineType.EM_ARM:
                 if self.elfOsAbi == ELFAbiType.ELFOSABI_ARM:
                     result = "ARM"
-            elif self.elfMachine in (ELFMachineType.EM_MSP430, ):
+            elif self.elfMachine in (ELFMachineType.EM_MSP430, ELFMachineType.EM_MSP430_OLD):
                 if self.elfOsAbi == ELFAbiType.ELFOSABI_STANDALONE:
                     result = "Standalone App"
             elif self.elfMachine == ELFMachineType.EM_TI_C6000:
@@ -805,7 +888,7 @@ class ELFHeader(object):
                 elif self.elfOsAbi == ELFAbiType.ELFOSABI_C6000_LINUX:
                     result = "Linux C6000"
         else:
-            result = "<unknown: %x>" % self.elfOsAbi
+            result = "<unknown: {0:x}>".format(self.elfOsAbi)
         return result
 
 
@@ -823,11 +906,11 @@ class ELFHeader(object):
             result = "CORE (Core file)"
         else:
             if self.elfType >= ELFType.ET_LOPROC and self.elfType <= ELFType.ET_HIPROC:
-                result = "Processor Specific: (%x)" % self.elfType
+                result = "Processor Specific: ({0:x})".format(self.elfType)
             elif self.elfType >= ELFType.ET_LOOS and self.elfType <= ELFType.ET_HIOS:
-                result = "OS Specific: (%x)" % self.elfType
+                result = "OS Specific: ({0:x})".format(self.elfType)
             else:
-                result = "<unknown>: %x" % self.elfType
+                result = "<unknown>: {0:x}".format(self.elfType)
         return result
 
 
@@ -839,13 +922,16 @@ class ELFSymbol(object):
 class ELFSectionHeaderTable(object):
     def __init__(self, parent, atPosition=0):
         self.parent = parent
+        self._name = None
         parent.inFile.seek(atPosition, os.SEEK_SET)
-        data=parent.inFile.read(ELF_SECTION_SIZE)
+        data = parent.inFile.read(ELF_SECTION_SIZE32)
 
-        elfProgramHeaderTable = struct.unpack("%s%s" % (parent.byteOrderPrefix, SEC_FMT), data)
+        elfProgramHeaderTable = struct.unpack("{0}{1}".format(parent.byteOrderPrefix, SEC_FMT32), data)
         d = Elf32_Shdr(*elfProgramHeaderTable)
         for name, value in d._asdict().items():
             setattr(self, name, value)
+
+        #self.parent.sectionHeadersByName[name] = value
 
         if self.shType not in (SHT_NOBITS, SHT_NULL) and self.shSize > 0:
             pos = self.shOffset
@@ -858,8 +944,8 @@ class ELFSectionHeaderTable(object):
             self.symbols = {}
             for idx, symbol in enumerate(range(self.shSize / ELF_SYM_TABLE_SIZE)):
                 offset = idx * ELF_SYM_TABLE_SIZE
-                data=self.image[offset : offset + ELF_SYM_TABLE_SIZE]
-                symData = struct.unpack("%s%s" % (parent.byteOrderPrefix, SYMTAB_FMT), data)
+                data = self.image[offset : offset + ELF_SYM_TABLE_SIZE]
+                symData = struct.unpack("{0}{1}".format(parent.byteOrderPrefix, SYMTAB_FMT), data)
                 sym = Elf32_Sym(*symData)
                 self.symbols[idx] = sym
 
@@ -880,37 +966,64 @@ class ELFSectionHeaderTable(object):
     @property
     def shTypeName(self):
         TYPES = {
-            SHT_NULL        : "NULL",
-            SHT_PROGBITS    : "PROGBITS",
-            SHT_SYMTAB      : "SYMTAB",
-            SHT_STRTAB      : "STRTAB",
-            SHT_RELA        : "RELA",
-            SHT_HASH        : "HASH",
-            SHT_DYNAMIC     : "DYNAMIC",
-            SHT_NOTE        : "NOTE",
-            SHT_NOBITS      : "NOBITS",
-            SHT_REL         : "REL",
-            SHT_SHLIB       : "SHLIB",
-            SHT_DYNSYM      : "DYNSYM",
-            SHT_LOPROC      : "LOPROC",
-            SHT_HIPROC      : "HIPROC",
-            SHT_LOUSER      : "LOUSER",
-            SHT_HIUSER      : "HIUSER"
+            SHT_NULL            : "NULL",
+            SHT_PROGBITS        : "PROGBITS",
+            SHT_SYMTAB          : "SYMTAB",
+            SHT_STRTAB          : "STRTAB",
+            SHT_RELA            : "RELA",
+            SHT_HASH            : "HASH",
+            SHT_DYNAMIC         : "DYNAMIC",
+            SHT_NOTE            : "NOTE",
+            SHT_NOBITS          : "NOBITS",
+            SHT_REL             : "REL",
+            SHT_SHLIB           : "SHLIB",
+            SHT_DYNSYM          : "DYNSYM",
+            SHT_INIT_ARRAY      : "INIT_ARRAY",
+            SHT_FINI_ARRAY      : "FINI_ARRAY",
+            SHT_PREINIT_ARRAY   : "PREINIT_ARRAY",
+            SHT_GROUP           : "GROUP",
+            SHT_SYMTAB_SHNDX    : "SYMTAB_SHNDX",
+            SHT_NUM             : "NUM",
+            SHT_LOOS            : "LOOS",
+            SHT_GNU_ATTRIBUTES  : "NU_ATTRIBUTES",
+            SHT_GNU_HASH        : "GNU_HASH",
+            SHT_GNU_LIBLIST     : "GNU_LIBLIST",
+            SHT_CHECKSUM        : "CHECKSUM",
+            SHT_LOSUNW          : "LOSUNW",
+            SHT_SUNW_move       : "SUNW_move",
+            SHT_SUNW_COMDAT     : "UNW_COMDAT",
+            SHT_SUNW_syminfo    : "SUNW_syminfo",
+            SHT_GNU_verdef      : "VERDEF",
+            SHT_GNU_verneed     : "VERNEED",
+            SHT_GNU_versym      : "VERSYM",
+            SHT_HISUNW          : "HISUNW",
+            SHT_HIOS            : "HIOS",
+
+            SHT_ARM_EXIDX       : "ARM_EXIDX",
+            SHT_ARM_PREEMPTMAP  : "ARM_PREEMPTMAP",
+            SHT_ARM_ATTRIBUTES  : "ARM_ATTRIBUTES",
+            SHT_ARM_DEBUGOVERLAY    : "ARM_DEBUGOVERLAY",
+            SHT_ARM_OVERLAYSECTION  : "ARM_OVERLAYSECTION",
+
+            SHT_LOPROC          : "LOPROC",
+            SHT_HIPROC          : "HIPROC",
+            SHT_LOUSER          : "LOUSER",
+            SHT_HIUSER          : "HIUSER"
         }
         return TYPES.get(self.shType, "UNKNOWN")
 
     @property
     def shName(self):
-        pass
+        return self._name
 
 
 class ELFProgramHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
         parent.inFile.seek(atPosition, os.SEEK_SET)
-        data = parent.inFile.read(ELF_PHDR_SIZE)
+        data = parent.inFile.read(ELF_PHDR_SIZE32)
 
         try:
-            elfProgramHeaderTable=struct.unpack("%s%s" % (parent.byteOrderPrefix, PHDR_FMT), data)
+            elfProgramHeaderTable=struct.unpack("{0}{1}".format(parent.byteOrderPrefix, PHDR_FMT32), data)
         except struct.error:
             raise FormatError("Wrong program header table.")
 
@@ -925,13 +1038,23 @@ class ELFProgramHeaderTable(object):
     @property
     def phTypeName(self):
         NAMES = {
-            0 : 'NULL',
-            1 : 'LOAD',
-            2 : 'DYNAMIC',
-            3 : 'INTERP',
-            4 : 'NOTE',
-            5 : 'SHLIB',
-            6 : 'PHDR'
+            0           : 'NULL',
+            1           : 'LOAD',
+            2           : 'DYNAMIC',
+            3           : 'INTERP',
+            4           : 'NOTE',
+            5           : 'SHLIB',
+            6           : 'PHDR',
+            7           : 'TLS',
+            8           : 'NUM',
+            0x60000000  : 'LOOS',
+            0x6474e550  : 'GNU_EH_FRAME',
+            0x6474e551  : 'GNU_STACK',
+            0x6474e552  : 'GNU_RELRO',
+            0x6ffffffa  : 'LOSUNW',
+            0x6ffffffa  : 'SUNWBSS',
+            0x6ffffffb  : 'SUNWSTACK',
+            0x6fffffff  : 'HIOS',
         }
         if self.phType in NAMES:
             return NAMES.get(self.phType)
@@ -980,16 +1103,15 @@ class Reader(object):
 
         self.programHeaders = []
         self.sectionHeaders = []
+        self._sectionHeadersByName = {}
         self._stringCache = {}
 
-        #pos = self.header.data.e_phoff
         pos = self.header.e_phoff
         if pos:
             for _ in range(self.header.elfNumberOfPHs):
                 self.programHeaders.append(ELFProgramHeaderTable(self, pos))
                 pos += self.header.elfPHTEntrySize
 
-        #pos = self.header.data.e_shoff
         pos = self.header.e_shoff
         if pos:
             for _ in range(self.header.elfNumberOfSHs):
@@ -1017,15 +1139,19 @@ class Reader(object):
                     offset += entrySize
             elif sectionHeader == SHT_NOTE:
                 pass
+        for section in self.sectionHeaders:
+            name = self.getString(self.header.elfStringTableIndex, section.shNameIdx)
+            section._name = name
+            self._sectionHeadersByName[name] = section
+
+    def sectionHeaderByName(self, name):
+        return self._sectionHeadersByName.get(name)
 
     def getString(self, tableIndex, entry):
         if (tableIndex, entry) in self._stringCache:
             return self._stringCache[(tableIndex, entry)]
         else:
-            # self.header.elfStringTableIndex
             unterminatedString = self.sectionHeaders[tableIndex].image[entry : ]
-#            if not unterminatedString:
-#                return ''
             terminatedString = unterminatedString[ : unterminatedString.index('\x00')]
             self._stringCache[(tableIndex,entry)] = terminatedString
             return terminatedString
@@ -1033,3 +1159,4 @@ class Reader(object):
     @property
     def byteOrderPrefix(self):
         return self.header.byteOrderPrefix
+
