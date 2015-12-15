@@ -30,7 +30,8 @@ from functools import partial
 import operator
 import objutils.HexFile as HexFile
 from objutils.checksums import lrc, COMPLEMENT_TWOS
-from objutils.utils import identity
+import objutils.utils as utils
+import objutils.checksums as checksums
 
 from objutils.registry import register
 
@@ -54,8 +55,7 @@ class Reader(HexFile.Reader):
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
             raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-        # todo: factor out checksum calculation from line!!!
-        checksum = (~(sum([line.type, line.length, (line.address & 0xff00) >> 8, line.address & 0xff])+ sum(line.chunk)) + 1) & 0xff
+        checksum = checksums.lrc(utils.makeList(line.type, line.length, utils.intToArray(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
         if line.checksum != checksum:
             raise HexFile.InvalidRecordChecksumError()
 
@@ -102,7 +102,7 @@ class Reader(HexFile.Reader):
         else:
             self.warn("Invalid record type [%u] at line #%u" % (line.type, line.lineNumber))
 
-    _addressCalculator = identity
+    _addressCalculator = utils.identity
 
 
 class Writer(HexFile.Writer):
