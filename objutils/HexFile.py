@@ -248,6 +248,12 @@ class Reader(object):
     def warn(self, msg):
         self.logger.warn(msg)
 
+    def info(self, msg):
+        self.logger.info(msg)        
+        
+    def debug(self, msg):
+        self.logger.debug(msg)
+        
     def probe(self):
         "Determine if valid object from first line." # if object is valid.
         raise NotImplementedError()
