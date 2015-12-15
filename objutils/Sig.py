@@ -30,8 +30,8 @@ from objutils import utils
 import objutils.checksums as checksums
 from objutils.registry import register
 
-DATA=1
-EOF=2
+DATA = 1
+EOF = 2
 
 
 class Reader(objutils.HexFile.Reader):
@@ -42,8 +42,8 @@ class Reader(objutils.HexFile.Reader):
     )
 
     def checkLine(self, line, formatType):
-        if formatType==DATA:
-            if line.length!=len(line.chunk):
+        if formatType == DATA:
+            if line.length != len(line.chunk):
                 raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(line.address), line.length), 8, checksums.ROTATE_LEFT)
             if line.addrChecksum != addressChecksum:
@@ -53,7 +53,7 @@ class Reader(objutils.HexFile.Reader):
                 raise HexFile.InvalidRecordChecksumError()
 
     def isDataLine(self,line,formatType):
-        return formatType==DATA
+        return formatType == DATA
 
 class Writer(objutils.HexFile.Writer):
 
@@ -62,7 +62,8 @@ class Writer(objutils.HexFile.Writer):
     def composeRow(self, address, length, row):
         addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(address), length), 8, checksums.ROTATE_LEFT)
         dataChecksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
-        line = ":%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        #line = ":%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         return line
 
 #    def composeFooter(self, meta):
