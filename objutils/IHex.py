@@ -64,19 +64,21 @@ class Reader(HexFile.Reader):
             return True
         else:
             return False
+            
+    def calculateExtendedAddress(self, line, shiftBy, name):
+            if len(line.chunk) == 2:
+                segment = ((line.chunk[0]) << 8) | (line.chunk[1])
+                line.addPI(('segment', segment))
+                self._addressCalculator = partial(operator.add, segment << shiftBy)
+                self.debug("EXTENDED_{0}_ADDRESS: {1:#X}".format(name.upper(), segment))
+            else:
+                self.error("Bad Extended {0} Address at line #{1}.".format(name, line.lineNumber))
 
     def specialProcessing(self, line, formatType):
         if line.type == DATA:
             line.address = self._addressCalculator(line.address)
-            #print "DATA - address: %08x [%u]" % (line.address, len(line.chunk))
         elif line.type == EXTENDED_SEGMENT_ADDRESS:
-            if len(line.chunk) == 2:
-                seg = ((line.chunk[0]) << 8) | (line.chunk[1])
-                line.addPI(('segment', seg))
-                self._addressCalculator = partial(operator.add, seg << 4)
-                print "EXTENDED_SEGMENT_ADDRESS: ", hex(seg)
-            else:
-                self.logger.error("Bad Extended Segment Address at line #%u." % line.lineNumber)
+            self.calculateExtendedAddress(line, 4, "Segment")
         elif line.type == START_SEGMENT_ADDRESS:
             if len(line.chunk) == 4:
                 cs = ((line.chunk[0]) << 8) | (line.chunk[1])
@@ -85,25 +87,18 @@ class Reader(HexFile.Reader):
                 line.addPI(('ip', ip))
                 print "START_SEGMENT_ADDRESS: %s:%s" % (hex(cs), hex(ip))
             else:
-                self.logger.error("Bad Segment Address at line #%u." % line.lineNumber)
+                self.error("Bad Segment Address at line #%u." % line.lineNumber)
         elif line.type == EXTENDED_LINEAR_ADDRESS:
-            if len(line.chunk) == 2:
-                seg = ((line.chunk[0]) << 8) | (line.chunk[1])
-                line.addPI(('segment', seg))
-                self._addressCalculator = partial(operator.add, seg << 16)
-                print "EXTENDED_LINEAR_ADDRESS: ", hex(seg)
-            else:
-                self.logger.error("Bad Extended Linear Address at line #%u." % line.lineNumber)
+            self.calculateExtendedAddress(line, 16, "Linear")
         elif line.type == START_LINEAR_ADDRESS:
             if len(line.chunk) == 4:
                 eip = ((line.chunk[0]) << 24) | ((line.chunk[1]) << 16) | ((line.chunk[2]) << 8) | (line.chunk[3])
                 line.addPI(('eip', eip))
                 print "START_LINEAR_ADDRESS: ", hex(eip)
             else:
-                self.logger.error("Bad Linear Address at line #%u." % line.lineNumber)
+                self.error("Bad Linear Address at line #%u." % line.lineNumber)
         elif line.type == EOF:
             pass
-            #print "/// EOF"
         else:
             self.warn("Invalid record type [%u] at line #%u" % (line.type, line.lineNumber))
 
