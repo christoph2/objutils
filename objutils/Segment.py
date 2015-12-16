@@ -28,10 +28,11 @@ __copyright__ = """
 
 from operator import itemgetter
 
+# Note: Section seens to be a more appropriate name.
 class Segment(object):
-    def __init__(self, address = 0, length = 0, data = bytearray()):
+    def __init__(self, address = 0, data = bytearray()):
         self.address = address
-        self.length = length
+        self._length = len(data)
         self.data = data
 
     def __getitem__(self, key):
@@ -46,6 +47,14 @@ class Segment(object):
 
     def __repr__(self):
         return "Segment (address: '0X%08X' length: '%d')" % (self.address, self.length)
+        
+    @property
+    def length(self):
+        return self._length
+        
+    @length.setter
+    def length(self, value):
+        self._length = value
 
 
 def joinSegments(segments):
@@ -59,7 +68,7 @@ def joinSegments(segments):
             resultSegments[-1].length += segment.length
         else:
             # Create a new Segment.
-            resultSegments.append(Segment(segment.address, segment.length, segment.data))
+            resultSegments.append(Segment(segment.address, segment.data))
         prevSegment = segment
     lastSeg = resultSegments[-1]
     return resultSegments

@@ -62,7 +62,6 @@ class Writer(objutils.HexFile.Writer):
     def composeRow(self, address, length, row):
         addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(address), length), 8, checksums.ROTATE_LEFT)
         dataChecksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
-        #line = ":%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         return line
 

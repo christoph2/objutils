@@ -168,7 +168,6 @@ class Container(object):
 class Reader(object):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
-    #logger = logging.getLogger("object.utils")
     logger = logger
 
     def __init__(self):
@@ -216,7 +215,7 @@ class Reader(object):
                         self.specialProcessing(container, formatType)
                         if self.isDataLine(container, formatType):
                             # print chunk
-                            segments.append(Segment(container.address, container.length, container.chunk))
+                            segments.append(Segment(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
                             metaData[formatType].append(MetaRecord(formatType, container.address, chunk))
