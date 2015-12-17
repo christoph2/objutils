@@ -43,22 +43,12 @@ from objutils.registry import register
 STX = '\x02'
 ETX = '\x03'
 
-DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4}),)?', re.DOTALL | re.MULTILINE)
-
-ADDRESS = re.compile(r'\$A(?P<value>[0-9a-zA-Z]{2,8}),\s*')
+DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4})[,.])?', re.DOTALL | re.MULTILINE)
+ADDRESS = re.compile(r'\$A(?P<value>[0-9a-zA-Z]{2,8})[,.]\s*')
+LINE_SPLIITER = re.compile(r"[ %,']")
 
 checksum = partial(lrc, width = 16)
 
-
-"""
-       In  addition  to a space character, the execution character can also be
-       percent (%) called "ascii-hex-percent" format, apostrophe (') or  comma
-       (,) called "ascii-hex-comma" format.  The file must use the same execu-
-       tion character throughout.
-
-       If the execution character is a comma, the address  and  checksum  com-
-       mands are terminated by a dot (.) rather than a comma (,).
-"""
 
 class Reader(HexFile.Reader):
     def __init__(self, dataSeparator = ' '):
@@ -100,8 +90,8 @@ class Reader(HexFile.Reader):
 
     def _getByte(self, chunk):
         for line in chunk.splitlines():
-            for b in line.split():
-                yield chr(int(b, 16))
+            for ch in LINE_SPLIITER.split(line):
+                yield chr(int(ch, 16))
 
 
 class Writer(HexFile.Writer):
