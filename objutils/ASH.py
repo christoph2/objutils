@@ -26,9 +26,8 @@ __copyright__ = """
 """
 
 ##
-##  ASCII hex-space format.
+##  ASCII Space Hex format.
 ##
-
 
 import cStringIO
 from functools import partial
@@ -44,25 +43,22 @@ from objutils.registry import register
 STX = '\x02'
 ETX = '\x03'
 
-
-ASCII_HEX = """ $A0000,
-7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C
-3B E0 00 01 93 FE 00 00 7F FA 02 A6 93 FE 00 04
-7F FB 02 A6 93 FE 00 08 7F D2 42 A6 7F F3 42 A6
-48 00 1F 04 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-$ACF00,
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-$$0FF0,"""
-
-
 DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4}),)?', re.DOTALL | re.MULTILINE)
 
 ADDRESS = re.compile(r'\$A(?P<value>[0-9a-zA-Z]{2,8}),\s*')
 
 checksum = partial(lrc, width = 16)
+
+
+"""
+       In  addition  to a space character, the execution character can also be
+       percent (%) called "ascii-hex-percent" format, apostrophe (') or  comma
+       (,) called "ascii-hex-comma" format.  The file must use the same execu-
+       tion character throughout.
+
+       If the execution character is a comma, the address  and  checksum  com-
+       mands are terminated by a dot (.) rather than a comma (,).
+"""
 
 class Reader(HexFile.Reader):
     def __init__(self, dataSeparator = ' '):
@@ -70,9 +66,9 @@ class Reader(HexFile.Reader):
 
     def read(self, fp):
         lines = fp.read()
-        ma = DATA.match(lines)
+        match = DATA.match(lines)
 
-        chunks = ma.groupdict()['chunks'].strip()
+        chunks = match.groupdict()['chunks'].strip()
 
         segments = []
         lines = []
@@ -80,16 +76,11 @@ class Reader(HexFile.Reader):
         previousAddress = 0
 
         for line in chunks.splitlines():
-            print "***%s***" % line
-            ma = ADDRESS.match(line)
-            if ma:
-                address = int(ma.groupdict()['value'], 16)
-                print "ADDRESS: %u" % address
+            match = ADDRESS.match(line)
+            if match:
+                address = int(match.groupdict()['value'], 16)
                 if lines:
-                    print "APPEND"
                     segments.append((previousAddress, lines))
-                else:
-                    print "*** No Lines!!!"
                 previousAddress = address
                 lines = []
             else:
@@ -100,12 +91,9 @@ class Reader(HexFile.Reader):
 
         chunks = []
         for address, segment in segments:
-            print "Start-Address: %04X" % address
             for line in segment:
                 chunk = bytearray(self._getByte(line))
-                print "*** BA: '%s'***" % chunk
-
-                chunks.append(Segment(address, len(chunk), chunk))
+                chunks.append(Segment(address, chunk))
                 address += len(chunk)
 
         return Image(joinSegments(chunks))
@@ -116,56 +104,28 @@ class Reader(HexFile.Reader):
                 yield chr(int(b, 16))
 
 
-class Writer(object):
-    def __init__(self, outFile, bytesPerRow = 16):
-        self.outFile = outFile
-        self.bytesPerRow = bytesPerRow
+class Writer(HexFile.Writer):
 
-    def write(self, image): # TODO: Make Template Pattern!!!
-        checksum = 0
-        self.writeHeader()
-        for segment in image.segments:
-            self.outFile.write("$A%04X," %segment.address)
-            for idx, b in enumerate(segment.data):
-                if (idx % self.bytesPerRow) == 0:
-                    self.outFile.write("\n")
+    MAX_ADDRESS_BITS = 16
+        
+    def composeRow(self, address, length, row):
+        prependAddress =  True if address != self.previousAddress else False
+        self.previousAddress = (address + length)            
+        self.checksum += checksum(row)
+        if prependAddress:
+            line = "{0}\n{1}".format("$A{0:04X},".format(address), " ".join(["{0:02X}".format(x) for x in row]))
+        else:
+            line = " ".join(["{0:02X}".format(x) for x in row])
+        return line        
 
-                self.outFile.write("%02X " % b)
-                checksum += b
-            self.outFile.write("\n")
-        ## TODO: Newline in case of odd byte count.
-        self.writeFooter(checksum)
+    def composeHeader(self, meta):
+        self.checksum = 0
+        self.previousAddress = None
+        line ="{0} ".format(STX)
+        return line
 
-    def updateChecksum(self, value):
-        pass
-
-    def writeHeader(self):
-        self.outFile.write("%c " % STX)
-
-    def writeFooter(self, checksum):
-        self.outFile.write("%c$$%04X," % (ETX, (checksum % 65536)))
-
-    def writeBlock(self, block):
-        pass
-
+    def composeFooter(self, meta):
+        line = "{0}$${1:04X},".format(ETX, self.checksum % 65536)
+        return line
 
 register('ash', Reader, Writer)
-
-
-S19 = """S321000000007FD243A67FF343A63FC0003F3BDE700C3BE0000193FE00007FFA02A6A8
-S3210000001C93FE00047FFB02A693FE00087FD242A67FF342A648001F040000000074
-S3210000003800000000000000000000000000000000000000000000000000000000A6
-S32100000054000000000000000000000000000000000000000000000000000000008A"""
-
-
-def main():
-    inf = cStringIO.StringIO(ASCII_HEX)
-    hr = Reader()
-    data = hr.load(inf)
-    print data
-    wr = Writer(sys.stdout)
-    wr.write(data)
-
-if __name__ == '__main__':
-    main()
-

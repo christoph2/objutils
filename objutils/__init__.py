@@ -48,7 +48,7 @@ def dumps(codecName, *args, **kws):
 def _importer():
     import objutils.Sig
     import objutils.SRecords
-    #import objutils.ASH
+    import objutils.ASH
     import objutils.EMon52
     import objutils.Elf
     import objutils.ETek
