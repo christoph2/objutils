@@ -170,7 +170,7 @@ class Reader(object):
     logger = logger
 
     def __init__(self):
-        if isinstance(self.FORMAT_SPEC, basestring):
+        if isinstance(self.FORMAT_SPEC, str):
             self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
