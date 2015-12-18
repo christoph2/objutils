@@ -375,10 +375,10 @@ class Reader(object):
 
     def checkSectionIndex(self, index):
         if  self.currentSectionIndex == None:
-            print "No current Section Index."
+            print("No current Section Index.")
         elif self.currentSectionIndex != index:
             print
-            print "Invalid Section Index."
+            print("Invalid Section Index.")
 
 
     def readByte(self, offset):
