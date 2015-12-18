@@ -120,17 +120,14 @@ class Reader(HexFile.Reader):
             startAddress = line.address
             #print "Startaddress[S7]: %u" % startAddress
             #print "32-Bit Start-Address: ", hex(startAddress)
-            pass
         elif formatType == S8:
             startAddress = line.address
             #print "Startaddress[S8]: %u" % startAddress
             #print "24-Bit Start-Address: ", hex(startAddress)
-            pass
         elif formatType == S9:
             startAddress = line.address
             #print "Startaddress[S9]: %u" % startAddress
             #print "16-Bit Start-Address: ", hex(startAddress)
-            pass
 
     def _stripSymbols(self, symbolTables):
         self.symbols=[]
