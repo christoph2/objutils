@@ -25,7 +25,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import cStringIO
 from functools import partial
 import re
 from objutils.checksums import lrc, COMPLEMENT_ONES
@@ -201,3 +200,4 @@ class Writer(HexFile.Writer):
 
 
 register('srec', Reader, Writer)
+
