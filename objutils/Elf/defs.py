@@ -294,7 +294,7 @@ class ELFMachineType(enum.IntEnum):
     EM_IP2K_OLD             = 0x8217  # Ubicom IP2xxx;   Written in the absense of an ABI.
     EM_OR32                 = 0x8472  # (Deprecated) Temporary number for the OpenRISC processor.
     EM_CYGNUS_POWERPC       = 0x9025  # Cygnus PowerPC ELF backend.  Written in the absence of an ABI.
-    EM_ALPHA                = 0x9026  # Alpha backend magic number.  Written in the absence of an ABI.
+    EM_ALPHA_NO_ABI         = 0x9026  # Alpha backend magic number.  Written in the absence of an ABI.
     EM_CYGNUS_M32R          = 0x9041  # Cygnus M32R ELF backend.  Written in the absence of an ABI.
     EM_CYGNUS_V850          = 0x9080  # V850 backend magic number.  Written in the absense of an ABI.
     EM_S390_OLD             = 0xa390  # old S/390 backend magic number. Written in the absence of an ABI.
@@ -469,7 +469,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_IP2K_OLD      : 'Ubicom IP2xxx',
     ELFMachineType.EM_OR32          : 'OpenRISC 32',
     ELFMachineType.EM_CYGNUS_POWERPC: 'Cygnus PowerPC',
-    ELFMachineType.EM_ALPHA         : 'Alpha',
+    ELFMachineType.EM_ALPHA_NO_ABI  : 'Alpha',
     ELFMachineType.EM_CYGNUS_M32R   : 'Cygnus M32R',
     ELFMachineType.EM_CYGNUS_V850   : 'Cygnus V850',
     ELFMachineType.EM_S390_OLD      : 'S/390',
