@@ -408,7 +408,7 @@ class Reader(object):
             length = typecode & ~0x80
             data = self.inFile.read(length)
             self.fpos = self.inFile.tell()
-            result = reduce(lambda x, y: (x * 256) + ord(y), data, 0L)
+            result = reduce(lambda x, y: (x * 256) + ord(y), data, 0)
         return result
 
     def readString(self, offset):
