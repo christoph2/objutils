@@ -132,21 +132,3 @@ def calc(ids):
         return int(math.ceil((id - l) / slope))
     return fun
 
-import operator
-
-def test():
-    fun = calc(ids)
-
-    for id in ids:
-        print hex(id), hex(fun(id))
-
-    r0 = reduce(operator.and_,ids)
-    r1 = ~r0
-
-    data = StringIO.StringIO(TEST)
-    hr = Reader(data)
-    d = hr.read()
-    print d
-
-if __name__=='__main__':
-    test()
