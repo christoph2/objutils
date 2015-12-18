@@ -26,7 +26,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import cStringIO
 import re
 import objutils.HexFile as HexFile
 import objutils.utils as utils

@@ -25,7 +25,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import cStringIO as StringIO
 import operator
 import re
 import objutils.HexFile as HexFile
@@ -107,7 +106,7 @@ class Reader(HexFile.Reader):
             checksum += 1
             line.address = self.lastAddress
         elif formatType == DATA_REL:
-            raise NotImplementedError("relative adressing not supported.")
+            raise NotImplementedError("relative adressing not supported.")  # FIXME!
             checksum += 2
         checksum += cs32(line.address)
         checksum += reduce(operator.add, line.chunk)

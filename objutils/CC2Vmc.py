@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cStringIO
+try:
+    import cStringIO as StringIO
+except NameError:
+    import StringIO
 import re
 
 SAMPLE1="""
@@ -51,7 +54,7 @@ class Reader(object):
             pass # todo: Error-Handling.
 
 def main():
-    r=Reader(cStringIO.StringIO(SAMPLE1.strip()))
+    r = Reader(StringIO.StringIO(SAMPLE1.strip()))
 
 if __name__=='__main__':
     main()

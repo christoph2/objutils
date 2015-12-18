@@ -29,7 +29,6 @@ __copyright__ = """
 ##  ASCII Space Hex format.
 ##
 
-import cStringIO
 from functools import partial
 import re
 import sys
@@ -97,16 +96,16 @@ class Reader(HexFile.Reader):
 class Writer(HexFile.Writer):
 
     MAX_ADDRESS_BITS = 16
-        
+
     def composeRow(self, address, length, row):
         prependAddress =  True if address != self.previousAddress else False
-        self.previousAddress = (address + length)            
+        self.previousAddress = (address + length)
         self.checksum += checksum(row)
         if prependAddress:
             line = "{0}\n{1}".format("$A{0:04X},".format(address), " ".join(["{0:02X}".format(x) for x in row]))
         else:
             line = " ".join(["{0:02X}".format(x) for x in row])
-        return line        
+        return line
 
     def composeHeader(self, meta):
         self.checksum = 0
