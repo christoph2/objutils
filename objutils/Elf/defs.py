@@ -664,8 +664,8 @@ SHF_MASKOS              = 0x0ff00000    # OS-specific.
 
 SHF_MASKPROC            = 0xf0000000    # Processor-specific.
 
-SHF_ORDERED             = 1073741824L   # Special ordering requirement (Solaris).
-SHF_EXCLUDE             = 2147483648L   # Section is excluded unless referenced or allocated (Solaris).
+SHF_ORDERED             = 1073741824    # Special ordering requirement (Solaris).
+SHF_EXCLUDE             = 2147483648    # Section is excluded unless referenced or allocated (Solaris).
 
 ##
 ##
