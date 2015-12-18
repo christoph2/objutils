@@ -29,16 +29,6 @@ import operator
 import re
 import objutils.HexFile as HexFile
 
-
-TEST = """$kL&@h%%,:,B.\?00EPuX0K3rO0JI))
-$;UPR'%%,:<Hn&FCG:at<GVF(;G9wIw
-$7FD1p%%,:LHmy:>GTV%/KJ7@GE[kYz
-$B[6\;%%,:\KIn?GFWY/qKI1G5:;-_e
-$%%%%%"""
-
-MAPPING = dict(enumerate(map(chr, range(37, 37 + 5) + range(37 + 6, 37 + 80 + 6))))
-REV_MAPPING = dict([(value, key) for key, value in MAPPING.items()])
-
 DATA_ABS    = 1
 DATA_INC    = 2
 DATA_REL    = 3
