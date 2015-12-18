@@ -63,16 +63,16 @@ class TestLRCs(unittest.TestCase):
         self.assertEquals(lrc(range(100), 32, COMPLEMENT_NONE), 4950)
 
     def testLRCCase15(self):
-        self.assertEquals(lrc(range(10), 32, COMPLEMENT_ONES), 4294967250L)
+        self.assertEquals(lrc(range(10), 32, COMPLEMENT_ONES), 4294967250)
 
     def testLRCCase16(self):
-        self.assertEquals(lrc(range(100), 32, COMPLEMENT_ONES), 4294962345L)
+        self.assertEquals(lrc(range(100), 32, COMPLEMENT_ONES), 4294962345)
 
     def testLRCCase17(self):
-        self.assertEquals(lrc(range(10), 32, COMPLEMENT_TWOS), 4294967251L)
+        self.assertEquals(lrc(range(10), 32, COMPLEMENT_TWOS), 4294967251)
 
     def testLRCCase18(self):
-        self.assertEquals(lrc(range(100), 32, COMPLEMENT_TWOS), 4294962346L)
+        self.assertEquals(lrc(range(100), 32, COMPLEMENT_TWOS), 4294962346)
 
 
 class TestRXORs(unittest.TestCase):
