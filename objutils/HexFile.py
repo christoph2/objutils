@@ -32,7 +32,6 @@ import math
 import re
 import sys
 
-import types
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
@@ -171,9 +170,9 @@ class Reader(object):
     logger = logger
 
     def __init__(self):
-        if isinstance(self.FORMAT_SPEC, types.StringType):
+        if isinstance(self.FORMAT_SPEC, basestring):
             self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
-        elif isinstance(self.FORMAT_SPEC,(types.ListType, types.TupleType)):
+        elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
             for formatType, format in self.FORMAT_SPEC:
                 self.formats.append((formatType, FormatParser(format, self.DATA_SEPARATOR).parse()))
@@ -248,11 +247,11 @@ class Reader(object):
         self.logger.warn(msg)
 
     def info(self, msg):
-        self.logger.info(msg)        
-        
+        self.logger.info(msg)
+
     def debug(self, msg):
         self.logger.debug(msg)
-        
+
     def probe(self):
         "Determine if valid object from first line." # if object is valid.
         raise NotImplementedError()
@@ -275,7 +274,7 @@ class Reader(object):
 
 class Writer(object):
 
-    def dump(self, fp, image, rowLength = 16, **kws):
+    def dump(self, fp, image, rowLength = 16, **kws):   # TODO: rename to bytesPerRow!
         fp.write(dumps(image, rowLength))
 
     def dumps(self, image, rowLength = 16, **kws):
