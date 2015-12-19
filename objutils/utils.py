@@ -78,3 +78,12 @@ def getPythonVersion():
 
 PYTHON_VERSION = getPythonVersion()
 
+def binExtractor(fname, offset, length):
+    """Extract a junk of data from a file.
+    """
+    fp = open(fname)
+    fp.seek(offset)
+    data = fp.read(length)
+    return data
+
+

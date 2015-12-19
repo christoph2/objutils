@@ -193,7 +193,7 @@ class Reader(object):
         metaData = defaultdict(list)
         for (lineNumber, line) in enumerate(fp.readlines(), 1):
             for formatType, format in self.formats:
-                match = format.match(line)
+                match = format.match(str(line))
                 if match:
                     matched = True
                     container = Container()

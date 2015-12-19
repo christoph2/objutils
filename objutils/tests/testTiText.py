@@ -45,11 +45,12 @@ fromTiTxt =  loads('titxt', TITEXT)
 dataFromTiTxt = dumps('srec', fromTiTxt, rowLength = 32)
 
 class TestRoundTrip(unittest.TestCase):
-    
+        
     def testFromSrec(self):
-        #fromSrec =  loads('srec', SREC)
-        #data = dumps('titxt', fromSrec)
-        self.assertEquals(dataFromSRec, TITEXT)
+        fromSrec =  loads('srec', SREC)
+        data = dumps('titxt', fromSrec)
+        self.assertEquals(data, TITEXT)
+        #self.assertEquals(dataFromSRec, TITEXT)
         
     def testFromTiTxt(self):
         #fromTiTxt =  loads('titxt', TITEXT)
