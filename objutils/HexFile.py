@@ -181,7 +181,10 @@ class Reader(object):
         return self.read(fp)
 
     def loads(self, image, **kws):
-        return self.load(StringIO(bytes(image)))
+        if PYTHON_VERSION.major == 3:
+            return self.load(StringIO(bytes(image, "ascii")))
+        else:
+            return self.load(StringIO(image))
 
     def read(self, fp):
         segments = []
