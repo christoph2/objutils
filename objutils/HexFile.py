@@ -181,7 +181,7 @@ class Reader(object):
         return self.read(fp)
 
     def loads(self, image, **kws):
-        return self.load(bytes(StringIO(image)))
+        return self.load(StringIO(bytes(image)))
 
     def read(self, fp):
         segments = []
