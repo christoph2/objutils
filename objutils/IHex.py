@@ -94,7 +94,7 @@ class Reader(HexFile.Reader):
             if len(line.chunk) == 4:
                 eip = ((line.chunk[0]) << 24) | ((line.chunk[1]) << 16) | ((line.chunk[2]) << 8) | (line.chunk[3])
                 line.addPI(('eip', eip))
-                 self.debug("START_LINEAR_ADDRESS: {0}".format(hex(eip)))
+                self.debug("START_LINEAR_ADDRESS: {0}".format(hex(eip)))
             else:
                 self.error("Bad Linear Address at line #%u." % line.lineNumber)
         elif line.type == EOF:
