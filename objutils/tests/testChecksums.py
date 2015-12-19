@@ -8,10 +8,10 @@ from objutils.checksums import COMPLEMENT_NONE, COMPLEMENT_ONES, COMPLEMENT_TWOS
 class TestNiblleSums(unittest.TestCase):
 
     def testNibbleSumCase1(self):
-        self.assertEquals(nibbleSum(range(10)), 45)
+        self.assertEqual(nibbleSum(range(10)), 45)
 
     def testNibbleSumCase2(self):
-        self.assertEquals(nibbleSum(range(100)), 222)
+        self.assertEqual(nibbleSum(range(100)), 222)
 
     # check that s.split fails when the separator is not a string
     #with self.assertRaises(TypeError):
@@ -21,97 +21,97 @@ class TestNiblleSums(unittest.TestCase):
 class TestLRCs(unittest.TestCase):
 
     def testLRCCase1(self):
-        self.assertEquals(lrc(range(10), 8, COMPLEMENT_NONE), 45)
+        self.assertEqual(lrc(range(10), 8, COMPLEMENT_NONE), 45)
 
     def testLRCCase2(self):
-        self.assertEquals(lrc(range(100), 8, COMPLEMENT_NONE), 86)
+        self.assertEqual(lrc(range(100), 8, COMPLEMENT_NONE), 86)
 
     def testLRCCase3(self):
-        self.assertEquals(lrc(range(10), 8, COMPLEMENT_ONES), 210)
+        self.assertEqual(lrc(range(10), 8, COMPLEMENT_ONES), 210)
 
     def testLRCCase4(self):
-        self.assertEquals(lrc(range(100), 8, COMPLEMENT_ONES), 169)
+        self.assertEqual(lrc(range(100), 8, COMPLEMENT_ONES), 169)
 
     def testLRCCase5(self):
-        self.assertEquals(lrc(range(10), 8, COMPLEMENT_TWOS), 211)
+        self.assertEqual(lrc(range(10), 8, COMPLEMENT_TWOS), 211)
 
     def testLRCCase6(self):
-        self.assertEquals(lrc(range(100), 8, COMPLEMENT_TWOS), 170)
+        self.assertEqual(lrc(range(100), 8, COMPLEMENT_TWOS), 170)
 
     def testLRCCase7(self):
-        self.assertEquals(lrc(range(10), 16, COMPLEMENT_NONE), 45)
+        self.assertEqual(lrc(range(10), 16, COMPLEMENT_NONE), 45)
 
     def testLRCCase8(self):
-        self.assertEquals(lrc(range(100), 16, COMPLEMENT_NONE), 4950)
+        self.assertEqual(lrc(range(100), 16, COMPLEMENT_NONE), 4950)
 
     def testLRCCase9(self):
-        self.assertEquals(lrc(range(10), 16, COMPLEMENT_ONES), 65490)
+        self.assertEqual(lrc(range(10), 16, COMPLEMENT_ONES), 65490)
 
     def testLRCCase10(self):
-        self.assertEquals(lrc(range(100), 16, COMPLEMENT_ONES), 60585)
+        self.assertEqual(lrc(range(100), 16, COMPLEMENT_ONES), 60585)
 
     def testLRCCase11(self):
-        self.assertEquals(lrc(range(10), 16, COMPLEMENT_TWOS), 65491)
+        self.assertEqual(lrc(range(10), 16, COMPLEMENT_TWOS), 65491)
 
     def testLRCCase12(self):
-        self.assertEquals(lrc(range(100), 16, COMPLEMENT_TWOS), 60586)
+        self.assertEqual(lrc(range(100), 16, COMPLEMENT_TWOS), 60586)
 
     def testLRCCase13(self):
-        self.assertEquals(lrc(range(10), 32, COMPLEMENT_NONE), 45)
+        self.assertEqual(lrc(range(10), 32, COMPLEMENT_NONE), 45)
 
     def testLRCCase14(self):
-        self.assertEquals(lrc(range(100), 32, COMPLEMENT_NONE), 4950)
+        self.assertEqual(lrc(range(100), 32, COMPLEMENT_NONE), 4950)
 
     def testLRCCase15(self):
-        self.assertEquals(lrc(range(10), 32, COMPLEMENT_ONES), 4294967250)
+        self.assertEqual(lrc(range(10), 32, COMPLEMENT_ONES), 4294967250)
 
     def testLRCCase16(self):
-        self.assertEquals(lrc(range(100), 32, COMPLEMENT_ONES), 4294962345)
+        self.assertEqual(lrc(range(100), 32, COMPLEMENT_ONES), 4294962345)
 
     def testLRCCase17(self):
-        self.assertEquals(lrc(range(10), 32, COMPLEMENT_TWOS), 4294967251)
+        self.assertEqual(lrc(range(10), 32, COMPLEMENT_TWOS), 4294967251)
 
     def testLRCCase18(self):
-        self.assertEquals(lrc(range(100), 32, COMPLEMENT_TWOS), 4294962346)
+        self.assertEqual(lrc(range(100), 32, COMPLEMENT_TWOS), 4294962346)
 
 
 class TestRXORs(unittest.TestCase):
 
     def testRXORCase1(self):
-        self.assertEquals(rotatedXOR(range(10), 8, ROTATE_LEFT), 74)
+        self.assertEqual(rotatedXOR(range(10), 8, ROTATE_LEFT), 74)
 
     def testRXORCase2(self):
-        self.assertEquals(rotatedXOR(range(100), 8, ROTATE_LEFT), 66)
+        self.assertEqual(rotatedXOR(range(100), 8, ROTATE_LEFT), 66)
 
     def testRXORCase3(self):
-        self.assertEquals(rotatedXOR(range(10), 8, ROTATE_RIGHT), 186)
+        self.assertEqual(rotatedXOR(range(10), 8, ROTATE_RIGHT), 186)
 
     def testRXORCase4(self):
-        self.assertEquals(rotatedXOR(range(100), 8, ROTATE_RIGHT), 3)
+        self.assertEqual(rotatedXOR(range(100), 8, ROTATE_RIGHT), 3)
 
     def testRXORCase5(self):
-        self.assertEquals(rotatedXOR(range(10), 16, ROTATE_LEFT), 74)
+        self.assertEqual(rotatedXOR(range(10), 16, ROTATE_LEFT), 74)
 
     def testRXORCase6(self):
-        self.assertEquals(rotatedXOR(range(100), 16, ROTATE_LEFT), 66)
+        self.assertEqual(rotatedXOR(range(100), 16, ROTATE_LEFT), 66)
 
     def testRXORCase7(self):
-        self.assertEquals(rotatedXOR(range(10), 16, ROTATE_RIGHT), 186)
+        self.assertEqual(rotatedXOR(range(10), 16, ROTATE_RIGHT), 186)
 
     def testRXORCase8(self):
-        self.assertEquals(rotatedXOR(range(100), 16, ROTATE_RIGHT), 3)
+        self.assertEqual(rotatedXOR(range(100), 16, ROTATE_RIGHT), 3)
 
     def testRXORCase9(self):
-        self.assertEquals(rotatedXOR(range(10), 32, ROTATE_LEFT), 74)
+        self.assertEqual(rotatedXOR(range(10), 32, ROTATE_LEFT), 74)
 
     def testRXORCase10(self):
-        self.assertEquals(rotatedXOR(range(100), 32, ROTATE_LEFT), 66)
+        self.assertEqual(rotatedXOR(range(100), 32, ROTATE_LEFT), 66)
 
     def testRXORCase11(self):
-        self.assertEquals(rotatedXOR(range(10), 32, ROTATE_RIGHT), 186)
+        self.assertEqual(rotatedXOR(range(10), 32, ROTATE_RIGHT), 186)
 
     def testRXORCase12(self):
-        self.assertEquals(rotatedXOR(range(100), 32, ROTATE_RIGHT), 3)
+        self.assertEqual(rotatedXOR(range(100), 32, ROTATE_RIGHT), 3)
 
 
 if __name__ == '__main__':

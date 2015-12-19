@@ -35,7 +35,7 @@ import sys
 import objutils.HexFile as HexFile
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
-
+from objutils.utils import PYTHON_VERSION
 from objutils.registry import register
 
 
@@ -49,17 +49,16 @@ class Reader(HexFile.Reader):
         pass
 
     def read(self, fp):
-        lines = fp.read()
-        #match = DATA.match(lines)
-        #chunks = match.groupdict()['chunks'].strip()
-
+        if PYTHON_VERSION.major == 3:
+            lines = fp.read().decode()
+        else:
+            lines = fp.read()
         segments = []
         address = 0
         previousAddress = 0
         resultLines = []
         for line in lines.splitlines():
             match = ADDRESS.match(line)
-            #print line, match
             if match:
                 address = int(match.groupdict()['value'], 16)
                 if resultLines:
@@ -76,14 +75,19 @@ class Reader(HexFile.Reader):
         chunks = []
         for address, segment in segments:
             for line in segment:
-                chunk = bytearray(self._getByte(line))
+                #print(line)
+                #chunk = bytearray(self._getByte(line))
+                chunk = [int(ch, 16) for ch in line.split()]
+                #chunk = bytes(self._getByte(line))
                 chunks.append(Segment(address, chunk))
                 address += len(chunk)
 
         return Image(joinSegments(chunks))
 
     def _getByte(self, chunk):
+        print(chunk)
         for line in chunk.splitlines():
+            print("xxx",line)
             for ch in line.split():
                 yield chr(int(ch, 16))
 

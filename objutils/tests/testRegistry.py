@@ -12,7 +12,7 @@ class TestRegistry(unittest.TestCase):
         self.clearRegistry()
 
     def testRegistryShallBeEmpty(self):
-        self.assertEquals(objutils.registry.registry(), {})
+        self.assertEqual(objutils.registry.registry(), {})
 
     def registerSomeCodecs(self):
         for cdc in self.CODECS:
@@ -23,7 +23,7 @@ class TestRegistry(unittest.TestCase):
 
     def testRegistration(self):
         self.registerSomeCodecs()
-        self.assertEquals(sorted(objutils.registry.getFormats()), ['A', 'B', 'C', 'X', 'Y', 'Z'])
+        self.assertEqual(sorted(objutils.registry.getFormats()), ['A', 'B', 'C', 'X', 'Y', 'Z'])
 
     def testGetCodec(self):
         self.registerSomeCodecs()

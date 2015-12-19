@@ -178,7 +178,10 @@ class Reader(object):
                 self.formats.append((formatType, FormatParser(format, self.DATA_SEPARATOR).parse()))
 
     def load(self, fp, **kws):
-        return self.read(fp)
+        if PYTHON_VERSION.major == 3:
+            return self.read(fp)# .decode()
+        else:
+            return self.read(fp)
 
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
@@ -193,7 +196,10 @@ class Reader(object):
         metaData = defaultdict(list)
         for (lineNumber, line) in enumerate(fp.readlines(), 1):
             for formatType, format in self.formats:
-                match = format.match(str(line))
+                if isinstance(line, bytes):
+                    match = format.match(line.decode())
+                else:
+                    match = format.match(line)
                 if match:
                     matched = True
                     container = Container()
@@ -204,7 +210,7 @@ class Reader(object):
                         for key, value in dict_.items():
                             if key != 'chunk':
                                 setattr(container, key, atoi(value))
-                        if dict_.has_key('chunk'):
+                        if 'chunk' in dict_:
                             if self.parseData(container, formatType):
                                 chunk = bytearray(map(atoi, BYTES.findall(dict_['chunk'])))
                             else:
