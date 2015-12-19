@@ -64,7 +64,7 @@ class Reader(HexFile.Reader):
             return True
         else:
             return False
-            
+
     def calculateExtendedAddress(self, line, shiftBy, name):
             if len(line.chunk) == 2:
                 segment = ((line.chunk[0]) << 8) | (line.chunk[1])
@@ -85,22 +85,22 @@ class Reader(HexFile.Reader):
                 ip = ((line.chunk[2]) << 8) | (line.chunk[3])
                 line.addPI(('cs', cs))
                 line.addPI(('ip', ip))
-                print "START_SEGMENT_ADDRESS: %s:%s" % (hex(cs), hex(ip))
+                self.debug("START_SEGMENT_ADDRESS: {0}:{1}".format(hex(cs), hex(ip)))
             else:
-                self.error("Bad Segment Address at line #%u." % line.lineNumber)
+                self.error("Bad Segment Address at line %{0:u}.".format(line.lineNumber))
         elif line.type == EXTENDED_LINEAR_ADDRESS:
             self.calculateExtendedAddress(line, 16, "Linear")
         elif line.type == START_LINEAR_ADDRESS:
             if len(line.chunk) == 4:
                 eip = ((line.chunk[0]) << 24) | ((line.chunk[1]) << 16) | ((line.chunk[2]) << 8) | (line.chunk[3])
                 line.addPI(('eip', eip))
-                print "START_LINEAR_ADDRESS: ", hex(eip)
+                 self.debug("START_LINEAR_ADDRESS: {0}".format(hex(eip)))
             else:
                 self.error("Bad Linear Address at line #%u." % line.lineNumber)
         elif line.type == EOF:
             pass
         else:
-            self.warn("Invalid record type [%u] at line #%u" % (line.type, line.lineNumber))
+            self.warn("Invalid record type [{0:u}] at line {1:u}".format(line.type, line.lineNumber))
 
     _addressCalculator = utils.identity
 
