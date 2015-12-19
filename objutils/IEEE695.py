@@ -922,15 +922,6 @@ class Reader(object):
 
 ## $C0-$DA Variable letters (null, A-Z).
 
-def main():
-    reader = Reader(file(r'c:\projekte\csProjects\yObjl\tests\2cb_12.695', 'rb'))
-    #reader = Reader(file(r'c:\projekte\csProjects\yObjl\tests\Test.695', 'rb'))
-    #reader = Reader(file(r'c:\projekte\csProjects\yObjl\tests\1Wire.695', 'rb'))
-    print reader
-
-if __name__ == '__main__':
-    main()
-
 ## Information-Variables: s. 3
 
 """
