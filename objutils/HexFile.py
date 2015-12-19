@@ -41,12 +41,12 @@ from objutils.logger import logger
 
 
 if PYTHON_VERSION.major == 3:
-    from io import StringIO
+    from io import BytesIO as StringIO
 else:
     try:
-        import cStringIO as StringIO
+        from cStringIO import StringIO
     except ImportError:
-        import StringIO
+        from StringIO import StringIO
 
 
 '''
@@ -181,7 +181,7 @@ class Reader(object):
         return self.read(fp)
 
     def loads(self, image, **kws):
-        return self.load(StringIO.StringIO(image))
+        return self.load(StringIO(image))
 
     def read(self, fp):
         segments = []
