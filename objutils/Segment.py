@@ -47,11 +47,14 @@ class Segment(object):
 
     def __repr__(self):
         return "Segment (address: '0X%08X' length: '%d')" % (self.address, self.length)
-        
+
+    def __len__(self):
+        return self.length
+
     @property
     def length(self):
         return self._length
-        
+
     @length.setter
     def length(self, value):
         self._length = value
