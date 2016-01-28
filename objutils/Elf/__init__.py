@@ -67,31 +67,52 @@ class Alias(object):
 
 class FormatError(Exception): pass
 
+import struct
+
+
+INDENT_HEADER_FORMAT = "B" * defs.EI_NIDENT
+IndentHeaderType = namedtuple("IndentHeaderType", """e_ident0 e_ident1 e_ident2 e_ident3 e_ident4 e_ident5 e_ident6
+e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15""")  # MagicHeaderAttributes
+
+
+class Attributor(object):
+
+    def __init__(self, format, attributes, byteOrderPrefix = "@"):
+        self.format = format
+        self.length = struct.calcsize(format)
+        self.attributes = attributes
+        self.byteOrderPrefix = byteOrderPrefix
+
+    def apply(self, data, target):
+        ddd = self.attributes(*struct.unpack("{0}{1}".format(self.byteOrderPrefix, self.format), data))
+        for name, value in ddd._asdict().items():
+            setattr(target, name, value)
+
+    def __len__(self):
+        return self.length
 
 class ELFHeader(object):
+
+    magicHeader = Attributor(INDENT_HEADER_FORMAT, IndentHeaderType)
+
     def __init__(self, parent):
         self.parent = parent
-        parent.inFile.seek(0, os.SEEK_SET)
-        self.rawData = parent.inFile.read(defs.ELF_HEADER_SIZE32)
+        parent.fp.seek(0, os.SEEK_SET)
+        self.magicBytes = parent.fp.read(len(self.magicHeader))
 
-        if self.rawData[ : 4] != defs.ELF_MAGIC:
+        if self.magicBytes[ : 4] != defs.ELF_MAGIC:    # 7f 45 4c 46
             raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
 
-        self.is64Bit = (self.rawData[defs.EI_CLASS] ==  defs.ELFClass.ELFCLASS64)
-        self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(ord(self.rawData[defs.EI_DATA]))]
+        self.magicHeader.apply(self.magicBytes, self)
+        self.is64Bit = (self.elfClass ==  defs.ELFClass.ELFCLASS64)
+        self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
 
-        elfHeader = struct.unpack("{0}{1}".format(self.byteOrderPrefix, defs.HDR_FMT32), self.rawData)
-        d = defs.Elf32_Ehdr(*elfHeader)
-        for name, value in d._asdict().items():
-            setattr(self, name, value)
+        elfHeader = Attributor(defs.HDR_FMT64 if self.is64Bit else defs.HDR_FMT32, defs.Elf32_Ehdr, self.byteOrderPrefix)
+        rawData = parent.fp.read(len(elfHeader))
+        elfHeader.apply(rawData, self)
 
-        if not (self.elfEHSize == defs.ELF_HEADER_SIZE32):
+        if self.elfEHSize!= (len(self.magicHeader) + len(elfHeader)):
             raise FormatError("Wrong header size.")
-        if not (self.elfPHTEntrySize == defs.ELF_PHDR_SIZE32):
-            raise FormatError("Wrong p-header size.")
-        if not (self.elfSHTEntrySize == defs.ELF_SECTION_SIZE32):
-            raise FormatError("Wrong section size.")
-
         self.hasStringTable = not (self.elfStringTableIndex == defs.SHN_UNDEF)
 
 
@@ -101,11 +122,14 @@ class ELFHeader(object):
 
     @property
     def elfMachineName(self):
-        return defs.ELF_MACHINE_NAMES.get(defs.ELFMachineType(self.elfMachine), "<unknown>")
+        try:
+            return defs.ELF_MACHINE_NAMES.get(defs.ELFMachineType(self.elfMachine))
+        except ValueError:
+            return "<unknown>: 0x{0:04x}".format(self.elfMachine)
 
     @property
     def elfClassName(self):
-        return defs.defs.ELF_CLASS_NAMES.get(defs.ELFClass(self.elfClass), "<unknown>")
+        return defs.ELF_CLASS_NAMES.get(defs.ELFClass(self.elfClass), "<unknown>")
 
     @property
     def elfByteOrderName(self):
@@ -239,34 +263,42 @@ class ELFSymbol(object):
 
 
 class ELFSectionHeaderTable(object):
-    def __init__(self, parent, atPosition=0):
+    def __init__(self, parent, atPosition = 0):
         self.parent = parent
         self._name = None
-        parent.inFile.seek(atPosition, os.SEEK_SET)
-        data = parent.inFile.read(defs.ELF_SECTION_SIZE32)
+        parent.fp.seek(atPosition, os.SEEK_SET)
 
-        elfProgramHeaderTable = struct.unpack("{0}{1}".format(parent.byteOrderPrefix, defs.SEC_FMT32), data)
-        d = defs.Elf32_Shdr(*elfProgramHeaderTable)
-        for name, value in d._asdict().items():
-            setattr(self, name, value)
+        data = parent.fp.read(defs.ELF_SECTION_SIZE64 if parent.is64Bit else defs.ELF_SECTION_SIZE32)
+        format = defs.SEC_FMT64 if parent.is64Bit else defs.SEC_FMT32
+        attributes = defs.Elf_Shdr
 
-        #self.parent.sectionHeadersByName[name] = value
+        sectionHeader = Attributor(format, attributes, parent.byteOrderPrefix)
+        sectionHeader.apply(data, self)
+
+        if self.sh_size and self.sh_entsize:
+            self.numEntries = self.sh_size / self.sh_entsize
+        else:
+            self.numEntries = None
 
         if self.shType not in (defs.SHT_NOBITS, defs.SHT_NULL) and self.shSize > 0:
             pos = self.shOffset
-            parent.inFile.seek(pos, os.SEEK_SET)
-            self.image = parent.inFile.read(self.shSize)
+            parent.fp.seek(pos, os.SEEK_SET)
+            self.image = parent.fp.read(self.shSize)
         else:
             self.image = None
 
         if self.shType in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
             self.symbols = {}
-            for idx, symbol in enumerate(range(self.shSize / defs.ELF_SYM_TABLE_SIZE)):
-                offset = idx * defs.ELF_SYM_TABLE_SIZE
-                data = self.image[offset : offset + defs.ELF_SYM_TABLE_SIZE]
-                symData = struct.unpack("{0}{1}".format(parent.byteOrderPrefix, defs.SYMTAB_FMT), data)
-                sym = defs.Elf32_Sym(*symData)
-                self.symbols[idx] = sym
+            format = defs.SYMTAB_FMT64 if parent.is64Bit else defs.SYMTAB_FMT32
+            attributes = defs.Elf64_Sym if parent.is64Bit else defs.Elf32_Sym
+            size = defs.ELF64_SYM_TABLE_SIZE if parent.is64Bit else defs.ELF32_SYM_TABLE_SIZE
+            for idx, symbol in enumerate(range(self.shSize / size)):
+
+                offset = idx * size
+                data = self.image[offset : offset + size]
+                symbol = Attributor(format, attributes, parent.byteOrderPrefix)
+                symbol.apply(data, symbol)
+                self.symbols[idx] = symbol
 
         if self.shType in (defs.SHT_REL, defs.SHT_RELA):
             pass
@@ -336,20 +368,19 @@ class ELFSectionHeaderTable(object):
 
 class ELFProgramHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
-        parent.inFile.seek(atPosition, os.SEEK_SET)
-        data = parent.inFile.read(defs.ELF_PHDR_SIZE32)
+        parent.fp.seek(atPosition, os.SEEK_SET)
 
-        try:
-            elfProgramHeaderTable=struct.unpack("{0}{1}".format(parent.byteOrderPrefix, defs.PHDR_FMT32), data)
-        except struct.error:
-            raise FormatError("Wrong program header table.")
+        data = parent.fp.read(defs.ELF_PHDR_SIZE64 if parent.is64Bit else defs.ELF_PHDR_SIZE32)
 
-        d = defs.Elf32_Phdr(*elfProgramHeaderTable)
-        for name, value in d._asdict().items():
-            setattr(self, name, value)
-        parent.inFile.seek(d.p_offset, os.SEEK_SET)
-        self.image = parent.inFile.read(d.p_filesz)
-        if d.p_type in (defs.PT_DYNAMIC, defs.PT_INTERP, defs.PT_NOTE, defs.PT_SHLIB, defs.PT_PHDR):
+        format = defs.PHDR_FMT64 if parent.is64Bit else defs.PHDR_FMT32
+        attributes = defs.Elf64_Phdr if parent.is64Bit else defs.Elf32_Phdr
+
+        elfHeader = Attributor(format, attributes, parent.byteOrderPrefix)
+        elfHeader.apply(data, self)
+
+        parent.fp.seek(self.p_offset, os.SEEK_SET)
+        self.image = parent.fp.read(self.p_filesz)
+        if self.p_type in (defs.PT_DYNAMIC, defs.PT_INTERP, defs.PT_NOTE, defs.PT_SHLIB, defs.PT_PHDR):
             pass
 
     @property
@@ -419,18 +450,13 @@ def getSpecialSectionName(section):
         return "<section: {0}>".format(section)
 
 
-class Object(object):
-    def __init__(self, copyFrom):
-        for key, value in copyFrom._asdict().items():
-            setattr(self, key, value)
-
-
 class Reader(object):
-    def __init__(self, inFile, readContent = True):
-        if not hasattr(inFile, 'read'):
+    def __init__(self, fp, readContent = True):
+        if not hasattr(fp, 'read'):
             raise TypeError("Need a file-like object.")
-        self.inFile = inFile
+        self.fp = fp
         self.header = ELFHeader(self)
+        self.is64Bit = self.header.is64Bit
 
         self.programHeaders = []
         self.sectionHeaders = []
@@ -452,8 +478,7 @@ class Reader(object):
         for idx, sectionHeader in enumerate(self.sectionHeaders):
             if sectionHeader.shType in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
                 for _, symbol in sectionHeader.symbols.items():
-                    o = Object(symbol)
-                    o.sectionName = getSpecialSectionName(symbol.st_shndx)
+                    symbol.sectionName = getSpecialSectionName(symbol.st_shndx)
             elif sectionHeader.shType in (defs.SHT_REL, defs.SHT_RELA):
                 symtab = sectionHeader.shLink
                 sectionToModify = sectionHeader.shInfo

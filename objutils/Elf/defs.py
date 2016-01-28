@@ -74,20 +74,38 @@ typedef Elf32_Half Elf32_Versym;
 typedef Elf64_Half Elf64_Versym;
 """
 
+"""
+Elf64_Addr      8 8 Unsigned program address
+Elf64_Off       8 8 Unsigned file offset
+Elf64_Half      2 2 Unsigned medium integer
+Elf64_Word      4 4 Unsigned integer
+Elf64_Sword     4 4 Signed integer
+Elf64_Xword     8 8 Unsigned long integer
+Elf64_Sxword    8 8 Signed long integer
+unsigned char   1 1 Unsigned small integer
+
+typedef struct
+{
+    Elf64_Word st_name; /* Symbol name */
+    unsigned char st_info; /* Type and Binding attributes */
+    unsigned char st_other; /* Reserved */
+    Elf64_Half st_shndx; /* Section table index */
+    Elf64_Addr st_value; /* Symbol value */
+    Elf64_Xword st_size; /* Size of object (e.g., common) */
+} Elf64_Sym
+
+IBBHQQ
+"""
+
 ELF_MAGIC = '\x7fELF'
 
 EI_NIDENT = 16        # Size of e_ident[].
+HDR_FMT32 = "HHIIIIIHHHHHH"
+HDR_FMT64 = "HHIQQQIHHHHHH"
 
-HDR_FMT32 = "B" * EI_NIDENT + "HHIIIIIHHHHHH"
 
-ELF_HEADER_SIZE32 = struct.calcsize(HDR_FMT32)
-
-assert(struct.calcsize(HDR_FMT32) == 52)    # todo: Unittest!!!
-
-Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_ident0 e_ident1 e_ident2 e_ident3 e_ident4 e_ident5 e_ident6
-    e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15
-    e_type e_machine e_version e_entry e_phoff e_shoff e_flags e_ehsize e_phentsize e_phnum
-    e_shentsize e_shnum e_shstrndx""")
+Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_type e_machine e_version e_entry e_phoff e_shoff e_flags e_ehsize
+                        e_phentsize e_phnum e_shentsize e_shnum e_shstrndx""")
 
 class ELFType(enum.IntEnum):
     ET_NONE     = 0
@@ -182,7 +200,7 @@ class ELFMachineType(enum.IntEnum):
     EM_ME16         =  59     # Toyota ME16 processor.
     EM_ST100        =  60     # STMicroelectronics ST100 processor.
     EM_TINYJ        =  61     # Advanced Logic Corp. TinyJ embedded processor family.
-    EM_X8664        =  62     # AMD x86-64 architecture.
+    EM_X8664        =  62     # Advanced Micro Devices X86-64.
     EM_PDSP         =  63     # Sony DSP Processor.
     EM_PDP10        =  64     # DEC PDP-10
     EM_PDP11        =  65     # DEC PDP-11
@@ -275,6 +293,7 @@ class ELFMachineType(enum.IntEnum):
     EM_ETPU         = 178     # Freescale Extended Time Processing Unit.
     EM_SLE9X        = 179     # Infineon Technologies SLE9X core.
     EM_L1OM         = 180     # Intel L1OM.
+    EM_AARCH64      = 183
     EM_AVR32        = 185     # Atmel Corporation 32-bit microprocessor family.
     EM_STM8         = 186     # STMicroeletronics STM8 8-bit microcontroller.
     EM_TILE64       = 187     # Tilera TILE64 multicore architecture family.
@@ -289,6 +308,7 @@ class ELFMachineType(enum.IntEnum):
     EM_DLX                  = 0x5aa5  # DLX magic number.  Written in the absense of an ABI.
     EM_CYGNUS_FRV           = 0x5441  # FRV magic number - no EABI available??.
     EM_XC16X                = 0x4688  # Infineon Technologies 16-bit microcontroller with C166-V2 core.
+    EM_NEC_V850             = 0x723e  # V850ES/FJ3 /w NEC compiler.
     EM_CYGNUS_D10V          = 0x7650  # D10V backend magic number.  Written in the absence of an ABI.
     EM_CYGNUS_D30V          = 0x7676  # D30V backend magic number.  Written in the absence of an ABI.
     EM_IP2K_OLD             = 0x8217  # Ubicom IP2xxx;   Written in the absense of an ABI.
@@ -357,7 +377,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_ME16          : "Toyota ME16 processor.",
     ELFMachineType.EM_ST100         : "STMicroelectronics ST100 processor.",
     ELFMachineType.EM_TINYJ         : "Advanced Logic Corp. TinyJ embedded processor family.",
-    ELFMachineType.EM_X8664         : "AMD x86-64 architecture.",
+    ELFMachineType.EM_X8664         : "Advanced Micro Devices X86-64",
     ELFMachineType.EM_PDSP          : "Sony DSP Processor.",
     ELFMachineType.EM_PDP10         : "DEC PDP-10",
     ELFMachineType.EM_PDP11         : "DEC PDP-11",
@@ -450,6 +470,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_ETPU          : 'Freescale Extended Time Processing Unit.',
     ELFMachineType.EM_SLE9X         : 'Infineon Technologies SLE9X core.',
     ELFMachineType.EM_L1OM          : 'Intel L1OM.',
+    ELFMachineType.EM_AARCH64       : 'EM_AArch64',
     ELFMachineType.EM_AVR32         : 'Atmel Corporation 32-bit microprocessor family.',
     ELFMachineType.EM_STM8          : 'STMicroeletronics STM8 8-bit microcontroller.',
     ELFMachineType.EM_TILE64        : 'Tilera TILE64 multicore architecture family.',
@@ -464,6 +485,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_DLX           : 'DLX',
     ELFMachineType.EM_CYGNUS_FRV    : 'Cygnus FRV',
     ELFMachineType.EM_XC16X         : 'Infineon C166-V2 core.',
+    ELFMachineType.EM_NEC_V850      : 'V850ES/FJ3 (NEC compiler)',
     ELFMachineType.EM_CYGNUS_D10V   : 'Cygnus D10V',
     ELFMachineType.EM_CYGNUS_D30V   : 'Cygnus D30V',
     ELFMachineType.EM_IP2K_OLD      : 'Ubicom IP2xxx',
@@ -561,10 +583,12 @@ class ELFAbiType(enum.IntEnum):
 ##
 
 SEC_FMT32 = "IIIIIIIIII"
-
 ELF_SECTION_SIZE32 = struct.calcsize(SEC_FMT32)
 
-Elf32_Shdr = namedtuple("Elf32_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
+SEC_FMT64 = "IIQQQQIIQQ"
+ELF_SECTION_SIZE64 = struct.calcsize(SEC_FMT64)
+
+Elf_Shdr = namedtuple("Elf_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset sh_size
     sh_link sh_info sh_addralign sh_entsize"""
 )
 
@@ -604,6 +628,10 @@ SHN_HIRESERVE   = 0xffff
     # the values do not reference the section header table.That is, the section header
     # table does not contain entries for the  reserved indexes.
 
+SHN_IA_64_ANSI_COMMON   = 0xFF00
+    # This section only used by HP-UX, The HP linker gives weak symbols
+    # precedence over regular common symbols.  We want common to override
+    # weak.  Using this common instead of SHN_COMMON does that.
 
 SHT_NULL            = 0             # Section header table entry unused.
 SHT_PROGBITS        = 1             # Program data.
@@ -673,11 +701,14 @@ SHF_EXCLUDE             = 2147483648    # Section is excluded unless referenced 
 ##
 ##
 
-SYMTAB_FMT = "IIIBBH"
+SYMTAB_FMT32 = "IIIBBH"
+SYMTAB_FMT64 = "IBBHQQ"
 
-Elf32_Sym = namedtuple("Elf32_Sym", "st_name st_value st_size st_info st_other st_shndx")
+Elf32_Sym = namedtuple("Elf_Sym", "st_name st_value st_size st_info st_other st_shndx")
+Elf64_Sym = namedtuple("Elf_Sym", "st_name st_info st_other st_shndx st_value st_size")
 
-ELF_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT)
+ELF32_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT32)
+ELF64_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT64)
 
 STN_UNDEF           = 0
 
@@ -696,6 +727,11 @@ STT_FILE            = 4
 STT_LOPROC          = 13
 STT_HIPROC          = 15
 
+# Symbol visibility specification encoded in the st_other field.
+STV_DEFAULT         = 0 # Default symbol visibility rules
+STV_INTERNAL        = 1 # Processor specific hidden class
+STV_HIDDEN          = 2 # Sym unavailable in other modules
+STV_PROTECTED       = 3 # Not preemptible, not exported
 
 ##
 ##
@@ -720,8 +756,11 @@ Elf32_Rela  = namedtuple("Elf32_Rela", "r_offset r_info r_addend")
 PHDR_FMT32 = "IIIIIIII"
 
 ELF_PHDR_SIZE32   = struct.calcsize(PHDR_FMT32)
-
 Elf32_Phdr      = namedtuple("Elf32_Phdr", "p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
+
+Elf64_Phdr      = namedtuple("Elf32_Phdr", "p_type p_flags p_offset p_vaddr p_paddr p_filesz p_memsz p_align")
+PHDR_FMT64 = "IIQQQQQQ"
+ELF_PHDR_SIZE64   = struct.calcsize(PHDR_FMT64)
 
 
 PT_NULL             = 0             # Program header table entry unused.
