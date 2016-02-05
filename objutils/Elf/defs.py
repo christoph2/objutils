@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
