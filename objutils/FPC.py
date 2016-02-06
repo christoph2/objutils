@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -36,10 +36,10 @@ EOF         = 4
 
 
 FORMATS=(
-    (DATA_ABS,"CCLL0000AAAAAAAADD"),
-    (DATA_INC,"CCLL0001DD"),
-    (DATA_REL,"CCLL0002AAAAAAAADD"),
-    (EOF,"00000000")
+    (DATA_ABS,  "CCLL0000AAAAAAAADD"),
+    (DATA_INC,  "CCLL0001DD"),
+    (DATA_REL,  "CCLL0002AAAAAAAADD"),
+    (EOF,       "00000000")
 )
 
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
@@ -53,7 +53,7 @@ def cs32(val):  # todo: universelle Funktion (in 'HexFile') !!!
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile, dataSep=None):
+    def __init__(self, inFile, dataSep = None):
         self.lastAddress = 0
         outLines = []
         for inLine in inFile.readlines():
@@ -96,7 +96,7 @@ class Reader(HexFile.Reader):
             checksum += 1
             line.address = self.lastAddress
         elif formatType == DATA_REL:
-            raise NotImplementedError("relative adressing not supported.")  # FIXME!
+            self.error("relative adressing not supported.")
             checksum += 2
         checksum += cs32(line.address)
         checksum += reduce(operator.add, line.chunk)
@@ -106,19 +106,4 @@ class Reader(HexFile.Reader):
 
     def isDataLine(self, line, formatType):
         return formatType in (DATA_ABS, DATA_INC, DATA_REL)
-
-
-
-ids =[0x752, 0x142, 0x44a]
-
-import math
-
-def calc(ids):
-    '''Offline calculation of local MSCAN priorities.'''
-    ids = sorted(ids)
-    l, r = min(ids), max(ids)
-    slope = (r - l) / 255.0
-    def fun(id):
-        return int(math.ceil((id - l) / slope))
-    return fun
 

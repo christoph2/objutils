@@ -440,7 +440,7 @@ class ELFProgramHeaderTable(object):
             0x6474e550  : 'GNU_EH_FRAME',
             0x6474e551  : 'GNU_STACK',
             0x6474e552  : 'GNU_RELRO',
-            0x6ffffffa  : 'LOSUNW',
+            #0x6ffffffa  : 'LOSUNW',
             0x6ffffffa  : 'SUNWBSS',
             0x6ffffffb  : 'SUNWSTACK',
             0x6fffffff  : 'HIOS',

@@ -926,7 +926,7 @@ class ELFReader(object):
                     print(" "),
                 else:
                     print("{0:3}".format(flags))
-                print("{0:2d} {1:3d} {0:2d}".format(section.shLink, section.shInfo, section.shAddressAlign))
+                print("{0:2d} {1:3d} {2:2d}".format(section.shLink, section.shInfo, section.shAddressAlign))
             elif self.doSectionDetails:
                 print("       {0:<15s}  {1:016x}  {2:016x}  {3:d}".format(section.shTypeName, section.shAddress, section.shOffset, section.shLink))
                 print("       {0:016x} {1:016x}  {2:<16d}  {3:d}".format(section.shSize, section.shEntitySize, section.shInfo, section.shAddressAlign))
@@ -955,7 +955,6 @@ class ELFReader(object):
 ##  I (info), L (link order), G (group), T (TLS), E (exclude), x (unknown)
 ##  O (extra OS processing required) o (OS specific), p (processor specific)""")
 ##
-            pass
 
     def printSymbols(self):
         if not self.reader.header.is64Bit:
@@ -1195,12 +1194,12 @@ def getSymbolIndexType(header, _type):
 
 
 def printInfoData(reader):
-    for header in filter(lambda x: x.shType == defs.SHT_NOTE, reader.sectionHeaders):
+    for header in [x for x in reader.sectionHeaders if x.shType == defs.SHT_NOTE]:
         img=header.image
 
 
 def printRelocationData(reader):
-    for header in filter(lambda x: x.shType in (defs.SHT_REL, defs.SHT_RELA), reader.sectionHeaders):
+    for header in [x for x in reader.sectionHeaders if x.shType in (defs.SHT_REL, defs.SHT_RELA)]:
         if header.shType == defs.SHT_REL:
             entrySize = defs.ELF_RELOCATION_SIZE
         else:
