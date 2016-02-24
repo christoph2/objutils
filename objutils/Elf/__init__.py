@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -26,7 +26,7 @@ __copyright__ = """
 """
 
 import enum
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import mmap
 import os
 import sys
@@ -540,6 +540,7 @@ class Reader(object):
             name = self.getString(self.header.elfStringTableIndex, section.shNameIdx)
             section._name = name
             self._sectionHeadersByName[name] = section
+        self.createSectionToSegmentMapping()
 
     def sectionHeaderByName(self, name):
         return self._sectionHeadersByName.get(name)
@@ -552,6 +553,17 @@ class Reader(object):
             terminatedString = unterminatedString[ : unterminatedString.index('\x00')]
             self._stringCache[(tableIndex,entry)] = terminatedString
             return terminatedString
+
+    def createSectionToSegmentMapping(self):
+        mapping = OrderedDict()
+        for idx in range(self.header.e_phnum):
+            segment = self.programHeaders[idx]
+            mapping[segment] = []
+            for j in range(self.header.e_shnum):
+                section = self.sectionHeaders[j]
+                if not tbssSpecial(section, segment) and sectioInSegmentStrict(section, segment):
+                    mapping[segment].append(section)
+        self.sectionsToSegments = mapping
 
     @property
     def byteOrderPrefix(self):

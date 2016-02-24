@@ -59,46 +59,48 @@ def getMachineFlags(flags, machine):
 ##
 ##
 
-def tbssSpecial(sectionHeader, segment):
-   return ((sectionHeader.sh_flags & defs.SHF_TLS) != 0 and sectionHeader.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS)
-
-def sectionSize(sectionHeader, segment):
-    return 0 if tbssSpecial(sectionHeader, segment) else sectionHeader.sh_size
-
-def sectionInSegment1(sectionHeader, segment, check_vma, strict):
-    hasOffset = False
-    validSegment = False
-    hasVMA = False
-    hasDynamicSize = False
-
-    validSegment =((sectionHeader.sh_flags & defs.SHF_TLS) != 0) and (segment.p_type == defs.PT_TLS or segment.p_type == defs.PT_GNU_RELRO \
-        or segment.p_type == defs.PT_LOAD) or \
-        ((sectionHeader.sh_flags & defs.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and segment.p_type != defs.PT_PHDR)
-    hasOffset = sectionHeader.sh_type == defs.SHT_NOBITS \
-        or (sectionHeader.sh_offset >= segment.p_offset \
-        and (not strict or (sectionHeader.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
-        and ((sectionHeader.sh_offset - segment.p_offset + sectionSize(sectionHeader, segment)) <= (segment.p_filesz)))
-    hasVMA = (not check_vma or (sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 or (sectionHeader.sh_addr >= segment.p_vaddr \
-        and (not strict or (sectionHeader.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)) \
-        and ((sectionHeader.sh_addr - segment.p_vaddr + sectionSize(sectionHeader, segment)) <= segment.p_memsz))
-    )
-    hasDynamicSize = (segment.p_type != defs.PT_DYNAMIC or sectionHeader.sh_size != 0 or segment.p_memsz == 0 \
-        or ((sectionHeader.sh_type == defs.SHT_NOBITS or (sectionHeader.sh_offset > segment.p_offset \
-        and (sectionHeader.sh_offset - segment.p_offset < segment.p_filesz))) \
-        and ((sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 \
-        or (sectionHeader.sh_addr > segment.p_vaddr \
-        and (sectionHeader.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
-    )
-
-    result = validSegment and hasOffset and hasVMA and hasDynamicSize
-    return result
-
-
-def sectionInSegment(sectionHeader, segment):
-    return sectionInSegment1(sectionHeader, segment, 1, 0)
-
-def sectioInSegmentStrict(sectionHeader, segment):
-    return sectionInSegment1(sectionHeader, segment, 1, 1)
+##
+##def tbssSpecial(sectionHeader, segment):
+##   return ((sectionHeader.sh_flags & defs.SHF_TLS) != 0 and sectionHeader.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS)
+##
+##def sectionSize(sectionHeader, segment):
+##    return 0 if tbssSpecial(sectionHeader, segment) else sectionHeader.sh_size
+##
+##def sectionInSegment1(sectionHeader, segment, check_vma, strict):
+##    hasOffset = False
+##    validSegment = False
+##    hasVMA = False
+##    hasDynamicSize = False
+##
+##    validSegment =((sectionHeader.sh_flags & defs.SHF_TLS) != 0) and (segment.p_type == defs.PT_TLS or segment.p_type == defs.PT_GNU_RELRO \
+##        or segment.p_type == defs.PT_LOAD) or \
+##        ((sectionHeader.sh_flags & defs.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and segment.p_type != defs.PT_PHDR)
+##    hasOffset = sectionHeader.sh_type == defs.SHT_NOBITS \
+##        or (sectionHeader.sh_offset >= segment.p_offset \
+##        and (not strict or (sectionHeader.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
+##        and ((sectionHeader.sh_offset - segment.p_offset + sectionSize(sectionHeader, segment)) <= (segment.p_filesz)))
+##    hasVMA = (not check_vma or (sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 or (sectionHeader.sh_addr >= segment.p_vaddr \
+##        and (not strict or (sectionHeader.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)) \
+##        and ((sectionHeader.sh_addr - segment.p_vaddr + sectionSize(sectionHeader, segment)) <= segment.p_memsz))
+##    )
+##    hasDynamicSize = (segment.p_type != defs.PT_DYNAMIC or sectionHeader.sh_size != 0 or segment.p_memsz == 0 \
+##        or ((sectionHeader.sh_type == defs.SHT_NOBITS or (sectionHeader.sh_offset > segment.p_offset \
+##        and (sectionHeader.sh_offset - segment.p_offset < segment.p_filesz))) \
+##        and ((sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 \
+##        or (sectionHeader.sh_addr > segment.p_vaddr \
+##        and (sectionHeader.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
+##    )
+##
+##    result = validSegment and hasOffset and hasVMA and hasDynamicSize
+##    return result
+##
+##
+##def sectionInSegment(sectionHeader, segment):
+##    return sectionInSegment1(sectionHeader, segment, 1, 0)
+##
+##def sectioInSegmentStrict(sectionHeader, segment):
+##    return sectionInSegment1(sectionHeader, segment, 1, 1)
+##
 
 ##
 ##
@@ -795,15 +797,10 @@ class ELFReader(object):
         if self.doSegments and reader.sectionHeaders:   # and reader.stringTable
             print("\n Section to Segment mapping:")
             print("  Segment Sections...")
-            for idx in range(reader.header.e_phnum):
-                #print("   %2.2d     " % idx)
-                slist = []
-                segment = self.reader.programHeaders[idx]
-                for j in range(reader.header.e_shnum):
-                    section = self.reader.sectionHeaders[j]
-                    if not tbssSpecial (section, segment) and sectioInSegmentStrict(section, segment):
-                        slist.append(section.shName)
-                print("   {0:02d}     {1}".format(idx, " ".join(slist)))
+            sectionsToSegments = reader.sectionsToSegments
+
+            for idx, entry in enumerate(sectionsToSegments.values()):
+                print("   {0:02d}     {1}".format(idx, " ".join([x.shName for x in entry])))
 
     def printSectionsHeaders(self, reader):
         if not self.reader.header.e_shnum:
@@ -1221,6 +1218,9 @@ def printELFInfo(f):
 
 
 import sys
+
+sys.argv.append("-Hlt")
+sys.argv.append(r"C:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile_class_func")
 
 def main():
     reader = ELFReader()
