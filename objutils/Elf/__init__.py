@@ -75,47 +75,6 @@ IndentHeaderType = namedtuple("IndentHeaderType", """e_ident0 e_ident1 e_ident2 
 e_ident7 e_ident8 e_ident9 e_ident10 e_ident11 e_ident12 e_ident13 e_ident14 e_ident15""")  # MagicHeaderAttributes
 
 
-def tbssSpecial(sectionHeader, segment):
-   return ((sectionHeader.sh_flags & defs.SHF_TLS) != 0 and sectionHeader.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS)
-
-def sectionSize(sectionHeader, segment):
-    return 0 if tbssSpecial(sectionHeader, segment) else sectionHeader.sh_size
-
-def sectionInSegment1(sectionHeader, segment, check_vma, strict):
-    hasOffset = False
-    validSegment = False
-    hasVMA = False
-    hasDynamicSize = False
-
-    validSegment =((sectionHeader.sh_flags & defs.SHF_TLS) != 0) and (segment.p_type == defs.PT_TLS or segment.p_type == defs.PT_GNU_RELRO \
-        or segment.p_type == defs.PT_LOAD) or \
-        ((sectionHeader.sh_flags & defs.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and segment.p_type != defs.PT_PHDR)
-    hasOffset = sectionHeader.sh_type == defs.SHT_NOBITS \
-        or (sectionHeader.sh_offset >= segment.p_offset \
-        and (not strict or (sectionHeader.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
-        and ((sectionHeader.sh_offset - segment.p_offset + sectionSize(sectionHeader, segment)) <= (segment.p_filesz)))
-    hasVMA = (not check_vma or (sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 or (sectionHeader.sh_addr >= segment.p_vaddr \
-        and (not strict or (sectionHeader.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)) \
-        and ((sectionHeader.sh_addr - segment.p_vaddr + sectionSize(sectionHeader, segment)) <= segment.p_memsz))
-    )
-    hasDynamicSize = (segment.p_type != defs.PT_DYNAMIC or sectionHeader.sh_size != 0 or segment.p_memsz == 0 \
-        or ((sectionHeader.sh_type == defs.SHT_NOBITS or (sectionHeader.sh_offset > segment.p_offset \
-        and (sectionHeader.sh_offset - segment.p_offset < segment.p_filesz))) \
-        and ((sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 \
-        or (sectionHeader.sh_addr > segment.p_vaddr \
-        and (sectionHeader.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
-    )
-
-    result = validSegment and hasOffset and hasVMA and hasDynamicSize
-    return result
-
-
-def sectionInSegment(sectionHeader, segment):
-    return sectionInSegment1(sectionHeader, segment, 1, 0)
-
-def sectioInSegmentStrict(sectionHeader, segment):
-    return sectionInSegment1(sectionHeader, segment, 1, 1)
-
 class Attributor(object):
 
     def __init__(self, format, attributes, byteOrderPrefix = "@"):
@@ -561,9 +520,50 @@ class Reader(object):
             mapping[segment] = []
             for j in range(self.header.e_shnum):
                 section = self.sectionHeaders[j]
-                if not tbssSpecial(section, segment) and sectioInSegmentStrict(section, segment):
+                if not self.tbssSpecial(section, segment) and self.sectioInSegmentStrict(section, segment):
                     mapping[segment].append(section)
         self.sectionsToSegments = mapping
+
+    def tbssSpecial(self, sectionHeader, segment):
+       return ((sectionHeader.sh_flags & defs.SHF_TLS) != 0 and sectionHeader.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS)
+
+    def sectionSize(self, sectionHeader, segment):
+        return 0 if self.tbssSpecial(sectionHeader, segment) else sectionHeader.sh_size
+
+    def sectionInSegment1(self, sectionHeader, segment, check_vma, strict):
+        hasOffset = False
+        validSegment = False
+        hasVMA = False
+        hasDynamicSize = False
+
+        validSegment =((sectionHeader.sh_flags & defs.SHF_TLS) != 0) and (segment.p_type == defs.PT_TLS or segment.p_type == defs.PT_GNU_RELRO \
+            or segment.p_type == defs.PT_LOAD) or \
+            ((sectionHeader.sh_flags & defs.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and segment.p_type != defs.PT_PHDR)
+        hasOffset = sectionHeader.sh_type == defs.SHT_NOBITS \
+            or (sectionHeader.sh_offset >= segment.p_offset \
+            and (not strict or (sectionHeader.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
+            and ((sectionHeader.sh_offset - segment.p_offset + self.sectionSize(sectionHeader, segment)) <= (segment.p_filesz)))
+        hasVMA = (not check_vma or (sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 or (sectionHeader.sh_addr >= segment.p_vaddr \
+            and (not strict or (sectionHeader.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)) \
+            and ((sectionHeader.sh_addr - segment.p_vaddr + self.sectionSize(sectionHeader, segment)) <= segment.p_memsz))
+        )
+        hasDynamicSize = (segment.p_type != defs.PT_DYNAMIC or sectionHeader.sh_size != 0 or segment.p_memsz == 0 \
+            or ((sectionHeader.sh_type == defs.SHT_NOBITS or (sectionHeader.sh_offset > segment.p_offset \
+            and (sectionHeader.sh_offset - segment.p_offset < segment.p_filesz))) \
+            and ((sectionHeader.sh_flags & defs.SHF_ALLOC) == 0 \
+            or (sectionHeader.sh_addr > segment.p_vaddr \
+            and (sectionHeader.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
+        )
+
+        result = validSegment and hasOffset and hasVMA and hasDynamicSize
+        return result
+
+
+    def sectionInSegment(self, sectionHeader, segment):
+        return self.sectionInSegment1(sectionHeader, segment, 1, 0)
+
+    def sectioInSegmentStrict(self, sectionHeader, segment):
+        return self.sectionInSegment1(sectionHeader, segment, 1, 1)
 
     @property
     def byteOrderPrefix(self):
