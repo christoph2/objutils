@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -34,6 +34,7 @@ import types
 import struct
 
 from objutils.Elf import defs
+from objutils.logger import Logger
 
 
 #
@@ -451,7 +452,44 @@ def getSpecialSectionName(section):
 
 
 class Relocation(object):
-    pass
+
+    def __init__(self, is64Bit):
+        self.is64Bit = is64Bit
+
+    def _getSymbol(self):
+        if self.is64Bit:
+            return
+        else:
+            return
+
+    def _getType(self):
+        if self.is64Bit:
+            return
+        else:
+            return
+
+    def _getInfo(self):
+        if self.is64Bit:
+            return
+        else:
+            return
+
+    symbol = property(_getSymbol)
+    type = property(_getType)
+    info = property(_getInfo)
+
+    """
+    r_offset r_info r_addend
+
+    #define ELF32_R_SYM(val)                ((val) >> 8)
+    #define ELF32_R_TYPE(val)               ((val) & 0xff)
+    #define ELF32_R_INFO(sym, type)         (((sym) << 8) + ((type) & 0xff))
+
+    #define ELF64_R_SYM(i)                  ((i) >> 32)
+    #define ELF64_R_TYPE(i)                 ((i) & 0xffffffff)
+    #define ELF64_R_INFO(sym,type)          ((((Elf64_Xword) (sym)) << 32) + (type))
+    """
+
 
 class Reader(object):
     def __init__(self, fp, readContent = True):
@@ -465,6 +503,8 @@ class Reader(object):
         self.sectionHeaders = []
         self._sectionHeadersByName = {}
         self._stringCache = {}
+
+        self.logger = Logger("ELF")
 
         pos = self.header.e_phoff
         if pos:
@@ -498,7 +538,7 @@ class Reader(object):
                 img = sectionHeader.image
                 for pos in range(len(img) / entrySize):
                     data = img[offset : offset + entrySize]
-                    reloc = Relocation()
+                    reloc = Relocation(self.is64Bit)
                     elfRelocation.apply(data, reloc)
                     offset += entrySize
             elif sectionHeader == defs.SHT_NOTE:

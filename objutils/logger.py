@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -28,34 +28,38 @@ __copyright__ = """
 
 import logging
 
-LOGGER_NAME = 'knxReTk'
-DEPHAULT_LEVEL = logging.NOTSET
-PHORMAT = "[%(levelname)s]: %(message)s"
 
-try:
-    logger
-except NameError:
-    # Create logger if it doesn't exist.
-    logger = logging.getLogger(LOGGER_NAME)
-    logger.setLevel(DEPHAULT_LEVEL)
-    handler = logging.StreamHandler()
-    handler.setLevel(DEPHAULT_LEVEL)
-    formatter = logging.Formatter(PHORMAT)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+class Logger(object):
 
-def defaultLevel():
-    logger.setLevel(logging.WARNING)
+    LOGGER_BASE_NAME = 'objutils'
+    FORMAT = "[%(levelname)s (%(name)s)]: %(message)s"
 
-def verboseLevel():
-    logger.setLevel(logging.DEBUG)
+    def __init__(self, name, level = logging.WARN):
+        self.logger = logging.getLogger("{0}.{1}".format(self.LOGGER_BASE_NAME, name))
+        self.logger.setLevel(level)
+        handler = logging.StreamHandler()
+        handler.setLevel(level)
+        formatter = logging.Formatter(self.FORMAT)
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
 
-def silentLevel():
-    logger.setLevel(logging.CRITICAL)
+    def log(self, message, level):
+        self.logger.log(level, "{0}".format(message))
 
-def alsoLogToFile(fname):
-    pass
+    def info(self, message):
+        self.log(message, logging.INFO)
 
-def doNotLogToFile(fname):
-    pass
+    def warn(self, message):
+        self.log(message, logging.WARN)
 
+    def error(self, message):
+        self.log(message, logging.ERROR)
+
+    def critical(self, message):
+        self.log(message, logging.CRITICAL)
+
+    def verbose(self):
+        self.logger.setLevel(logging.DEBUG)
+
+    def silent(self):
+        self.logger.setLevel(logging.CRITICAL)

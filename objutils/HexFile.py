@@ -37,7 +37,7 @@ from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
 from objutils.utils import slicer, PYTHON_VERSION
-from objutils.logger import logger
+from objutils.logger import Logger
 
 
 if PYTHON_VERSION.major == 3:
@@ -167,9 +167,9 @@ class Container(object):
 class Reader(object):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
-    logger = logger
 
     def __init__(self):
+        self.logger = Logger("Reader")
         if isinstance(self.FORMAT_SPEC, str):
             self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
@@ -356,4 +356,76 @@ class Writer(object):
     def hexBytes(row, spaced = False):
         spacer = ' ' if spaced else ''
         return spacer.join(["%02X" % x for x in row])
+
+
+class ASCIIHexReader(Reader):
+    HEADER_PATTERN = None
+    FOOTER_PATTERN = None
+    DATA_PATTERN = "(?:[0-9a-zA-Z]{2}[{0}]?)*"
+
+    def __init__(self, separators = ' '):
+        self.separators = separators
+        self.dataPattern = Reader.DATA_PATTERN.format(separators)
+
+    def read(self, fp):
+        if PYTHON_VERSION.major == 3:
+            lines = fp.read().decode()
+        else:
+            lines = fp.read()
+        segments = []
+        address = 0
+        previousAddress = 0
+        resultLines = []
+        for line in lines.splitlines():
+            match = ADDRESS.match(line)
+            if match:
+                address = int(match.groupdict()['value'], 16)
+                if resultLines:
+                        segments.append((previousAddress, resultLines))
+                previousAddress = address
+                resultLines = []
+            else:
+                if not line.startswith('q'):
+                    resultLines.append(line)
+
+            if resultLines:
+                segments.append((address, resultLines))
+
+            chunks = []
+            for address, segment in segments:
+                for line in segment:
+                    #print(line)
+                    #chunk = bytearray(self._getByte(line))
+                    chunk = [int(ch, 16) for ch in line.split()]
+                    #chunk = bytes(self._getByte(line))
+                    chunks.append(Segment(address, chunk))
+                    address += len(chunk)
+
+            return Image(joinSegments(chunks))
+
+        def _getByte(self, chunk):
+            print(chunk)
+            for line in chunk.splitlines():
+                print("xxx",line)
+                for ch in line.split():
+                    yield chr(int(ch, 16))
+
+
+class ASCIIHexWriter(Writer):
+
+    MAX_ADDRESS_BITS = 16
+    previousAddress = None
+
+    def composeRow(self, address, length, row):
+        prependAddress =  True if address != self.previousAddress else False
+        self.previousAddress = (address + length)
+        if prependAddress:
+            line = "{0}\n{1}".format("@{0:04X}".format(address), " ".join(["{0:02X}".format(x) for x in row]))
+        else:
+            line = " ".join(["{0:02X}".format(x) for x in row])
+        return line
+
+    def composeFooter(self, meta):
+        line = "q\n"
+        return line
 

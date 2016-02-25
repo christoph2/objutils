@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -32,7 +32,7 @@ from datetime import datetime
 import os
 import sys
 
-from objutils.logger import logger
+from objutils.logger import Logger
 
 """
 $00-$7F     Simple number in the range 0 to 127, or 7-bit ASCII string with length 0 to 127.
@@ -303,11 +303,10 @@ class Section(object):
 
 class Reader(object):
 
-    logger = logger
-
     def __init__(self, inFile):
         if not hasattr(inFile, 'read'):
             raise TypeError("Need a file-like object.")
+        self.logger = Logger("IEEE695")
         self.inFile = inFile
         self.info = Info()
         self.info.ASWs={}
