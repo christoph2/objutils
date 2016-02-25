@@ -25,5 +25,6 @@ setup(
 	'console_scripts': [
 		'readelf.py = objutils.tools.readelf:main',
         ],    
+    }
 )
 
