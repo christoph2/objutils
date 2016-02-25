@@ -740,15 +740,22 @@ STV_PROTECTED       = 3 # Not preemptible, not exported
 ##   ELF Relocation.
 ##
 ##
-REL_FMT = "II"
+REL_FMT32 = "II"
+RELA_FMT32 = "IIi"
 
-RELA_FMT = "IIi"
+ELF_RELOCATION_SIZE32     = struct.calcsize(REL_FMT32)
+ELF_RELOCATION_A_SIZE32   = struct.calcsize(RELA_FMT32)
 
-ELF_RELOCATION_SIZE     = struct.calcsize(REL_FMT)
-ELF_RELOCATION_A_SIZE   = struct.calcsize(RELA_FMT)
+##
+#
+REL_FMT64 = "QQ"
+RELA_FMT64 = "QQq"
 
-Elf32_Rel   = namedtuple("Elf32_Rel", "r_offset r_info")
-Elf32_Rela  = namedtuple("Elf32_Rela", "r_offset r_info r_addend")
+ELF_RELOCATION_SIZE64     = struct.calcsize(REL_FMT64)
+ELF_RELOCATION_A_SIZE64   = struct.calcsize(RELA_FMT64)
+
+Elf_Rel   = namedtuple("Elf_Rel", "r_offset r_info")
+Elf_Rela  = namedtuple("Elf_Rela", "r_offset r_info r_addend")
 
 ##
 ##

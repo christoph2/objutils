@@ -450,6 +450,9 @@ def getSpecialSectionName(section):
         return "<section: {0}>".format(section)
 
 
+class Relocation(object):
+    pass
+
 class Reader(object):
     def __init__(self, fp, readContent = True):
         if not hasattr(fp, 'read'):
@@ -482,16 +485,21 @@ class Reader(object):
             elif sectionHeader.shType in (defs.SHT_REL, defs.SHT_RELA):
                 symtab = sectionHeader.shLink
                 sectionToModify = sectionHeader.shInfo
-                if sectionHeader.shType == defs.SHT_REL:
-                    entry = defs.Elf32_Rel
-                    entrySize = defs.ELF_RELOCATION_SIZE
-                else:
-                    entry = defs.Elf32_Rela
-                    entrySize = defs.ELF_RELOCATION_A_SIZE
-                img = sectionHeader.image
                 offset = 0
+
+                if sectionHeader.shType == defs.SHT_REL:
+                    format = defs.REL_FMT64 if self.is64Bit else defs.REL_FMT32
+                    entrySize = defs.ELF_RELOCATION_SIZE64 if self.is64Bit else defs.ELF_RELOCATION_SIZE32
+                    elfRelocation = Attributor(format, defs.Elf_Rel, self.byteOrderPrefix)
+                else:
+                    format = defs.RELA_FMT64 if self.is64Bit else defs.RELA_FMT32
+                    entrySize = defs.ELF_RELOCATION_A_SIZE64 if self.is64Bit else defs.ELF_RELOCATION_A_SIZE32
+                    elfRelocation = Attributor(format, defs.Elf_Rela, self.byteOrderPrefix)
+                img = sectionHeader.image
                 for pos in range(len(img) / entrySize):
-                    ddd = img[offset : offset + entrySize]
+                    data = img[offset : offset + entrySize]
+                    reloc = Relocation()
+                    elfRelocation.apply(data, reloc)
                     offset += entrySize
             elif sectionHeader == defs.SHT_NOTE:
                 pass
