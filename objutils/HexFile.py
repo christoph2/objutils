@@ -6,7 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -36,17 +36,8 @@ from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
-from objutils.utils import slicer, PYTHON_VERSION
+from objutils.utils import slicer, createStringBuffer, PYTHON_VERSION
 from objutils.logger import Logger
-
-
-if PYTHON_VERSION.major == 3:
-    from io import BytesIO as StringIO
-else:
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
 
 
 '''
@@ -58,9 +49,7 @@ Segment-Types: generic,code,const,bss,... (s. ELF!?)
 """
 TODO:   Create a base class for Reader/Writer common functionality.
         FactoryMethods ???
-        Logger!!!
         Parameter ['exceptionsOnErrors'].
-
 """
 
 SIXTEEN_BITS    = 0
@@ -185,9 +174,9 @@ class Reader(object):
 
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
-            return self.load(StringIO(bytes(image, "ascii")))
+            return self.load(createStringBuffer(bytes(image, "ascii")))
         else:
-            return self.load(StringIO(image))
+            return self.load(createStringBuffer(image))
 
     def read(self, fp):
         segments = []

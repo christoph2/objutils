@@ -78,6 +78,20 @@ def getPythonVersion():
 
 PYTHON_VERSION = getPythonVersion()
 
+if PYTHON_VERSION == 3:
+    from io import BytesIO as StringIO
+else:
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+
+
+def createStringBuffer(*args):
+    """Create a string with file-like behaviour (StringIO on Python 2.x).
+    """
+    return StringIO(*args)
+
 def binExtractor(fname, offset, length):
     """Extract a junk of data from a file.
     """
