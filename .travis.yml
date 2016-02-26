@@ -11,6 +11,13 @@ notifications:
 
 install:
   - pip install -r requirements.txt
+  - travis_retry pip install pylint
+  - travis_retry pip install pytest-cov coverage coveralls codacy-coverage
 
 script:
   python -m unittest discover ./objutils/tests/
+
+after_success:
+  - pylint app
+  - coveralls
+  - coverage xml && python-codacy-coverage -r coverage.xml
