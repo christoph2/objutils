@@ -78,7 +78,7 @@ def getPythonVersion():
 
 PYTHON_VERSION = getPythonVersion()
 
-if PYTHON_VERSION == 3:
+if PYTHON_VERSION.major == 3:
     from io import BytesIO as StringIO
 else:
     try:
