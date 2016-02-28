@@ -61,6 +61,9 @@ class Logger(object):
     def warn(self, message):
         self.log(message, logging.WARN)
 
+    def debug(self, message):
+        self.log(message, logging.DEBUG)
+
     def error(self, message):
         self.log(message, logging.ERROR)
 
@@ -77,6 +80,7 @@ class Logger(object):
         LEVEL_MAP = {
             "INFO": logging.INFO,
             "WARN": logging.WARN,
+            "DEBUG": logging.DEBUG,
             "ERROR": logging.ERROR,
             "CRITICAL": logging.CRITICAL,
         }
