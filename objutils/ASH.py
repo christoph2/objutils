@@ -36,7 +36,7 @@ import objutils.HexFile as HexFile
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from objutils.checksums import lrc, COMPLEMENT_NONE
-
+from objutils.utils import PYTHON_VERSION
 from objutils.registry import register
 
 STX = '\x02'
@@ -50,33 +50,33 @@ checksum = partial(lrc, width = 16)
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, dataSeparator = ' '):
-        self.dataSeparator = dataSeparator
+
+    def __init__(self):
+        pass
 
     def read(self, fp):
-        lines = fp.read()
-        match = DATA.match(lines)
-
-        chunks = match.groupdict()['chunks'].strip()
-
+        if PYTHON_VERSION.major == 3:
+            lines = fp.read().decode()
+        else:
+            lines = fp.read()
         segments = []
-        lines = []
         address = 0
         previousAddress = 0
-
-        for line in chunks.splitlines():
+        resultLines = []
+        for line in lines.splitlines():
             match = ADDRESS.match(line)
             if match:
                 address = int(match.groupdict()['value'], 16)
-                if lines:
-                    segments.append((previousAddress, lines))
+                if resultLines:
+                    segments.append((previousAddress, resultLines))
                 previousAddress = address
-                lines = []
+                resultLines = []
             else:
-                lines.append(line)
+                if not line.startswith('q'):
+                    resultLines.append(line)
 
-        if lines:
-            segments.append((address, lines))
+        if resultLines:
+            segments.append((address, resultLines))
 
         chunks = []
         for address, segment in segments:
@@ -118,3 +118,4 @@ class Writer(HexFile.Writer):
         return line
 
 register('ash', Reader, Writer)
+

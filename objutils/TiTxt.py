@@ -43,7 +43,9 @@ DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-
 ADDRESS = re.compile(r'^@(?P<value>[0-9a-zA-Z]{2,8})\s*$')
 
 
-class Reader(HexFile.Reader):
+"(?:[0-9a-zA-Z]{2}[ %,']?)*"
+
+class Reader(HexFile.ASCIIHexReader):
 
     def __init__(self):
         pass
@@ -92,7 +94,7 @@ class Reader(HexFile.Reader):
                 yield chr(int(ch, 16))
 
 
-class Writer(HexFile.Writer):
+class Writer(HexFile.ASCIIHexWriter):
 
     MAX_ADDRESS_BITS = 16
     previousAddress = None
@@ -111,3 +113,4 @@ class Writer(HexFile.Writer):
         return line
 
 register('titxt', Reader, Writer)
+
