@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -26,6 +26,7 @@ __copyright__ = """
 """
 
 import itertools
+import os
 import sys
 
 def slicer(iterable, sliceLength, converter = None):
@@ -100,4 +101,13 @@ def binExtractor(fname, offset, length):
     data = fp.read(length)
     return data
 
+CYG_PREFIX = "/cygdrive/"
+
+def cygpathToWin(path):
+    if path.startswith(CYG_PREFIX):
+        path = path[len(CYG_PREFIX) : ]
+        driveLetter = "{0}:\\".format(path[0])
+        path = path[2 : ].replace("/", "\\")
+        path = "{0}{1}".format(driveLetter, path)
+    return path
 
