@@ -22,7 +22,7 @@ install:
 
 script:
 #  python -m unittest discover ./objutils/tests/
-   coverage run --source=pywilo setup.py test
+   coverage run --source=objutils setup.py test
 
 after_success:
   - pylint app
