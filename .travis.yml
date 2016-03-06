@@ -21,7 +21,8 @@ install:
   - travis_retry pip install pytest-cov coverage coveralls codacy-coverage
 
 script:
-  python -m unittest discover ./objutils/tests/
+#  python -m unittest discover ./objutils/tests/
+   coverage run --source=pywilo setup.py test
 
 after_success:
   - pylint app
