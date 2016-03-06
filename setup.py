@@ -25,6 +25,7 @@ setup(
 	'console_scripts': [
 		'readelf.py = objutils.tools.readelf:main',
         ],    
-    }
+    },
+    test_suite = "objutils.tests"
 )
 
