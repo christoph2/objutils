@@ -146,3 +146,15 @@ class StructureWithEnums(ctypes.Structure):
     __repr__ = __str__
 
 
+import subprocess
+
+class CommandError(Exception):
+    pass
+
+def runCommand(cmd):
+    proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    result = proc.communicate()
+    proc.wait()
+    if proc.returncode:
+        raise CommandError("{0}".format(result[1]))
+    return result[0]
