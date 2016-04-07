@@ -357,7 +357,7 @@ class ASCIIHexReader(Reader):
         self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parseLine), (self.ETX_PATTERN, self.nop))
 
     def getAddress(self, line, match):
-        self.address = int(match.group(1), 16)
+        self.address = int(match.group('address'), 16)
         self.previousAddress = self.address
         return True
 

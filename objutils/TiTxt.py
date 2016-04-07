@@ -43,7 +43,8 @@ class Reader(HexFile.ASCIIHexReader):
     """
     """
 
-    def __init__(self, addressPattern = r'^@([0-9a-zA-Z]{2,8})\s*$', dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
+    def __init__(self, addressPattern = r'^@(?P<address>[0-9a-zA-Z]{2,8})\s*$',
+                 dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
         super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
 
 
