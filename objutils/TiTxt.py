@@ -40,12 +40,11 @@ from objutils.registry import register
 
 
 class Reader(HexFile.ASCIIHexReader):
-    DATA = r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{{2,4}})[{0}])?'
-    ADDRESS = r'^@(?P<value>[0-9a-zA-Z]{2,8})\s*$'
-    ETX = r'^q.*$'
+    """
+    """
 
-    def __init__(self, addressPattern = ADDRESS, dataPattern = DATA):
-        super(Reader, self).__init__(addressPattern, dataPattern)
+    def __init__(self, addressPattern = r'^@([0-9a-zA-Z]{2,8})\s*$', dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
+        super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
 
 
 class Writer(HexFile.ASCIIHexWriter):

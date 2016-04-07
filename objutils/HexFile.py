@@ -348,30 +348,46 @@ class Writer(object):
 
 class ASCIIHexReader(Reader):
 
-    def __init__(self, addressPattern, dataPattern, separators = ', '):
+    def __init__(self, addressPattern, dataPattern, etxPattern, separators = ', '):
         self.separators = separators
         self.DATA_PATTERN = re.compile(dataPattern.format(separators), re.DOTALL | re.MULTILINE)
         self.ADDRESS_PATTERN = re.compile(addressPattern, re.DOTALL | re.MULTILINE)
+        self.ETX_PATTERN = re.compile(etxPattern, re.DOTALL | re.MULTILINE)
+        self.SPLITTER = re.compile('[{0}]'.format(separators))
+        self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parseLine), (self.ETX_PATTERN, self.nop))
+
+    def getAddress(self, line, match):
+        self.address = int(match.group(1), 16)
+        self.previousAddress = self.address
+        return True
+
+    def nop(self, line, match):
+        return False
+
+    def parseLine(self, line, match):
+        segment = Segment(self.address, bytearray([int(ch, 16) for ch in self.SPLITTER.split(line)]))
+        self.segments.append(segment)
+        self.address += len(segment)
+        return True
 
     def read(self, fp):
         if PYTHON_VERSION.major == 3:
             lines = fp.read().decode()
         else:
             lines = fp.read()
-        segments = []
-        address = 0
-        previousAddress = 0
+        self.segments = []
+        self.address = 0
+        breakRequest = False
         for line in lines.splitlines():
-            match = self.ADDRESS_PATTERN.match(line)
-            if match:
-                address = int(match.groupdict()['value'], 16)
-                previousAddress = address
-            else:
-                if not line.startswith('q'):
-                    segment = Segment(address, bytearray([int(ch, 16) for ch in line.split()]))
-                    segments.append(segment)
-                    address += len(segment)
-        return Image(joinSegments(segments))
+            for pattern, action in self.patterns:
+                match = pattern.match(line)
+                if match:
+                    if not action(line, match):
+                        breakRequest = True
+                    break
+            if breakRequest:
+                break
+        return Image(joinSegments(self.segments))
 
 
 class ASCIIHexWriter(Writer):
