@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -39,59 +39,13 @@ from objutils.utils import PYTHON_VERSION
 from objutils.registry import register
 
 
-DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4})[,.])?', re.DOTALL | re.MULTILINE)
-ADDRESS = re.compile(r'^@(?P<value>[0-9a-zA-Z]{2,8})\s*$')
-
-
-"(?:[0-9a-zA-Z]{2}[ %,']?)*"
-
 class Reader(HexFile.ASCIIHexReader):
+    DATA = r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{{2,4}})[{0}])?'
+    ADDRESS = r'^@(?P<value>[0-9a-zA-Z]{2,8})\s*$'
+    ETX = r'^q.*$'
 
-    def __init__(self):
-        pass
-
-    def read(self, fp):
-        if PYTHON_VERSION.major == 3:
-            lines = fp.read().decode()
-        else:
-            lines = fp.read()
-        segments = []
-        address = 0
-        previousAddress = 0
-        resultLines = []
-        for line in lines.splitlines():
-            match = ADDRESS.match(line)
-            if match:
-                address = int(match.groupdict()['value'], 16)
-                if resultLines:
-                    segments.append((previousAddress, resultLines))
-                previousAddress = address
-                resultLines = []
-            else:
-                if not line.startswith('q'):
-                    resultLines.append(line)
-
-        if resultLines:
-            segments.append((address, resultLines))
-
-        chunks = []
-        for address, segment in segments:
-            for line in segment:
-                #print(line)
-                #chunk = bytearray(self._getByte(line))
-                chunk = [int(ch, 16) for ch in line.split()]
-                #chunk = bytes(self._getByte(line))
-                chunks.append(Segment(address, chunk))
-                address += len(chunk)
-
-        return Image(joinSegments(chunks))
-
-    def _getByte(self, chunk):
-        print(chunk)
-        for line in chunk.splitlines():
-            print("xxx",line)
-            for ch in line.split():
-                yield chr(int(ch, 16))
+    def __init__(self, addressPattern = ADDRESS, dataPattern = DATA):
+        super(Reader, self).__init__(addressPattern, dataPattern)
 
 
 class Writer(HexFile.ASCIIHexWriter):
