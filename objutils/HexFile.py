@@ -326,7 +326,6 @@ class Writer(object):
         for k, v in params.items():
             setattr(self, k, v)
 
-
     def composeRow(self, address, length, row):
         raise NotImplementedError()
 
@@ -348,13 +347,11 @@ class Writer(object):
 
 
 class ASCIIHexReader(Reader):
-    HEADER_PATTERN = None
-    FOOTER_PATTERN = None
-    DATA_PATTERN = "(?:[0-9a-zA-Z]{2}[{0}]?)*"
 
-    def __init__(self, separators = ' '):
+    def __init__(self, addressPattern, dataPattern, separators = ', '):
         self.separators = separators
-        self.dataPattern = Reader.DATA_PATTERN.format(separators)
+        self.DATA_PATTERN = re.compile(dataPattern.format(separators), re.DOTALL | re.MULTILINE)
+        self.ADDRESS_PATTERN = re.compile(addressPattern, re.DOTALL | re.MULTILINE)
 
     def read(self, fp):
         if PYTHON_VERSION.major == 3:
@@ -364,40 +361,17 @@ class ASCIIHexReader(Reader):
         segments = []
         address = 0
         previousAddress = 0
-        resultLines = []
         for line in lines.splitlines():
-            match = ADDRESS.match(line)
+            match = self.ADDRESS_PATTERN.match(line)
             if match:
                 address = int(match.groupdict()['value'], 16)
-                if resultLines:
-                        segments.append((previousAddress, resultLines))
                 previousAddress = address
-                resultLines = []
             else:
                 if not line.startswith('q'):
-                    resultLines.append(line)
-
-            if resultLines:
-                segments.append((address, resultLines))
-
-            chunks = []
-            for address, segment in segments:
-                for line in segment:
-                    #print(line)
-                    #chunk = bytearray(self._getByte(line))
-                    chunk = [int(ch, 16) for ch in line.split()]
-                    #chunk = bytes(self._getByte(line))
-                    chunks.append(Segment(address, chunk))
-                    address += len(chunk)
-
-            return Image(joinSegments(chunks))
-
-        def _getByte(self, chunk):
-            print(chunk)
-            for line in chunk.splitlines():
-                print("xxx",line)
-                for ch in line.split():
-                    yield chr(int(ch, 16))
+                    segment = Segment(address, bytearray([int(ch, 16) for ch in line.split()]))
+                    segments.append(segment)
+                    address += len(segment)
+        return Image(joinSegments(segments))
 
 
 class ASCIIHexWriter(Writer):
