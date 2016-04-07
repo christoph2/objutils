@@ -48,49 +48,13 @@ LINE_SPLIITER = re.compile(r"[ %,']")
 
 checksum = partial(lrc, width = 16)
 
+class Reader(HexFile.ASCIIHexReader):
+    """
+    """
 
-class Reader(HexFile.Reader):
-
-    def __init__(self):
-        pass
-
-    def read(self, fp):
-        if PYTHON_VERSION.major == 3:
-            lines = fp.read().decode()
-        else:
-            lines = fp.read()
-        segments = []
-        address = 0
-        previousAddress = 0
-        resultLines = []
-        for line in lines.splitlines():
-            match = ADDRESS.match(line)
-            if match:
-                address = int(match.groupdict()['value'], 16)
-                if resultLines:
-                    segments.append((previousAddress, resultLines))
-                previousAddress = address
-                resultLines = []
-            else:
-                if not line.startswith('q'):
-                    resultLines.append(line)
-
-        if resultLines:
-            segments.append((address, resultLines))
-
-        chunks = []
-        for address, segment in segments:
-            for line in segment:
-                chunk = bytearray(self._getByte(line))
-                chunks.append(Segment(address, chunk))
-                address += len(chunk)
-
-        return Image(joinSegments(chunks))
-
-    def _getByte(self, chunk):
-        for line in chunk.splitlines():
-            for ch in LINE_SPLIITER.split(line):
-                yield chr(int(ch, 16))
+    def __init__(self, addressPattern = r'^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$',
+                 dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
+        super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
 
 
 class Writer(HexFile.Writer):
