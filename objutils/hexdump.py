@@ -29,7 +29,7 @@ import math
 import sys
 
 
-isprintable = lambda ch: 0x1F < ch
+isprintable = lambda ch: 0x1F < ch < 0x80
 
 def unpack(*args):
     return args
@@ -47,7 +47,7 @@ class Dumper(object):
     def dumpRow(self, row):
         pass
 
-    def dumpData(self, section, offset = 0):
+    def dumpData(self, section, offset = 0):    # TODO: size option!
         end = section.length
         lineCount = math.ceil(len(section.data) / self.LINE_LENGTH)
         startPos = 0
@@ -68,6 +68,9 @@ class Dumper(object):
             self.previousRow = row
         row = section.data[startPos : endPos]
         self.dumpRow(row, startPos + section.address)
+        print("-" * 15)
+        print("{0:-9d} bytes".format(section.length))
+        print("-" * 15)
 
 
 class CanonicalDumper(Dumper):
