@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps
-from objutils.Segment  import Segment
-from objutils.Image  import Image
+from objutils.Segment import Segment
+from objutils.Image import Image
 import unittest
 
 TITEXT = """@DEAD
@@ -47,16 +47,12 @@ dataFromTiTxt = dumps('srec', fromTiTxt, rowLength = 32)
 class TestRoundTrip(unittest.TestCase):
 
     def testFromSrec(self):
-        fromSrec =  loads('srec', SREC)
-        data = dumps('titxt', fromSrec)
-        self.assertEqual(data, TITEXT)
-        #self.assertEquals(dataFromSRec, TITEXT)
+        self.assertEquals(dataFromSRec, TITEXT)
 
     def testFromTiTxt(self):
-        #fromTiTxt =  loads('titxt', TITEXT)
-        #data = dumps('srec', fromTiTxt, rowLength = 32)
         self.assertEqual(dataFromTiTxt, SREC)
 
 
 if __name__ == '__main__':
     unittest.main()
+
