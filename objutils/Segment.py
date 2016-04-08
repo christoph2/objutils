@@ -27,6 +27,7 @@ __copyright__ = """
 """
 
 from operator import itemgetter
+import objutils.hexdump as hexdump
 
 # Note: Section seens to be a more appropriate name.
 class Segment(object):
@@ -64,6 +65,10 @@ class Segment(object):
     @length.setter
     def length(self, value):
         self._length = value
+
+    def hexdump(self):
+        dumper = hexdump.CanonicalDumper()  # TODO: cache dumpers.
+        dumper.dumpData(self)
 
 
 def joinSegments(segments):
