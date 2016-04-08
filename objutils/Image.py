@@ -27,7 +27,7 @@ __copyright__ = """
 
 import operator
 
-from objutils.Segment import Segment
+from objutils.Segment import Segment, joinSegments
 
 ## TODO: diff interface!
 
@@ -83,17 +83,18 @@ class Builder(object):
         self._segments = segments if segments else []
         self.address = 0
 
-    def addSegment(self, data, address =None, dontJoin = False):
-        # If Address omitted, create continuous address space.
+    def addSegment(self, data, address = None, dontJoin = False):
+        address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         self._segments.append(Segment(address, data))
+        self.address = address + len(data)
 
     def addMetaData(self, metaData):
         pass
 
     def joinSegments(self):
-        pass
+        self._segments = joinSegments(self._segments)
 
     def orderSegments(self):
         pass
