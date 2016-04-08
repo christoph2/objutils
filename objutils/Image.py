@@ -27,6 +27,8 @@ __copyright__ = """
 
 import operator
 
+from objutils.Segment import Segment
+
 ## TODO: diff interface!
 
 ## Adress-space constants.
@@ -71,4 +73,33 @@ class Image(object):
             print("\nSection #{0:04d}".format(idx))
             print("-" * 13)
             section.hexdump()
+
+
+class Builder(object):
+
+    def __init__(self, segments = []):
+        self._segments = segments
+        self.address = 0
+
+    def addSegment(self, data, address =None, dontJoin = False):
+        # If Address omitted, create continuos  address space.
+        if isinstance(data, str):
+            data = [ord(x) for x in data] # array.array('B',data)
+        self._segments.append(Segment(address, data))
+
+    def addMetaData(self, metaData):
+        pass
+
+    def joinSegments(self):
+        pass
+
+    def orderSegments(self):
+        pass
+
+    def hexdump(self):
+        self.image.hexdump()
+
+    @property
+    def image(self):
+        return Image(self._segments)
 
