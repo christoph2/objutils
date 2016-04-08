@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -28,9 +28,7 @@ __copyright__ = """
 
 from functools import partial
 
-from objutils.dwarf import constants
-import objutils.dwarf.encoding as encoding
-
+from objutils.dwarf import constants, encoding
 
 NO_OPERANDS = (
     constants.DW_OP_reg0,
@@ -261,7 +259,7 @@ class Dissector(object):
                 try:
                     result.append(Operation(opcode, decoder(self)))
                 except TypeError as e:
-                    print "*** EXECPTION: %s" % e
+                    print("*** EXECPTION: %s" % e)
             return result
         else:
             return self.block   # TODO: Nur bis zu entgültigen Klärung!!!
@@ -351,19 +349,20 @@ class Dissector(object):
         ULEB128_FOLLOWED_BY_BLOCK: readULebFollowedByBlock, MACHINE_WORD: readMachineWord
     }
 
-
-d=Dissector([0x03, 0x00, 0x00, 0x40,0x39], 4)
-#print d.arrayToNumber([0x00, 0x00, 0x40, 0x39])
-result = d.run()
-for r in result:
-    print r
-
-def getLEB(values):
-    for idx, bval in enumerate(values, 1):
-         if bval & 0x80 == 0:
-             break
-    return values[ : idx], idx
-
-
-leb, endIndex = getLEB([199, 155, 127])
+##
+##d=Dissector([0x03, 0x00, 0x00, 0x40,0x39], 4)
+##result = d.run()
+##for r in result:
+##    print r
+##
+##def getLEB(values):
+##    for idx, bval in enumerate(values, 1):
+##         if bval & 0x80 == 0:
+##             break
+##    return values[ : idx], idx
+##
+##
+##leb, endIndex = getLEB([199, 155, 127])
+##
+##
 

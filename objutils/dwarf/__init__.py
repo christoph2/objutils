@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -26,5 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-
+from objutils.dwarf.sectionreader import DebugSectionReader
+from objutils.dwarf import constants
+from objutils.dwarf import encoding
 
