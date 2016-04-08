@@ -207,7 +207,7 @@ class DebugSectionReader(object):
         self.instantiateReaders()
         self.abbrevs = {}
         self.infoHeaders = []
-        if self.sections.has_key('.debug_info'):
+        if '.debug_info' in self.sections:
             self.scanDebugInfoHeaders()
 
     def instantiateReaders(self):
@@ -217,19 +217,32 @@ class DebugSectionReader(object):
                 self.readers[name] = DwarfReader(section.image, self, self.byteorderPrefix)
 
     def getReader(self, name):
-        return  self.readers[name]
+        return self.readers[name]
 
     def process(self):
         for name, image in self.sections.items():
             print name
-        if self.sections.has_key('.debug_line'):
+        #if '.debug_ranges' in self.sections:
+        #    self.processRanges()
+        if '.debug_line' in self.sections:
             self.processLineSection()
-        if self.sections.has_key('.debug_abbrev'):
+        if '.debug_abbrev' in self.sections:
             self.processAbbreviations()
-        if self.sections.has_key('.debug_info'):
+        if '.debug_info' in self.sections:
             self.processInfoSection()
-        if self.sections.has_key('.debug_pubnames'):
+        if '.debug_pubnames' in self.sections :
             self.processPubNames()
+        """
+            .debug_aranges
+            .debug_frame
+            .debug_info
+            .debug_line
+            .debug_pubnames
+.           .debug_pubtypes
+            .debug_types
+            ## debug_loc
+        """
+
 
     def processAbbreviations(self):
         dr = self.getReader('.debug_abbrev')
@@ -273,6 +286,22 @@ class DebugSectionReader(object):
         #    abbrevs[offset] = abbrevEntries
         self.abbrevs = abbrevs
         dr.reset()
+
+    def processRanges(self):
+        name = ".debug_ranges"
+        dr = self.getReader('.debug_ranges')
+        if not dr.size:
+            print("\nThe {0} section is empty.".format(name))
+            return
+        else:
+            print("Contents of the %s section:\n".format(name))
+            print("    Offset   Begin    End")
+        while dr.pos < dr.size:
+            offset = dr.u32()
+            begin = dr.u32()
+            end = dr.u32()
+            b  = dr.u32()
+            c  = dr.u32()
 
     def processInfoSection(self):
         dr = self.getReader('.debug_info')
