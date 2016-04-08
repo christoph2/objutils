@@ -395,14 +395,21 @@ class ASCIIHexWriter(Writer):
     MAX_ADDRESS_BITS = 16
     previousAddress = None
 
+    def __init__(self, addressDesignator):
+        self.addressDesignator = addressDesignator
+
     def composeRow(self, address, length, row):
         prependAddress =  True if address != self.previousAddress else False
         self.previousAddress = (address + length)
         if prependAddress:
-            line = "{0}\n{1}".format("@{0:04X}".format(address), " ".join(["{0:02X}".format(x) for x in row]))
+            line = "{0}\n{1}".format("{0}{1:04X}".format(self.addressDesignator, address), " ".join(["{0:02X}".format(x) for x in row]))
         else:
             line = " ".join(["{0:02X}".format(x) for x in row])
+        self.rowCallout(address, length, row)
         return line
+
+    def rowCallout(self, address, length, row):
+        pass
 
     def composeFooter(self, meta):
         line = "q\n"

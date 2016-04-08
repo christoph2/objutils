@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -57,19 +57,13 @@ class Reader(HexFile.ASCIIHexReader):
         super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
 
 
-class Writer(HexFile.Writer):
+class Writer(HexFile.ASCIIHexWriter):
 
     MAX_ADDRESS_BITS = 16
+    ADDRESS_DESIGNATOR = '$A'
 
-    def composeRow(self, address, length, row):
-        prependAddress =  True if address != self.previousAddress else False
-        self.previousAddress = (address + length)
-        self.checksum += checksum(row)
-        if prependAddress:
-            line = "{0}\n{1}".format("$A{0:04X},".format(address), " ".join(["{0:02X}".format(x) for x in row]))
-        else:
-            line = " ".join(["{0:02X}".format(x) for x in row])
-        return line
+    def __init__(self, addressDesignator = '$A'):
+        super(Writer, self).__init__(addressDesignator)
 
     def composeHeader(self, meta):
         self.checksum = 0
@@ -80,6 +74,10 @@ class Writer(HexFile.Writer):
     def composeFooter(self, meta):
         line = "{0}$${1:04X},".format(ETX, self.checksum % 65536)
         return line
+
+    def rowCallout(self, address, length, row):
+        self.checksum += checksum(row)
+
 
 register('ash', Reader, Writer)
 
