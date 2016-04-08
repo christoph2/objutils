@@ -29,7 +29,7 @@ import math
 import sys
 
 
-isprintable = lambda ch: 0x1F < ch #< 127
+isprintable = lambda ch: 0x1F < ch
 
 def unpack(*args):
     return args
@@ -63,7 +63,6 @@ class Dumper(object):
             else:
                 self.dumpRow(row, startPos + section.address)
                 self.elided = False
-
             startPos = endPos
             endPos = endPos + self.LINE_LENGTH
             self.previousRow = row
@@ -77,17 +76,17 @@ class CanonicalDumper(Dumper):
     def printHexBytes(self, row):
         row = list(row)
         filler = list([0x20] * (self.LINE_LENGTH - len(row)))
-        print '|%s|' % (('%s' * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or '.' for x in row + filler] ))
+        print('|{0}|'.format(('%s' * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or '.' for x in row + filler] )))
 
     def dumpRow(self, row, startAddr):
         startPos = 0
-        print self._addressMask % ((startPos + startAddr) % self._rolloverMask),
-        print '%02x ' * len(row) % unpack(*row),
+        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask)),
+        print('%02x ' * len(row) % unpack(*row)),
         if len(row) == 0:
             print
         if len(row) < self.LINE_LENGTH:
             spaces = "   " * (self.LINE_LENGTH - len(row))
-            print spaces[ 1: ],
+            print(spaces[ 1: ]),
         self.printHexBytes(row)
 
 
@@ -95,8 +94,8 @@ class OneByteOctalDumper(Dumper):
 
     def dumpRow(self, row, startAddr):
         startPos = 0
-        print self._addressMask % ((startPos + startAddr) % self._rolloverMask),
-        print '%03o ' * len(row) % unpack(*row)
+        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask)),
+        print('%03o ' * len(row) % unpack(*row))
 
 class TwoByteOctalDumper(Dumper): pass
 
@@ -107,10 +106,4 @@ class TwoByteDecimalDumper(Dumper): pass
 class TwoByteHexDumper(Dumper): pass
 
 class FormattedDumper(Dumper): pass
-
-def canonicalDump(data):
-    dumper = CanonicalDumper()
-    for section in data:
-        dumper.dumpData(section)
-        print
 
