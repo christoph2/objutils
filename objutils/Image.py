@@ -66,3 +66,9 @@ class Image(object):
     def __ne__(self, other):
         return not (self == other)
 
+    def hexdump(self):
+        for idx, section in enumerate(self.segments):
+            print("\nSection #{0:04d}".format(idx))
+            print("-" * 13)
+            section.hexdump()
+
