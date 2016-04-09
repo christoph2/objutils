@@ -53,5 +53,8 @@ class Writer(HexFile.ASCIIHexWriter):
     def __init__(self, addressDesignator = '@'):
         super(Writer, self).__init__(addressDesignator)
 
+    def composeFooter(self, meta):
+        return "q"
+
 register('titxt', Reader, Writer)
 
