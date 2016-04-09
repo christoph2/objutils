@@ -153,7 +153,23 @@ class Container(object):
         self.processingInstructions.append(pi)
 
 
-class Reader(object):
+class BaseType(object):
+
+    def error(self, msg):
+        self.logger.error(msg)
+        self.valid = False
+
+    def warn(self, msg):
+        self.logger.warn(msg)
+
+    def info(self, msg):
+        self.logger.info(msg)
+
+    def debug(self, msg):
+        self.logger.debug(msg)
+
+
+class Reader(BaseType):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
 
@@ -237,19 +253,6 @@ class Reader(object):
         else:
             raise ValueError("Unsupported Addressspace size.")
 
-    def error(self, msg):
-        self.logger.error(msg)
-        self.valid = False
-
-    def warn(self, msg):
-        self.logger.warn(msg)
-
-    def info(self, msg):
-        self.logger.info(msg)
-
-    def debug(self, msg):
-        self.logger.debug(msg)
-
     def probe(self):
         "Determine if valid object from first line." # if object is valid.
         raise NotImplementedError()
@@ -270,13 +273,17 @@ class Reader(object):
         return True
 
 
-class Writer(object):
+class Writer(BaseType):
+
+    def __init__(self):
+        self.logger = Logger("Writer")
 
     def dump(self, fp, image, rowLength = 16, **kws):   # TODO: rename to bytesPerRow!
         fp.write(dumps(image, rowLength))
 
     def dumps(self, image, rowLength = 16, **kws):
         result = []
+        self.rowLength = rowLength
 
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
@@ -301,12 +308,15 @@ class Writer(object):
             self.restoreParameters(params)
         if footer:
             result.append(footer)
-        return '\n'.join(result)
+        return self.postProcess('\n'.join(result))
 
     def calculateAddressBits(self, image):
         lastSegment = sorted(image.segments, key = lambda s: s.address)[-1]
         highestAddress = lastSegment.address + lastSegment.length
         return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
+
+    def postProcess(self, data):
+        return data
 
     def preProcessing(self, image):
         pass
@@ -348,6 +358,8 @@ class Writer(object):
 
 class ASCIIHexReader(Reader):
 
+    FORMAT_SPEC = None
+
     def __init__(self, addressPattern, dataPattern, etxPattern, separators = ', '):
         self.separators = separators
         self.DATA_PATTERN = re.compile(dataPattern.format(separators), re.DOTALL | re.MULTILINE)
@@ -355,6 +367,7 @@ class ASCIIHexReader(Reader):
         self.ETX_PATTERN = re.compile(etxPattern, re.DOTALL | re.MULTILINE)
         self.SPLITTER = re.compile('[{0}]'.format(separators))
         self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parseLine), (self.ETX_PATTERN, self.nop))
+        super(ASCIIHexReader, self).__init__()
 
     def getAddress(self, line, match):
         self.address = int(match.group('address'), 16)
@@ -397,6 +410,7 @@ class ASCIIHexWriter(Writer):
 
     def __init__(self, addressDesignator):
         self.addressDesignator = addressDesignator
+        super(ASCIIHexWriter, self).__init__()
 
     def composeRow(self, address, length, row):
         prependAddress =  True if address != self.previousAddress else False
@@ -410,8 +424,4 @@ class ASCIIHexWriter(Writer):
 
     def rowCallout(self, address, length, row):
         pass
-
-    def composeFooter(self, meta):
-        line = "q\n"
-        return line
 
