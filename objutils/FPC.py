@@ -25,24 +25,26 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from functools import partial
 import operator
 import re
 import objutils.HexFile as HexFile
+from objutils.utils import createStringBuffer, slicer
+from objutils import checksums
+from objutils.registry import register
 
 DATA_ABS    = 1
 DATA_INC    = 2
 DATA_REL    = 3
 EOF         = 4
 
+PREFIX      = '$'
 
-FORMATS=(
-    (DATA_ABS,  "CCLL0000AAAAAAAADD"),
-    (DATA_INC,  "CCLL0001DD"),
-    (DATA_REL,  "CCLL0002AAAAAAAADD"),
-    (EOF,       "00000000")
-)
-
+MAPPING = dict(enumerate(map(chr, range(37, 37 + 5) + range(37 + 6, 37 + 80 + 6))))
+REV_MAPPING = dict([(value, key) for key, value in MAPPING.items()])
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
+
+atoi16 = partial(int, base = 16)
 
 def cs32(val):  # todo: universelle Funktion (in 'HexFile') !!!
     result = []
@@ -53,28 +55,37 @@ def cs32(val):  # todo: universelle Funktion (in 'HexFile') !!!
 
 
 class Reader(HexFile.Reader):
-    def __init__(self, inFile, dataSep = None):
+
+    FORMAT_SPEC = (
+        (DATA_ABS,  "CCLL0000AAAAAAAADD"),
+        (DATA_INC,  "CCLL0001DD"),
+        (DATA_REL,  "CCLL0002AAAAAAAADD"),
+        (EOF,       "00000000")
+    )
+
+    #def __init__(self, inFile, dataSep = None):
+    def read(self, fp):
         self.lastAddress = 0
         outLines = []
-        for inLine in inFile.readlines():
-            inLine = inLine.strip()
-            startSym, inLine = inLine[0], inLine[1:]
+        for line in fp.readlines():
+            line = line.strip()
+            startSym, line = line[0], line[1:]
 
-            if startSym != '$':
+            if startSym != PREFIX:
                 pass # todo: FormatError!!!
 
-            if (len(inLine) % 5) != 0:
+            if (len(line) % 5) != 0:
                 pass # todo: FormatError!!!
 
             values = []
-            for quintuple in self.splitQuintuples(inLine):
+            for quintuple in self.splitQuintuples(line):
                 value = self.convertQuintuple(quintuple)
                 values.append("%08X" % value)
             outLines.append(''.join(values))
-        super(Reader, self).__init__(FORMATS, StringIO.StringIO('\n'.join(outLines)) , dataSep)
+        return super(Reader, self).read(createStringBuffer('\n'.join(outLines)))
 
     def convertQuintuple(self, quintuple):
-        res = 0
+        res = 0         # reduce(lambda accu, x: (accu * 85) + x, value, 0)
         for ch  in quintuple:
             v = REV_MAPPING[ch]
             res = v + (res * 85)
@@ -88,7 +99,9 @@ class Reader(HexFile.Reader):
 
     def checkLine(self, line, formatType):
         checksum = line.length
-        line.length = len(line.chunk)
+        line.length -= 4 # len(line.chunk)
+        if line.length != len(line.chunk):
+            line.chunk = line.chunk[ : line.length] # Cut padding.
         if formatType == DATA_ABS:
             checksum += 0
             self.lastAddress = line.address + line.length
@@ -107,3 +120,61 @@ class Reader(HexFile.Reader):
     def isDataLine(self, line, formatType):
         return formatType in (DATA_ABS, DATA_INC, DATA_REL)
 
+
+class Writer(HexFile.Writer):
+
+    MAX_ADDRESS_BITS = 16
+
+    def composeRow(self, address, length, row):
+        checksum = length + 4
+        checksum += cs32(address)
+        checksum += reduce(operator.add, row)
+        checksum = (~checksum + 1) & 0xff
+        if length < self.rowLength:
+            lengthToPad = self.rowLength - length
+            padding = [0] * (lengthToPad)
+            row.extend(padding)
+        line = "{0:02X}{1}0000{2:08X}{3}".format(checksum, length - 2, address, Writer.hexBytes(row))
+        return line
+
+    def composeFooter(self, meta):
+        return "00000000"
+
+    def postProcess(self, data):
+        result = []
+        for line in data.splitlines():
+            if len(line) % 4:
+                self.error("Size of line must be a multiple of 4.")
+                continue
+            res = []
+            for item in slicer(line, 8, atoi16):
+                item = self.convertQuintuple(item)
+                res.append(item)
+            result.append("{0}{1}".format(PREFIX, ''.join(res)))
+        return '\n'.join(result)
+
+    def convertQuintuple(self, value):
+        result = []
+        while value:
+            result.append(MAPPING[value % 85])
+            value /= 85
+        if len(result) < 5:
+            result.extend([MAPPING[0]] * (5 - len(result)))
+        return ''.join(reversed(result))
+
+
+register('fpc', Reader, Writer)
+
+"""
+ZMQ-Base85:
+----------
++------+------+------+------+------+------+------+------+
+| 0x86 | 0x4F | 0xD2 | 0x6F | 0xB5 | 0x59 | 0xF7 | 0x5B |
++------+------+------+------+------+------+------+------+
+
+   SHALL encode as the following 10 characters:
++---+---+---+---+---+---+---+---+---+---+
+| H | e | l | l | o | W | o | r | l | d |
++---+---+---+---+---+---+---+---+---+---+
+
+"""
