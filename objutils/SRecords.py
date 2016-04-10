@@ -199,5 +199,5 @@ class Writer(HexFile.Writer):
         return '\n'.join(result)
 
 
-register('srec', Reader, Writer)
+register('srec', Reader, Writer, "Motorola S-Records (a.k.a. S19).")
 

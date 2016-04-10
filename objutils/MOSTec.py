@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -68,5 +68,5 @@ class Writer(HexFile.Writer):
     def composeFooter(self, meta):
         return ";00"
 
-register('mostec', Reader, Writer)
+register('mostec', Reader, Writer, "MOSTech format.")
 

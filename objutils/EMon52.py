@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -76,5 +76,5 @@ class Writer(HexFile.Writer):
         checksum = sum(row) % 65536
         return "%02X %04X:%s %04X" % (length, address, Writer.hexBytes(row, spaced = True), checksum)
 
-register('emon52', Reader, Writer)
+register('emon52', Reader, Writer, "Elektor Monitor (EMON52) file format.")
 

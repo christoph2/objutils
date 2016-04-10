@@ -79,5 +79,5 @@ class Writer(HexFile.ASCIIHexWriter):
         self.checksum += checksum(row)
 
 
-register('ash', Reader, Writer)
+register('ash', Reader, Writer, "ASCII hex space formats.")
 

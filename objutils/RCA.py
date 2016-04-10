@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -69,5 +69,5 @@ class Writer(HexFile.Writer):
         return "%s" % Writer.SEPARATOR
 
 
-register('rca', Reader, Writer)
+register('rca', Reader, Writer, "RCA format.")
 

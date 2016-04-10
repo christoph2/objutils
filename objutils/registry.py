@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -30,7 +30,7 @@ from collections import namedtuple
 class CodecDoesNotExistError(Exception): pass
 class CodecAlreadyExistError(Exception): pass
 
-Codec = namedtuple("Codec", "reader writer")
+Codec = namedtuple("Codec", "reader writer description")
 codecs = {}
 
 def registry():
@@ -45,9 +45,8 @@ def getCodec(codecName):
         raise CodecDoesNotExistError(codecName)
     return codec
 
-def register(name, readerClass, writerClass):
+def register(name, readerClass, writerClass, description = ''):
     if name in codecs:
         raise CodecAlreadyExistError(name)
-    codecs[name] = Codec(readerClass(), writerClass())
-
+    codecs[name] = Codec(readerClass(), writerClass(), description)
 
