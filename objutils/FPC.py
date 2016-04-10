@@ -31,6 +31,7 @@ import re
 import objutils.HexFile as HexFile
 from objutils.utils import createStringBuffer, slicer
 from objutils import checksums
+import objutils.utils as utils
 from objutils.registry import register
 
 DATA_ABS    = 1
@@ -46,13 +47,6 @@ NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 
 atoi16 = partial(int, base = 16)
 
-def cs32(val):  # todo: universelle Funktion (in 'HexFile') !!!
-    result = []
-    for i in range(4):
-        offs = 32 - (8 * (i + 1))
-        result.append( (val & (0xff << offs)) >> offs)
-    return reduce(operator.add, result)
-
 
 class Reader(HexFile.Reader):
 
@@ -63,7 +57,6 @@ class Reader(HexFile.Reader):
         (EOF,       "00000000")
     )
 
-    #def __init__(self, inFile, dataSep = None):
     def read(self, fp):
         self.lastAddress = 0
         outLines = []
@@ -98,22 +91,22 @@ class Reader(HexFile.Reader):
         return res
 
     def checkLine(self, line, formatType):
-        checksum = line.length
-        line.length -= 4 # len(line.chunk)
+        line.length -= 4
         if line.length != len(line.chunk):
             line.chunk = line.chunk[ : line.length] # Cut padding.
         if formatType == DATA_ABS:
-            checksum += 0
+            tmp = 0
             self.lastAddress = line.address + line.length
         elif formatType == DATA_INC:
-            checksum += 1
+            tmp = 1
             line.address = self.lastAddress
         elif formatType == DATA_REL:
             self.error("relative adressing not supported.")
-            checksum += 2
-        checksum += cs32(line.address)
-        checksum += reduce(operator.add, line.chunk)
-        checksum = (~checksum + 1) & 0xff
+            tmp = 2
+        else:
+            self.error("Invalid format type: '{0}'".format(formatType))
+            tmp = 0
+        checksum = checksums.lrc(utils.makeList(tmp, line.length + 4, utils.intToArray(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
         if line.checksum != checksum:
             raise HexFile.InvalidRecordChecksumError()
 
@@ -126,10 +119,8 @@ class Writer(HexFile.Writer):
     MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
-        checksum = length + 4
-        checksum += cs32(address)
-        checksum += reduce(operator.add, row)
-        checksum = (~checksum + 1) & 0xff
+        tmp = 0 # TODO: format type!?
+        checksum = checksums.lrc(utils.makeList(tmp, length + 4, utils.intToArray(address), row), 8, checksums.COMPLEMENT_TWOS)
         if length < self.rowLength:
             lengthToPad = self.rowLength - length
             padding = [0] * (lengthToPad)
