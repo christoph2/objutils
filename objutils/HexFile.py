@@ -285,6 +285,9 @@ class Writer(BaseType):
         result = []
         self.rowLength = rowLength
 
+        if not image.segments:
+            return ''
+
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
 
@@ -378,7 +381,7 @@ class ASCIIHexReader(Reader):
         return False
 
     def parseLine(self, line, match):
-        segment = Segment(self.address, bytearray([int(ch, 16) for ch in self.SPLITTER.split(line)]))
+        segment = Segment(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
         self.segments.append(segment)
         self.address += len(segment)
         return True
