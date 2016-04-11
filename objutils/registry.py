@@ -30,7 +30,7 @@ from collections import namedtuple
 class CodecDoesNotExistError(Exception): pass
 class CodecAlreadyExistError(Exception): pass
 
-Codec = namedtuple("Codec", "reader writer description")
+Codec = namedtuple("Codec", "Reader Writer description")
 codecs = {}
 
 def registry():
@@ -48,5 +48,5 @@ def getCodec(codecName):
 def register(name, readerClass, writerClass, description = ''):
     if name in codecs:
         raise CodecAlreadyExistError(name)
-    codecs[name] = Codec(readerClass(), writerClass(), description)
+    codecs[name] = Codec(readerClass, writerClass, description)
 

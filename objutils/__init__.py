@@ -33,16 +33,16 @@ from objutils.registry import getCodec
 ##  Interface to OBJUTILS.
 ##
 def load(codecName, *args, **kws):
-    return getCodec(codecName).reader.load(*args, **kws)
+    return getCodec(codecName).Reader().load(*args, **kws)
 
 def loads(codecName, *args, **kws):
-    return getCodec(codecName).reader.loads(*args, **kws)
+    return getCodec(codecName).Reader().loads(*args, **kws)
 
 def dump(codecName, *args, **kws):
-    getCodec(codecName).writer.dump(*args, **kws)
+    getCodec(codecName).Writer().dump(*args, **kws)
 
 def dumps(codecName, *args, **kws):
-    return getCodec(codecName).writer.dumps(*args, **kws)
+    return getCodec(codecName).Writer().dumps(*args, **kws)
 
 
 def _importer():
