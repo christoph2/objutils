@@ -4,7 +4,11 @@
 from objutils import loads, dumps
 from objutils.Segment import Segment
 from objutils.Image import Image
+import objutils.registry as registry
 import unittest
+
+for key, value in sorted(registry.registry().items()):
+    print("{0:10} {1}".format(key, value.description))
 
 
 SREC = """S123B000576F77212044696420796F75207265616C6C7920676F207468726F7567682061DF

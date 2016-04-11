@@ -111,13 +111,12 @@ class DwarfReader(PlainBinaryReader):
             try:
                 bval = section[offset + idx]
             except IndexError as e: # TODO: Genau analysieren!!!
-                print e
+                print(e)
                 break
             if bval == '\0':
                 break
             idx += 1
             result.append(bval)
         rstr = ''.join(x for x in result)
-
         return rstr
 
