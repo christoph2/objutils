@@ -84,6 +84,8 @@ def joinSegments(segments):
             # Create a new Segment.
             resultSegments.append(Segment(segment.address, segment.data))
         prevSegment = segment
-    lastSeg = resultSegments[-1]
-    return resultSegments
+    if resultSegments:
+        return resultSegments
+    else:
+        return []
 
