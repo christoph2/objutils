@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -26,7 +26,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-# TODO: Reader interfac!!!
 
 import os
 import struct
@@ -87,6 +86,33 @@ class PlainBinaryReader(object):
     def s64(self):
         return self.value('q', 8)
 
+    def uleb(self):
+        result = 0
+        shift = 0
+        while True:
+            bval = self.nextByte()
+            result |= ((bval & 0x7f) << shift)
+            if bval & 0x80 == 0:
+                break
+            shift += 7
+        return result
+
+    def sleb(self):
+        result = 0
+        shift = 0
+        idx =0
+        while True:
+            bval = self.nextByte()
+            result |= ((bval & 0x7f) << shift)
+            shift += 7
+            idx += 1
+            if bval & 0x80 == 0:
+                break
+        if (shift < 32) or (bval & 0x40) == 0x40:
+            mask = - (1 << (idx * 7))
+            result |= mask
+        return result
+
     def asciiz(self):
         result = []
         while True:
@@ -99,7 +125,4 @@ class PlainBinaryReader(object):
 
     pos = property(_getPos, _setPos)
     size = property(_getSize)
-
-
-
 

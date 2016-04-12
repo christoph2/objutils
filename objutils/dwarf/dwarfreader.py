@@ -37,42 +37,6 @@ class DwarfReader(PlainBinaryReader):
         self.wordSize = None
         self.imageReader = imageReader
 
-    def uleb(self):
-        result = 0
-        shift = 0
-        while True:
-            bval = self.nextByte()
-            result |= ((bval & 0x7f) << shift)
-            if bval & 0x80 == 0:
-                break
-            shift += 7
-        return result
-
-    def sleb(self):
-        result = 0
-        shift = 0
-        idx =0
-        while True:
-            bval = self.nextByte()
-            result |= ((bval & 0x7f) << shift)
-            shift += 7
-            idx += 1
-            if bval & 0x80 == 0:
-                break
-        if (shift < 32) or (bval & 0x40) == 0x40:
-            mask = - (1 << (idx * 7))
-            result |= mask
-        return result
-
-    def asciiz(self):
-        result = []
-        while True:
-            bval = self.nextByte()
-            if bval == 0:
-                break
-            result.append(bval)
-        return ''.join(chr(x) for x in result)
-
     def _block(self, size):
         _BLOCK_SIZE_READER = {1: self.u8, 2: self.u16, 4: self.u32, -1: self.uleb}
         return [self.u8() for _ in range(_BLOCK_SIZE_READER[size]())]
