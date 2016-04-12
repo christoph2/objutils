@@ -78,9 +78,3 @@ class Writer(HexFile.Writer):
         line = "%%%02X6%02X%04X%s" % ((length + 5) * 2, checksum, address, Writer.hexBytes(row), )
         return line
 
-#    def composeFooter(self, meta):
-#        return ";00"
-
-
-register('etek', Reader, Writer, "Extended Tektonix format.")
-

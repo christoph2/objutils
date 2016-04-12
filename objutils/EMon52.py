@@ -76,5 +76,3 @@ class Writer(HexFile.Writer):
         checksum = sum(row) % 65536
         return "%02X %04X:%s %04X" % (length, address, Writer.hexBytes(row, spaced = True), checksum)
 
-register('emon52', Reader, Writer, "Elektor Monitor (EMON52) file format.")
-

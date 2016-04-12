@@ -128,5 +128,3 @@ class Writer(HexFile.Writer):
 
         self.outFile.write(":%02X%04X%02X%s%02X" % (length, address, type_, line, checksum))
 
-register('ihex', Reader, Writer, "Intel IHex format.")
-

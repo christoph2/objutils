@@ -29,8 +29,6 @@ import objutils.HexFile as HexFile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
-from objutils.registry import register
-
 DATA    = 1
 EOF     = 2
 
@@ -67,9 +65,4 @@ class Writer(HexFile.Writer):
         dataChecksum = checksums.nibbleSum(row)
         line = "/%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         return line
-
-#    def composeFooter(self, meta):
-#        return ";00"
-
-register('tek', Reader, Writer, "Tektonix format.")
 

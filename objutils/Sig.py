@@ -65,8 +65,4 @@ class Writer(objutils.HexFile.Writer):
         line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         return line
 
-#    def composeFooter(self, meta):
-#        return ";00"
-
-register('sig', Reader, Writer, "Signetics format.")
 

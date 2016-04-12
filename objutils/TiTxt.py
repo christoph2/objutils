@@ -56,5 +56,3 @@ class Writer(HexFile.ASCIIHexWriter):
     def composeFooter(self, meta):
         return "q"
 
-register('titxt', Reader, Writer, "Texas Instruments MSP430 text format.")
-

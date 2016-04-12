@@ -68,6 +68,3 @@ class Writer(HexFile.Writer):
     def composeFooter(self, meta):
         return "%s" % Writer.SEPARATOR
 
-
-register('rca', Reader, Writer, "RCA format.")
-

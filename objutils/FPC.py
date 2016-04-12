@@ -155,9 +155,6 @@ class Writer(HexFile.Writer):
             result.extend([MAPPING[0]] * (5 - len(result)))
         return ''.join(reversed(result))
 
-
-register('fpc', Reader, Writer, "Four packed code file format.")
-
 """
 ZMQ-Base85:
 ----------

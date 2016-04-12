@@ -78,6 +78,3 @@ class Writer(HexFile.ASCIIHexWriter):
     def rowCallout(self, address, length, row):
         self.checksum += checksum(row)
 
-
-register('ash', Reader, Writer, "ASCII hex space formats.")
-

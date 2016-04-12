@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -197,7 +197,4 @@ class Writer(HexFile.Writer):
             s7 = meta[S7][0]
             result.append(self.srecord(7, 0, s7.address))
         return '\n'.join(result)
-
-
-register('srec', Reader, Writer, "Motorola S-Records (a.k.a. S19).")
 
