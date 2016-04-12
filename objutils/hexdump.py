@@ -58,7 +58,7 @@ class Dumper(object):
             row = section.data[startPos : endPos]
             if row == self.previousRow:
                 if not self.elided:
-                    print "          *"
+                    print("          *")
                     self.elided = True
             else:
                 self.dumpRow(row, startPos + section.address)
