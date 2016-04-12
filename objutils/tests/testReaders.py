@@ -8,7 +8,7 @@ from objutils.readers import PlainBinaryReader
 class TestReader(unittest.TestCase):
 
     def _createReader(self):
-        return PlainBinaryReader(createStringBuffer("hello world!"), PlainBinaryReader.LITTLE_ENDIAN)
+        return PlainBinaryReader(createStringBuffer(bytearray("hello world!", "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
 
     def testSize(self):
         reader = self._createReader()
@@ -38,7 +38,7 @@ class TestReader(unittest.TestCase):
 class Decoder(unittest.TestCase):
 
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(createStringBuffer(value), PlainBinaryReader.LITTLE_ENDIAN)
+        dr = PlainBinaryReader(createStringBuffer(bytes(value)), PlainBinaryReader.LITTLE_ENDIAN)
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):
