@@ -31,8 +31,6 @@ import objutils.HexFile as HexFile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
-from objutils.registry import register
-
 DATA    = 1
 EOF     = 2
 

@@ -27,26 +27,36 @@ __copyright__ = """
 
 from collections import namedtuple
 
+from objutils.utils import SingletonBase
+
 class CodecDoesNotExistError(Exception): pass
 class CodecAlreadyExistError(Exception): pass
 
 Codec = namedtuple("Codec", "Reader Writer description")
-codecs = {}
 
-def registry():
-    return codecs
+class Registry(SingletonBase):
 
-def getFormats():
-    return sorted(codecs.keys())
+    def __init__(self):
+        self._codecs = {}
 
-def getCodec(codecName):
-    codec = codecs.get(codecName, None)
-    if codec is None:
-        raise CodecDoesNotExistError(codecName)
-    return codec
+    def _getCodecs(self):
+        return self._codecs
 
-def register(name, readerClass, writerClass, description = ''):
-    if name in codecs:
-        raise CodecAlreadyExistError(name)
-    codecs[name] = Codec(readerClass, writerClass, description)
+    def _getFormats(self):
+        return sorted(self.codecs.keys())
+
+    def get(self, name):
+        codec = self.codecs.get(name, None)
+        if codec is None:
+            raise CodecDoesNotExistError(name)
+        return codec
+
+    def register(self, name, readerClass, writerClass, description = ''):
+        if name in self.codecs:
+            raise CodecAlreadyExistError(name)
+        self._codecs[name] = Codec(readerClass, writerClass, description)
+
+    codecs = property(_getCodecs)
+    formats = property(_getFormats)
+
 

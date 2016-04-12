@@ -26,7 +26,6 @@ __copyright__ = """
 """
 
 import objutils.HexFile as HexFile
-from objutils.registry import register
 
 DATA                        = 0
 EOF                         = 1

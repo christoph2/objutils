@@ -27,65 +27,67 @@ __copyright__ = """
 
 from collections import namedtuple
 
-from objutils.registry import getCodec, register
+from objutils.registry import Registry
+
+reg = Registry()
 
 ##
 ##  Register codecs.
 ##
 import objutils.ASH
-register('ash', objutils.ASH.Reader, objutils.ASH.Writer, "ASCII hex space formats.")
+reg.register('ash', objutils.ASH.Reader, objutils.ASH.Writer, "ASCII hex space formats.")
 
 import objutils.Sig
-register('sig', objutils.Sig.Reader, objutils.Sig.Writer, "Signetics format.")
+reg.register('sig', objutils.Sig.Reader, objutils.Sig.Writer, "Signetics format.")
 
 import objutils.SRecords
-register('srec', objutils.SRecords.Reader, objutils.SRecords.Writer, "Motorola S-Records (a.k.a. S19).")
+reg.register('srec', objutils.SRecords.Reader, objutils.SRecords.Writer, "Motorola S-Records (a.k.a. S19).")
 
 import objutils.TiTxt
-register('titxt', objutils.TiTxt.Reader, objutils.TiTxt.Writer, "Texas Instruments MSP430 text format.")
+reg.register('titxt', objutils.TiTxt.Reader, objutils.TiTxt.Writer, "Texas Instruments MSP430 text format.")
 
 import objutils.EMon52
-register('emon52', objutils.EMon52.Reader, objutils.EMon52.Writer, "Elektor Monitor (EMON52) file format.")
+reg.register('emon52', objutils.EMon52.Reader, objutils.EMon52.Writer, "Elektor Monitor (EMON52) file format.")
 
 import objutils.Elf
 # TODO!!!
 
 import objutils.ETek
-register('etek', objutils.ETek.Reader, objutils.ETek.Writer, "Extended Tektonix format.")
+reg.register('etek', objutils.ETek.Reader, objutils.ETek.Writer, "Extended Tektonix format.")
 
 import objutils.FPC
-register('fpc', objutils.FPC.Reader, objutils.FPC.Writer, "Four packed code file format.")
+reg.register('fpc', objutils.FPC.Reader, objutils.FPC.Writer, "Four packed code file format.")
 
 import objutils.IEEE695
 # TODO!!!
 
 import objutils.IHex
-register('ihex', objutils.IHex.Reader, objutils.IHex.Writer, "Intel IHex format.")
+reg.register('ihex', objutils.IHex.Reader, objutils.IHex.Writer, "Intel IHex format.")
 
 import objutils.MOSTec
-register('mostec', objutils.MOSTec.Reader, objutils.MOSTec.Writer, "MOSTech format.")
+reg.register('mostec', objutils.MOSTec.Reader, objutils.MOSTec.Writer, "MOSTech format.")
 
 import objutils.RCA
-register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
+reg.register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
 
 #import objutils.cosmac
-#register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
+#reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 
 #import objutils.Tek
-#register('tek', import objutils.Tek.Reader, import objutils.Tek.Writer, "Tektonix format.")
+#reg.register('tek', import objutils.Tek.Reader, import objutils.Tek.Writer, "Tektonix format.")
 
 ##
 ##  Interface to objutils.
 ##
 def load(codecName, *args, **kws):
-    return getCodec(codecName).Reader().load(*args, **kws)
+    return reg.get(codecName).Reader().load(*args, **kws)
 
 def loads(codecName, *args, **kws):
-    return getCodec(codecName).Reader().loads(*args, **kws)
+    return reg.get(codecName).Reader().loads(*args, **kws)
 
 def dump(codecName, *args, **kws):
-    getCodec(codecName).Writer().dump(*args, **kws)
+    reg.get(codecName).Writer().dump(*args, **kws)
 
 def dumps(codecName, *args, **kws):
-    return getCodec(codecName).Writer().dumps(*args, **kws)
+    return reg.get(codecName).Writer().dumps(*args, **kws)
 

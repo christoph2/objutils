@@ -37,7 +37,6 @@ from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from objutils.checksums import lrc, COMPLEMENT_NONE
 from objutils.utils import PYTHON_VERSION
-from objutils.registry import register
 
 STX = '\x02'
 ETX = '\x03'

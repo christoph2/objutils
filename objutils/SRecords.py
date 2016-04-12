@@ -31,7 +31,6 @@ from objutils.checksums import lrc, COMPLEMENT_ONES
 from objutils.utils import makeList
 import objutils.HexFile as HexFile
 import objutils.utils as utils
-from objutils.registry import register
 
 S0  = 1
 S1  = 2

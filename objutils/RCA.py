@@ -29,12 +29,9 @@ __copyright__ = """
 import re
 import objutils.HexFile as HexFile
 import objutils.utils as utils
-from objutils.registry import register
 
 DATA    = 1
 EOF     = 2
-
-
 
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 

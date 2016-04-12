@@ -28,7 +28,6 @@ __copyright__ = """
 import objutils.HexFile
 from objutils import utils
 import objutils.checksums as checksums
-from objutils.registry import register
 
 DATA = 1
 EOF = 2

@@ -36,7 +36,6 @@ import objutils.HexFile as HexFile
 from objutils.Segment import Segment, joinSegments
 from objutils.Image import Image
 from objutils.utils import PYTHON_VERSION
-from objutils.registry import register
 
 
 class Reader(HexFile.ASCIIHexReader):

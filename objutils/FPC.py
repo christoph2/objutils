@@ -32,7 +32,6 @@ import objutils.HexFile as HexFile
 from objutils.utils import createStringBuffer, slicer
 from objutils import checksums
 import objutils.utils as utils
-from objutils.registry import register
 
 DATA_ABS    = 1
 DATA_INC    = 2

@@ -26,9 +26,6 @@ __copyright__ = """
 """
 
 import objutils.HexFile as HexFile
-from objutils.registry import register
-
-
 import objutils.checksums as checksums
 import objutils.utils as utils
 

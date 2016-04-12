@@ -33,8 +33,6 @@ from objutils.checksums import lrc, COMPLEMENT_TWOS
 import objutils.utils as utils
 import objutils.checksums as checksums
 
-from objutils.registry import register
-
 DATA                        = 0
 EOF                         = 1
 EXTENDED_SEGMENT_ADDRESS    = 2

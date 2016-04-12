@@ -28,6 +28,7 @@ __copyright__ = """
 import itertools
 import os
 import sys
+import threading
 
 def slicer(iterable, sliceLength, converter = None):
     if converter is None:
@@ -158,3 +159,40 @@ def runCommand(cmd):
     if proc.returncode:
         raise CommandError("{0}".format(result[1]))
     return result[0]
+
+
+class SingletonBase(object):
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kws):
+        # Double-Checked Locking
+        if not hasattr(cls, '_instance'):
+            try:
+                cls._lock.acquire()
+                if not hasattr(cls, '_instance'):
+                    cls._instance = super(SingletonBase, cls).__new__(cls)
+            finally:
+                cls._lock.release()
+        return cls._instance
+
+
+class RepresentationMixIn(object):
+
+    def __repr__(self):
+        keys = [k for k in self.__dict__ if not (k.startswith('__') and k.endswith('__'))]
+        result = []
+        result.append("%s {" % self.__class__.__name__)
+        for key in keys:
+            value = getattr(self, key)
+            if isinstance(value, (int, long)):
+                line = "    %s = 0x%X" % (key, value)
+            elif isinstance(value, (float, types.NoneType)):
+                line = "    %s = %s" % (key, value)
+            elif isinstance(value, array):
+                line = "    %s = %s" % (key, helper.hexDump(value))
+            else:
+                line = "    %s = '%s'" % (key, value)
+            result.append(line)
+        result.append("}")
+        return '\n'.join(result)
+
