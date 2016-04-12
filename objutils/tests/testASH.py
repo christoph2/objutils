@@ -69,21 +69,30 @@ S5030001FB"""
 
 class TestAcceptance(unittest.TestCase):
 
-    def runTest(self, format):
+    def _runTest(self, format):
         data = loads("ash", format)
         self.assertTrue(dumps("srec", data) == SREC)
 
     def testAcceptSpace(self):
-        self.runTest(TEST_HEX_SPACE)
+        self._runTest(TEST_HEX_SPACE)
 
     def testAcceptPercent(self):
-        self.runTest(TEST_HEX_PERCENT)
+        self._runTest(TEST_HEX_PERCENT)
 
     def testAcceptComma(self):
-        self.runTest(TEST_HEX_COMMA)
+        self._runTest(TEST_HEX_COMMA)
 
     def testAcceptApostroph(self):
-        self.runTest(TEST_HEX_APOSTROPH)
+        self._runTest(TEST_HEX_APOSTROPH)
+
+
+class TestGenerateVariants(unittest.TestCase):
+
+    def testWriteHexSpace(self):
+        data = loads("srec", SREC)
+        print(dumps("ash", data, separator = "%"))
+        print()
+
 
 def main():
     unittest.main()
