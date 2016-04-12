@@ -40,7 +40,8 @@ EOF         = 4
 
 PREFIX      = '$'
 
-MAPPING = dict(enumerate(map(chr, range(37, 37 + 5) + range(37 + 6, 37 + 80 + 6))))
+MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42, )))
+
 REV_MAPPING = dict([(value, key) for key, value in MAPPING.items()])
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 
