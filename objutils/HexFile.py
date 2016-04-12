@@ -185,7 +185,7 @@ class Reader(BaseType):
 
     def load(self, fp, **kws):
         if PYTHON_VERSION.major == 3:
-            return self.read(fp)# .decode()
+            return self.read(fp).decode()
         else:
             return self.read(fp)
 
