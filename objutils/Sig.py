@@ -68,5 +68,5 @@ class Writer(objutils.HexFile.Writer):
 #    def composeFooter(self, meta):
 #        return ";00"
 
-register('signetics', Reader, Writer, "Signetics format.")
+register('sig', Reader, Writer, "Signetics format.")
 
