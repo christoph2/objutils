@@ -140,7 +140,7 @@ class TestDecoding(Decoder):
         self.u64("\x80\x00\x00\x00\x00\x00\x00\x00", 128)
 
     def testU64_3(self):
-        self.u64("\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680
+        self.u64("\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680)
 
     def testS64_1(self):
         self.s64("\x00\x00\x00\x00\x00\x00\x00\x00", 0)
