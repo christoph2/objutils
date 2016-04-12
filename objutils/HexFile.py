@@ -116,6 +116,7 @@ class FormatParser(object):
             group += ch
             prevCh = ch
         self.translateFormat(group)
+        self.translatedFmt.append((0, 0, r"(?P<junk>(.*?))$"))  #??
         ft = ''.join(map(itemgetter(2), self.translatedFmt))
         return re.compile(ft, re.DOTALL | re.MULTILINE)
 
@@ -213,8 +214,10 @@ class Reader(BaseType):
                     if dict_ != {}:
                         # Handle scalar values.
                         for key, value in dict_.items():
-                            if key != 'chunk':
+                            if key not in ('chunk', 'junk'):
                                 setattr(container, key, atoi(value))
+                            elif key == 'junk':
+                                setattr(container, key, value)
                         if 'chunk' in dict_:
                             if self.parseData(container, formatType):
                                 chunk = bytearray(map(atoi, BYTES.findall(dict_['chunk'])))
@@ -231,7 +234,8 @@ class Reader(BaseType):
                             segments.append(Segment(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
-                            metaData[formatType].append(MetaRecord(formatType, container.address, chunk))
+                            address = container.address if hasattr(container, 'address') else None
+                            metaData[formatType].append(MetaRecord(formatType, address, chunk))
                     break
             if not matched:
                 self.warn("Ignoring garbage line #%u" % lineNumber)
@@ -291,8 +295,7 @@ class Writer(BaseType):
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
 
-        if kws:
-            params = self.saveParameters(**kws)
+        params = self.setParameters(**kws)
 
         self.preProcessing(image)
 
@@ -307,8 +310,6 @@ class Writer(BaseType):
                 result.append(self.composeRow(address, length, row))
                 address += rowLength
         footer = self.composeFooter(image.meta)
-        if kws:
-            self.restoreParameters(params)
         if footer:
             result.append(footer)
         return self.postProcess('\n'.join(result))
@@ -324,7 +325,7 @@ class Writer(BaseType):
     def preProcessing(self, image):
         pass
 
-    def saveParameters(self, **kws):
+    def setParameters(self, **kws):
         params = {}
         for k, v in kws.items():
             try:
@@ -334,10 +335,6 @@ class Writer(BaseType):
             else:
                 setattr(self, k, v)
         return params
-
-    def restoreParameters(self, params):
-        for k, v in params.items():
-            setattr(self, k, v)
 
     def composeRow(self, address, length, row):
         raise NotImplementedError()
@@ -412,6 +409,7 @@ class ASCIIHexWriter(Writer):
     previousAddress = None
 
     def __init__(self, addressDesignator):
+        self.separator = ' '
         self.addressDesignator = addressDesignator
         super(ASCIIHexWriter, self).__init__()
 
@@ -419,7 +417,9 @@ class ASCIIHexWriter(Writer):
         prependAddress =  True if address != self.previousAddress else False
         self.previousAddress = (address + length)
         if prependAddress:
-            line = "{0}\n{1}".format("{0}{1:04X}".format(self.addressDesignator, address), " ".join(["{0:02X}".format(x) for x in row]))
+            line = "{0}\n{1}".format("{0}{1:04X}".format(
+                self.addressDesignator, address), "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row])
+            )
         else:
             line = " ".join(["{0:02X}".format(x) for x in row])
         self.rowCallout(address, length, row)
