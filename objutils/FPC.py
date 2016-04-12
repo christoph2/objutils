@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import division
 __version__ = "0.1.0"
 
 __copyright__ = """
@@ -24,7 +24,6 @@ __copyright__ = """
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
-
 from functools import partial
 import operator
 import re
@@ -32,6 +31,7 @@ import objutils.HexFile as HexFile
 from objutils.utils import createStringBuffer, slicer
 from objutils import checksums
 import objutils.utils as utils
+
 
 DATA_ABS    = 1
 DATA_INC    = 2
@@ -150,7 +150,7 @@ class Writer(HexFile.Writer):
         result = []
         while value:
             result.append(MAPPING[value % 85])
-            value /= 85
+            value //= 85
         if len(result) < 5:
             result.extend([MAPPING[0]] * (5 - len(result)))
         return ''.join(reversed(result))
