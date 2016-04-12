@@ -74,7 +74,7 @@ class Reader(HexFile.Reader):
                 value = self.convertQuintuple(quintuple)
                 values.append("%08X" % value)
             outLines.append(''.join(values))
-        return super(Reader, self).read(createStringBuffer(bytes('\n'.join(outLines))))
+        return super(Reader, self).read(createStringBuffer(bytes('\n'.join(outLines), "ascii")))
 
     def convertQuintuple(self, quintuple):
         res = 0         # reduce(lambda accu, x: (accu * 85) + x, value, 0)
