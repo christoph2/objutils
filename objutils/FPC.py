@@ -76,7 +76,7 @@ class Reader(HexFile.Reader):
             outLines.append(''.join(values))
         return super(Reader, self).read(
             createStringBuffer(
-                bytes('\n'.join(outLines)).decode("ascii")
+                bytes('\n'.join(outLines).decode("ascii"))
             )
         )
 
