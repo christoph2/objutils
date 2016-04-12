@@ -41,9 +41,11 @@ EOF         = 4
 PREFIX      = '$'
 
 MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42, )))
-
 REV_MAPPING = dict([(value, key) for key, value in MAPPING.items()])
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
+
+print(MAPPING)
+print(REV_MAPPING)
 
 atoi16 = partial(int, base = 16)
 
