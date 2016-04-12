@@ -41,11 +41,8 @@ EOF         = 4
 PREFIX      = '$'
 
 MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42, )))
-REV_MAPPING = dict([(value, key) for key, value in MAPPING.items()])
+REV_MAPPING = dict([(ord(value), key) for key, value in MAPPING.items()])
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
-
-print(MAPPING)
-print(REV_MAPPING)
 
 atoi16 = partial(int, base = 16)
 
@@ -82,7 +79,7 @@ class Reader(HexFile.Reader):
     def convertQuintuple(self, quintuple):
         res = 0         # reduce(lambda accu, x: (accu * 85) + x, value, 0)
         for ch  in quintuple:
-            v = REV_MAPPING[ch]
+            v = REV_MAPPING[bytearray((ch, ))[0]]
             res = v + (res * 85)
         return res
 
