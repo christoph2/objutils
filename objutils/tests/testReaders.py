@@ -122,7 +122,7 @@ class TestDecoding(Decoder):
         self.u32("\x80\x00\x00\x00", 128)
 
     def testU32_3(self):
-        self.u32("\x00\x00\x00\xff", 4278190080L)
+        self.u32("\x00\x00\x00\xff", 4278190080)
 
     def testS32_1(self):
         self.s32("\x00\x00\x00\x00", 0)
@@ -140,13 +140,13 @@ class TestDecoding(Decoder):
         self.u64("\x80\x00\x00\x00\x00\x00\x00\x00", 128)
 
     def testU64_3(self):
-        self.u64("\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680L)
+        self.u64("\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680
 
     def testS64_1(self):
         self.s64("\x00\x00\x00\x00\x00\x00\x00\x00", 0)
 
     def testS64_2(self):
-        self.s64("\x00\x00\x00\x00\x00\x00\x00\x80", -9223372036854775808L)
+        self.s64("\x00\x00\x00\x00\x00\x00\x00\x80", -9223372036854775808)
 
     def testS64_3(self):
         self.s64("\xff\xff\xff\xff\xff\xff\xff\xff", -1)
