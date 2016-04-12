@@ -91,6 +91,8 @@ class Reader(HexFile.Reader):
         return res
 
     def checkLine(self, line, formatType):
+        if formatType == EOF:
+            return True
         line.length -= 4
         if line.length != len(line.chunk):
             line.chunk = line.chunk[ : line.length] # Cut padding.
