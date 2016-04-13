@@ -71,13 +71,13 @@ class Decoder(unittest.TestCase):
 class TestDecoding(Decoder):
 
     def testSlb01(self):
-        self.sleb("\x9b\xf1\x59", -624485)
+        self.sleb(b"\x9b\xf1\x59", -624485)
 
     def testASCIIZValue(self):
-        self._runTest("asciiz", "hello world!\x00", "hello world!")
+        self._runTest("asciiz", b"hello world!\x00", "hello world!")
 
     def testASCIIZEmpty(self):
-        self._runTest("asciiz", "\x00", "")
+        self._runTest("asciiz", b"\x00", "")
 
     def testU8_1(self):
         self.u8(b"\x00", 0)

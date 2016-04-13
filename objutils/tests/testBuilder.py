@@ -15,7 +15,7 @@ class TestBasicFunctionality(unittest.TestCase):
         b0.addSegment("hello world!")
         #b0.addSegment(unicode("€äöüßÄÖÜ", encoding = "latin-1"), 0x1000)
         b0.joinSegments()
-        b0.hexdump()
+        #b0.hexdump()
 
 
 if __name__ == '__main__':
