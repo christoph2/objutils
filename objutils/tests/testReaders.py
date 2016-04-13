@@ -41,31 +41,32 @@ class Decoder(unittest.TestCase):
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):
-        self._runTest("sleb", bytes(value), expected)
+        self._runTest("sleb", bytearray(value), expected)
 
     def u8(self, value, expected):
-        self._runTest("u8", bytes(value), expected)
+        self._runTest("u8", bytearray(value), expected)
 
     def s8(self, value, expected):
-        self._runTest("s8", bytes(value), expected)
+        self._runTest("s8", bytearray(value), expected)
 
     def u16(self, value, expected):
-        self._runTest("u16", bytes(value), expected)
+        self._runTest("u16", bytearray(value), expected)
 
     def s16(self, value, expected):
-        self._runTest("s16", bytes(value), expected)
+        self._runTest("s16", bytearray(value), expected)
 
     def u32(self, value, expected):
-        self._runTest("u32", bytes(value), expected)
+        self._runTest("u32", bytearray(value), expected)
 
     def s32(self, value, expected):
-        self._runTest("s32", bytes(value), expected)
+        self._runTest("s32", bytearray(value), expected)
 
     def u64(self, value, expected):
-        self._runTest("u64", bytes(value), expected)
+        self._runTest("u64", bytearray(value), expected)
 
     def s64(self, value, expected):
-        self._runTest("s64", bytes(value), expected)
+        self._runTest("s64", bytearray(value), expected)
+
 
 class TestDecoding(Decoder):
 
