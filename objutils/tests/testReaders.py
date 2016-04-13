@@ -80,76 +80,76 @@ class TestDecoding(Decoder):
         self._runTest("asciiz", "\x00", "")
 
     def testU8_1(self):
-        self.u8("\x00", 0)
+        self.u8(b"\x00", 0)
 
     def testU8_2(self):
-        self.u8("\x80", 128)
+        self.u8(b"\x80", 128)
 
     def testU8_3(self):
-        self.u8("\xff", 255)
+        self.u8(b"\xff", 255)
 
     def testS8_1(self):
-        self.s8("\x00", 0)
+        self.s8(b"\x00", 0)
 
     def testS8_2(self):
-        self.s8("\x80", -128)
+        self.s8(b"\x80", -128)
 
     def testS8_3(self):
-        self.s8("\xff", -1)
+        self.s8(b"\xff", -1)
 
     def testU16_1(self):
-        self.u16("\x00\x00", 0)
+        self.u16(b"\x00\x00", 0)
 
     def testU16_2(self):
-        self.u16("\x80\x00", 128)
+        self.u16(b"\x80\x00", 128)
 
     def testU16_3(self):
-        self.u16("\x00\xff", 65280)
+        self.u16(b"\x00\xff", 65280)
 
     def testS16_1(self):
-        self.s16("\x00\x00", 0)
+        self.s16(b"\x00\x00", 0)
 
     def testS16_2(self):
-        self.s16("\x00\x80", -32768)
+        self.s16(b"\x00\x80", -32768)
 
     def testS16_3(self):
-        self.s16("\xff\xff", -1)
+        self.s16(b"\xff\xff", -1)
 
     def testU32_1(self):
-        self.u32("\x00\x00\x00\x00", 0)
+        self.u32(b"\x00\x00\x00\x00", 0)
 
     def testU32_2(self):
-        self.u32("\x80\x00\x00\x00", 128)
+        self.u32(b"\x80\x00\x00\x00", 128)
 
     def testU32_3(self):
-        self.u32("\x00\x00\x00\xff", 4278190080)
+        self.u32(b"\x00\x00\x00\xff", 4278190080)
 
     def testS32_1(self):
-        self.s32("\x00\x00\x00\x00", 0)
+        self.s32(b"\x00\x00\x00\x00", 0)
 
     def testS32_2(self):
-        self.s32("\x00\x00\x00\x80", -2147483648)
+        self.s32(b"\x00\x00\x00\x80", -2147483648)
 
     def testS32_3(self):
-        self.s32("\xff\xff\xff\xff", -1)
+        self.s32(b"\xff\xff\xff\xff", -1)
 
     def testU64_1(self):
-        self.u64("\x00\x00\x00\x00\x00\x00\x00\x00", 0)
+        self.u64(b"\x00\x00\x00\x00\x00\x00\x00\x00", 0)
 
     def testU64_2(self):
-        self.u64("\x80\x00\x00\x00\x00\x00\x00\x00", 128)
+        self.u64(b"\x80\x00\x00\x00\x00\x00\x00\x00", 128)
 
     def testU64_3(self):
-        self.u64("\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680)
+        self.u64(b"\x00\x00\x00\x00\x00\x00\x00\xff", 18374686479671623680)
 
     def testS64_1(self):
-        self.s64("\x00\x00\x00\x00\x00\x00\x00\x00", 0)
+        self.s64(b"\x00\x00\x00\x00\x00\x00\x00\x00", 0)
 
     def testS64_2(self):
-        self.s64("\x00\x00\x00\x00\x00\x00\x00\x80", -9223372036854775808)
+        self.s64(b"\x00\x00\x00\x00\x00\x00\x00\x80", -9223372036854775808)
 
     def testS64_3(self):
-        self.s64("\xff\xff\xff\xff\xff\xff\xff\xff", -1)
+        self.s64(b"\xff\xff\xff\xff\xff\xff\xff\xff", -1)
 
 
 def main():
