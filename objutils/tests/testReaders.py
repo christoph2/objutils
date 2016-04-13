@@ -37,35 +37,35 @@ class TestReader(unittest.TestCase):
 class Decoder(unittest.TestCase):
 
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(createStringBuffer(bytearray(value, "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
+        dr = PlainBinaryReader(createStringBuffer(value), PlainBinaryReader.LITTLE_ENDIAN)
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):
-        self._runTest("sleb", value, expected)
+        self._runTest("sleb", bytes(value), expected)
 
     def u8(self, value, expected):
-        self._runTest("u8", value, expected)
+        self._runTest("u8", bytes(value), expected)
 
     def s8(self, value, expected):
-        self._runTest("s8", value, expected)
+        self._runTest("s8", bytes(value), expected)
 
     def u16(self, value, expected):
-        self._runTest("u16", value, expected)
+        self._runTest("u16", bytes(value), expected)
 
     def s16(self, value, expected):
-        self._runTest("s16", value, expected)
+        self._runTest("s16", bytes(value), expected)
 
     def u32(self, value, expected):
-        self._runTest("u32", value, expected)
+        self._runTest("u32", bytes(value), expected)
 
     def s32(self, value, expected):
-        self._runTest("s32", value, expected)
+        self._runTest("s32", bytes(value), expected)
 
     def u64(self, value, expected):
-        self._runTest("u64", value, expected)
+        self._runTest("u64", bytes(value), expected)
 
     def s64(self, value, expected):
-        self._runTest("s64", value, expected)
+        self._runTest("s64", bytes(value), expected)
 
 class TestDecoding(Decoder):
 
