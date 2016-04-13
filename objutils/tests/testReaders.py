@@ -34,11 +34,10 @@ class TestReader(unittest.TestCase):
         self.assertEqual(reader.nextByte(), 104)
 
 
-
 class Decoder(unittest.TestCase):
 
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(createStringBuffer(bytes(value)), PlainBinaryReader.LITTLE_ENDIAN)
+        dr = PlainBinaryReader(createStringBuffer(bytearray(value, "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):
