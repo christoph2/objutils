@@ -73,8 +73,8 @@ reg.register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
 #import objutils.cosmac
 #reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 
-#import objutils.Tek
-#reg.register('tek', import objutils.Tek.Reader, import objutils.Tek.Writer, "Tektonix format.")
+import objutils.Tek
+reg.register('tek', objutils.Tek.Reader, objutils.Tek.Writer, "Tektonix format.")
 
 ##
 ##  Interface to objutils.

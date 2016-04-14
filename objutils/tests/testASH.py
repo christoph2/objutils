@@ -90,8 +90,8 @@ class TestGenerateVariants(unittest.TestCase):
 
     def testWriteHexSpace(self):
         data = loads("srec", SREC)
-        print(dumps("ash", data, separator = "%"))
-        print()
+        #print(dumps("ash", data, separator = "%"))
+        #print()
 
 
 def main():
