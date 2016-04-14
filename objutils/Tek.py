@@ -59,10 +59,15 @@ class Writer(HexFile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
+
+    def composeFooter(self, meta):
+        return "/{0:04X}00{1:02X}".format(self.lastAddress, checksums.nibbleSum(utils.intToArray(self.lastAddress)))
+
     def composeRow(self, address, length, row):
         addressChecksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), length))
 
         dataChecksum = checksums.nibbleSum(row)
         line = "/%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        self.lastAddress = address + length
         return line
 
