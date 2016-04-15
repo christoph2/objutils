@@ -62,6 +62,8 @@ class Writer(objutils.HexFile.Writer):
         addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(address), length), 8, checksums.ROTATE_LEFT)
         dataChecksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
         line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        self.lastAddress = address + length
         return line
 
-
+    def composeFooter(self, meta):
+      return ":{0:04X}00".format(self.lastAddress)
