@@ -104,6 +104,7 @@ class Reader(HexFile.Reader):
 
 
 class Writer(HexFile.Writer):
+    MAX_ADDRESS_BITS = 32
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_TWOS)
 
     def writeHeader(self):
