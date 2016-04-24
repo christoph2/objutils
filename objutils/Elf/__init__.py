@@ -97,24 +97,18 @@ class ELFHeader(object):
 
     def __init__(self, parent):
         self.parent = parent
-        parent.fp.seek(0, os.SEEK_SET)
-        self.magicBytes = parent.fp.read(len(self.magicHeader))
-
+        self.magicBytes = parent.fp[0 : len(self.magicHeader)]
         if self.magicBytes[ : 4] != defs.ELF_MAGIC:    # 7f 45 4c 46
             raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
-
         self.magicHeader.apply(self.magicBytes, self)
         self.is64Bit = (self.elfClass ==  defs.ELFClass.ELFCLASS64)
         self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
-
         elfHeader = Attributor(defs.HDR_FMT64 if self.is64Bit else defs.HDR_FMT32, defs.Elf32_Ehdr, self.byteOrderPrefix)
-        rawData = parent.fp.read(len(elfHeader))
+        rawData = parent.fp[len(self.magicHeader) : len(self.magicHeader) + len(elfHeader)]
         elfHeader.apply(rawData, self)
-
         if self.elfEHSize!= (len(self.magicHeader) + len(elfHeader)):
             raise FormatError("Wrong header size.")
         self.hasStringTable = not (self.elfStringTableIndex == defs.SHN_UNDEF)
-
 
     @property
     def elfTypeName(self):
@@ -266,9 +260,8 @@ class ELFSectionHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
         self.parent = parent
         self._name = None
-        parent.fp.seek(atPosition, os.SEEK_SET)
+        data = parent.fp[atPosition : atPosition + (defs.ELF_SECTION_SIZE64 if parent.is64Bit else defs.ELF_SECTION_SIZE32)]
 
-        data = parent.fp.read(defs.ELF_SECTION_SIZE64 if parent.is64Bit else defs.ELF_SECTION_SIZE32)
         format = defs.SEC_FMT64 if parent.is64Bit else defs.SEC_FMT32
         attributes = defs.Elf_Shdr
 
@@ -282,8 +275,7 @@ class ELFSectionHeaderTable(object):
 
         if self.shType not in (defs.SHT_NOBITS, defs.SHT_NULL) and self.shSize > 0:
             pos = self.shOffset
-            parent.fp.seek(pos, os.SEEK_SET)
-            self.image = parent.fp.read(self.shSize)
+            self.image = parent.fp[pos : pos + self.shSize]
         else:
             self.image = None
 
@@ -368,18 +360,12 @@ class ELFSectionHeaderTable(object):
 
 class ELFProgramHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
-        parent.fp.seek(atPosition, os.SEEK_SET)
-
-        data = parent.fp.read(defs.ELF_PHDR_SIZE64 if parent.is64Bit else defs.ELF_PHDR_SIZE32)
-
+        data = parent.fp[atPosition : atPosition +(defs.ELF_PHDR_SIZE64 if parent.is64Bit else defs.ELF_PHDR_SIZE32)]
         format = defs.PHDR_FMT64 if parent.is64Bit else defs.PHDR_FMT32
         attributes = defs.Elf64_Phdr if parent.is64Bit else defs.Elf32_Phdr
-
         elfHeader = Attributor(format, attributes, parent.byteOrderPrefix)
         elfHeader.apply(data, self)
-
-        parent.fp.seek(self.p_offset, os.SEEK_SET)
-        self.image = parent.fp.read(self.p_filesz)
+        self.image = parent.fp[self.p_offset : self.p_offset + self.p_filesz]
         if self.p_type in (defs.PT_DYNAMIC, defs.PT_INTERP, defs.PT_NOTE, defs.PT_SHLIB, defs.PT_PHDR):
             pass
 
@@ -492,8 +478,6 @@ class Relocation(object):
 
 class Reader(object):
     def __init__(self, filename, readContent = True):
-        #if not hasattr(fp, 'read'):
-        #    raise TypeError("Need a file-like object.")
         self.fp = memoryMap(filename)
         self.header = ELFHeader(self)
         self.is64Bit = self.header.is64Bit
