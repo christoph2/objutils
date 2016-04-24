@@ -1076,7 +1076,8 @@ class ELFReader(object):
             self.doSectionDetails = True
 
         self.options = options
-        self.reader = Reader(file(filename, "rb"))
+        self.reader = Reader(filename)
+        #self.reader = Reader(file(filename, "rb"))
         self.printFileHeader(self.reader)
         self.printSectionsHeaders(self.reader)
         self.printProgramHeaders(self.reader)

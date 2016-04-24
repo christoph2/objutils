@@ -27,7 +27,6 @@ __copyright__ = """
 
 import enum
 from collections import namedtuple, OrderedDict
-import mmap
 import os
 import sys
 import types
@@ -35,7 +34,7 @@ import struct
 
 from objutils.Elf import defs
 from objutils.logger import Logger
-
+from objutils.utils import memoryMap
 
 #
 #   Reference:
@@ -492,10 +491,10 @@ class Relocation(object):
 
 
 class Reader(object):
-    def __init__(self, fp, readContent = True):
-        if not hasattr(fp, 'read'):
-            raise TypeError("Need a file-like object.")
-        self.fp = fp
+    def __init__(self, filename, readContent = True):
+        #if not hasattr(fp, 'read'):
+        #    raise TypeError("Need a file-like object.")
+        self.fp = memoryMap(filename)
         self.header = ELFHeader(self)
         self.is64Bit = self.header.is64Bit
 
