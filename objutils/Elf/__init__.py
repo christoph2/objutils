@@ -97,14 +97,14 @@ class ELFHeader(object):
 
     def __init__(self, parent):
         self.parent = parent
-        self.magicBytes = parent.fp[0 : len(self.magicHeader)]
+        self.magicBytes = parent.slice(0, len(self.magicHeader))
         if self.magicBytes[ : 4] != defs.ELF_MAGIC:    # 7f 45 4c 46
             raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
         self.magicHeader.apply(self.magicBytes, self)
         self.is64Bit = (self.elfClass ==  defs.ELFClass.ELFCLASS64)
         self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
         elfHeader = Attributor(defs.HDR_FMT64 if self.is64Bit else defs.HDR_FMT32, defs.Elf32_Ehdr, self.byteOrderPrefix)
-        rawData = parent.fp[len(self.magicHeader) : len(self.magicHeader) + len(elfHeader)]
+        rawData = parent.slice(len(self.magicHeader), len(elfHeader))
         elfHeader.apply(rawData, self)
         if self.elfEHSize!= (len(self.magicHeader) + len(elfHeader)):
             raise FormatError("Wrong header size.")
@@ -260,7 +260,7 @@ class ELFSectionHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
         self.parent = parent
         self._name = None
-        data = parent.fp[atPosition : atPosition + (defs.ELF_SECTION_SIZE64 if parent.is64Bit else defs.ELF_SECTION_SIZE32)]
+        data = parent.slice(atPosition, defs.ELF_SECTION_SIZE64 if parent.is64Bit else defs.ELF_SECTION_SIZE32)
 
         format = defs.SEC_FMT64 if parent.is64Bit else defs.SEC_FMT32
         attributes = defs.Elf_Shdr
@@ -275,7 +275,7 @@ class ELFSectionHeaderTable(object):
 
         if self.shType not in (defs.SHT_NOBITS, defs.SHT_NULL) and self.shSize > 0:
             pos = self.shOffset
-            self.image = parent.fp[pos : pos + self.shSize]
+            self.image = parent.slice(pos, self.shSize)
         else:
             self.image = None
 
@@ -477,7 +477,7 @@ class Relocation(object):
 
 
 class Reader(object):
-    def __init__(self, filename, readContent = True):
+    def __init__(self, filename):
         self.fp = memoryMap(filename)
         self.header = ELFHeader(self)
         self.is64Bit = self.header.is64Bit
@@ -531,6 +531,9 @@ class Reader(object):
             section._name = name
             self._sectionHeadersByName[name] = section
         self.createSectionToSegmentMapping()
+
+    def slice(self, start, length):
+        return self.fp[start : start + length]
 
     def sectionHeaderByName(self, name):
         return self._sectionHeadersByName.get(name)
