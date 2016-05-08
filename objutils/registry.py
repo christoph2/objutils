@@ -40,7 +40,7 @@ class Registry(SingletonBase):
         self._codecs = {}
 
     def __iter__(self):
-        return iter(self._codecs)
+        return iter(self._codecs.items())
 
     def _getCodecs(self):
         return self._codecs

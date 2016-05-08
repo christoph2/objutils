@@ -97,7 +97,7 @@ def probe(*args, **kws):
 
 def probes(*args, **kws):
     found = False
-    for name, codec in reg._codecs.items():
+    for name, codec in reg:
         print name
         reader = codec.Reader()
         found = reader.probes(*args, **kws)
