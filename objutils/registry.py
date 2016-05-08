@@ -55,6 +55,8 @@ class Registry(SingletonBase):
         if name in self.codecs:
             raise CodecAlreadyExistError(name)
         self._codecs[name] = Codec(readerClass, writerClass, description)
+        readerClass.codecName = name
+        writerClass.codecName = name
 
     codecs = property(_getCodecs)
     formats = property(_getFormats)
