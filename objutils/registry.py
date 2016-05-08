@@ -39,6 +39,9 @@ class Registry(SingletonBase):
     def __init__(self):
         self._codecs = {}
 
+    def __iter__(self):
+        return iter(self._codecs)
+
     def _getCodecs(self):
         return self._codecs
 

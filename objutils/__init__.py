@@ -85,6 +85,26 @@ def load(codecName, *args, **kws):
 def loads(codecName, *args, **kws):
     return reg.get(codecName).Reader().loads(*args, **kws)
 
+def probe(*args, **kws):
+    found = False
+    for name, codec in reg._codecs.items():
+        print name
+        reader = codec.Reader()
+        found = reader.probe(*args, **kws)
+        if found:
+            break
+    return reader.codecName if found else None
+
+def probes(*args, **kws):
+    found = False
+    for name, codec in reg._codecs.items():
+        print name
+        reader = codec.Reader()
+        found = reader.probes(*args, **kws)
+        if found:
+            break
+    return reader.codecName if found else None
+
 def dump(codecName, *args, **kws):
     reg.get(codecName).Writer().dump(*args, **kws)
 

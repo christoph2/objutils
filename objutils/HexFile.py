@@ -257,9 +257,28 @@ class Reader(BaseType):
         else:
             raise ValueError("Unsupported Addressspace size.")
 
-    def probe(self):
+    def probe(self, fp):
         "Determine if valid object from first line." # if object is valid.
-        raise NotImplementedError()
+        #raise NotImplementedError()
+        matched = False
+        for (lineNumber, line) in enumerate(fp.readlines(), 1):
+            for formatType, format in self.formats: # NOTE: Same as in 'read()'!
+                if isinstance(line, bytes):
+                    match = format.match(line.decode())
+                else:
+                    match = format.match(line)
+                if match:
+                    matched = True
+                    break
+            if matched or lineNumber > 3:
+                break
+        return matched
+
+    def probes(self, image):
+        if PYTHON_VERSION.major == 3:
+            return self.probe(createStringBuffer(bytes(image, "ascii")))
+        else:
+            return self.probe(createStringBuffer(image))
 
     def checkLine(self, line, formatType):
         raise NotImplementedError()
