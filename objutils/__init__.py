@@ -88,7 +88,6 @@ def loads(codecName, *args, **kws):
 def probe(*args, **kws):
     found = False
     for name, codec in reg._codecs.items():
-        print name
         reader = codec.Reader()
         found = reader.probe(*args, **kws)
         if found:
@@ -98,7 +97,6 @@ def probe(*args, **kws):
 def probes(*args, **kws):
     found = False
     for name, codec in reg:
-        print name
         reader = codec.Reader()
         found = reader.probes(*args, **kws)
         if found:
