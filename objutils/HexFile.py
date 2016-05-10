@@ -29,6 +29,7 @@ from collections import defaultdict, namedtuple
 import logging
 from functools import partial
 import math
+import os
 import re
 import sys
 
@@ -173,6 +174,7 @@ class BaseType(object):
 class Reader(BaseType):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
+    VALID_CHARS = re.compile(r"^[a-fA-F0-9 :/;,%\n\r!?S]*$") # General case, fits most formats.
 
     def __init__(self):
         self.logger = Logger("Reader")
@@ -257,9 +259,18 @@ class Reader(BaseType):
         else:
             raise ValueError("Unsupported Addressspace size.")
 
+    def maybeBinaryFile(self, fp):
+        fp.seek(0, os.SEEK_SET)
+        header = fp.read(128)
+        fp.seek(0, os.SEEK_SET)
+        result = not bool(self.VALID_CHARS.match(header))
+        return result
+
     def probe(self, fp):
-        "Determine if valid object from first line." # if object is valid.
-        #raise NotImplementedError()
+        "Determine if valid object."
+
+        if self.maybeBinaryFile(fp):
+            return False
         matched = False
         for (lineNumber, line) in enumerate(fp.readlines(), 1):
             for formatType, format in self.formats: # NOTE: Same as in 'read()'!
