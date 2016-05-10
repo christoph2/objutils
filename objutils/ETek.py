@@ -25,6 +25,8 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import re
+
 import objutils.HexFile as HexFile
 import objutils.checksums as checksums
 import objutils.utils as utils
@@ -36,6 +38,8 @@ EOF     = 3
 
 
 class Reader(HexFile.Reader):
+
+    VALID_CHARS = re.compile(r"^[a-zA-Z0-9_ %\n\r]*$")    # We need to consider symbol information.
 
     FORMAT_SPEC = (
         (DATA,      "%LL6CCAAAAADD"),
