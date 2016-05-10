@@ -56,8 +56,8 @@ class Reader(HexFile.Reader):
         (EOF,       "00000000")
     )
 
-    def read(self, fp):
-        self.lastAddress = 0
+    def decode(self, fp):
+        self.lastAddress = 0    # TODO: decode!
         outLines = []
         for line in fp.readlines():
             line = line.strip()
@@ -74,9 +74,12 @@ class Reader(HexFile.Reader):
                 value = self.convertQuintuple(quintuple)
                 values.append("%08X" % value)
             outLines.append(''.join(values))
+        return '\n'.join(outLines)
+
+    def read(self, fp):
         return super(Reader, self).read(
             createStringBuffer(
-                bytearray('\n'.join(outLines), "ascii")
+                bytearray(self.decode(fp), "ascii")
             )
         )
 
@@ -118,6 +121,13 @@ class Reader(HexFile.Reader):
     def isDataLine(self, line, formatType):
         return formatType in (DATA_ABS, DATA_INC, DATA_REL)
 
+    def probe(self, fp):
+        return super(Reader, self).probe(
+            createStringBuffer(
+                bytearray(self.decode(fp), "ascii")
+            )
+        )
+
 
 class Writer(HexFile.Writer):
 
@@ -158,16 +168,3 @@ class Writer(HexFile.Writer):
             result.extend([MAPPING[0]] * (5 - len(result)))
         return ''.join(reversed(result))
 
-"""
-ZMQ-Base85:
-----------
-+------+------+------+------+------+------+------+------+
-| 0x86 | 0x4F | 0xD2 | 0x6F | 0xB5 | 0x59 | 0xF7 | 0x5B |
-+------+------+------+------+------+------+------+------+
-
-   SHALL encode as the following 10 characters:
-+---+---+---+---+---+---+---+---+---+---+
-| H | e | l | l | o | W | o | r | l | d |
-+---+---+---+---+---+---+---+---+---+---+
-
-"""
