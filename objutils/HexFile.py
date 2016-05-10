@@ -263,12 +263,11 @@ class Reader(BaseType):
         fp.seek(0, os.SEEK_SET)
         header = fp.read(128)
         fp.seek(0, os.SEEK_SET)
-        result = not bool(self.VALID_CHARS.match(header))
+        result = not bool(self.VALID_CHARS.match(header.decode()))
         return result
 
     def probe(self, fp):
-        "Determine if valid object."
-
+        "Determine if object is valid."
         if self.maybeBinaryFile(fp):
             return False
         matched = False
