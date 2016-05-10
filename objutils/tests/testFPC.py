@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from objutils import loads, dumps
+from objutils import loads, dumps, probes
 from objutils.Segment import Segment
 from objutils.Image import Image
 from objutils.registry import Registry
@@ -21,6 +21,7 @@ $7FD1p%%,:LHmy:>GTV%/KJ7@GE[kYz
 $B[6\;%%,:\KIn?GFWY/qKI1G5:;-_e
 $%%%%%"""
 
+
 fromSrec =  loads('srec', SREC)
 dataFromSRec = dumps('fpc', fromSrec)
 
@@ -35,6 +36,15 @@ class TestRoundTrip(unittest.TestCase):
 
     def testFromFPC(self):
         self.assertEqual(dataFromFPC, SREC)
+
+
+class TestProbe(unittest.TestCase):
+
+    def testProbeSrec(self):
+        self.assertEqual(probes(SREC), "srec")
+        
+    def testProbeFpc(self):
+        self.assertEqual(probes(FPC), "fpc")        
 
 
 if __name__ == '__main__':
