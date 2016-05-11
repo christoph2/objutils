@@ -26,6 +26,7 @@ __copyright__ = """
 """
 from functools import partial
 import operator
+import os
 import re
 import objutils.HexFile as HexFile
 from objutils.utils import createStringBuffer, slicer
@@ -43,6 +44,7 @@ PREFIX      = '$'
 MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42, )))
 REV_MAPPING = dict([(ord(value), key) for key, value in MAPPING.items()])
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
+VALID_CHARS = re.compile("^\{0}[{1}]+$".format(PREFIX, re.escape(''.join(MAPPING.values()))))
 
 atoi16 = partial(int, base = 16)
 
@@ -122,10 +124,15 @@ class Reader(HexFile.Reader):
         return formatType in (DATA_ABS, DATA_INC, DATA_REL)
 
     def probe(self, fp):
+        for idx, line in enumerate(fp, 1):
+            if not VALID_CHARS.match(line):
+                fp.seek(0, os.SEEK_SET)
+                return False
+            if idx > 3:
+                break
+        fp.seek(0, os.SEEK_SET)
         return super(Reader, self).probe(
-            createStringBuffer(
-                bytearray(self.decode(fp), "ascii")
-            )
+            createStringBuffer(bytearray(self.decode(fp), "ascii"))
         )
 
 
