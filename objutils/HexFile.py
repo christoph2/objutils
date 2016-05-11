@@ -71,7 +71,7 @@ MAP_GROUP_TO_REGEX = {
     LENGTH          : "(?P<length>[0-9a-zA-Z]{%d})",
     TYPE            : "(?P<type>\d{%d})",
     ADDRESS         : "(?P<address>[0-9a-zA-Z]{%d})",
-    DATA            : "(?P<chunk>[0-9a-zA-Z]*)",
+    DATA            : "(?P<chunk>[0-9a-zA-Z]+)",
     UNPARSED        : "(?P<chunk>.*)",
     CHECKSUM        : "(?P<checksum>[0-9a-zA-Z]{%d})",
     ADDR_CHECKSUM   : "(?P<addrChecksum>[0-9a-zA-Z]{%d})",
@@ -118,7 +118,7 @@ class FormatParser(object):
             prevCh = ch
         self.translateFormat(group)
         self.translatedFmt.append((0, 0, r"(?P<junk>(.*?))$"))  #??
-        ft = ''.join(map(itemgetter(2), self.translatedFmt))
+        ft = "^{0}".format(''.join(map(itemgetter(2), self.translatedFmt)))
         return re.compile(ft, re.DOTALL | re.MULTILINE)
 
     def translateFormat(self, group):
