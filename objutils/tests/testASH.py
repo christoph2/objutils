@@ -71,7 +71,7 @@ class TestAcceptance(unittest.TestCase):
 
     def _runTest(self, format):
         data = loads("ash", format)
-        self.assertTrue(dumps("srec", data) == SREC)
+        self.assertTrue(dumps("srec", data, s5record = True) == SREC)
 
     def testAcceptSpace(self):
         self._runTest(TEST_HEX_SPACE)

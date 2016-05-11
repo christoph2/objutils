@@ -26,7 +26,7 @@ fromSrec =  loads('srec', SREC)
 dataFromSRec = dumps('fpc', fromSrec)
 
 fromFPC =  loads('fpc', FPC)
-dataFromFPC = dumps('srec', fromFPC, rowLength = 32)
+dataFromFPC = dumps('srec', fromFPC, rowLength = 32, s5record = True)
 
 
 class TestRoundTrip(unittest.TestCase):

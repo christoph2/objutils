@@ -41,7 +41,7 @@ S5030009F3"""
 fromSrec =  loads('srec', SREC)
 dataFromSRec = dumps('titxt', fromSrec)
 fromTiTxt =  loads('titxt', TITEXT)
-dataFromTiTxt = dumps('srec', fromTiTxt, rowLength = 32)
+dataFromTiTxt = dumps('srec', fromTiTxt, rowLength = 32, s5record = True)
 
 
 class TestRoundTrip(unittest.TestCase):

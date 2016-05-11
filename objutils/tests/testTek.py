@@ -26,7 +26,7 @@ class TestRoundtrip(unittest.TestCase):
         data = loads("tek", TEK)
         #data.hexdump()
         #print(dumps("srec", data))
-        self.assertEqual(dumps("srec", data), S19)
+        self.assertEqual(dumps("srec", data, s5record = True), S19)
         
     def testDumpsWorks(self):
         data = loads("srec", S19)

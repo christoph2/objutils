@@ -2,7 +2,6 @@
 import unittest
 from objutils.utils import cygpathToWin
 
-
 class TestCygpath(unittest.TestCase):
 
     def test01(self):

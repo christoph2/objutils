@@ -25,7 +25,7 @@ class TestRoundtrip(unittest.TestCase):
 
     def testLoadsWorks(self):
         data = loads("emon52", EMON52)
-        self.assertEqual(dumps("srec", data), S19)
+        self.assertEqual(dumps("srec", data, s5record = True), S19)
         
     def testDumpsWorks(self):
         data = loads("srec", S19)
