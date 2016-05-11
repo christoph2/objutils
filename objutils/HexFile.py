@@ -396,6 +396,7 @@ class ASCIIHexReader(Reader):
         self.ETX_PATTERN = re.compile(etxPattern, re.DOTALL | re.MULTILINE)
         self.SPLITTER = re.compile('[{0}]'.format(separators))
         self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parseLine), (self.ETX_PATTERN, self.nop))
+        self.formats = [(0, self.ADDRESS_PATTERN), (1, self.DATA_PATTERN), (2, self.ETX_PATTERN)]
         super(ASCIIHexReader, self).__init__()
 
     def getAddress(self, line, match):
