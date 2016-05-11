@@ -125,7 +125,7 @@ class Reader(HexFile.Reader):
 
     def probe(self, fp):
         for idx, line in enumerate(fp, 1):
-            if not VALID_CHARS.match(line):
+            if not VALID_CHARS.match(line.decode()):
                 fp.seek(0, os.SEEK_SET)
                 return False
             if idx > 3:
