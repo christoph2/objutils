@@ -85,13 +85,13 @@ class Reader(HexFile.Reader):
     def checkLine(self, line, formatType):
         # todo: Fkt.!!!
         if formatType in (S0, S1, S5, S9):
-            checkSumOfAddress=((line.address & 0xff00) >> 8) + (line.address & 0xff)
+            checkSumOfAddress = ((line.address & 0xff00) >> 8) + (line.address & 0xff)
         elif formatType in (S2, S8):
-            checkSumOfAddress = ((line.address & 0xff0000) >> 16) + ((line.address & 0xff00) >> 8) + \
-                (line.address & 0xff)
+            checkSumOfAddress = ((line.address & 0xff0000) >> 16) + ((line.address & 0xff00) >> 8) + (line.address & 0xff)
         elif formatType in (S3, S7):
-            checkSumOfAddress=(((line.address & 0xff000000) >> 24)+((line.address & 0xff0000) >> 16) + \
-                ((line.address & 0xff00) >>8 )+(line.address & 0xff))
+            checkSumOfAddress = (((line.address & 0xff000000) >> 24)+((line.address & 0xff0000) >> 16) +
+                ((line.address & 0xff00) >>8 )+(line.address & 0xff)
+            )
         else:
             raise TypeError("Invalid format type '%s'." % formatType)
         if hasattr(line, 'chunk'):
@@ -143,6 +143,9 @@ class Reader(HexFile.Reader):
 
 class Writer(HexFile.Writer):
     recordType = None
+    s5record = False
+    startAddress = None
+
     MAX_ADDRESS_BITS = 32
 
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_ONES)
@@ -163,7 +166,6 @@ class Writer(HexFile.Writer):
 
     def srecord(self, recordType, length, address, data = []):
         length += self.offset
-        # TODO: handle Record-Types!!!
         addressBytes = utils.intToArray(address)
         checksum = self.checksum(makeList(addressBytes, length, data))
         mask = "S%%u%%02X%s%%s%%02X" % self.addressMask
@@ -183,17 +185,25 @@ class Writer(HexFile.Writer):
 
     def composeFooter(self, meta):
         result = []
-        # Dito., but there really can be only one start-address!
-        # S5
-        result.append(self.srecord(5, 0, self.recordCount))
-        if S9 in meta:
-            s9 = meta[S9][0]
-            result.append(self.srecord(9, 0, s9.address))
-        if S8 in meta:
-            s8 = meta[S8][0]
-            result.append(self.srecord(8, 0, s8.address))
-        if S7 in meta:
-            s7 = meta[S7][0]
-            result.append(self.srecord(7, 0, s7.address))
+        if self.s5record:
+            result.append(self.srecord(5, 0, self.recordCount))
+        if not self.startAddress is None:
+            if self.recordType == 1:    # 16bit.
+                if S9 in meta:
+                    s9 = meta[S9][0]
+                    result.append(self.srecord(9, 0, s9.address))
+                else:
+                    result.append(self.srecord(9, 0, self.startAddress))
+            elif self.recordType == 2:  # 24bit.
+                if S8 in meta:
+                    s8 = meta[S8][0]
+                    result.append(self.srecord(8, 0, s8.address))
+                else:
+                    result.append(self.srecord(8, 0, self.startAddress))
+            elif self.recordType == 3:  # 32bit.
+                if S7 in meta:
+                    s7 = meta[S7][0]
+                    result.append(self.srecord(7, 0, s7.address))
+                else:
+                    result.append(self.srecord(7, 0, self.startAddress))
         return '\n'.join(result)
-
