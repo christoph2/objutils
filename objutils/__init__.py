@@ -34,9 +34,6 @@ reg = Registry()
 ##
 ##  Register codecs.
 ##
-import objutils.ASH
-reg.register('ash', objutils.ASH.Reader, objutils.ASH.Writer, "ASCII hex space formats.")
-
 import objutils.Sig
 reg.register('sig', objutils.Sig.Reader, objutils.Sig.Writer, "Signetics format.")
 
@@ -70,11 +67,14 @@ reg.register('mostec', objutils.MOSTec.Reader, objutils.MOSTec.Writer, "MOSTech 
 import objutils.RCA
 reg.register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
 
-#import objutils.cosmac
-#reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
-
 import objutils.Tek
 reg.register('tek', objutils.Tek.Reader, objutils.Tek.Writer, "Tektonix format.")
+
+import objutils.cosmac
+reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
+
+import objutils.ASH
+reg.register('ash', objutils.ASH.Reader, objutils.ASH.Writer, "ASCII hex space formats.")
 
 ##
 ##  Interface to objutils.
