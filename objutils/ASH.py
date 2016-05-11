@@ -50,6 +50,7 @@ checksum = partial(lrc, width = 16)
 class Reader(HexFile.ASCIIHexReader):
     """
     """
+    VALID_CHARS = re.compile(r"^[a-fA-F0-9 %,\'\$\x02\x03\n\r]*$")
 
     def __init__(self, addressPattern = r'^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$',
                  dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
