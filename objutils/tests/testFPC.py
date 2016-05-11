@@ -42,9 +42,9 @@ class TestProbe(unittest.TestCase):
 
     def testProbeSrec(self):
         self.assertEqual(probes(SREC), "srec")
-        
+
     def testProbeFpc(self):
-        self.assertEqual(probes(FPC), "fpc")        
+        self.assertEqual(probes(FPC), "fpc")
 
 
 if __name__ == '__main__':
