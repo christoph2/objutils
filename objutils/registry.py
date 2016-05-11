@@ -25,7 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from objutils.utils import SingletonBase
 
@@ -37,7 +37,7 @@ Codec = namedtuple("Codec", "Reader Writer description")
 class Registry(SingletonBase):
 
     def __init__(self):
-        self._codecs = {}
+        self._codecs = OrderedDict()
 
     def __iter__(self):
         return iter(self._codecs.items())
