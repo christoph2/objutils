@@ -90,21 +90,3 @@ class CanonicalDumper(Dumper):
             print(spaces, file = self._fp, end = ""),
         self.printHexBytes(row)
 
-
-class OneByteOctalDumper(Dumper):
-
-    def dumpRow(self, row, startAddr):
-        startPos = 0
-        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask), file = self._fp),
-        print('%03o ' * len(row) % unpack(*row), file = self._fp)
-
-class TwoByteOctalDumper(Dumper): pass
-
-class OneByteCharDumper(Dumper): pass
-
-class TwoByteDecimalDumper(Dumper): pass
-
-class TwoByteHexDumper(Dumper): pass
-
-class FormattedDumper(Dumper): pass
-
