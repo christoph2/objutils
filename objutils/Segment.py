@@ -47,10 +47,22 @@ class Segment(object):
             raise IndexError()
 
     def __eq__(self, other):
-        return (self.address == other.address) and (self.data == other.data)
+        return self.address == other.address
 
     def __ne__(self, other):
-        return not (self == other)
+        return self.address == other.address
+
+    def __lt__(self, other):
+        return self.address < other.address
+
+    def __le__(a, b):
+        return self.address <= other.address
+
+    def __ge__(a, b):
+        return self.address >= other.address
+
+    def __gt__(a, b):
+        return self.address > other.address
 
     def __repr__(self):
         return "Segment (address: '0X%08X' length: '%d')" % (self.address, self.length)
