@@ -27,6 +27,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import bisect
 import operator
 import sys
 
@@ -73,7 +74,7 @@ class Image(object):
 
     def hexdump(self, fp = sys.stdout):
         for idx, section in enumerate(self.segments):
-            print("\nSection #{0:04d}".format(idx), file = fp)
+            print(b"\nSection #{0:04d}".format(idx), file = fp)
             print("-" * 13, file = fp)
             section.hexdump(fp)
 
@@ -85,12 +86,17 @@ class Builder(object):
     def __init__(self, segments = None, autoJoin = False, autoSort = False):
         self._segments = segments if segments else []
         self.address = 0
+        self.autoJoin = autoJoin
+        self.autoSort = autoSort
 
     def addSegment(self, data, address = None, dontJoin = False):
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
-        self._segments.append(Segment(address, data))
+        if self.autoSort:
+            bisect.insort(self._segments, Segment(address, data))
+        else:
+            self._segments.append(Segment(address, data))
         self.address = address + len(data)
 
     def addMetaData(self, metaData):
