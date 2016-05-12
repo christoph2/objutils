@@ -3,7 +3,7 @@
 
 import unittest
 
-from objutils import loads, dumps
+from objutils import loads, dumps, probes
 from objutils.Segment import Segment
 from objutils.Image import Image, Builder
 
@@ -66,6 +66,7 @@ FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,
 
 SREC = """S1130000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC
 S5030001FB"""
+
 
 class TestAcceptance(unittest.TestCase):
 
