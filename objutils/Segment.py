@@ -90,8 +90,9 @@ def joinSegments(segments):
     while segments:
         segment = segments.pop(0)
         if segment.address == prevSegment.address + prevSegment.length and resultSegments:
-            resultSegments[-1].data.extend(segment.data)
-            resultSegments[-1].length += segment.length
+            lastSegment = resultSegments[-1]
+            lastSegment.data.extend(segment.data)
+            lastSegment.length += segment.length
         else:
             # Create a new Segment.
             resultSegments.append(Segment(segment.address, segment.data))
