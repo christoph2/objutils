@@ -62,24 +62,49 @@ Section #0000
 ---------------
 """
 
-##
-##builder = Builder()
-##builder.addSegment(range(64), 0x1000)
-##builder.addSegment([0] * 512)
-##builder.addSegment(range(64))
-##builder.joinSegments()
-##builder.hexdump()
-##
+TEST4 = """
+Section #0000
+-------------
+00001000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+00001010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  |................|
+00001020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f  | !"#$%&'()*+,-./|
+00001030  30 31 32 33 34                                   |01234           |
+---------------
+       53 bytes
+---------------
+"""
+
+TEST5 = """
+Section #0000
+-------------
+00001000                                                   |                |
+---------------
+        0 bytes
+---------------
+"""
+
+#builder = Builder()
+#builder.addSegment(range(53), 0x1000)
+#builder.addSegment(range(0), 0x1000)
+#builder.addSegment([0] * 512)
+#builder.addSegment(range(64))
+#builder.joinSegments()
+#builder.hexdump()
+
+
 
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
         self.buf = createStringBuffer()
-        self.stdout = sys.stdout
-        sys.stdout = self.buf
+        #self.stdout = sys.stdout
+        #sys.stdout = self.buf
+        self.builder = Builder()
 
     def tearDown(self):
-        sys.stdout = self.stdout
+        #sys.stdout = self.stdout
+        del self.buf
+        del self.builder
 
     def getBuffer(self):
         self.buf.seek(0, os.SEEK_SET)
@@ -89,28 +114,38 @@ class BaseTest(unittest.TestCase):
 class TestHexdumper(BaseTest):
 
     def testDumpContinuousRange(self):
-        builder = Builder()
-        builder.addSegment(range(64), 0x1000)
-        builder.joinSegments()
-        builder.hexdump()
+        self.builder.addSegment(range(64), 0x1000)
+        self.builder.joinSegments()
+        self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST1)
 
     def testDumpDiscontinuousRange(self):
-        builder = Builder()
-        builder.addSegment(range(64), 0x1000)
-        builder.addSegment(range(64), 0x2000)
-        builder.joinSegments()
-        builder.hexdump()
+        self.builder.addSegment(range(64), 0x1000)
+        self.builder.addSegment(range(64), 0x2000)
+        self.builder.joinSegments()
+        self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST2)
 
     def testDumpZeroBytesInBetween(self):
-        builder = Builder()
-        builder.addSegment(range(64), 0x1000)
-        builder.addSegment([0] * 512)
-        builder.addSegment(range(64))
-        builder.joinSegments()
-        builder.hexdump()
+        self.builder.addSegment(range(64), 0x1000)
+        self.builder.addSegment([0] * 512)
+        self.builder.addSegment(range(64))
+        self.builder.joinSegments()
+        self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST3)
+
+    def testDumpOddSizedRow(self):
+        self.builder.addSegment(range(53), 0x1000)
+        self.builder.joinSegments()
+        self.builder.hexdump(self.buf)
+        self.assertEqual(self.getBuffer(), TEST4)
+
+    def testDumpEmptyRow(self):
+        self.builder.addSegment(range(0), 0x1000)
+        self.builder.joinSegments()
+        self.builder.hexdump(self.buf)
+        self.assertEqual(self.getBuffer(), TEST5)
+
 
 def main():
     unittest.main()

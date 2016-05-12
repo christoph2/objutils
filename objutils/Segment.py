@@ -66,8 +66,8 @@ class Segment(object):
     def length(self, value):
         self._length = value
 
-    def hexdump(self):
-        dumper = hexdump.CanonicalDumper()  # TODO: cache dumpers.
+    def hexdump(self, fp):
+        dumper = hexdump.CanonicalDumper(fp)  # TODO: cache dumpers.
         dumper.dumpData(self)
 
 

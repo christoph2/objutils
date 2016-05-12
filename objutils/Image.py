@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 __version__ = "0.1.0"
 
 __copyright__ = """
@@ -26,6 +28,7 @@ __copyright__ = """
 """
 
 import operator
+import sys
 
 from objutils.Segment import Segment, joinSegments
 
@@ -68,18 +71,18 @@ class Image(object):
     def __ne__(self, other):
         return not (self == other)
 
-    def hexdump(self):
+    def hexdump(self, fp = sys.stdout):
         for idx, section in enumerate(self.segments):
-            print("\nSection #{0:04d}".format(idx))
-            print("-" * 13)
-            section.hexdump()
+            print("\nSection #{0:04d}".format(idx), file = fp)
+            print("-" * 13, file = fp)
+            section.hexdump(fp)
 
 
 class Builder(object):
     """Construct and `Image` object.
     """
 
-    def __init__(self, segments = None):
+    def __init__(self, segments = None, autoJoin = False, autoSort = False):
         self._segments = segments if segments else []
         self.address = 0
 
@@ -99,8 +102,8 @@ class Builder(object):
     def orderSegments(self):
         pass
 
-    def hexdump(self):
-        self.image.hexdump()
+    def hexdump(self, fp = sys.stdout):
+        self.image.hexdump(fp)
 
     @property
     def image(self):

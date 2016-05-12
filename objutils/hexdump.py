@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 __version__ = "0.1.1"
 
@@ -36,18 +37,15 @@ def unpack(*args):
 
 class Dumper(object):
 
-    def __init__(self, fout = sys.stdout, numAddressBits = 32):
-        self._fout = fout
+    def __init__(self, fp = sys.stdout, numAddressBits = 32):
+        self._fp = fp
         self._rolloverMask = 2 ** numAddressBits
         self._nibbles = numAddressBits >> 2
         self._addressMask = "%%0%ux " % self._nibbles
-        self.previousRow = bytearray()
+        self.previousRow = bytes()  # bytearray()
         self.elided = False
 
-    def dumpRow(self, row):
-        pass
-
-    def dumpData(self, section, offset = 0):    # TODO: size option!
+    def dumpData(self, section, offset = 0):
         end = section.length
         lineCount = math.ceil(len(section.data) / self.LINE_LENGTH)
         startPos = 0
@@ -58,7 +56,7 @@ class Dumper(object):
             row = section.data[startPos : endPos]
             if row == self.previousRow:
                 if not self.elided:
-                    print("          *")
+                    print("          *", file = self._fp)
                     self.elided = True
             else:
                 self.dumpRow(row, startPos + section.address)
@@ -68,9 +66,9 @@ class Dumper(object):
             self.previousRow = row
         row = section.data[startPos : endPos]
         self.dumpRow(row, startPos + section.address)
-        print("-" * 15)
-        print("{0:-9d} bytes".format(section.length))
-        print("-" * 15)
+        print("-" * 15, file = self._fp)
+        print("{0:-9d} bytes".format(section.length), file = self._fp)
+        print("-" * 15, file = self._fp)
 
 
 class CanonicalDumper(Dumper):
@@ -79,17 +77,17 @@ class CanonicalDumper(Dumper):
     def printHexBytes(self, row):
         row = list(row)
         filler = list([0x20] * (self.LINE_LENGTH - len(row)))
-        print('|{0}|'.format(('%s' * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or '.' for x in row + filler] )))
+        print('|{0}|'.format(('%s' * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or '.' for x in row + filler] )), file = self._fp)
 
     def dumpRow(self, row, startAddr):
         startPos = 0
-        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask)),
-        print('%02x ' * len(row) % unpack(*row)),
+        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask), file = self._fp, end = " "),
+        print('%02x ' * len(row) % unpack(*row), file = self._fp, end = " "),
         if len(row) == 0:
-            print
+            print("", file = self._fp, end = "")
         if len(row) < self.LINE_LENGTH:
             spaces = "   " * (self.LINE_LENGTH - len(row))
-            print(spaces[ 1: ]),
+            print(spaces, file = self._fp, end = ""),
         self.printHexBytes(row)
 
 
@@ -97,8 +95,8 @@ class OneByteOctalDumper(Dumper):
 
     def dumpRow(self, row, startAddr):
         startPos = 0
-        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask)),
-        print('%03o ' * len(row) % unpack(*row))
+        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask), file = self._fp),
+        print('%03o ' * len(row) % unpack(*row), file = self._fp)
 
 class TwoByteOctalDumper(Dumper): pass
 
