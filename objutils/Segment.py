@@ -34,7 +34,7 @@ class Segment(object):
     def __init__(self, address = 0, data = bytearray()):
         self.address = address
         self._length = len(data)
-        self.data = data
+        self.data = bytearray(data)
 
     def __getitem__(self, key):
         if key == 0:
