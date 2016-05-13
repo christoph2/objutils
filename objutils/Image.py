@@ -97,16 +97,15 @@ class Builder(object):
             bisect.insort(self._segments, Segment(address, data))
         else:
             self._segments.append(Segment(address, data))
+        if self.autoJoin:
+            self.joinSegments()
         self.address = address + len(data)
 
     def addMetaData(self, metaData):
         pass
 
-    def joinSegments(self):
-        self._segments = joinSegments(self._segments)
-
-    def orderSegments(self):
-        pass
+    def joinSegments(self, orderSegments = None):
+        self._segments = joinSegments(self._segments, orderSegments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)
