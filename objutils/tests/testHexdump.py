@@ -6,7 +6,7 @@ import unittest
 from objutils import loads, dumps, probes
 from objutils.Segment import Segment
 from objutils.Image import Image, Builder
-from objutils.utils import createStringBuffer
+from objutils.utils import createStringBuffer, PYTHON_VERSION
 import os
 import io
 import sys
@@ -93,12 +93,13 @@ Section #0000
 #builder.hexdump()
 
 
-
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.buf = io.TextIOWrapper(createStringBuffer())
-
+        if PYTHON_VERSION.major == 3:
+            self.buf = io.TextIOWrapper(createStringBuffer())
+        else:
+            self.buf = io.TextIOWrapper(createStringBuffer())
         #self.stdout = sys.stdout
         #sys.stdout = self.buf
         self.builder = Builder()

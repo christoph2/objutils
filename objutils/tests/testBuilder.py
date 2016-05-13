@@ -6,7 +6,7 @@ import os
 from objutils import loads, dumps
 from objutils.Segment import Segment
 from objutils.Image import Builder
-from objutils.utils import createStringBuffer
+from objutils.utils import createStringBuffer, PYTHON_VERSION
 import unittest
 
 TEST1 = """
@@ -21,7 +21,10 @@ Section #0000
 class TestBasicFunctionality(unittest.TestCase):
 
     def testBasic(self):
-        buf = io.TextIOWrapper(createStringBuffer())
+        if PYTHON_VERSION.major == 3:
+            buf = io.TextIOWrapper(createStringBuffer())
+        else:
+            buf = createStringBuffer()
         b0 = Builder()
         b0.addSegment("hello world!")
         b0.joinSegments()
