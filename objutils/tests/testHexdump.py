@@ -8,6 +8,7 @@ from objutils.Segment import Segment
 from objutils.Image import Image, Builder
 from objutils.utils import createStringBuffer
 import os
+import io
 import sys
 
 TEST1 = """
@@ -96,7 +97,8 @@ Section #0000
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.buf = createStringBuffer()
+        self.buf = io.TextIOWrapper(createStringBuffer())
+
         #self.stdout = sys.stdout
         #sys.stdout = self.buf
         self.builder = Builder()

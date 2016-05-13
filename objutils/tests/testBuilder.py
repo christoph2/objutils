@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 import os
 from objutils import loads, dumps
 from objutils.Segment import Segment
@@ -20,7 +21,7 @@ Section #0000
 class TestBasicFunctionality(unittest.TestCase):
 
     def testBasic(self):
-        buf = createStringBuffer()
+        buf = io.TextIOWrapper(createStringBuffer())
         b0 = Builder()
         b0.addSegment("hello world!")
         b0.joinSegments()
