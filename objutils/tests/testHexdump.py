@@ -99,7 +99,7 @@ class BaseTest(unittest.TestCase):
         if PYTHON_VERSION.major == 3:
             self.buf = io.TextIOWrapper(createStringBuffer())
         else:
-            self.buf = io.TextIOWrapper(createStringBuffer())
+            self.buf = createStringBuffer()
         #self.stdout = sys.stdout
         #sys.stdout = self.buf
         self.builder = Builder()
