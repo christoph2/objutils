@@ -1,4 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+__version__ = "0.1.0"
+
+__copyright__ = """
+    pyObjUtils - Object file library for Python.
+
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+                                        cpu12.gems@googlemail.com>
+
+   All Rights Reserved
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+"""
 
 from collections import namedtuple
 
@@ -74,7 +100,7 @@ class DebugSectionReader(object):
 
     def __init__(self, sections, byteorderPrefix):
         self.byteorderPrefix = byteorderPrefix
-        print sections.keys()
+        print(sections.keys())
         self.sections = sections
         self.instantiateReaders()
         self.abbrevs = {}
@@ -93,7 +119,7 @@ class DebugSectionReader(object):
 
     def process(self):
         for name, image in self.sections.items():
-            print name
+            print(name)
         #if '.debug_ranges' in self.sections:
         #    self.processRanges()
         if '.debug_line' in self.sections:
@@ -138,19 +164,19 @@ class DebugSectionReader(object):
             attrSpecs = []
             if dr.pos == 0x69:
                 pass
-            print "   %u      %s    [%s]" % (code, tag, "has children" if children == constants.DW_CHILDREN_yes else "no children")
+            print("   %u      %s    [%s]" % (code, tag, "has children" if children == constants.DW_CHILDREN_yes else "no children"))
             while True:
                 attrValue = dr.uleb()
                 attr = constants.AttributeEncoding(attrValue)
                 formValue = dr.uleb()
                 form = constants.AttributeForm(formValue)
                 if attrValue == 0 and formValue == 0:
-                    print "    DW_AT value: 0     DW_FORM value: 0"
+                    print("    DW_AT value: 0     DW_FORM value: 0")
                     break
                 if attr.value in attr.MAP:
-                    print "    %s %s" % (attr.MAP[attr.value], form.MAP[form.value])
+                    print("    %s %s" % (attr.MAP[attr.value], form.MAP[form.value]))
                 else:
-                    print "    Unknown AT value: %x %s" % (attr.value, form.MAP[form.value])
+                    print("    Unknown AT value: %x %s" % (attr.value, form.MAP[form.value]))
                 attrSpecs.append((attr, form))
             abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
             #print startPos, abbrevEntries[code]
@@ -185,7 +211,7 @@ class DebugSectionReader(object):
             abbrevOffs = dr.u32()
             abbrevs = self.abbrevs.get(abbrevOffs, None)
             if abbrevs is None:
-                print "*** Error: Invalid Abbreviations ***"
+                print("*** Error: Invalid Abbreviations ***")
                 return
             targetAddrSize = dr.u8()
             dr.wordSize = targetAddrSize
@@ -194,14 +220,14 @@ class DebugSectionReader(object):
                 entryOffset = dr.pos
                 number = dr.uleb()
                 if number == 0:
-                    print "<*** EMPTY ***>"
+                    print("<*** EMPTY ***>")
                     continue
                 try:
                     entry = abbrevs[number]
                 except KeyError as e:   # TODO: genau analysieren!!!
-                    print "ENTRY NOT FOUND: %u [%s]" % (number, e)
+                    print("ENTRY NOT FOUND: %u [%s]" % (number, e))
                     continue
-                print "<%x><%x>: Abbrev Number: %u (%s)" % (sectionHeaderStart, entryOffset, number, entry.tag,)
+                print("<%x><%x>: Abbrev Number: %u (%s)" % (sectionHeaderStart, entryOffset, number, entry.tag,))
                 for attr in entry.attrs:
                     offset = dr.pos
                     attribute, form = attr
@@ -211,31 +237,31 @@ class DebugSectionReader(object):
                         constants.DW_AT_data_member_location):
                         dis = Dissector(attrValue, targetAddrSize)
                         attrValue = dis.run()
-                    print "   <%x>   %18s    : %s" % (offset, attribute, attrValue)
+                    print("   <%x>   %18s    : %s" % (offset, attribute, attrValue))
         dr.reset()
 
     def processPubNames(self):  # TODO: NameLookupTable
         dr = self.getReader('.debug_pubnames')  # '.debug_pubtypes'
-        print "Contents of the .debug_pubnames section:"
+        print("Contents of the .debug_pubnames section:")
         while dr.pos < dr.size:
             length = dr.u32()
             stopPosition = dr.pos + length
             dwarfVersion = dr.u16()
             debugInfoOffs = dr.u32()
             debugInfoLen = dr.u32()
-            print "  Length:                              %u" % (length,  )
-            print "  Version:                             %u" % (dwarfVersion, )
-            print "  Offset into .debug_info section:     0x%x" % (debugInfoOffs, )
-            print "  Size of area in .debug_info section: %u" % (debugInfoLen, )
-            print
-            print "    Offset      Name"
+            print("  Length:                              %u" % (length,  ))
+            print("  Version:                             %u" % (dwarfVersion, ))
+            print("  Offset into .debug_info section:     0x%x" % (debugInfoOffs, ))
+            print("  Size of area in .debug_info section: %u" % (debugInfoLen, ))
+            print()
+            print("    Offset      Name")
             while dr.pos < stopPosition:
                 #tb = dr.u8()
                 entryOffset = dr.u32()
                 if not entryOffset:
                     break
                 entryName = dr.asciiz()
-                print "    %12s %s" % (hex(entryOffset), entryName)
+                print("    %12s %s" % (hex(entryOffset), entryName))
 
     def scanDebugInfoHeaders(self):
         dr = self.getReader('.debug_info')
@@ -253,7 +279,7 @@ class DebugSectionReader(object):
         self.infoHeaders = result
 
     def processLineSection(self):
-        print "Raw dump of debug contents of section .debug_line:\n"
+        print("Raw dump of debug contents of section .debug_line:\n")
         dr = self.getReader('.debug_line')
         while dr.pos < dr.size:
             sectionOffset = dr.pos
@@ -291,30 +317,30 @@ class DebugSectionReader(object):
                     # The last entry is followed by a single null byte.
                     break
 
-            print "  Offset:                      %x" % (sectionOffset, )           # BYTE-ORDER??!!
-            print "  Length:                      %u" % (length, )
-            print "  DWARF Version:               %u" % (dwarfVersion)
-            print "  Prologue Length:             %u" % (headerLength, )            # BYTE-ORDER??!!
-            print "  Minimum Instruction Length:  %u" % (minimumInstructionLength, )
-            #print "  Maximum Operations per Instruction: %u" % (maximumOperationsPerInstruction, )
-            print "  Initial value of 'is_stmt':  %u" % (defaultIsStmt, )
-            print "  Line Base:                   %i" % (lineBase, )
-            print "  Line Range:                  %u" % (lineRange)
-            print "  Opcode Base:                 %u" % (opcodeBase)
+            print("  Offset:                      %x" % (sectionOffset, ))           # BYTE-ORDER??!!
+            print("  Length:                      %u" % (length, ))
+            print("  DWARF Version:               %u" % (dwarfVersion))
+            print("  Prologue Length:             %u" % (headerLength, ))            # BYTE-ORDER??!!
+            print("  Minimum Instruction Length:  %u" % (minimumInstructionLength, ))
+            #print("  Maximum Operations per Instruction: %u" % (maximumOperationsPerInstruction, ))
+            print("  Initial value of 'is_stmt':  %u" % (defaultIsStmt, ))
+            print("  Line Base:                   %i" % (lineBase, ))
+            print("  Line Range:                  %u" % (lineRange))
+            print("  Opcode Base:                 %u" % (opcodeBase))
 
-            print "\n  Opcodes:"
+            print("\n  Opcodes:")
             for idx, args in enumerate(standardOpcodeLengths, 1):
-                print "   Opcode %u has %u args" % (idx, args)
+                print("   Opcode %u has %u args" % (idx, args))
 
             if includeDirectories:
                 #print "What now?"
-                 print " The Directory Table (offset 0x18):" # Cheeck: Offset!??
+                 print(" The Directory Table (offset 0x18):") # Cheeck: Offset!??
                  for idx, directory in enumerate(includeDirectories, 1):
-                     print "  %u     %s" % (idx, directory)
+                     print("  %u     %s" % (idx, directory))
             else:
-                print " The Directory Table is empty."
+                print(" The Directory Table is empty.")
 
-            " The File Name Table (offset 0x3c):"
+            #" The File Name Table (offset 0x3c):"
 
             fileNames = []
             idx = 0
@@ -326,7 +352,7 @@ class DebugSectionReader(object):
                     timeOfLastModification = dr.uleb()
                     fileLength = dr.uleb()
                     fileNames.append(filename)  # TODO: namedtuple.
-                    print "%u %u %u %u %s" % (idx, directoryIndex, timeOfLastModification, fileLength, filename)
+                    print("%u %u %u %u %s" % (idx, directoryIndex, timeOfLastModification, fileLength, filename))
                 else:
                     break
 
@@ -339,7 +365,7 @@ class DebugSectionReader(object):
             line = 1
             while True:
                 regs = LNSregisters(defaultIsStmt, dr.pos)
-                print "[0x%08x]  " % dr.pos,
+                print("[0x%08x]  " % dr.pos, )
                 opcode = dr.u8()
                 if opcode >= opcodeBase:
                     # Special opcodes.
@@ -358,7 +384,7 @@ class DebugSectionReader(object):
                     regs.prologue_end = False
                     regs.epilogue_begin = False
                     regs.discriminator = 0
-                    print "Special opcode %u: advance Address by %u to 0x%x and Line by %u to %u" % (adjustedOpcode, addrIncr, address, lineIncr, line)
+                    print("Special opcode %u: advance Address by %u to 0x%x and Line by %u to %u" % (adjustedOpcode, addrIncr, address, lineIncr, line))
 
                 else:
                     if opcode == DW_LNS_extended_op:
@@ -369,19 +395,19 @@ class DebugSectionReader(object):
                         if extOp == constants.DW_LNE_end_sequence:
                             regs.end_sequence = True
                             line = 1
-                            print "Extended opcode 1: End of Sequence"
+                            print("Extended opcode 1: End of Sequence")
                         elif extOp == constants.DW_LNE_set_address:
                             address = dr.addr()
-                            print "Extended opcode 2: set Address to 0x%x" % address
+                            print("Extended opcode 2: set Address to 0x%x" % address)
                         elif extOp == constants.DW_LNE_define_file:
-                            print "Extended opcode 3: define new File Table entry"
+                            print("Extended opcode 3: define new File Table entry")
                             fileName = dr.asciiz()
                             directoryIndex = dr.uleb()
                             timeOfLastModification = dr.uleb()
                             fileLength = dr.uleb()
                             # TODO: Append to filename-Table!!!
-                            print "Entry Dir     Time    Size    Name"
-                            print " 1    %u       %u       %u       %s" % (directoryIndex, timeOfLastModification, fileLength, fileName)
+                            print("Entry Dir     Time    Size    Name")
+                            print(" 1    %u       %u       %u       %s" % (directoryIndex, timeOfLastModification, fileLength, fileName))
                         elif extOp == constants.DW_LNE_set_discriminator:
                             raise Exception("FIX ME!!!")
                         else:
@@ -390,39 +416,39 @@ class DebugSectionReader(object):
                         # Standard opcodes.
                         if opcode == constants.DW_LNS_copy:
                             regs.basic_block = False
-                            print "Copy"
+                            print("Copy")
                         elif opcode == constants.DW_LNS_advance_pc:
                             addressIncr = dr.uleb() * minimumInstructionLength
                             address += addressIncr
-                            print "Advance PC by %u to 0x%x" % (addressIncr, address)
+                            print("Advance PC by %u to 0x%x" % (addressIncr, address))
                         elif opcode == constants.DW_LNS_advance_line:
                             lineIncr = dr.uleb()
                             line += lineIncr
-                            print "Advance Line by %u to %u" % (lineIncr, line, )
+                            print("Advance Line by %u to %u" % (lineIncr, line, ))
                         elif opcode == constants.DW_LNS_set_file:
                             regs.fileNumber = dr.uleb()
-                            print "Set File Name to entry %u in the File Name Table" % (regs.fileNumber)
+                            print("Set File Name to entry %u in the File Name Table" % (regs.fileNumber))
                         elif opcode == constants.DW_LNS_set_column:
                             regs.column = dr.uleb()
-                            print "Set column to %u" % regs.column
+                            print("Set column to %u" % regs.column)
                         elif opcode == constants.DW_LNS_negate_stmt:
                             regs.is_stmt = not regs.is_stmt # Check!!!
                         elif opcode == constants.DW_LNS_set_basic_block:
                             regs.basic_block = True
-                            print "Set basic block"
+                            print("Set basic block")
                         elif opcode == constants.DW_LNS_const_add_pc:
                             offset = ((255 - opcodeBase) / lineRange) * minimumInstructionLength
                             address += offset
-                            print "Advance PC by constant %u to 0x%x" % (offset, address)
+                            print("Advance PC by constant %u to 0x%x" % (offset, address))
                         elif opcode == constants.DW_LNS_fixed_advance_pc:
                             addrInc = dr.u16()
                             address += addrInc
-                            print "Advance PC by fixed size amount %u to 0x%x" % (addrInc, address)
+                            print("Advance PC by fixed size amount %u to 0x%x" % (addrInc, address))
                         elif opcode == constants.DW_LNS_set_prologue_end:
-                            print "Set prologue_end to true"
+                            print("Set prologue_end to true")
                             regs.prologue_end = True
                         elif opcode == constants.DW_LNS_set_epilogue_begin:
-                            print "Set epilogue_begin to true"
+                            print("Set epilogue_begin to true")
                         elif opcode == constants.DW_LNS_set_isa:
                             pass
                         else:
