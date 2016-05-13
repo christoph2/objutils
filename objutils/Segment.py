@@ -83,9 +83,10 @@ class Segment(object):
         dumper.dumpData(self)
 
 
-def joinSegments(segments):
+def joinSegments(segments, orderSegments = True):
     resultSegments = []
-    segments.sort(key = itemgetter(0))
+    if orderSegments:
+        segments.sort(key = itemgetter(0))
     prevSegment = Segment()
     while segments:
         segment = segments.pop(0)
