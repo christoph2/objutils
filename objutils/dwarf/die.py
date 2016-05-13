@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -26,7 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import constants
+import objutils.dwarf.constants
 import unittest
 
 
@@ -91,25 +91,27 @@ def createAttributes(*attributes):
   return result
 
 
-def test():
-
-  attrs = createAttributes( ("Name", 'int'), ("ByteSize", 4),  ("Encoding", "signed integer"))
-  baseType = DebuggingInformationEntry('baseType', attrs)
-
-  attrs = createAttributes( ('Name', ' main'), ('File', 'hello.c'), ('Line', 2), ('Type', 'int'), ('LowPC', 0x0), ('HighPC', 0x2b),
-    ('External', 'yes'),
-  )
-  subprogram = DebuggingInformationEntry('subprograms', attrs, children = [baseType])
-
-  attrs = createAttributes( ('Dir', '/home/dwarf/examples'), ('Name', 'hello.c'), ('LowPC', 0x2000), ('HighPC', 0x2b00), ('Producer', 'GCC'))
-  compilationUnit = DebuggingInformationEntry('compilationUnit', attrs, children = [subprogram])
-
-
-def main():
-    print constants.DW_TAG_base_type
-    test()
-    die = DebuggingInformationEntry('flonz', [])
-
-if __name__ == '__main__':
-    main()
-
+##
+##def test():
+##
+##  attrs = createAttributes( ("Name", 'int'), ("ByteSize", 4),  ("Encoding", "signed integer"))
+##  baseType = DebuggingInformationEntry('baseType', attrs)
+##
+##  attrs = createAttributes( ('Name', ' main'), ('File', 'hello.c'), ('Line', 2), ('Type', 'int'), ('LowPC', 0x0), ('HighPC', 0x2b),
+##    ('External', 'yes'),
+##  )
+##  subprogram = DebuggingInformationEntry('subprograms', attrs, children = [baseType])
+##
+##  attrs = createAttributes( ('Dir', '/home/dwarf/examples'), ('Name', 'hello.c'), ('LowPC', 0x2000), ('HighPC', 0x2b00), ('Producer', 'GCC'))
+##  compilationUnit = DebuggingInformationEntry('compilationUnit', attrs, children = [subprogram])
+##
+##
+##def main():
+##    print constants.DW_TAG_base_type
+##    test()
+##    die = DebuggingInformationEntry('flonz', [])
+##
+##if __name__ == '__main__':
+##    main()
+##
+##
