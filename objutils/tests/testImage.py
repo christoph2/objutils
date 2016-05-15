@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from array import array
+import unittest
+import sys
 
 from objutils import loads, dumps
 from objutils.Segment  import Segment
 from objutils.Image  import Image, Builder
 from objutils.utils import PYTHON_VERSION
-import unittest
 
 class BaseTest(unittest.TestCase):
 
@@ -81,7 +82,10 @@ class TestCreateSections(BaseTest):
         self.runSectionTestPass(array('B', [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]))
 
     def testCreateSectionFromArrayHWorks(self):
-        self.runSectionTestPass(array('H', [0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e]))
+        if sys.byteorder == 'little':
+            self.runSectionTestPass(array('H', [0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e]))
+        else:
+            self.runSectionTestPass(array('H', [0x0001, 0x0203, 0x0405, 0x0607, 0x0809, 0x0a0b, 0x0c0d, 0x0e0f]))
 
     #def testCreateSectionFromUnicodeFails(self):
     #    self.runSectionTestPass('\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f')
