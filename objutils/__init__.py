@@ -64,8 +64,8 @@ reg.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex for
 import objutils.mostec
 reg.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
 
-import objutils.RCA
-reg.register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
+import objutils.rca
+reg.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
 
 import objutils.Tek
 reg.register('tek', objutils.Tek.Reader, objutils.Tek.Writer, "Tektonix format.")
