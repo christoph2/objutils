@@ -37,8 +37,8 @@ reg = Registry()
 import objutils.sig
 reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
 
-import objutils.SRecords
-reg.register('srec', objutils.SRecords.Reader, objutils.SRecords.Writer, "Motorola S-Records (a.k.a. S19).")
+import objutils.srec
+reg.register('srec', objutils.srec.Reader, objutils.srec.Writer, "Motorola S-Records (a.k.a. S19).")
 
 import objutils.TiTxt
 reg.register('titxt', objutils.TiTxt.Reader, objutils.TiTxt.Writer, "Texas Instruments MSP430 text format.")
