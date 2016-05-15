@@ -55,11 +55,11 @@ reg.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tekto
 import objutils.fpc
 reg.register('fpc', objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
 
-import objutils.IEEE695
+import objutils.ieee695
 # TODO!!!
 
-import objutils.IHex
-reg.register('ihex', objutils.IHex.Reader, objutils.IHex.Writer, "Intel IHex format.")
+import objutils.ihex
+reg.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
 
 import objutils.MOSTec
 reg.register('mostec', objutils.MOSTec.Reader, objutils.MOSTec.Writer, "MOSTech format.")

@@ -34,7 +34,7 @@ import re
 import sys
 import objutils.hexfile as hexfile
 from objutils.section import Section, joinSections
-from objutils.Image import Image
+from objutils.image import Image
 from objutils.utils import PYTHON_VERSION
 
 

@@ -7,7 +7,7 @@ import sys
 
 from objutils import loads, dumps
 from objutils.section  import Section
-from objutils.Image  import Image, Builder
+from objutils.image  import Image, Builder
 from objutils.utils import PYTHON_VERSION
 
 class BaseTest(unittest.TestCase):

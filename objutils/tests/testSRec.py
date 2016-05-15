@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps, probes
-from objutils.Image import Builder
+from objutils.image import Builder
 import unittest
 
 

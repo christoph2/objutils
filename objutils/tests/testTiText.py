@@ -3,7 +3,7 @@
 
 from objutils import loads, dumps
 from objutils.section import Section
-from objutils.Image import Image
+from objutils.image import Image
 import unittest
 
 TITEXT = """@DEAD

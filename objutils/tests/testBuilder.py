@@ -5,7 +5,7 @@ import io
 import os
 from objutils import loads, dumps
 from objutils.section import Section
-from objutils.Image import Builder
+from objutils.image import Builder
 from objutils.utils import createStringBuffer, PYTHON_VERSION
 import unittest
 

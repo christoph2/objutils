@@ -34,7 +34,7 @@ import re
 import sys
 
 from objutils.section import Section, joinSections
-from objutils.Image import Image
+from objutils.image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
 from objutils.utils import slicer, createStringBuffer, PYTHON_VERSION

@@ -3,7 +3,7 @@
 
 from objutils import loads, dumps, probes
 from objutils.section import Section
-from objutils.Image import Image
+from objutils.image import Image
 from objutils.registry import Registry
 import unittest
 
