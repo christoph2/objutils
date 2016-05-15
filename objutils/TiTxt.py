@@ -32,13 +32,13 @@ __copyright__ = """
 from functools import partial
 import re
 import sys
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 from objutils.section import Section, joinSections
 from objutils.Image import Image
 from objutils.utils import PYTHON_VERSION
 
 
-class Reader(HexFile.ASCIIHexReader):
+class Reader(hexfile.ASCIIHexReader):
     """
     """
 
@@ -47,7 +47,7 @@ class Reader(HexFile.ASCIIHexReader):
         super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
 
 
-class Writer(HexFile.ASCIIHexWriter):
+class Writer(hexfile.ASCIIHexWriter):
 
     def __init__(self, addressDesignator = '@'):
         super(Writer, self).__init__(addressDesignator)

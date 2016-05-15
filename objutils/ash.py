@@ -32,7 +32,7 @@ __copyright__ = """
 from functools import partial
 import re
 import sys
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 from objutils.section import Section, joinSections
 from objutils.Image import Image
 from objutils.checksums import lrc, COMPLEMENT_NONE
@@ -47,7 +47,7 @@ LINE_SPLIITER = re.compile(r"[ %,']")
 
 checksum = partial(lrc, width = 16)
 
-class Reader(HexFile.ASCIIHexReader):
+class Reader(hexfile.ASCIIHexReader):
     """
     """
     VALID_CHARS = re.compile(r"^[a-fA-F0-9 %,\'\$\x02\x03\n\r]*$")
@@ -57,7 +57,7 @@ class Reader(HexFile.ASCIIHexReader):
         super(Reader, self).__init__(addressPattern, dataPattern, etxPattern, separators = ", %'")
 
 
-class Writer(HexFile.ASCIIHexWriter):
+class Writer(hexfile.ASCIIHexWriter):
 
     MAX_ADDRESS_BITS = 16
     ADDRESS_DESIGNATOR = '$A'

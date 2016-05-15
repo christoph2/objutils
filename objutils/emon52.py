@@ -25,7 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 
 DATA                        = 0
 EOF                         = 1
@@ -48,26 +48,26 @@ class Codec(object):
             self.fileLike.write(line)
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
-        (HexFile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
+        (hexfile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
     )
     DATA_SEPARATOR =  " "
 
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
-            raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
         # todo: factor out checksum calculation from line!!!
         checksum = (sum(line.chunk) & 0xffff)
         if line.checksum != checksum:
-            raise HexFile.InvalidRecordChecksumError()
+            raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return True
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 

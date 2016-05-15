@@ -27,7 +27,7 @@ __copyright__ = """
 
 import re
 
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 import objutils.checksums as checksums
 import objutils.utils as utils
 
@@ -37,7 +37,7 @@ SYMBOL  = 2
 EOF     = 3
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     VALID_CHARS = re.compile(r"^[a-zA-Z0-9_ %\n\r]*$")    # We need to consider symbol information.
 
@@ -52,16 +52,16 @@ class Reader(HexFile.Reader):
             line.length = (line.length / 2) - 5
             checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(line.address), 6, ((line.length + 5) * 2), line.chunk))
             if line.length != len(line.chunk):
-                raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             if line.checksum!=checksum:
-                raise HexFile.InvalidRecordChecksumError()
+                raise hexfile.InvalidRecordChecksumError()
         elif formatType == SYMBOL:
             checksum = checksums.nibbleSum(utils.makeList(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
             chunk = line.chunk.strip()
             address = int(chunk[-4 : ], 16)
             line.address = address
             #if line.checksum!=checksum:
-            #    raise HexFile.InvalidRecordChecksumError()
+            #    raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
@@ -69,7 +69,7 @@ class Reader(HexFile.Reader):
     def parseData(self, line, formatType):
         return formatType != SYMBOL
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 24
 

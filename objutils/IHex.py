@@ -28,7 +28,7 @@ __copyright__ = """
 
 from functools import partial
 import operator
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 from objutils.checksums import lrc, COMPLEMENT_TWOS
 import objutils.utils as utils
 import objutils.checksums as checksums
@@ -41,9 +41,9 @@ EXTENDED_LINEAR_ADDRESS     = 4
 START_LINEAR_ADDRESS        = 5
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
     FORMAT_SPEC = (
-        (HexFile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
+        (hexfile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
         )
 
     def __init__(self):
@@ -52,10 +52,10 @@ class Reader(HexFile.Reader):
 
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
-            raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
         checksum = checksums.lrc(utils.makeList(line.type, line.length, utils.intToArray(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
         if line.checksum != checksum:
-            raise HexFile.InvalidRecordChecksumError()
+            raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         if line.type == DATA:
@@ -103,7 +103,7 @@ class Reader(HexFile.Reader):
     _addressCalculator = utils.identity
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 32
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_TWOS)
 

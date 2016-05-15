@@ -27,7 +27,7 @@ __copyright__ = """
 """
 
 import re
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 import objutils.utils as utils
 
 DATA    = 1
@@ -36,7 +36,7 @@ EOF     = 2
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     #data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)  # FIXME!!!
     FORMAT_SPEC = (
@@ -52,7 +52,7 @@ class Reader(HexFile.Reader):
         return formatType == DATA
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
     SEPARATOR = "%s\x0d\x0a" % ('\x00' * 48)
     MAX_ADDRESS_BITS = 16
 

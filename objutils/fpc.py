@@ -28,7 +28,7 @@ from functools import partial
 import operator
 import os
 import re
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 from objutils.utils import createStringBuffer, slicer
 from objutils import checksums
 import objutils.utils as utils
@@ -49,7 +49,7 @@ VALID_CHARS = re.compile("^\{0}[{1}]+$".format(PREFIX, re.escape(''.join(MAPPING
 atoi16 = partial(int, base = 16)
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
         (DATA_ABS,  "CCLL0000AAAAAAAADD"),
@@ -118,7 +118,7 @@ class Reader(HexFile.Reader):
             tmp = 0
         checksum = checksums.lrc(utils.makeList(tmp, line.length + 4, utils.intToArray(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
         if line.checksum != checksum:
-            raise HexFile.InvalidRecordChecksumError()
+            raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return formatType in (DATA_ABS, DATA_INC, DATA_REL)
@@ -136,7 +136,7 @@ class Reader(HexFile.Reader):
         )
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 

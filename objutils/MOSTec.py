@@ -27,7 +27,7 @@ __copyright__ = """
 """
 
 
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
@@ -35,7 +35,7 @@ DATA    = 1
 EOF     = 2
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
         (DATA,  ";LLAAAADDCCCC"),
@@ -45,16 +45,16 @@ class Reader(HexFile.Reader):
     def checkLine(self, line, formatType):
         if formatType == DATA:
             if line.length != len(line.chunk):
-                raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             checksum = checksums.lrc(utils.makeList(utils.intToArray(line.address), line.length, line.chunk), 16, checksums.COMPLEMENT_NONE)
             if line.checksum != checksum:
-                raise HexFile.InvalidRecordChecksumError()
+                raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self, line, formatType):
         return formatType == DATA
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 

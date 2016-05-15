@@ -25,7 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.HexFile
+import objutils.hexfile
 from objutils import utils
 import objutils.checksums as checksums
 
@@ -33,7 +33,7 @@ DATA = 1
 EOF = 2
 
 
-class Reader(objutils.HexFile.Reader):
+class Reader(objutils.hexfile.Reader):
 
     FORMAT_SPEC = (
         (DATA, ":AAAALLBBDDCC"),
@@ -43,18 +43,18 @@ class Reader(objutils.HexFile.Reader):
     def checkLine(self, line, formatType):
         if formatType == DATA:
             if line.length != len(line.chunk):
-                raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(line.address), line.length), 8, checksums.ROTATE_LEFT)
             if line.addrChecksum != addressChecksum:
-                raise HexFile.InvalidRecordChecksumError()
+                raise hexfile.InvalidRecordChecksumError()
             dataChecksum = checksums.rotatedXOR(line.chunk, 8, checksums.ROTATE_LEFT)
             if line.checksum != dataChecksum:
-                raise HexFile.InvalidRecordChecksumError()
+                raise hexfile.InvalidRecordChecksumError()
 
     def isDataLine(self,line,formatType):
         return formatType == DATA
 
-class Writer(objutils.HexFile.Writer):
+class Writer(objutils.hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 

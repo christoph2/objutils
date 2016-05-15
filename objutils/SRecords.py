@@ -29,7 +29,7 @@ from functools import partial
 import re
 from objutils.checksums import lrc, COMPLEMENT_ONES
 from objutils.utils import makeList
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 import objutils.utils as utils
 
 S0  = 1
@@ -56,7 +56,7 @@ BIAS = {
 SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)",re.MULTILINE|re.DOTALL)
 SYMBOL = re.compile(r'\s+(?P<symbol>.*?)\s+\$(?P<value>.+)',re.MULTILINE|re.DOTALL)
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
     FORMAT_SPEC = (
         (S0, "S0LLAAAADDCC"),
         (S1, "S1LLAAAADDCC"),
@@ -99,10 +99,10 @@ class Reader(HexFile.Reader):
         else:
             checksum = (~(sum([line.length,checkSumOfAddress]))) & 0xff
         if line.checksum != checksum:
-            raise HexFile.InvalidRecordChecksumError()
+            raise hexfile.InvalidRecordChecksumError()
         line.length -= BIAS[formatType]   # calculate actual data length.
         if hasattr(line, 'chunk') and line.length and (line.length != len(line.chunk)):
-            raise HexFile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def isDataLine(self, line, formatType):
         return formatType in (S1, S2, S3)
@@ -141,7 +141,7 @@ class Reader(HexFile.Reader):
         #print self.symbols
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
     recordType = None
     s5record = False
     startAddress = None

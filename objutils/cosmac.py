@@ -26,7 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.HexFile as HexFile
+import objutils.hexfile as hexfile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
@@ -36,7 +36,7 @@ DATA2    = 3
 DATA3    = 4
 
 
-class Reader(HexFile.Reader):
+class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
         (DATA0,  "!MAAAA DD"),
@@ -67,7 +67,7 @@ class Reader(HexFile.Reader):
         return formatType in (DATA0, DATA1, DATA2, DATA3)
 
 
-class Writer(HexFile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
