@@ -6,6 +6,7 @@ from array import array
 from objutils import loads, dumps
 from objutils.Segment  import Segment
 from objutils.Image  import Image, Builder
+from objutils.utils import PYTHON_VERSION
 import unittest
 
 class BaseTest(unittest.TestCase):
@@ -68,7 +69,10 @@ class TestCreateSections(BaseTest):
         self.assertEqual(result, '')
 
     def testCreateSectionFromBytesWorks(self):
-        self.runSectionTestPass(bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]))
+        if PYTHON_VERSION.major == 3:
+            self.runSectionTestPass(bytes([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]))
+        else:
+            pass    # Unfortunately, this test-case isn't supported by Python 2.x
 
     def testCreateSectionFromByteArrayWorks(self):
         self.runSectionTestPass(bytearray([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]))
