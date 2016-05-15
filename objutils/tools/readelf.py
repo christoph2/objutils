@@ -28,12 +28,12 @@ __copyright__ = """
 
 import os
 import enum
-import objutils.Elf as Elf
-import objutils.Elf.defs as defs
-from objutils.Elf import Reader
+import objutils.elf as Elf
+import objutils.elf.defs as defs
+from objutils.elf import Reader
 from optparse import OptionParser
 
-import objutils.ARMAbi as arm
+import objutils.armabi as arm
 
 def stVisibility(v):
     return v & 0x3
@@ -701,9 +701,9 @@ class ELFReader(object):
         elif not self.doSegments:
             return
         print
-        print "Program Headers:"
+        print("Program Headers:")
         if not self.reader.header.is64Bit:
-            print "  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align"
+            print("  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
         elif self.options.wideScreen:
             print("  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align")
         else:
@@ -811,7 +811,7 @@ class ELFReader(object):
         if self.reader.header.e_shnum > 1:
             print("Section Headers:")
         else:
-            print "Section Header:"
+            print("Section Header:")
 
         if not self.reader.header.is64Bit:
             if self.doSectionDetails:

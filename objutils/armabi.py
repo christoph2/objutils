@@ -26,7 +26,7 @@ __copyright__ = """
 """
 
 import enum
-from objutils.Elf import defs
+from objutils.elf import defs
 
 # Processor specific flags for the ELF header e_flags field.
 EF_ARM_RELEXEC          = 0x01

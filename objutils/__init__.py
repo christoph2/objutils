@@ -46,7 +46,7 @@ reg.register('titxt', objutils.titxt.Reader, objutils.titxt.Writer, "Texas Instr
 import objutils.emon52
 reg.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
 
-import objutils.Elf
+import objutils.elf
 # TODO!!!
 
 import objutils.etek
