@@ -27,7 +27,7 @@ class TestBasicFunctionality(unittest.TestCase):
             buf = createStringBuffer()
         b0 = Builder()
         b0.addSegment("hello world!")
-        b0.joinSegments()
+        b0.joinSections()
         b0.hexdump(buf)
         buf.seek(0, os.SEEK_SET)
         self.assertEqual(buf.read(), TEST1)

@@ -91,23 +91,23 @@ class Section(object):
         dumper.dumpData(self)
 
 
-def joinSegments(segments, orderSegments = True):
-    resultSegments = []
-    if orderSegments:
-        segments.sort(key = itemgetter(0))
-    prevSegment = Section()
-    while segments:
-        segment = segments.pop(0)
-        if segment.address == prevSegment.address + prevSegment.length and resultSegments:
-            lastSegment = resultSegments[-1]
-            lastSegment.data.extend(segment.data)
-            lastSegment.length += segment.length
+def joinSections(sections, orderSections = True):
+    resultSections = []
+    if orderSections:
+        sections.sort(key = itemgetter(0))
+    prevSection = Section()
+    while sections:
+        section = sections.pop(0)
+        if section.address == prevSection.address + prevSection.length and resultSections:
+            lastSegment = resultSections[-1]
+            lastSegment.data.extend(section.data)
+            lastSegment.length += section.length
         else:
             # Create a new Segment.
-            resultSegments.append(Section(segment.address, segment.data))
-        prevSegment = segment
-    if resultSegments:
-        return resultSegments
+            resultSections.append(Section(section.address, section.data))
+        prevSection = section
+    if resultSections:
+        return resultSections
     else:
         return []
 

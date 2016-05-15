@@ -31,7 +31,7 @@ import bisect
 import operator
 import sys
 
-from objutils.section import Section, joinSegments
+from objutils.section import Section, joinSections
 
 ## TODO: diff interface!
 
@@ -98,14 +98,14 @@ class Builder(object):
         else:
             self._segments.append(Section(address, data))
         if self.autoJoin:
-            self.joinSegments()
+            self.joinSections()
         self.address = address + len(data)
 
     def addMetaData(self, metaData):
         pass
 
-    def joinSegments(self, orderSegments = None):
-        self._segments = joinSegments(self._segments, orderSegments)
+    def joinSections(self, orderSegments = None):
+        self._segments = joinSections(self._segments, orderSegments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)

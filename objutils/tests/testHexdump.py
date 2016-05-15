@@ -89,7 +89,7 @@ Section #0000
 #builder.addSegment(range(0), 0x1000)
 #builder.addSegment([0] * 512)
 #builder.addSegment(range(64))
-#builder.joinSegments()
+#builder.joinSections()
 #builder.hexdump()
 
 
@@ -118,14 +118,14 @@ class TestHexdumper(BaseTest):
 
     def testDumpContinuousRange(self):
         self.builder.addSegment(range(64), 0x1000)
-        self.builder.joinSegments()
+        self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST1)
 
     def testDumpDiscontinuousRange(self):
         self.builder.addSegment(range(64), 0x1000)
         self.builder.addSegment(range(64), 0x2000)
-        self.builder.joinSegments()
+        self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST2)
 
@@ -133,19 +133,19 @@ class TestHexdumper(BaseTest):
         self.builder.addSegment(range(64), 0x1000)
         self.builder.addSegment([0] * 512)
         self.builder.addSegment(range(64))
-        self.builder.joinSegments()
+        self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST3)
 
     def testDumpOddSizedRow(self):
         self.builder.addSegment(range(53), 0x1000)
-        self.builder.joinSegments()
+        self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST4)
 
     def testDumpEmptyRow(self):
         self.builder.addSegment(range(0), 0x1000)
-        self.builder.joinSegments()
+        self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST5)
 
