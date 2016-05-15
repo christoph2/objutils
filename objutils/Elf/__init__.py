@@ -32,7 +32,7 @@ import sys
 import types
 import struct
 
-from objutils.elf import defs
+from objutils.Elf import defs
 from objutils.logger import Logger
 from objutils.utils import memoryMap
 
