@@ -26,15 +26,23 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from array import array
 from operator import itemgetter
 import objutils.hexdump as hexdump
+
+from objutils.utils import PYTHON_VERSION
 
 # Note: Section seens to be a more appropriate name.
 class Segment(object):
     def __init__(self, address = 0, data = bytearray()):
         self.address = address
         self._length = len(data)
-        self.data = bytearray(data)
+        if isinstance(data, array) and data.typecode != 'B':
+            if PYTHON_VERSION.major == 3:
+                data = array('B', data.tobytes())
+            else:
+                data = array('B', data.tostring())
+        self.data = bytearray(data) # bytearray seems to be the most appropriate canocical representation.
 
     def __getitem__(self, key):
         if key == 0:
