@@ -67,8 +67,8 @@ reg.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech 
 import objutils.rca
 reg.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
 
-import objutils.Tek
-reg.register('tek', objutils.Tek.Reader, objutils.Tek.Writer, "Tektonix format.")
+import objutils.tek
+reg.register('tek', objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
 
 import objutils.cosmac
 reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
