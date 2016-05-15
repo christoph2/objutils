@@ -52,8 +52,8 @@ import objutils.Elf
 import objutils.etek
 reg.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
 
-import objutils.FPC
-reg.register('fpc', objutils.FPC.Reader, objutils.FPC.Writer, "Four packed code file format.")
+import objutils.fpc
+reg.register('fpc', objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
 
 import objutils.IEEE695
 # TODO!!!
