@@ -34,8 +34,8 @@ reg = Registry()
 ##
 ##  Register codecs.
 ##
-import objutils.Sig
-reg.register('sig', objutils.Sig.Reader, objutils.Sig.Writer, "Signetics format.")
+import objutils.sig
+reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
 
 import objutils.SRecords
 reg.register('srec', objutils.SRecords.Reader, objutils.SRecords.Writer, "Motorola S-Records (a.k.a. S19).")
