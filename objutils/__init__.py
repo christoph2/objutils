@@ -43,14 +43,14 @@ reg.register('srec', objutils.SRecords.Reader, objutils.SRecords.Writer, "Motoro
 import objutils.TiTxt
 reg.register('titxt', objutils.TiTxt.Reader, objutils.TiTxt.Writer, "Texas Instruments MSP430 text format.")
 
-import objutils.EMon52
-reg.register('emon52', objutils.EMon52.Reader, objutils.EMon52.Writer, "Elektor Monitor (EMON52) file format.")
+import objutils.emon52
+reg.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
 
 import objutils.Elf
 # TODO!!!
 
-import objutils.ETek
-reg.register('etek', objutils.ETek.Reader, objutils.ETek.Writer, "Extended Tektonix format.")
+import objutils.etek
+reg.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
 
 import objutils.FPC
 reg.register('fpc', objutils.FPC.Reader, objutils.FPC.Writer, "Four packed code file format.")
