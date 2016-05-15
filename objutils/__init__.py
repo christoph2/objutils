@@ -40,8 +40,8 @@ reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.
 import objutils.srec
 reg.register('srec', objutils.srec.Reader, objutils.srec.Writer, "Motorola S-Records (a.k.a. S19).")
 
-import objutils.TiTxt
-reg.register('titxt', objutils.TiTxt.Reader, objutils.TiTxt.Writer, "Texas Instruments MSP430 text format.")
+import objutils.titxt
+reg.register('titxt', objutils.titxt.Reader, objutils.titxt.Writer, "Texas Instruments MSP430 text format.")
 
 import objutils.emon52
 reg.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
