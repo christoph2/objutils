@@ -73,8 +73,8 @@ reg.register('tek', objutils.Tek.Reader, objutils.Tek.Writer, "Tektonix format."
 import objutils.cosmac
 reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 
-import objutils.ASH
-reg.register('ash', objutils.ASH.Reader, objutils.ASH.Writer, "ASCII hex space formats.")
+import objutils.ash
+reg.register('ash', objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
 
 ##
 ##  Interface to objutils.
