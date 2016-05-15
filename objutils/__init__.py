@@ -61,8 +61,8 @@ import objutils.ieee695
 import objutils.ihex
 reg.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
 
-import objutils.MOSTec
-reg.register('mostec', objutils.MOSTec.Reader, objutils.MOSTec.Writer, "MOSTech format.")
+import objutils.mostec
+reg.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
 
 import objutils.RCA
 reg.register('rca', objutils.RCA.Reader, objutils.RCA.Writer, "RCA format.")
