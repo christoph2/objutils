@@ -33,7 +33,7 @@ import os
 import re
 import sys
 
-from objutils.Segment import Segment, joinSegments
+from objutils.section import Section, joinSegments
 from objutils.Image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
@@ -233,7 +233,7 @@ class Reader(BaseType):
                         self.specialProcessing(container, formatType)
                         if self.isDataLine(container, formatType):
                             # print chunk
-                            segments.append(Segment(container.address, container.chunk))
+                            segments.append(Section(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
                             address = container.address if hasattr(container, 'address') else None
@@ -408,7 +408,7 @@ class ASCIIHexReader(Reader):
         return False
 
     def parseLine(self, line, match):
-        segment = Segment(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
+        segment = Section(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
         self.segments.append(segment)
         self.address += len(segment)
         return True

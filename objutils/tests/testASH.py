@@ -4,7 +4,7 @@
 import unittest
 
 from objutils import loads, dumps, probes
-from objutils.Segment import Segment
+from objutils.section import Section
 from objutils.Image import Image, Builder
 
 TEST1 = ''' $A0000,

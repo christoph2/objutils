@@ -33,7 +33,7 @@ from functools import partial
 import re
 import sys
 import objutils.HexFile as HexFile
-from objutils.Segment import Segment, joinSegments
+from objutils.section import Section, joinSegments
 from objutils.Image import Image
 from objutils.utils import PYTHON_VERSION
 

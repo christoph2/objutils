@@ -4,7 +4,7 @@
 import unittest
 
 from objutils import loads, dumps, probes
-from objutils.Segment import Segment
+from objutils.section import Section
 from objutils.Image import Image, Builder
 from objutils.utils import createStringBuffer, PYTHON_VERSION
 import os

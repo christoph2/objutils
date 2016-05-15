@@ -32,8 +32,8 @@ import objutils.hexdump as hexdump
 
 from objutils.utils import PYTHON_VERSION
 
-# Note: Section seens to be a more appropriate name.
-class Segment(object):
+
+class Section(object):
     def __init__(self, address = 0, data = bytearray()):
         self.address = address
         self._length = len(data)
@@ -73,7 +73,7 @@ class Segment(object):
         return self.address > other.address
 
     def __repr__(self):
-        return "Segment (address: '0X%08X' length: '%d')" % (self.address, self.length)
+        return "Section (address: '0X%08X' length: '%d')" % (self.address, self.length)
 
     def __len__(self):
         return self.length
@@ -95,7 +95,7 @@ def joinSegments(segments, orderSegments = True):
     resultSegments = []
     if orderSegments:
         segments.sort(key = itemgetter(0))
-    prevSegment = Segment()
+    prevSegment = Section()
     while segments:
         segment = segments.pop(0)
         if segment.address == prevSegment.address + prevSegment.length and resultSegments:
@@ -104,7 +104,7 @@ def joinSegments(segments, orderSegments = True):
             lastSegment.length += segment.length
         else:
             # Create a new Segment.
-            resultSegments.append(Segment(segment.address, segment.data))
+            resultSegments.append(Section(segment.address, segment.data))
         prevSegment = segment
     if resultSegments:
         return resultSegments

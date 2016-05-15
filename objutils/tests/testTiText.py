@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps
-from objutils.Segment import Segment
+from objutils.section import Section
 from objutils.Image import Image
 import unittest
 

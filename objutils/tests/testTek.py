@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps
-from objutils.Segment import Segment
+from objutils.section import Section
 from objutils.Image import Image, Builder
 import unittest
 
@@ -27,12 +27,12 @@ class TestRoundtrip(unittest.TestCase):
         #data.hexdump()
         #print(dumps("srec", data))
         self.assertEqual(dumps("srec", data, s5record = True), S19)
-        
+
     def testDumpsWorks(self):
         data = loads("srec", S19)
         self.assertEqual(dumps("tek", data), TEK)
-        
-        
+
+
 if __name__ == '__main__':
     unittest.main()
 

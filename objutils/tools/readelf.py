@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 __version__ = "0.1.0"
 
@@ -604,7 +605,7 @@ class PrintMode(enum.IntEnum):
 def printVMA(vma, mode):
     nc = 0
     if mode == PrintMode.FULL_HEX:
-        print("0x", )
+        print("0x", end ="")
 
 """
 print_vma (bfd_vma vma, print_mode mode)

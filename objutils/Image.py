@@ -31,7 +31,7 @@ import bisect
 import operator
 import sys
 
-from objutils.Segment import Segment, joinSegments
+from objutils.section import Section, joinSegments
 
 ## TODO: diff interface!
 
@@ -89,14 +89,14 @@ class Builder(object):
         self.autoJoin = autoJoin
         self.autoSort = autoSort
 
-    def addSegment(self, data, address = None, dontJoin = False):
+    def addSegment(self, data, address = None, dontJoin = False):   # TODO: 'polymorph' signature, move 'dontJoin' to segment!
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         if self.autoSort:
-            bisect.insort(self._segments, Segment(address, data))
+            bisect.insort(self._segments, Section(address, data))
         else:
-            self._segments.append(Segment(address, data))
+            self._segments.append(Section(address, data))
         if self.autoJoin:
             self.joinSegments()
         self.address = address + len(data)
