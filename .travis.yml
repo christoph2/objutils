@@ -22,7 +22,7 @@ install:
 
 script:
 #  python -m unittest discover ./objutils/tests/
-   python ./objutils/tools/readelf.py
+#   python ./objutils/tools/readelf.py
    coverage run --source=objutils setup.py test
 
 after_success:
