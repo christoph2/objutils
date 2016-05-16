@@ -28,7 +28,16 @@ __copyright__ = """
 
 import os
 import enum
-import objutils.elf as Elf
+try:
+    import objutils.elf as Elf
+    print("'objutils.elf' works.")
+except ImportError:
+    try:
+        import objutils.Elf as Elf
+        print("'objutils.Elf' works.")
+    except ImportError:
+        print("Nothing works!")
+
 import objutils.elf.defs as defs
 from objutils.elf import Reader
 from optparse import OptionParser
