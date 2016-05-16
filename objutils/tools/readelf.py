@@ -28,9 +28,9 @@ __copyright__ = """
 
 import os
 import enum
-import objutils.Elf as Elf
-import objutils.Elf.defs as defs
-from objutils.Elf import Reader
+import objutils.elf as Elf
+import objutils.elf.defs as defs
+from objutils.elf import Reader
 from optparse import OptionParser
 
 import objutils.armabi as arm
