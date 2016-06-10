@@ -28,12 +28,13 @@ __copyright__ = """
 
 from array import array
 from operator import itemgetter
+import reprlib
 import objutils.hexdump as hexdump
-
 from objutils.utils import PYTHON_VERSION
 
 
 class Section(object):
+
     def __init__(self, address = 0, data = bytearray()):
         self.address = address
         self._length = len(data)
@@ -43,6 +44,8 @@ class Section(object):
             else:
                 data = array('B', data.tostring())
         self.data = bytearray(data) # bytearray seems to be the most appropriate canocical representation.
+        self.repr = reprlib.Repr()
+        self.repr.maxstring = 64
 
     def __getitem__(self, key):
         if key == 0:
@@ -73,7 +76,7 @@ class Section(object):
         return self.address > other.address
 
     def __repr__(self):
-        return "Section (address: '0X%08X' length: '%d')" % (self.address, self.length)
+        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(self.address, self.length, self.repr.repr(str(self.data)))
 
     def __len__(self):
         return self.length
