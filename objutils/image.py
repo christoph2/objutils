@@ -65,7 +65,7 @@ class Image(object):
 
     def __eq__(self, other):
         if len(self.segments) == len(other.segments):
-            return all([operator.eq(l,r) for l, r in zip(self.segments, other.segments)])
+            return all([operator.eq(l, r) for l, r in zip(self.segments, other.segments)])
         else:
             return False
 
