@@ -198,7 +198,7 @@ class Reader(BaseType):
             return self.load(createStringBuffer(image))
 
     def read(self, fp):
-        segments = []
+        sections = []
         matched = False
         self.valid = True
         metaData = defaultdict(list)
@@ -233,7 +233,7 @@ class Reader(BaseType):
                         self.specialProcessing(container, formatType)
                         if self.isDataLine(container, formatType):
                             # print chunk
-                            segments.append(Section(container.address, container.chunk))
+                            sections.append(Section(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
                             address = container.address if hasattr(container, 'address') else None
@@ -241,8 +241,8 @@ class Reader(BaseType):
                     break
             if not matched:
                 self.warn("Ignoring garbage line #%u" % lineNumber)
-        if segments:
-            return Image(joinSections(segments), metaData, self.valid)
+        if sections:
+            return Image(joinSections(sections), metaData, self.valid)
         else:
             self.error("File seems to be invalid.")
             return Image([], valid = False)
@@ -318,7 +318,7 @@ class Writer(BaseType):
         result = []
         self.rowLength = rowLength
 
-        if not image.segments:
+        if not image.sections:
             return ''
 
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
@@ -331,9 +331,9 @@ class Writer(BaseType):
         header = self.composeHeader(image.meta)
         if header:
             result.append(header)
-        for segment in image:
-            address = segment.address
-            rows = slicer(segment.data, rowLength, lambda x:  [int(y) for y in x])
+        for section in image:
+            address = section.address
+            rows = slicer(section.data, rowLength, lambda x:  [int(y) for y in x])
             for row in rows:
                 length = len(row)
                 result.append(self.composeRow(address, length, row))
@@ -344,7 +344,7 @@ class Writer(BaseType):
         return self.postProcess('\n'.join(result))
 
     def calculateAddressBits(self, image):
-        lastSegment = sorted(image.segments, key = lambda s: s.address)[-1]
+        lastSegment = sorted(image.sections, key = lambda s: s.address)[-1]
         highestAddress = lastSegment.address + lastSegment.length
         return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
 
@@ -408,9 +408,9 @@ class ASCIIHexReader(Reader):
         return False
 
     def parseLine(self, line, match):
-        segment = Section(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
-        self.segments.append(segment)
-        self.address += len(segment)
+        section = Section(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
+        self.sections.append(section)
+        self.address += len(section)
         return True
 
     def read(self, fp):
@@ -418,7 +418,7 @@ class ASCIIHexReader(Reader):
             lines = fp.read().decode()
         else:
             lines = fp.read()
-        self.segments = []
+        self.sections = []
         self.address = 0
         breakRequest = False
         for line in lines.splitlines():
@@ -430,7 +430,7 @@ class ASCIIHexReader(Reader):
                     break
             if breakRequest:
                 break
-        return Image(joinSections(self.segments))
+        return Image(joinSections(self.sections))
 
 
 class ASCIIHexWriter(Writer):

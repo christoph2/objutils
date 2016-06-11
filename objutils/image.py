@@ -42,30 +42,32 @@ AS_32   = 2
 AS_64   = 3
 
 class Image(object):
-    def __init__(self, segments, meta = {}, valid = False):
-        self.segments = segments
+
+    def __init__(self, sections = None, meta = {}, valid = False):
+        self.sections = sections if sections else []
+        _validateSections(self.sections)
         self.meta = meta
         self.valid = valid
 
     def __repr__(self):
         result = []
-        for segment in self.segments:
+        for segment in self.sections:
             result.append(repr(segment))
         return '\n'.join(result)
 
     def __len__(self):
-        return len(self.segments)
+        return len(self.sections)
 
     def __iter__(self):
-        return iter(self.segments)
+        return iter(self.sections)
 
     def next(self):
-        for segment in self.segments:
+        for segment in self.sections:
             yield segment
 
     def __eq__(self, other):
-        if len(self.segments) == len(other.segments):
-            return all([operator.eq(l, r) for l, r in zip(self.segments, other.segments)])
+        if len(self.sections) == len(other.sections):
+            return all([operator.eq(l, r) for l, r in zip(self.sections, other.sections)])
         else:
             return False
 
@@ -73,7 +75,7 @@ class Image(object):
         return not (self == other)
 
     def hexdump(self, fp = sys.stdout):
-        for idx, section in enumerate(self.segments):
+        for idx, section in enumerate(self.sections):
             print("\nSection #%04d" % (idx, ), file = fp)
             print("-" * 13, file = fp)
             section.hexdump(fp)
@@ -83,8 +85,9 @@ class Builder(object):
     """Construct and `Image` object.
     """
 
-    def __init__(self, segments = None, autoJoin = False, autoSort = False):
-        self._segments = segments if segments else []
+    def __init__(self, sections = None, autoJoin = False, autoSort = False):
+        self._sections = sections if sections else []
+        _validateSections(self._sections)
         self.address = 0
         self.autoJoin = autoJoin
         self.autoSort = autoSort
@@ -94,9 +97,9 @@ class Builder(object):
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         if self.autoSort:
-            bisect.insort(self._segments, Section(address, data))
+            bisect.insort(self._sections, Section(address, data))
         else:
-            self._segments.append(Section(address, data))
+            self._sections.append(Section(address, data))
         if self.autoJoin:
             self.joinSections()
         self.address = address + len(data)
@@ -105,12 +108,24 @@ class Builder(object):
         pass
 
     def joinSections(self, orderSegments = None):
-        self._segments = joinSections(self._segments, orderSegments)
+        self._sections = joinSections(self._sections, orderSegments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)
 
     @property
     def image(self):
-        return Image(self._segments)
+        return Image(self._sections)
+
+
+def _validateSections(sections):
+    """Test for required protocol
+    """
+    ATTRIBUTES = ('address', 'length', 'data')
+    if not '__iter__' in dir(sections):
+        raise TypeError("Sections must be iteratable.")
+    for section in sections:
+        if not all([hasattr(section, attr) for attr in ATTRIBUTES]):
+            raise TypeError("Section '{0}' doesn't fulfills required protocol (missing attributes).")
+
 

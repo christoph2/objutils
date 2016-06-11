@@ -32,6 +32,19 @@ class TestBasicFunctionality(unittest.TestCase):
         buf.seek(0, os.SEEK_SET)
         self.assertEqual(buf.read(), TEST1)
 
+    def testFailIfSectionsAreNotIterateble(self):
+        self.assertRaises(TypeError, Builder, 4711)
+
+    def testFailIfSectionIsNotValid(self):
+        self.assertRaises(TypeError, Builder, ["abc"])
+
+    def testValidSections(self):
+        builder = Builder([Section(0x1000, range(128))])
+
+
+    def testFailIfSectionsAreNotIterateble2(self):
+        builder = Builder([])
+        print(builder.image)
 
 class TestBuilderParameters(unittest.TestCase):
 

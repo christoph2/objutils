@@ -35,15 +35,18 @@ from objutils.utils import PYTHON_VERSION
 
 class Section(object):
 
-    def __init__(self, address = 0, data = bytearray()):
+    def __init__(self, address = 0, data = None):
         self.address = address
-        self._length = len(data)
+        if data is None:
+            self.data = bytearray()
+        else:
+            self.data = bytearray(data) # bytearray seems to be the most appropriate canocical representation.
+        self._length = len(self.data)
         if isinstance(data, array) and data.typecode != 'B':
             if PYTHON_VERSION.major == 3:
                 data = array('B', data.tobytes())
             else:
                 data = array('B', data.tostring())
-        self.data = bytearray(data) # bytearray seems to be the most appropriate canocical representation.
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
 
