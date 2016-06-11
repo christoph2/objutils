@@ -40,7 +40,7 @@ class Section(object):
         if data is None:
             self.data = bytearray()
         else:
-            self.data = bytearray(data) # bytearray seems to be the most appropriate canocical representation.
+            self.data = bytearray(data) # bytearray seems to be the most appropriate canonical representation.
         self._length = len(self.data)
         if isinstance(data, array) and data.typecode != 'B':
             if PYTHON_VERSION.major == 3:
