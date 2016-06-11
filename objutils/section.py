@@ -82,7 +82,13 @@ class Section(object):
     def __repr__(self):
         if PYTHON_VERSION.major == 3:
             #data = re.match(r"bytearray\(b'(?P<bytes>[^' ]*)'\)", repr(self.data)).group('bytes')
-            data = repr(self.data)
+            #data = repr(self.data)
+            match = re.match(r"bytearray\(b'(?P<bytes>[^' ]*)'\)", repr(self.data))
+            if match:
+                data = match.group('bytes')
+            else:
+                print("WW: {0}".format(self.data))
+                data = self.data
             print("{}".format(data))
         else:
             data = str(self.data)
