@@ -81,7 +81,9 @@ class Section(object):
 
     def __repr__(self):
         if PYTHON_VERSION.major == 3:
-            data = re.match(r"bytearray\(b'(?P<bytes>[^' ]*)'\)", repr(self.data)).group('bytes')
+            #data = re.match(r"bytearray\(b'(?P<bytes>[^' ]*)'\)", repr(self.data)).group('bytes')
+            data = repr(self.data)
+            print("{}".format(data))
         else:
             data = str(self.data)
         return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(self.address, self.length, self.repr.repr(str(data)))
