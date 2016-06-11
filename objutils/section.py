@@ -28,6 +28,7 @@ __copyright__ = """
 
 from array import array
 from operator import itemgetter
+import re
 import reprlib
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
@@ -79,7 +80,11 @@ class Section(object):
         return self.address > other.address
 
     def __repr__(self):
-        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(self.address, self.length, self.repr.repr(str(self.data)))
+        if PYTHON_VERSION.major == 3:
+            data = re.match(r"bytearray\(b'(?P<bytes>[^' ]*)'\)", repr(self.data))).group('bytes')
+        else:
+            data = str(self.data)
+        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(self.address, self.length, self.repr.repr(str(data)))
 
     def __len__(self):
         return self.length
