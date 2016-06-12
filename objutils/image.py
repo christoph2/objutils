@@ -69,7 +69,7 @@ class Image(object):
 
     def __eq__(self, other):
         if len(self.sections) == len(other.sections):
-            return all([operator.eq(l, r) for l, r in zip(self.sections, other.sections)])
+            return all( operator.eq(l, r) for l, r in zip(self.sections, other.sections))
         else:
             return False
 
@@ -127,7 +127,7 @@ def _validateSections(sections):
     if not '__iter__' in dir(sections):
         raise TypeError("Sections must be iteratable.")
     for section in sections:
-        if not all([hasattr(section, attr) for attr in ATTRIBUTES]):
+        if not all( hasattr(section, attr) for attr in ATTRIBUTES):
             raise TypeError("Section '{0}' doesn't fulfills required protocol (missing attributes).")
 
 
