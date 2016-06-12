@@ -164,7 +164,9 @@ class Writer(hexfile.Writer):
         self.offset = self.recordType + 2
 
 
-    def srecord(self, recordType, length, address, data = []):
+    def srecord(self, recordType, length, address, data = None):
+        if data is None:
+            data = []
         length += self.offset
         addressBytes = utils.intToArray(address)
         checksum = self.checksum(makeList(addressBytes, length, data))
