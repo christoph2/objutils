@@ -44,7 +44,7 @@ class Attribute(object):
     return self._value
 
   def __repr__(self):
-    return "Attribute(%s = %s)" % (self.name, self.value)
+    return "Attribute({0!s} = {1!s})".format(self.name, self.value)
 
   name = property(_getName)
   value = property(_getValue)

@@ -126,7 +126,7 @@ class FormatParser(object):
         length = len(group)
         if groupNumber is None:    # Handle invariants (i.e. fixed chars).
             if group[0] == ' ':
-                expr = '\s{%s}' % (length, )
+                expr = '\s{{{0!s}}}'.format(length )
             else:
                 expr = group[0] * length
         else:
@@ -136,7 +136,7 @@ class FormatParser(object):
             elif groupNumber == DATA:
                 "(?P<chunk>[0-9a-zA-Z]*)"
                 if self.dataSep is not None:
-                    expr = "(?P<chunk>[0-9a-zA-Z%s]*)" % (self.dataSep, )
+                    expr = "(?P<chunk>[0-9a-zA-Z{0!s}]*)".format(self.dataSep )
                 else:
                     pass
             elif groupNumber == UNPARSED:
@@ -240,7 +240,7 @@ class Reader(BaseType):
                             metaData[formatType].append(MetaRecord(formatType, address, chunk))
                     break
             if not matched:
-                self.warn("Ignoring garbage line #%u" % lineNumber)
+                self.warn("Ignoring garbage line #{0:d}".format(lineNumber))
         if sections:
             return Image(joinSections(sections), metaData, self.valid)
         else:
@@ -360,7 +360,7 @@ class Writer(BaseType):
             try:
                 params[k] = getattr(self, k)
             except AttributeError:
-                raise AttributeError("Invalid keyword argument '%s'." % k)
+                raise AttributeError("Invalid keyword argument '{0!s}'.".format(k))
             else:
                 setattr(self, k, v)
         return params
@@ -382,7 +382,7 @@ class Writer(BaseType):
     @staticmethod
     def hexBytes(row, spaced = False):
         spacer = ' ' if spaced else ''
-        return spacer.join(["%02X" % x for x in row])
+        return spacer.join(["{0:02X}".format(x) for x in row])
 
 
 class ASCIIHexReader(Reader):

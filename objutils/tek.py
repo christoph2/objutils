@@ -67,7 +67,7 @@ class Writer(hexfile.Writer):
         addressChecksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), length))
 
         dataChecksum = checksums.nibbleSum(row)
-        line = "/%04X%02X%02X%s%02X" % (address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
+        line = "/{0:04X}{1:02X}{2:02X}{3!s}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
         self.lastAddress = address + length
         return line
 

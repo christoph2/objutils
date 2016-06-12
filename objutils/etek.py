@@ -76,6 +76,6 @@ class Writer(hexfile.Writer):
     def composeRow(self, address, length, row):
         checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), 6, ((length + 5) * 2), row))
 
-        line = "%%%02X6%02X%04X%s" % ((length + 5) * 2, checksum, address, Writer.hexBytes(row), )
+        line = "%{0:02X}6{1:02X}{2:04X}{3!s}".format((length + 5) * 2, checksum, address, Writer.hexBytes(row) )
         return line
 

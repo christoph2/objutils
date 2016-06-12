@@ -73,5 +73,5 @@ class Writer(hexfile.Writer):
 
     def composeRow(self, address, length, row):
         checksum = sum(row) % 65536
-        return "%02X %04X:%s %04X" % (length, address, Writer.hexBytes(row, spaced = True), checksum)
+        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(length, address, Writer.hexBytes(row, spaced = True), checksum)
 

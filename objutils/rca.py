@@ -53,15 +53,15 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    SEPARATOR = "%s\x0d\x0a" % ('\x00' * 48)
+    SEPARATOR = "{0!s}\x0d\x0a".format(('\x00' * 48))
     MAX_ADDRESS_BITS = 16
 
     def composeRow(self, address, length, row):
-        return "%04X %s;" % (address, Writer.hexBytes(row))
+        return "{0:04X} {1!s};".format(address, Writer.hexBytes(row))
 
     def composeHeader(self, meta):
-        return "%s!M" % Writer.SEPARATOR
+        return "{0!s}!M".format(Writer.SEPARATOR)
 
     def composeFooter(self, meta):
-        return "%s" % Writer.SEPARATOR
+        return "{0!s}".format(Writer.SEPARATOR)
 

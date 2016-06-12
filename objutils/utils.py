@@ -181,17 +181,17 @@ class RepresentationMixIn(object):
     def __repr__(self):
         keys = [k for k in self.__dict__ if not (k.startswith('__') and k.endswith('__'))]
         result = []
-        result.append("%s {" % self.__class__.__name__)
+        result.append("{0!s} {{".format(self.__class__.__name__))
         for key in keys:
             value = getattr(self, key)
             if isinstance(value, (int, long)):
-                line = "    %s = 0x%X" % (key, value)
+                line = "    {0!s} = 0x{1:X}".format(key, value)
             elif isinstance(value, (float, types.NoneType)):
-                line = "    %s = %s" % (key, value)
+                line = "    {0!s} = {1!s}".format(key, value)
             elif isinstance(value, array):
-                line = "    %s = %s" % (key, helper.hexDump(value))
+                line = "    {0!s} = {1!s}".format(key, helper.hexDump(value))
             else:
-                line = "    %s = '%s'" % (key, value)
+                line = "    {0!s} = '{1!s}'".format(key, value)
             result.append(line)
         result.append("}")
         return '\n'.join(result)

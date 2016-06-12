@@ -76,7 +76,7 @@ class Image(object):
 
     def hexdump(self, fp = sys.stdout):
         for idx, section in enumerate(self.sections):
-            print("\nSection #%04d" % (idx, ), file = fp)
+            print("\nSection #{0:04d}".format(idx ), file = fp)
             print("-" * 13, file = fp)
             section.hexdump(fp)
 
