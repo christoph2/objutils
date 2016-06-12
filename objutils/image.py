@@ -43,7 +43,9 @@ AS_64   = 3
 
 class Image(object):
 
-    def __init__(self, sections = None, meta = {}, valid = False):
+    def __init__(self, sections = None, meta = None, valid = False):
+        if meta is None:
+            meta = {}
         self.sections = sections if sections else []
         _validateSections(self.sections)
         self.meta = meta

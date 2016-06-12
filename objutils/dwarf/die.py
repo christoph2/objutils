@@ -53,7 +53,11 @@ class Attribute(object):
 class DebuggingInformationEntry(object):
     __slots__ = ['_tag', '_attributes', '_parent', '_siblings', '_children']
 
-    def __init__(self, tag, attributes, parent = None, siblings = [], children = []):
+    def __init__(self, tag, attributes, parent = None, siblings = None, children = None):
+      if siblings is None:
+        siblings = []
+      if children is None:
+        children = []
       self._tag = tag
       self._attributes = attributes
       self._parent = parent
