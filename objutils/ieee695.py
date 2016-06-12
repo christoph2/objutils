@@ -373,7 +373,7 @@ class Reader(object):
         self.currentSectionIndex = index
 
     def checkSectionIndex(self, index):
-        if  self.currentSectionIndex == None:
+        if  self.currentSectionIndex is None:
             print("No current Section Index.")
         elif self.currentSectionIndex != index:
             print
@@ -886,7 +886,7 @@ class Reader(object):
         values = []
         while True:
             value = self.checkOptional(self.fpos)
-            if value == None:
+            if value is None:
                 break
             else:
                 values.append(value)
