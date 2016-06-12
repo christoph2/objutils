@@ -36,7 +36,7 @@ class Base(object):
         return self._value
 
     def __str__(self):
-        return "< %s >" % (self.MAP.get(self._value, self._value))
+        return "< {0!s} >".format((self.MAP.get(self._value, self._value)))
 
     __repr__ = __str__
 

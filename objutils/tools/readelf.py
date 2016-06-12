@@ -666,18 +666,18 @@ class ELFReader(object):
     def printFileHeader(self, reader):
         if self.options.fileHeader:
             print("ELF Header:")
-            print("  Magic:   " + ' '.join(["%02x" %(ord(x)) for x in reader.header.magicBytes[:16]]) + " ")
-            print("  Class:                             %s" % (reader.header.elfClassAsString()))
-            print("  Data:                              %s" % reader.header.elfDataEncodingAsString())
-            print("  Version:                           %d %s" % (reader.header.elfVersion, reader.header.getVersionAsString()))
-            print("  OS/ABI:                            %s" % (reader.header.getAbiNameAsString()))
-            print("  ABI Version:                       %d" % (reader.header.elfAbiVersion))
-            print("  Type:                              %s" % reader.header.getElfTypeAsString())
-            print("  Machine:                           %s" % reader.header.elfMachineName)
+            print("  Magic:   " + ' '.join(["{0:02x}".format((ord(x))) for x in reader.header.magicBytes[:16]]) + " ")
+            print("  Class:                             {0!s}".format((reader.header.elfClassAsString())))
+            print("  Data:                              {0!s}".format(reader.header.elfDataEncodingAsString()))
+            print("  Version:                           {0:d} {1!s}".format(reader.header.elfVersion, reader.header.getVersionAsString()))
+            print("  OS/ABI:                            {0!s}".format((reader.header.getAbiNameAsString())))
+            print("  ABI Version:                       {0:d}".format((reader.header.elfAbiVersion)))
+            print("  Type:                              {0!s}".format(reader.header.getElfTypeAsString()))
+            print("  Machine:                           {0!s}".format(reader.header.elfMachineName))
             print("  Version:                           0x%lx" % reader.header.elfVersion)
-            print("  Entry point address:               0x%x" % (reader.header.elfEntryPoint))  #  (bytes into file)
-            print("  Start of program headers:          %d (bytes into file)" % (reader.header.elfProgramHeaderTableOffset))
-            print("  Start of section headers:          %d (bytes into file)" % (reader.header.elfSectionHeaderTableOffset))
+            print("  Entry point address:               0x{0:x}".format((reader.header.elfEntryPoint)))  #  (bytes into file)
+            print("  Start of program headers:          {0:d} (bytes into file)".format((reader.header.elfProgramHeaderTableOffset)))
+            print("  Start of section headers:          {0:d} (bytes into file)".format((reader.header.elfSectionHeaderTableOffset)))
             print("  Flags:                             0x%lx%s" % (reader.header.elfFlags, getMachineFlags(reader.header.elfFlags, reader.header.elfMachine)))
             print("  Size of this header:               %ld (bytes)" % (reader.header.elfEHSize))
             print("  Size of program headers:           %ld (bytes)" % (reader.header.elfPHTEntrySize))
@@ -690,7 +690,7 @@ class ELFReader(object):
                 print(" (%ld)" % reader.section_headers[0].sh_size);
             print("  Section header string table index: %ld" % (reader.header.elfStringTableIndex))
             if reader.sectionHeaders and reader.header.e_shstrndx == defs.SHN_XINDEX:
-                print(" (%u)" % reader.header.section_headers[0].sh_link);
+                print(" ({0:d})".format(reader.header.section_headers[0].sh_link));
             elif reader.header.e_shstrndx != defs.SHN_UNDEF and reader.header.e_shstrndx > reader.header.e_shnum:
                 print(" <corrupt: out of range>")
 
@@ -704,9 +704,9 @@ class ELFReader(object):
                 return
 
         if self.doSegments and not self.doHeader:
-            print("Elf file type is %s" % reader.header.getElfTypeAsString())
-            print("Entry point 0x%x" % reader.header.e_entry)
-            print("There are %d program headers, starting at offset %d" % (reader.header.e_phnum, reader.header.e_phoff))
+            print("Elf file type is {0!s}".format(reader.header.getElfTypeAsString()))
+            print("Entry point 0x{0:x}".format(reader.header.e_entry))
+            print("There are {0:d} program headers, starting at offset {1:d}".format(reader.header.e_phnum, reader.header.e_phoff))
         elif not self.doSegments:
             return
         print
@@ -802,7 +802,7 @@ class ELFReader(object):
                 """
             elif header.phType == defs.PT_INTERP:
                 if self.doSegments:
-                    print("      [Requesting program interpreter: %s]" % (header.image.strip()))
+                    print("      [Requesting program interpreter: {0!s}]".format((header.image.strip())))
 
         if self.doSegments and reader.sectionHeaders:   # and reader.stringTable
             print("\n Section to Segment mapping:")

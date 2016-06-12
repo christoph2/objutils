@@ -94,7 +94,7 @@ class Reader(hexfile.Reader):
                 line.addPI(('eip', eip))
                 self.debug("START_LINEAR_ADDRESS: {0}".format(hex(eip)))
             else:
-                self.error("Bad Linear Address at line #%u." % line.lineNumber)
+                self.error("Bad Linear Address at line #{0:d}.".format(line.lineNumber))
         elif line.type == EOF:
             pass
         else:
@@ -123,7 +123,7 @@ class Writer(hexfile.Writer):
         ## buildLine()
         line = ""
         for b in data:
-            line += "%02X" % b
+            line += "{0:02X}".format(b)
 
-        self.outFile.write(":%02X%04X%02X%s%02X" % (length, address, type_, line, checksum))
+        self.outFile.write(":{0:02X}{1:04X}{2:02X}{3!s}{4:02X}".format(length, address, type_, line, checksum))
 

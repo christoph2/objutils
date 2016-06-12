@@ -93,7 +93,7 @@ class Reader(hexfile.Reader):
                 ((line.address & 0xff00) >>8 )+(line.address & 0xff)
             )
         else:
-            raise TypeError("Invalid format type '%s'." % formatType)
+            raise TypeError("Invalid format type '{0!s}'.".format(formatType))
         if hasattr(line, 'chunk'):
             checksum = (~(sum([line.length,checkSumOfAddress]) + sum(line.chunk))) & 0xff
         else:
@@ -160,7 +160,7 @@ class Writer(hexfile.Writer):
                 self.recordType = 2
             elif highestAddress <= 0xffffffff:
                 self.recordType = 3
-        self.addressMask = "%%0%uX" % ((self.recordType + 1) * 2, )
+        self.addressMask = "%0{0:d}X".format((self.recordType + 1) * 2 )
         self.offset = self.recordType + 2
 
 
@@ -170,7 +170,7 @@ class Writer(hexfile.Writer):
         length += self.offset
         addressBytes = utils.intToArray(address)
         checksum = self.checksum(makeList(addressBytes, length, data))
-        mask = "S%%u%%02X%s%%s%%02X" % self.addressMask
+        mask = "S%u%02X{0!s}%s%02X".format(self.addressMask)
         return mask % (recordType, length, address, Writer.hexBytes(data), checksum)
 
     def composeRow(self, address, length, row):

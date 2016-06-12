@@ -6,7 +6,7 @@ from setuptools import find_packages
 from glob import glob
 
 def packagez(base):
-    return  ["%s%s%s" % (base, os.path.sep, p) for p in find_packages(base)]
+    return  ["{0!s}{1!s}{2!s}".format(base, os.path.sep, p) for p in find_packages(base)]
 
 from distutils.core import setup,Extension
 from setuptools import find_packages,setup

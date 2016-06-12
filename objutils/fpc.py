@@ -74,7 +74,7 @@ class Reader(hexfile.Reader):
             values = []
             for quintuple in self.splitQuintuples(line):
                 value = self.convertQuintuple(quintuple)
-                values.append("%08X" % value)
+                values.append("{0:08X}".format(value))
             outLines.append(''.join(values))
         return '\n'.join(outLines)
 

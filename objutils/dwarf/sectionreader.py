@@ -164,7 +164,7 @@ class DebugSectionReader(object):
             attrSpecs = []
             if dr.pos == 0x69:
                 pass
-            print("   %u      %s    [%s]" % (code, tag, "has children" if children == constants.DW_CHILDREN_yes else "no children"))
+            print("   {0:d}      {1!s}    [{2!s}]".format(code, tag, "has children" if children == constants.DW_CHILDREN_yes else "no children"))
             while True:
                 attrValue = dr.uleb()
                 attr = constants.AttributeEncoding(attrValue)
@@ -174,9 +174,9 @@ class DebugSectionReader(object):
                     print("    DW_AT value: 0     DW_FORM value: 0")
                     break
                 if attr.value in attr.MAP:
-                    print("    %s %s" % (attr.MAP[attr.value], form.MAP[form.value]))
+                    print("    {0!s} {1!s}".format(attr.MAP[attr.value], form.MAP[form.value]))
                 else:
-                    print("    Unknown AT value: %x %s" % (attr.value, form.MAP[form.value]))
+                    print("    Unknown AT value: {0:x} {1!s}".format(attr.value, form.MAP[form.value]))
                 attrSpecs.append((attr, form))
             abbrevEntries[code] = AbbreviationEntry(tag, "DW_CHILDREN_yes" if children == constants.DW_CHILDREN_yes else "DW_CHILDREN_no", attrSpecs)
             #print startPos, abbrevEntries[code]
@@ -225,9 +225,9 @@ class DebugSectionReader(object):
                 try:
                     entry = abbrevs[number]
                 except KeyError as e:   # TODO: genau analysieren!!!
-                    print("ENTRY NOT FOUND: %u [%s]" % (number, e))
+                    print("ENTRY NOT FOUND: {0:d} [{1!s}]".format(number, e))
                     continue
-                print("<%x><%x>: Abbrev Number: %u (%s)" % (sectionHeaderStart, entryOffset, number, entry.tag,))
+                print("<{0:x}><{1:x}>: Abbrev Number: {2:d} ({3!s})".format(sectionHeaderStart, entryOffset, number, entry.tag))
                 for attr in entry.attrs:
                     offset = dr.pos
                     attribute, form = attr
@@ -237,7 +237,7 @@ class DebugSectionReader(object):
                         constants.DW_AT_data_member_location):
                         dis = Dissector(attrValue, targetAddrSize)
                         attrValue = dis.run()
-                    print("   <%x>   %18s    : %s" % (offset, attribute, attrValue))
+                    print("   <{0:x}>   {1:18!s}    : {2!s}".format(offset, attribute, attrValue))
         dr.reset()
 
     def processPubNames(self):  # TODO: NameLookupTable
@@ -249,10 +249,10 @@ class DebugSectionReader(object):
             dwarfVersion = dr.u16()
             debugInfoOffs = dr.u32()
             debugInfoLen = dr.u32()
-            print("  Length:                              %u" % (length,  ))
-            print("  Version:                             %u" % (dwarfVersion, ))
-            print("  Offset into .debug_info section:     0x%x" % (debugInfoOffs, ))
-            print("  Size of area in .debug_info section: %u" % (debugInfoLen, ))
+            print("  Length:                              {0:d}".format(length  ))
+            print("  Version:                             {0:d}".format(dwarfVersion ))
+            print("  Offset into .debug_info section:     0x{0:x}".format(debugInfoOffs ))
+            print("  Size of area in .debug_info section: {0:d}".format(debugInfoLen ))
             print()
             print("    Offset      Name")
             while dr.pos < stopPosition:
@@ -261,7 +261,7 @@ class DebugSectionReader(object):
                 if not entryOffset:
                     break
                 entryName = dr.asciiz()
-                print("    %12s %s" % (hex(entryOffset), entryName))
+                print("    {0:12!s} {1!s}".format(hex(entryOffset), entryName))
 
     def scanDebugInfoHeaders(self):
         dr = self.getReader('.debug_info')
@@ -317,26 +317,26 @@ class DebugSectionReader(object):
                     # The last entry is followed by a single null byte.
                     break
 
-            print("  Offset:                      %x" % (sectionOffset, ))           # BYTE-ORDER??!!
-            print("  Length:                      %u" % (length, ))
-            print("  DWARF Version:               %u" % (dwarfVersion))
-            print("  Prologue Length:             %u" % (headerLength, ))            # BYTE-ORDER??!!
-            print("  Minimum Instruction Length:  %u" % (minimumInstructionLength, ))
+            print("  Offset:                      {0:x}".format(sectionOffset ))           # BYTE-ORDER??!!
+            print("  Length:                      {0:d}".format(length ))
+            print("  DWARF Version:               {0:d}".format((dwarfVersion)))
+            print("  Prologue Length:             {0:d}".format(headerLength ))            # BYTE-ORDER??!!
+            print("  Minimum Instruction Length:  {0:d}".format(minimumInstructionLength ))
             #print("  Maximum Operations per Instruction: %u" % (maximumOperationsPerInstruction, ))
-            print("  Initial value of 'is_stmt':  %u" % (defaultIsStmt, ))
-            print("  Line Base:                   %i" % (lineBase, ))
-            print("  Line Range:                  %u" % (lineRange))
-            print("  Opcode Base:                 %u" % (opcodeBase))
+            print("  Initial value of 'is_stmt':  {0:d}".format(defaultIsStmt ))
+            print("  Line Base:                   {0:d}".format(lineBase ))
+            print("  Line Range:                  {0:d}".format((lineRange)))
+            print("  Opcode Base:                 {0:d}".format((opcodeBase)))
 
             print("\n  Opcodes:")
             for idx, args in enumerate(standardOpcodeLengths, 1):
-                print("   Opcode %u has %u args" % (idx, args))
+                print("   Opcode {0:d} has {1:d} args".format(idx, args))
 
             if includeDirectories:
                 #print "What now?"
                  print(" The Directory Table (offset 0x18):") # Cheeck: Offset!??
                  for idx, directory in enumerate(includeDirectories, 1):
-                     print("  %u     %s" % (idx, directory))
+                     print("  {0:d}     {1!s}".format(idx, directory))
             else:
                 print(" The Directory Table is empty.")
 
@@ -352,7 +352,7 @@ class DebugSectionReader(object):
                     timeOfLastModification = dr.uleb()
                     fileLength = dr.uleb()
                     fileNames.append(filename)  # TODO: namedtuple.
-                    print("%u %u %u %u %s" % (idx, directoryIndex, timeOfLastModification, fileLength, filename))
+                    print("{0:d} {1:d} {2:d} {3:d} {4!s}".format(idx, directoryIndex, timeOfLastModification, fileLength, filename))
                 else:
                     break
 
@@ -365,7 +365,7 @@ class DebugSectionReader(object):
             line = 1
             while True:
                 regs = LNSregisters(defaultIsStmt, dr.pos)
-                print("[0x%08x]  " % dr.pos, )
+                print("[0x{0:08x}]  ".format(dr.pos), )
                 opcode = dr.u8()
                 if opcode >= opcodeBase:
                     # Special opcodes.
@@ -384,7 +384,7 @@ class DebugSectionReader(object):
                     regs.prologue_end = False
                     regs.epilogue_begin = False
                     regs.discriminator = 0
-                    print("Special opcode %u: advance Address by %u to 0x%x and Line by %u to %u" % (adjustedOpcode, addrIncr, address, lineIncr, line))
+                    print("Special opcode {0:d}: advance Address by {1:d} to 0x{2:x} and Line by {3:d} to {4:d}".format(adjustedOpcode, addrIncr, address, lineIncr, line))
 
                 else:
                     if opcode == DW_LNS_extended_op:
@@ -398,7 +398,7 @@ class DebugSectionReader(object):
                             print("Extended opcode 1: End of Sequence")
                         elif extOp == constants.DW_LNE_set_address:
                             address = dr.addr()
-                            print("Extended opcode 2: set Address to 0x%x" % address)
+                            print("Extended opcode 2: set Address to 0x{0:x}".format(address))
                         elif extOp == constants.DW_LNE_define_file:
                             print("Extended opcode 3: define new File Table entry")
                             fileName = dr.asciiz()
@@ -407,11 +407,11 @@ class DebugSectionReader(object):
                             fileLength = dr.uleb()
                             # TODO: Append to filename-Table!!!
                             print("Entry Dir     Time    Size    Name")
-                            print(" 1    %u       %u       %u       %s" % (directoryIndex, timeOfLastModification, fileLength, fileName))
+                            print(" 1    {0:d}       {1:d}       {2:d}       {3!s}".format(directoryIndex, timeOfLastModification, fileLength, fileName))
                         elif extOp == constants.DW_LNE_set_discriminator:
                             raise Exception("FIX ME!!!")
                         else:
-                            raise AttributeError("Unexpected extended opcode: '%u'" % opcode)
+                            raise AttributeError("Unexpected extended opcode: '{0:d}'".format(opcode))
                     else:
                         # Standard opcodes.
                         if opcode == constants.DW_LNS_copy:
@@ -420,17 +420,17 @@ class DebugSectionReader(object):
                         elif opcode == constants.DW_LNS_advance_pc:
                             addressIncr = dr.uleb() * minimumInstructionLength
                             address += addressIncr
-                            print("Advance PC by %u to 0x%x" % (addressIncr, address))
+                            print("Advance PC by {0:d} to 0x{1:x}".format(addressIncr, address))
                         elif opcode == constants.DW_LNS_advance_line:
                             lineIncr = dr.uleb()
                             line += lineIncr
-                            print("Advance Line by %u to %u" % (lineIncr, line, ))
+                            print("Advance Line by {0:d} to {1:d}".format(lineIncr, line ))
                         elif opcode == constants.DW_LNS_set_file:
                             regs.fileNumber = dr.uleb()
-                            print("Set File Name to entry %u in the File Name Table" % (regs.fileNumber))
+                            print("Set File Name to entry {0:d} in the File Name Table".format((regs.fileNumber)))
                         elif opcode == constants.DW_LNS_set_column:
                             regs.column = dr.uleb()
-                            print("Set column to %u" % regs.column)
+                            print("Set column to {0:d}".format(regs.column))
                         elif opcode == constants.DW_LNS_negate_stmt:
                             regs.is_stmt = not regs.is_stmt # Check!!!
                         elif opcode == constants.DW_LNS_set_basic_block:
@@ -439,11 +439,11 @@ class DebugSectionReader(object):
                         elif opcode == constants.DW_LNS_const_add_pc:
                             offset = ((255 - opcodeBase) / lineRange) * minimumInstructionLength
                             address += offset
-                            print("Advance PC by constant %u to 0x%x" % (offset, address))
+                            print("Advance PC by constant {0:d} to 0x{1:x}".format(offset, address))
                         elif opcode == constants.DW_LNS_fixed_advance_pc:
                             addrInc = dr.u16()
                             address += addrInc
-                            print("Advance PC by fixed size amount %u to 0x%x" % (addrInc, address))
+                            print("Advance PC by fixed size amount {0:d} to 0x{1:x}".format(addrInc, address))
                         elif opcode == constants.DW_LNS_set_prologue_end:
                             print("Set prologue_end to true")
                             regs.prologue_end = True
@@ -452,7 +452,7 @@ class DebugSectionReader(object):
                         elif opcode == constants.DW_LNS_set_isa:
                             pass
                         else:
-                            raise AttributeError("Unexpected standard opcode: '%u'" % opcode)
+                            raise AttributeError("Unexpected standard opcode: '{0:d}'".format(opcode))
                 regs.line = line
                 regs.address = address
                 lineNumberProgram.append(regs)

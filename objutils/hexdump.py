@@ -41,7 +41,7 @@ class Dumper(object):
         self._fp = fp
         self._rolloverMask = 2 ** numAddressBits
         self._nibbles = numAddressBits >> 2
-        self._addressMask = "%%0%ux " % self._nibbles
+        self._addressMask = "%0{0:d}x ".format(self._nibbles)
         self.previousRow = bytes()  # bytearray()
         self.elided = False
 

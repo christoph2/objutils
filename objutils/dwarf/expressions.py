@@ -67,9 +67,9 @@ class LiteralEncoding(object):
 
     def _setValue(self, value):
         if value < self._minimum:
-            raise ValueError("Value must be at least '%u'" % self._minimum)
+            raise ValueError("Value must be at least '{0:d}'".format(self._minimum))
         elif value > self._maximum:
-            raise ValueError("Value must be at most '%u'" % self._maximum)
+            raise ValueError("Value must be at most '{0:d}'".format(self._maximum))
         self._value = value
 
     def _getValue(self):

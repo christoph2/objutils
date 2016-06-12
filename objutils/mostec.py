@@ -60,7 +60,7 @@ class Writer(hexfile.Writer):
 
     def composeRow(self, address, length, row):
         checksum = checksums.lrc(utils.makeList(utils.intToArray(address), length, row), 16, checksums.COMPLEMENT_NONE)
-        line = ";%02X%04X%s%04X" % (length, address, Writer.hexBytes(row), checksum)
+        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(length, address, Writer.hexBytes(row), checksum)
         return line
 
     def composeFooter(self, meta):
