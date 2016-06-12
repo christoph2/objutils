@@ -10,7 +10,8 @@ import unittest
 if PYTHON_VERSION.major == 2:
     RESULT = "Section(address = 0X00000000, length = 10000, data = '\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\...\\x07\\x08\\t\\n\\x0b\\x0c\\r\\x0e\\x0f')"
 else:
-    RESULT = "Section(address = 0X00000000, length = 10000, data = b'\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\...\\x07\\x08\\t\\n\\x0b\\x0c\\r\\x0e\\x0f')"
+    RESULT = "Section(address = 0X00000000, length = 10000, data = b'\\x00\\x01\\x02\\x03\\x04\\x05\\x06...\\x07\\x08\\t\\n\\x0b\\x0c\\r\\x0e\\x0f')"
+
 
 class TestRepr(unittest.TestCase):
 
