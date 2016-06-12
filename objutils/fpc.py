@@ -42,7 +42,7 @@ EOF         = 4
 PREFIX      = '$'
 
 MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42, )))
-REV_MAPPING = dict([(ord(value), key) for key, value in MAPPING.items()])
+REV_MAPPING = {ord(value): key for key, value in MAPPING.items()}
 NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
 VALID_CHARS = re.compile("^\{0}[{1}]+$".format(PREFIX, re.escape(''.join(MAPPING.values()))))
 
