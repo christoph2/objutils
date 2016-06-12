@@ -49,6 +49,7 @@ class Section(object):
                 data = array('B', data.tostring())
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
+        self.repr.maxother = 64
 
     def __getitem__(self, key):
         if key == 0:
