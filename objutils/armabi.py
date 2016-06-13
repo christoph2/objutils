@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2015 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -59,8 +59,6 @@ EF_ARM_ABI_FLOAT_HARD   = 0x400         # NB conflicts with EF_ARM_VFP_FLOAT.
 # Constants defined in AAELF.
 EF_ARM_BE8              = 0x00800000
 EF_ARM_LE8              = 0x00400000
-
-EF_ARM_EABI_VERSION = lambda flags: ((flags) & EF_ARM_EABIMASK)
 
 EF_ARM_EABI_UNKNOWN     = 0x00000000
 EF_ARM_EABI_VER1        = 0x01000000
@@ -119,7 +117,7 @@ MAX_TAG_CPU_ARCH        = 14
 TAG_CPU_ARCH_V4T_PLUS_V6_M  = (MAX_TAG_CPU_ARCH + 1)
 
 
-class ElfArmReloc_type(enum.IntEnum):
+class ElfArmRelocType(enum.IntEnum):
 
 # AAELF official names and numbers.
     R_ARM_NONE =               0
@@ -268,7 +266,7 @@ class ElfArmReloc_type(enum.IntEnum):
 def decodeARMMachineFlags(flags):
     result = ''
     unknown = False
-    eabi = EF_ARM_EABI_VERSION(flags)
+    eabi = flags  & EF_ARM_EABIMASK
     flags &= ~EF_ARM_EABIMASK
 
     if flags & EF_ARM_RELEXEC:
