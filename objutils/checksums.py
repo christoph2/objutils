@@ -26,6 +26,7 @@ __copyright__ = """
 """
 
 import operator
+import functools
 
 COMPLEMENT_NONE = 0
 COMPLEMENT_ONES = 1
@@ -68,7 +69,7 @@ def rorb(value):
     return value
 
 def xor(frame, invert = True):
-    return reduce(operator.xor, frame, 0xff if invert else 0x00)
+    return functools.reduce(operator.xor, frame, 0xff if invert else 0x00)
 
 ROTATE_LEFT = rolb
 ROTATE_RIGHT = rorb
