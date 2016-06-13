@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2014 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -67,7 +67,8 @@ def rorb(value):
     value |= 0x80 if carry else 0
     return value
 
-xor = lambda frame, invert = True: reduce(operator.xor, frame, 0xff if invert else 0x00)
+def xor(frame, invert = True):
+    return reduce(operator.xor, frame, 0xff if invert else 0x00)
 
 ROTATE_LEFT = rolb
 ROTATE_RIGHT = rorb

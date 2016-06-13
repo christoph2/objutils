@@ -1,7 +1,7 @@
 
 import unittest
 
-from objutils.checksums import nibbleSum, lrc, rotatedXOR
+from objutils.checksums import nibbleSum, lrc, rotatedXOR, xor
 from objutils.checksums import COMPLEMENT_NONE, COMPLEMENT_ONES, COMPLEMENT_TWOS, ROTATE_LEFT, ROTATE_RIGHT
 
 
@@ -16,6 +16,15 @@ class TestNiblleSums(unittest.TestCase):
     # check that s.split fails when the separator is not a string
     #with self.assertRaises(TypeError):
     #    s.split(2)
+
+
+class TestXor(unittest.TestCase):
+
+    def testXorInverted(self):
+        self.assertEqual(xor([0xbc, 0xaf, 0xfe, 0x11, 0x52, 0x60, 0x80], True), 0xb1)
+
+    def testXorNotInverted(self):
+        self.assertEqual(xor([0xbc, 0xaf, 0xfe, 0x11, 0x52, 0x60, 0x80], False), 0x4e)
 
 
 class TestLRCs(unittest.TestCase):
