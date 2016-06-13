@@ -9,7 +9,8 @@ from objutils.readers import PlainBinaryReader
 
 class TestReader(unittest.TestCase):
 
-    def _createReader(self):
+    @staticmethod
+    def _createReader():
         return PlainBinaryReader(createStringBuffer(bytearray("hello world!", "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
 
     def testSize(self):
