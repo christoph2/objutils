@@ -209,8 +209,8 @@ class DebugSectionReader(object):
             stopPosition = dr.pos + length
             dwarfVersion = dr.u16()
             abbrevOffs = dr.u32()
-            abbrevs = self.abbrevs.get(abbrevOffs, None)
-            if abbrevs is None:
+            abbrevs = self.abbrevs.get(abbrevOffs)
+            if not abbrevs:
                 print("*** Error: Invalid Abbreviations ***")
                 return
             targetAddrSize = dr.u8()
