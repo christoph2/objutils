@@ -64,10 +64,7 @@ class Alias(object):
         raise AttributeError("can't delete attribute")
 
 
-
 class FormatError(Exception): pass
-
-import struct
 
 
 INDENT_HEADER_FORMAT = "B" * defs.EI_NIDENT
