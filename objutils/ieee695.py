@@ -711,7 +711,7 @@ class Reader(object):
         if f == 'T':
             brotherSectionIndex = self.readNumber(self.fpos)
 
-        if f == 'B' or f == 'T':
+        if f in ('B', 'T'):
             contextIndex = self.readNumber(self.fpos)
 
         self.sections[sectionIndex] = Section(sectionType, sectionName, parentSectionIndex)
