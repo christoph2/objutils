@@ -189,7 +189,7 @@ class Writer(hexfile.Writer):
         result = []
         if self.s5record:
             result.append(self.srecord(5, 0, self.recordCount))
-        if not self.startAddress is None:
+        if self.startAddress is not None:
             if self.recordType == 1:    # 16bit.
                 if S9 in meta:
                     s9 = meta[S9][0]
