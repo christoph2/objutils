@@ -49,8 +49,8 @@ class Registry(SingletonBase):
         return sorted(self.codecs.keys())
 
     def get(self, name):
-        codec = self.codecs.get(name, None)
-        if codec is None:
+        codec = self.codecs.get(name)
+        if not codec:
             raise CodecDoesNotExistError(name)
         return codec
 

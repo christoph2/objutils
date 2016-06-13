@@ -130,7 +130,7 @@ class FormatParser(object):
             else:
                 expr = group[0] * length
         else:
-            expr = MAP_GROUP_TO_REGEX.get(groupNumber, None)
+            expr = MAP_GROUP_TO_REGEX.get(groupNumber)
             if groupNumber == START:
                 expr = expr % (self.startSign, )
             elif groupNumber == DATA:
