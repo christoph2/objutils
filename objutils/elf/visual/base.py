@@ -33,7 +33,7 @@ class TestVisualBaseClass(unittest.TestCase):
 
   def testLineSeparatorWorks(self):
     bc = BaseClass()
-    self.assertEqual(bc.join(['X', 'Y', 'Z', lineSeparator = '++']), "X++Y++Z")
+    self.assertEqual(bc.join(['X', 'Y', 'Z'], lineSeparator = '++'), "X++Y++Z")
 
 def main():
   unittest.main()
