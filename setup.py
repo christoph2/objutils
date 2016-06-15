@@ -1,4 +1,4 @@
-#!/bin/env/python
+#!/bin/env python
 
 from distutils.core import setup, Extension
 import os
@@ -17,12 +17,18 @@ setup(
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
     packages = packagez('objutils'),
-    install_requires = ['enum34', 'future'],
+    install_requires = ['enum34', 'future', 'mako'],
     entry_points = {
         'console_scripts': [
                 'readelf.py = objutils.tools.readelf:main',
         ],
     },
+    #data_files = [
+    #    ('objutils/tests/ELFFiles', glob('objutils/tests/ELFFiles*.*')),
+    #],
+    package_dir = {'tests': 'objutils/tests'},
+    package_data = {'tests': ['ELFFiles/*.*']},
+    #include_package_data = True,
     test_suite = "objutils.tests"
 )
 

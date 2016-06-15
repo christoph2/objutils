@@ -1,0 +1,2 @@
+#include tests/test*py
+include  objutils/tests/ELFFiles/*
