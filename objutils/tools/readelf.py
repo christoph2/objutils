@@ -28,17 +28,8 @@ __copyright__ = """
 
 import os
 import enum
-try:
-    import objutils.elf as Elf
-    print("'objutils.elf' works.")
-except ImportError:
-    try:
-        import objutils.Elf as Elf
-        print("'objutils.Elf' works.")
-    except ImportError:
-        print("Nothing works!")
 
-import objutils.elf.defs as defs
+import objutils.elf as Elf
 from objutils.elf import Reader
 from optparse import OptionParser
 
@@ -61,8 +52,6 @@ def getMachineFlags(flags, machine):
                 result += ", code in L1"
             if  flags & defs.EF_BFIN_DATA_IN_L1:
                 result += ", data in L1"
-
-
     return result
 
 ##
