@@ -127,11 +127,24 @@ ${" ({0:d})".format(section_headers[0].sh_link)}
 """
 
 
-reader = Elf.Reader(os.path.join(PATH_TO_TEST_FILES, 'testfile23'))
-print(reader)
 
-ns = {'defs': defs, 'header': reader.header, 'getMachineFlags': getMachineFlags, 'sectionHeaders': reader.sectionHeaders}
+import unittest
 
-header = renderTemplate(HEADER_TMPL, ns)
-print(header)
-print(header == R0, header == R1)
+class TestHeader(unittest.TestCase):
+
+    def testBasicHeader(self):
+        reader = Elf.Reader(os.path.join(PATH_TO_TEST_FILES, 'testfile23'))
+        #print(reader)
+
+        ns = {'defs': defs, 'header': reader.header, 'getMachineFlags': getMachineFlags, 'sectionHeaders': reader.sectionHeaders}
+
+        header = renderTemplate(HEADER_TMPL, ns)
+        #print(header)
+        self.assertEqual(header, R0)
+
+def main():
+    unittest.main()
+
+if __name__ == '__main__':
+    main()
+

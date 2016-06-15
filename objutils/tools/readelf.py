@@ -30,6 +30,7 @@ import os
 import enum
 
 import objutils.elf as Elf
+import objutils.elf.defs as defs
 from objutils.elf import Reader
 from optparse import OptionParser
 

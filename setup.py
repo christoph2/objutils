@@ -1,8 +1,7 @@
 #!/bin/env python
 
-from distutils.core import setup, Extension
 import os
-from setuptools import find_packages
+from setuptools import setup, find_packages
 from glob import glob
 
 def packagez(base):
