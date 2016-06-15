@@ -349,7 +349,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_SPARC32PLUS   : "Enhanced instruction set SPARC",
     ELFMachineType.EM_960           : "Intel 80960",
     ELFMachineType.EM_PPC           : "PowerPC",
-    ELFMachineType.EM_PPC64         : "64-bit PowerPC",
+    ELFMachineType.EM_PPC64         : "PowerPC64",
     ELFMachineType.EM_S390          : "IBM S390",
     ELFMachineType.EM_SPU           : "Sony/Toshiba/IBM SPU",
     ELFMachineType.EM_V800          : "Renesas V850 (using RH850 ABI)",
