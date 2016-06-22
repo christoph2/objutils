@@ -354,6 +354,51 @@ class ELFSectionHeaderTable(object):
     def shName(self):
         return self._name
 
+    @property
+    def flags(self):
+        flgs = ""
+        flagsLong = []
+        if (self.shFlags & defs.SHF_WRITE) == defs.SHF_WRITE:
+            flgs += 'W'
+            flagsLong.append('WRITE')
+        if (self.shFlags & defs.SHF_ALLOC) == defs.SHF_ALLOC:
+            flgs += 'A'
+            flagsLong.append('ALLOC')
+        if (self.shFlags & defs.SHF_EXECINSTR) == defs.SHF_EXECINSTR:
+            flgs += 'X'
+            flagsLong.append('EXEC')
+        if (self.shFlags & defs.SHF_MERGE) == defs.SHF_MERGE:
+            flgs += 'M'
+            flagsLong.append('MERGE')
+        if (self.shFlags & defs.SHF_STRINGS) == defs.SHF_STRINGS:
+            flgs += 'S'
+            flagsLong.append('STRINGS')
+        if (self.shFlags & defs.SHF_INFO_LINK) == defs.SHF_INFO_LINK:
+            flgs += 'I'
+            flagsLong.append('INFO LINK')
+        if (self.shFlags & defs.SHF_LINK_ORDER) == defs.SHF_LINK_ORDER:
+            flgs += 'L'
+            flagsLong.append('LINK ORDER')
+        if (self.shFlags & defs.SHF_GROUP) == defs.SHF_GROUP:
+            flgs += 'G'
+            flagsLong.append('GROUP')
+        if (self.shFlags & defs.SHF_TLS) == defs.SHF_TLS:
+            flgs += 'T'
+            flagsLong.append('TLS')
+        if (self.shFlags & defs.SHF_EXCLUDE) == defs.SHF_EXCLUDE:
+            flgs += 'E'
+            flagsLong.append('EXCLUDE')
+        if (self.shFlags & defs.SHF_ORDERED) == defs.SHF_ORDERED:
+            flgs += 'O'
+            flagsLong.append('ORDERED')
+        if (self.shFlags & defs.SHF_MASKOS) == defs.SHF_MASKOS:
+            flgs += 'o'
+            flagsLong.append('MASKOS')
+        if (self.shFlags & defs.SHF_MASKPROC) == defs.SHF_MASKPROC:
+            flgs += 'p'
+            flagsLong.append('MASKPROC')
+        return flgs, flagsLong
+
 
 class ELFProgramHeaderTable(object):
     def __init__(self, parent, atPosition = 0):
@@ -365,6 +410,23 @@ class ELFProgramHeaderTable(object):
         self.image = parent.fp[self.p_offset : self.p_offset + self.p_filesz]
         if self.p_type in (defs.PT_DYNAMIC, defs.PT_INTERP, defs.PT_NOTE, defs.PT_SHLIB, defs.PT_PHDR):
             pass
+
+    @property
+    def flags(self):
+        result = ""
+        if (self.p_flags & defs.PF_R) == defs.PF_R:
+            result += 'R'
+        else:
+            result += ' '
+        if (self.p_flags & defs.PF_W) == defs.PF_W:
+            result += 'W'
+        else:
+            result += ' '
+        if (self.p_flags & defs.PF_X) == defs.PF_X:
+            result += 'E'
+        else:
+            result += ' '
+        return result
 
     @property
     def phTypeName(self):
