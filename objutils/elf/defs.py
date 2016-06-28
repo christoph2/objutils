@@ -200,7 +200,7 @@ class ELFMachineType(enum.IntEnum):
     EM_ME16         =  59     # Toyota ME16 processor.
     EM_ST100        =  60     # STMicroelectronics ST100 processor.
     EM_TINYJ        =  61     # Advanced Logic Corp. TinyJ embedded processor family.
-    EM_X8664        =  62     # Advanced Micro Devices X86-64.
+    EM_X86_64       =  62     # Advanced Micro Devices X86-64.
     EM_PDSP         =  63     # Sony DSP Processor.
     EM_PDP10        =  64     # DEC PDP-10
     EM_PDP11        =  65     # DEC PDP-11
@@ -300,6 +300,7 @@ class ELFMachineType(enum.IntEnum):
     EM_TILEPRO      = 188     # Tilera TILEPro multicore architecture family.
     EM_MICROBLAZE   = 189     # Xilinx MicroBlaze 32-bit RISC soft processor core.
     EM_CUDA         = 190     # NVIDIA CUDA architecture.
+    EM_TILEGX       = 191     # Tilera TILE-Gx
     EM_AVR_OLD              = 0x1057  # AVR magic number.  Written in the absense of an ABI.
     EM_MSP430_OLD           = 0x1059  # MSP430 magic number.  Written in the absense of everything.
     EM_MT                   = 0x2530  # Morpho MT.   Written in the absense of an ABI.
@@ -378,7 +379,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_ME16          : "Toyota ME16 processor",
     ELFMachineType.EM_ST100         : "STMicroelectronics ST100 processor",
     ELFMachineType.EM_TINYJ         : "Advanced Logic Corp. TinyJ embedded processor family",
-    ELFMachineType.EM_X8664         : "Advanced Micro Devices X86-64",
+    ELFMachineType.EM_X86_64        : "Advanced Micro Devices X86-64",
     ELFMachineType.EM_PDSP          : "Sony DSP Processor",
     ELFMachineType.EM_PDP10         : "DEC PDP-10",
     ELFMachineType.EM_PDP11         : "DEC PDP-11",
@@ -477,6 +478,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_TILE64        : 'Tilera TILE64 multicore architecture family',
     ELFMachineType.EM_TILEPRO       : 'Tilera TILEPro multicore architecture family',
     ELFMachineType.EM_MICROBLAZE    : 'Xilinx MicroBlaze 32-bit RISC soft processor core',
+    ELFMachineType.EM_TILEGX        : 'Tilera TILE-Gx',
     ELFMachineType.EM_CUDA          : 'NVIDIA CUDA architecture',
     ELFMachineType.EM_AVR_OLD       : 'AVR',
     ELFMachineType.EM_MSP430_OLD    : 'MSP430',
