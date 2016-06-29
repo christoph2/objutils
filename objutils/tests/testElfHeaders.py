@@ -48,7 +48,7 @@ class TestHeader(unittest.TestCase):
     def testFirst(self):
        headerStuff = json.load(file("./elfHeaders.json"))
        for fname in headerStuff.keys():
-           print(fname)
+           print(fname, os.path.exists(os.path.join(PATH_TO_TEST_FILES, fname)))
 
     def testFileHeader(self):
         readElf = ReadElf(os.path.join(PATH_TO_TEST_FILES, 'testfile23'))
