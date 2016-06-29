@@ -39,22 +39,6 @@ import objutils.armabi as arm
 def stVisibility(v):
     return v & 0x3
 
-def getMachineFlags(flags, machine):
-    result = ''
-    if flags:
-        if machine == defs.ELFMachineType.EM_ARM:
-            result = arm.decodeARMMachineFlags(flags)
-        elif machine == defs.ELFMachineType.EM_BLACKFIN:
-            if flags & defs.EF_BFIN_PIC:
-                result += ", PIC"
-            if flags & defs.EF_BFIN_FDPIC:
-                result += ", FDPIC"
-            if flags & defs.EF_BFIN_CODE_IN_L1:
-                result += ", code in L1"
-            if  flags & defs.EF_BFIN_DATA_IN_L1:
-                result += ", data in L1"
-    return result
-
 ##
 ##
 ##
