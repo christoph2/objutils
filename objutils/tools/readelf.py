@@ -1016,6 +1016,7 @@ class ELFReader(object):
 
         op.add_option('-t', '--section-details', help = "Display the section details", dest = "sectionDetails", action = "store_true", default = False)
         op.add_option('-s', '--symbols', help = "Display the symbol table", dest = "doSymbols", action = "store_true", default = False)
+        op.add_option('-S', '--section-headers', help = "Display the sections' header", dest = "sectionHeaders",  action = "store_true", default = False)
 
 
         """
@@ -1079,8 +1080,10 @@ class ELFReader(object):
         self.reader = Reader(filename)
         #self.reader = Reader(file(filename, "rb"))
         self.printFileHeader(self.reader)
-        self.printSectionsHeaders(self.reader)
-        self.printProgramHeaders(self.reader)
+        if options.sectionHeaders:
+            self.printSectionsHeaders(self.reader)
+        if options.pogramHeaders:
+            self.printProgramHeaders(self.reader)
         if options.doSymbols:
             self.printSymbols()
 
@@ -1207,21 +1210,6 @@ def printRelocationData(reader):
         numEntries = len(header.image) / entrySize
 
 
-def printELFInfo(f):
-    reader = Reader(file(f, "rb"))
-
-    printHeader(reader)
-    printProgramHeaders(reader)
-    printSectionsHeaders(reader)
-    #printInfoData(reader)
-    #printSymbols(reader)
-    #printRelocationData(reader)
-
-
-import sys
-
-sys.argv.append("-Hlt")
-sys.argv.append(r"C:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile_class_func")
 
 def main():
     reader = ELFReader()
