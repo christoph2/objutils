@@ -39,19 +39,19 @@ def _basePath():
     return ot.__path__[0]
 
 BASE_PATH = _basePath()
-PATH_TO_TEST_FILES = os.path.abspath(os.path.join(BASE_PATH, 'tests/ELFFiles'))
+PATH_TO_TEST_FILES = os.path.abspath(os.path.join(BASE_PATH, 'tests/'))
 
 import unittest
 
 class TestHeader(unittest.TestCase):
 
     def testFirst(self):
-       headerStuff = json.load(file("./elfHeaders.json"))
+       headerStuff = json.load(file(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
        for fname in headerStuff.keys():
-           print(fname, os.path.exists(os.path.join(PATH_TO_TEST_FILES, fname)))
+           print(fname, os.path.exists(os.path.join(PATH_TO_TEST_FILES, "ELFFiles/{0}".format(fname))))
 
     def testFileHeader(self):
-        readElf = ReadElf(os.path.join(PATH_TO_TEST_FILES, 'testfile23'))
+        readElf = ReadElf(os.path.join(PATH_TO_TEST_FILES, 'ELFFiles/testfile23'))
         header = readElf.renderHeader()
         #self.assertEqual(header, R0)
 
