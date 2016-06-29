@@ -1,2 +1,4 @@
 #include tests/test*py
-include  objutils/tests/ELFFiles/*
+include objutils/tests/ELFFiles/*
+include objutils/tests/elfHeaders.json
+
