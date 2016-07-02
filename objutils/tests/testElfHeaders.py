@@ -46,7 +46,7 @@ import unittest
 class TestHeader(unittest.TestCase):
 
     def testFirst(self):
-       headerStuff = json.load(file(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
+       headerStuff = json.load(open(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
        for fname in headerStuff.keys():
            print(fname, os.path.exists(os.path.join(PATH_TO_TEST_FILES, "ELFFiles/{0}".format(fname))))
 
