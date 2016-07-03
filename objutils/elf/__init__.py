@@ -25,16 +25,18 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import enum
+import binascii
 from collections import namedtuple, OrderedDict
 import os
 import sys
 import types
 import struct
 
+import enum
+
 from objutils.elf import defs
 from objutils.logger import Logger
-from objutils.utils import memoryMap
+from objutils.utils import memoryMap, slicer, PYTHON_VERSION
 
 #
 #   Reference:
@@ -99,13 +101,19 @@ class ELFHeader(object):
             raise FormatError("Not an ELF file - it has the wrong magic bytes at the start.")
         self.magicHeader.apply(self.magicBytes, self)
         self.is64Bit = (self.elfClass ==  defs.ELFClass.ELFCLASS64)
-        self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
+        self.setByteorderPrefix()
         elfHeader = Attributor(defs.HDR_FMT64 if self.is64Bit else defs.HDR_FMT32, defs.Elf32_Ehdr, self.byteOrderPrefix)
         rawData = parent.slice(len(self.magicHeader), len(elfHeader))
         elfHeader.apply(rawData, self)
         if self.elfEHSize!= (len(self.magicHeader) + len(elfHeader)):
             raise FormatError("Wrong header size.")
         self.hasStringTable = not (self.elfStringTableIndex == defs.SHN_UNDEF)
+
+    def setByteorderPrefix(self):
+        if self.elfByteOrder in defs.ELFDataEncoding.__members__.values():
+            self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
+        else:
+            self.byteOrderPrefix = '<' # Arbitrary, we don't know.
 
     @property
     def elfTypeName(self):
@@ -144,6 +152,13 @@ class ELFHeader(object):
     elfSHTEntrySize             = Alias("e_shentsize")
     elfNumberOfSHs              = Alias("e_shnum")
     elfStringTableIndex         = Alias("e_shstrndx")
+
+    def elfMagicBytes(self):
+        # Obviously, there is a need for refactoring...
+        if PYTHON_VERSION.major == 3:
+            return str(b' '.join(slicer(binascii.b2a_hex(self.magicBytes[ : 16]), 2)), encoding = "ascii")
+        else:
+            return ' '.join(slicer(binascii.b2a_hex(self.magicBytes[ : 16]), 2))
 
     def elfClassAsString(self):
         result = ""
