@@ -472,7 +472,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_ETPU          : 'Freescale Extended Time Processing Unit',
     ELFMachineType.EM_SLE9X         : 'Infineon Technologies SLE9X core',
     ELFMachineType.EM_L1OM          : 'Intel L1OM',
-    ELFMachineType.EM_AARCH64       : 'EM_AArch64',
+    ELFMachineType.EM_AARCH64       : 'AArch64',
     ELFMachineType.EM_AVR32         : 'Atmel Corporation 32-bit microprocessor family',
     ELFMachineType.EM_STM8          : 'STMicroeletronics STM8 8-bit microcontroller',
     ELFMachineType.EM_TILE64        : 'Tilera TILE64 multicore architecture family',
