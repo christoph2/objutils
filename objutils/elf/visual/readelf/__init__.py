@@ -57,7 +57,7 @@ def getMachineFlags(flags, machine):
     return result
 
 FILE_HEADER_TMPL = """ELF Header:
-  Magic:   ${' '.join(["{0:02x}".format((ord(x))) for x in header.magicBytes[:16]])}
+  Magic:   ${header.elfMagicBytes()}
   Class:                             ${"{}".format((header.elfClassAsString()))}
   Data:                              ${"{}".format(header.elfDataEncodingAsString())}
   Version:                           ${"{0:d} {1}".format(header.elfVersion, header.getVersionAsString())}
