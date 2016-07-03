@@ -25,6 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import io
 import os
 
 from mako.template import Template
@@ -36,7 +37,7 @@ import objutils.utils as utils
 indentText = lambda text, leftmargin = 0: '\n'.join(["{0}{1}".format((" " * leftmargin), line, ) for line in text.splitlines()])
 
 def render(tmpl, namespace = {}, leftMargin = 0, rightMargin = 80, formatExceptions = True, encoding = 'utf-8'):
-    buf = utils.createStringBuffer()
+    buf = io.StringIO()
     ctx = Context(buf, **namespace)
     try:
         tobj = Template(text = tmpl, output_encoding = encoding, format_exceptions = formatExceptions)
