@@ -97,7 +97,7 @@ typedef struct
 IBBHQQ
 """
 
-ELF_MAGIC = '\x7fELF'
+ELF_MAGIC = b'\x7fELF'
 
 EI_NIDENT = 16        # Size of e_ident[].
 HDR_FMT32 = "HHIIIIIHHHHHH"

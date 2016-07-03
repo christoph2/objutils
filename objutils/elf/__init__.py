@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import division
 __version__ = "0.1.0"
 
 __copyright__ = """
@@ -281,8 +281,7 @@ class ELFSectionHeaderTable(object):
             format = defs.SYMTAB_FMT64 if parent.is64Bit else defs.SYMTAB_FMT32
             attributes = defs.Elf64_Sym if parent.is64Bit else defs.Elf32_Sym
             size = defs.ELF64_SYM_TABLE_SIZE if parent.is64Bit else defs.ELF32_SYM_TABLE_SIZE
-            for idx, symbol in enumerate(range(self.shSize / size)):
-
+            for idx, symbol in enumerate(range(self.shSize // size)):
                 offset = idx * size
                 data = self.image[offset : offset + size]
                 symbol = Attributor(format, attributes, parent.byteOrderPrefix)
@@ -578,7 +577,7 @@ class Reader(object):
                     entrySize = defs.ELF_RELOCATION_A_SIZE64 if self.is64Bit else defs.ELF_RELOCATION_A_SIZE32
                     elfRelocation = Attributor(format, defs.Elf_Rela, self.byteOrderPrefix)
                 img = sectionHeader.image
-                for pos in range(len(img) / entrySize):
+                for pos in range(len(img) // entrySize):
                     data = img[offset : offset + entrySize]
                     reloc = Relocation(self.is64Bit)
                     elfRelocation.apply(data, reloc)
@@ -602,8 +601,8 @@ class Reader(object):
             return self._stringCache[(tableIndex, entry)]
         else:
             unterminatedString = self.sectionHeaders[tableIndex].image[entry : ]
-            terminatedString = unterminatedString[ : unterminatedString.index('\x00')]
-            self._stringCache[(tableIndex,entry)] = terminatedString
+            terminatedString = unterminatedString[ : unterminatedString.index(b'\x00')]
+            self._stringCache[(tableIndex, entry)] = terminatedString
             return terminatedString
 
     def createSectionToSegmentMapping(self):
