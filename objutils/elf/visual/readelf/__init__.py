@@ -29,6 +29,7 @@ import os
 
 import objutils.elf as Elf
 import objutils.elf.defs as defs
+import objutils.armabi as armabi
 #import objutils.utils as utils
 from objutils.elf.visual.template import render
 
@@ -44,7 +45,7 @@ def getMachineFlags(flags, machine):
     result = ''
     if flags:
         if machine == defs.ELFMachineType.EM_ARM:
-            result = arm.decodeARMMachineFlags(flags)
+            result = armabi.decodeARMMachineFlags(flags)
         elif machine == defs.ELFMachineType.EM_BLACKFIN:
             if flags & defs.EF_BFIN_PIC:
                 result += ", PIC"
@@ -91,6 +92,7 @@ FILE_HEADER_TMPL = """ELF Header:
 %if header.e_shstrndx != defs.SHN_UNDEF and header.e_shstrndx > header.e_shnum:
  <corrupt: out of range>
 %endif
+
 """
 
 SECTION_HEADER_TMPL = """
