@@ -312,7 +312,7 @@ class Writer(BaseType):
         self.logger = Logger("Writer")
 
     def dump(self, fp, image, rowLength = 16, **kws):   # TODO: rename to bytesPerRow!
-        fp.write(dumps(image, rowLength))
+        fp.write(self.dumps(image, rowLength))
 
     def dumps(self, image, rowLength = 16, **kws):
         result = []
