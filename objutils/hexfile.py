@@ -344,7 +344,10 @@ class Writer(BaseType):
         footer = self.composeFooter(image.meta)
         if footer:
             result.append(footer)
-        return self.postProcess('\n'.join(result))
+        if PYTHON_VERSION.major == 3:
+            return self.postProcess(bytes('\n'.join(result), "ascci"))            
+        else:
+            return self.postProcess(bytes('\n'.join(result)))
 
     def calculateAddressBits(self, image):
         lastSegment = sorted(image.sections, key = lambda s: s.address)[-1]
