@@ -42,13 +42,14 @@ START_LINEAR_ADDRESS        = 5
 
 
 class Reader(hexfile.Reader):
+
     FORMAT_SPEC = (
         (hexfile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),
         )
 
     def __init__(self):
         super(Reader,self).__init__()
-        self.segmentAddress=0
+        self.segmentAddress = 0
 
     def checkLine(self, line, formatType):
         if line.length != len(line.chunk):
@@ -103,27 +104,39 @@ class Reader(hexfile.Reader):
     _addressCalculator = utils.identity
 
 
+def divmod(a, b):
+    return a / b, a % b
+
 class Writer(hexfile.Writer):
+
     MAX_ADDRESS_BITS = 32
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_TWOS)
 
-    def writeHeader(self):
-        pass
+    def preProcessing(self, image):
+        self.previosAddress = None
+        self.startAddress = 0
 
-    def writeFooter(self, checksum):
-        pass
+    def composeRow(self, address, length, row):
+        result = ''
+        seg, offs = divmod(address, 0x10000)
+        h, l = self.wordToBytes(address)
+        if offs != self.previosAddress:
+            #print("NEQ: {0:04x} [{1:04x}:{2:04x}]".format(address, seg, offs))
+            if address > 0xffff:
+                if address > 0xfffff:
+                    segHi, segLo = self.wordToBytes(seg)
+                    result = ":02000004{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 4, segHi, segLo))))
+                else:
+                    seg <<= 12
+                    segHi, segLo = self.wordToBytes(seg)
+                    result = ":02000002{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 2, segHi, segLo))))
+        address = offs
+        checksum = self.checksum(list((length, h, l)) + list(row))
+        self.previosAddress = offs + length
+        result += ":{0:02X}{1:04X}{2:02X}{3!s}{4:02X}".format(length, address, DATA, Writer.hexBytes(row), checksum)
+        return result
 
-    def writeBlock(self, block):
-        pass
-
-    def writeLine(self, type_, address, data):
-        length = len(data)
-        h, l = self.wordToBytes((address))
-        checksum = self.checksum(list((length, h, l)) + list(data))
-        ## buildLine()
-        line = ""
-        for b in data:
-            line += "{0:02X}".format(b)
-
-        self.outFile.write(":{0:02X}{1:04X}{2:02X}{3!s}{4:02X}".format(length, address, type_, line, checksum))
+    def composeFooter(self, meta):
+        h, l = self.wordToBytes((self.startAddress))
+        return ":00{1:04X}{0:02X}{2:02X}\n".format(EOF, self.startAddress, self.checksum(list((h, l, EOF))))
 
