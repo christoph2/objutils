@@ -375,6 +375,7 @@ class Writer(BaseType):
         return None
 
     def wordToBytes(self, word):
+        word = int(word)
         h = (word & 0xff00) >> 8
         l = word & 0x00ff
         return h, l

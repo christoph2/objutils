@@ -127,7 +127,7 @@ class Writer(hexfile.Writer):
                     segHi, segLo = self.wordToBytes(seg)
                     result = ":02000004{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 4, segHi, segLo))))
                 else:
-                    seg <<= 12
+                    seg = int(seg) << 12
                     segHi, segLo = self.wordToBytes(seg)
                     result = ":02000002{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 2, segHi, segLo))))
         address = offs
