@@ -345,7 +345,7 @@ class Writer(BaseType):
         if footer:
             result.append(footer)
         if PYTHON_VERSION.major == 3:
-            return self.postProcess(bytes('\n'.join(result), "ascci"))            
+            return self.postProcess(bytes('\n'.join(result), "ascii"))            
         else:
             return self.postProcess(bytes('\n'.join(result)))
 
