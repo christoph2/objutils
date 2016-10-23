@@ -35,7 +35,7 @@ class Equality(BaseTest):
 
 class TestCreateSections(BaseTest):
 
-    SREC = "S1131000000102030405060708090A0B0C0D0E0F64"
+    SREC = b"S1131000000102030405060708090A0B0C0D0E0F64"
 
     def runSectionTestPass(self, data):
         self.b0.addSegment(data, 0x1000)
@@ -67,7 +67,7 @@ class TestCreateSections(BaseTest):
     def testEmptySectionProducesEmptiness(self):
         self.b0.addSegment([], 0x1000)
         result = dumps('srec', self.b0.image)
-        self.assertEqual(result, '')
+        self.assertEqual(result, b'')
 
     def testCreateSectionFromBytesWorks(self):
         if PYTHON_VERSION.major == 3:
