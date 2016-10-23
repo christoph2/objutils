@@ -125,11 +125,11 @@ class Writer(hexfile.Writer):
             if address > 0xffff:
                 if address > 0xfffff:
                     segHi, segLo = self.wordToBytes(seg)
-                    result = ":02000004{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 4, segHi, segLo))))
+                    result = ":02000004{0:04X}{1:02X}\n".format(int(seg), self.checksum(list((2, 4, segHi, segLo))))
                 else:
                     seg = int(seg) << 12
                     segHi, segLo = self.wordToBytes(seg)
-                    result = ":02000002{0:04X}{1:02X}\n".format(seg, self.checksum(list((2, 2, segHi, segLo))))
+                    result = ":02000002{0:04X}{1:02X}\n".format(int(seg), self.checksum(list((2, 2, segHi, segLo))))
         address = offs
         checksum = self.checksum(list((length, h, l)) + list(row))
         self.previosAddress = offs + length
