@@ -46,9 +46,22 @@ import unittest
 class TestHeader(unittest.TestCase):
 
     def testFirst(self):
-       headerStuff = json.load(open(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
-       for fname in headerStuff.keys():
-           print(fname, os.path.exists(os.path.join(PATH_TO_TEST_FILES, "ELFFiles/{0}".format(fname))))
+        headerStuff = json.load(open(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
+        log = open("results.txt", "w")
+
+        for fname in headerStuff.keys():
+           try:
+               print("ELFFiles/{0}".format(fname))
+               reader = ReadElf(os.path.join(PATH_TO_TEST_FILES, "ELFFiles/{0}".format(fname)))
+               header0 = reader.renderHeader()
+               header1 = headerStuff[fname]
+               self.assertEqual(header0, header1)
+               log.write(header0)
+               log.write("*****\n")
+               log.write(header1)
+           except Exception as e:
+                print("\t*** Something wrent wrong: '{0}'".format(str(e)))
+        log.close()
 
     def testFileHeader(self):
         readElf = ReadElf(os.path.join(PATH_TO_TEST_FILES, 'ELFFiles/testfile23'))
@@ -62,7 +75,26 @@ class TestHeader(unittest.TestCase):
     #    print(header)
 
 def main():
-    unittest.main()
+    #unittest.main()
+    pass
+
+#"""
+import difflib
+from pprint import pprint
+
+headerStuff = json.load(open(os.path.join(PATH_TO_TEST_FILES, "elfHeaders.json")))
+reader = ReadElf(os.path.join(PATH_TO_TEST_FILES, "ELFFiles/aarch64_super_stripped.elf"))
+header0 = headerStuff['aarch64_super_stripped.elf']
+header1 = reader.renderHeader()
+pprint(list(difflib.unified_diff(header0, header1)))
+#pprint(list(difflib.ndiff(header0, header1)))
+print("-" * 80)
+print(header0)
+print("-" * 80)
+print(header1)
+print("-" * 80)
+print(header0 == header1)
+#"""
 
 if __name__ == '__main__':
     main()
