@@ -32,7 +32,7 @@ import unittest
 from objutils import dump, dumps, load, loads, probe, probes
 
 
-TEST2 = ''':100000004578616D706C65207769746820616E2039
+TEST2 = b''':100000004578616D706C65207769746820616E2039
 :0B0010006164647265737320676170A7
 :101000004865726520697320612067617020696E90
 :1010100020746865206D656D6F727920616C6C6FEE
@@ -40,7 +40,7 @@ TEST2 = ''':100000004578616D706C65207769746820616E2039
 :00000001FF
 '''
 
-TEST3 = ''':020000022BC011
+TEST3 = b''':020000022BC011
 :1012340054686973207061727420697320696E2028
 :0D12440061206C6F77207365676D656E74B7
 :020000027F007D
@@ -49,7 +49,7 @@ TEST3 = ''':020000022BC011
 :00000001FF
 '''
 
-TEST4 = """:0D00000048656C6C6F2C20576F726C640AA1
+TEST4 = b""":0D00000048656C6C6F2C20576F726C640AA1
 :00000001FF"""
 
 
@@ -57,13 +57,13 @@ class TestIHex(unittest.TestCase):
 
     def testAddressGapFromString(self):
         data = loads("ihex", TEST2)
-        self.assertEqual(data.sections[0].data, 'Example with an address gap')
-        self.assertEqual(data.sections[1].data, 'Here is a gap in the memory allocation')
+        self.assertEqual(data.sections[0].data, bytearray('Example with an address gap'))
+        self.assertEqual(data.sections[1].data, bytearray('Here is a gap in the memory allocation'))
 
     def testAddressGapFromFileLike(self):
         data = load("ihex", io.BytesIO(TEST2))
-        self.assertEqual(data.sections[0].data, 'Example with an address gap')
-        self.assertEqual(data.sections[1].data, 'Here is a gap in the memory allocation')
+        self.assertEqual(data.sections[0].data, bytearray('Example with an address gap'))
+        self.assertEqual(data.sections[1].data, bytearray('Here is a gap in the memory allocation'))
 
     def testRoundtripFromString(self):
         dataIn = loads("ihex", TEST2)
