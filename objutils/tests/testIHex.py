@@ -60,6 +60,7 @@ class TestIHex(unittest.TestCase):
         self.assertEqual(data.sections[0].data, b'Example with an address gap')
         self.assertEqual(data.sections[1].data, b'Here is a gap in the memory allocation')
 
+
     def testAddressGapFromFileLike(self):
         data = load("ihex", io.BytesIO(TEST2))
         self.assertEqual(data.sections[0].data, b'Example with an address gap')
