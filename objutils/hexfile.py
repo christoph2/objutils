@@ -193,7 +193,10 @@ class Reader(BaseType):
 
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
-            return self.load(createStringBuffer(bytes(image, "ascii")))
+            if isinstance(image, str):
+                return self.load(createStringBuffer(bytes(image, "ascii")))
+            else:
+                return self.load(createStringBuffer(image))
         else:
             return self.load(createStringBuffer(image))
 
