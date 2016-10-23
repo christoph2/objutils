@@ -11,3 +11,8 @@ pyObjUtils
 
 Python library to process/parse object files (ELF, IEEE695, S19, iHex, Tektronix...)
 
+### Features at a glance
+
+- Write programs faster than you sreen-scrape readelf/objdump.
+- Decent AAABI (Arm Architecture Application Binary Interface) support.
+

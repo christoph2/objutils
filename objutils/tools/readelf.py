@@ -32,6 +32,8 @@ import enum
 import objutils.elf as Elf
 import objutils.elf.defs as defs
 from objutils.elf import Reader
+from objutils.elf.visual.readelf import getMachineFlags
+
 from optparse import OptionParser
 
 import objutils.armabi as arm
@@ -1193,7 +1195,9 @@ def printRelocationData(reader):
         img = header.image
         numEntries = len(header.image) / entrySize
 
-
+import sys
+sys.argv.append(r'C:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile23')
+sys.argv.append(r'-H')
 
 def main():
     reader = ELFReader()

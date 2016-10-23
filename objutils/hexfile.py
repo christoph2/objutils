@@ -289,8 +289,11 @@ class Reader(BaseType):
 
     def probes(self, image):
         if PYTHON_VERSION.major == 3:
-            return self.probe(createStringBuffer(bytes(image, "ascii")))
-        else:
+            if isinstance(image, str):
+                return self.probe(createStringBuffer(bytes(image, "ascii")))
+            else:
+                return self.probe(createStringBuffer(image))
+        else:        
             return self.probe(createStringBuffer(image))
 
     def checkLine(self, line, formatType):
