@@ -105,6 +105,8 @@ class Builder(object):
         if self.autoJoin:
             self.joinSections()
         self.address = address + len(data)
+        
+    addSection = addSegment
 
     def addMetaData(self, metaData):
         pass
