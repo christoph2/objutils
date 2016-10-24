@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2013 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -26,9 +26,8 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import constants
+from objutils.dwarf import constants
 
-import unittest
 
 class StackOverflowError(Exception): pass
 class StackUnderflowError(Exception): pass
@@ -171,113 +170,9 @@ class StackMachine(object):
     def implicit_value(self): pass
     def stack_value(self): pass
 
-    def _getStack(self):
+    @property
+    def stack(self):
         return self._stack
-
-    stack = property(_getStack)
-
-
-##
-## Unittests.
-##
-class TestStack(unittest.TestCase):
-    def setUp(self):
-        self.stack = Stack(8)
-
-    def tearDown(self):
-        delattr(self, 'stack')
-
-    def testPushPop(self):
-        values = [1, 2, 5, 9, 23, 42, 68, 99]
-
-        for value in values:
-            self.stack.push(value)
-        result = []
-        while self.stack.notEmpty():
-            result.append(self.stack.pop())
-        self.assertEquals(result, list(reversed(values)))
-
-    def testRaisesUnderflowException(self):
-        self.assertRaises(StackUnderflowError, self.stack.pop)
-
-    def testRaisesOverflowException(self):
-        values = [1, 2, 5, 9, 23, 42, 68, 99]
-
-        for value in values:
-            self.stack.push(value)
-
-        self.assertRaises(StackOverflowError, self.stack.push, 101)
-
-    def testGetSizeWorks(self):
-        self.assertEquals(self.stack.size, 8)
-
-    def testSizeIsReadonly(self):
-        self.assertRaises(AttributeError, setattr, self.stack, 'size', 32)
-
-
-class TestStackMachine(unittest.TestCase):
-    def setUp(self):
-        self.stackMachine = StackMachine(8)
-
-    def tearDown(self):
-        delattr(self, 'stackMachine')
-
-    def testStackMachineHasAStack(self):
-        sm = getattr(self.stackMachine, 'stack', None)
-        self.assertIsNotNone(sm)
-
-    def testOpcodeInRange(self):
-        rangeTuple = (constants.DW_OP_lit0, constants.DW_OP_lit31)
-
-        self.assertTrue(self.stackMachine.opcodeInRange(constants.DW_OP_lit0, rangeTuple))
-        self.assertTrue(self.stackMachine.opcodeInRange(constants.DW_OP_lit1, rangeTuple))
-        self.assertTrue(self.stackMachine.opcodeInRange(constants.DW_OP_lit31, rangeTuple))
-
-    def testOpcodeNotInRange(self):
-        rangeTuple = (constants.DW_OP_lit0, constants.DW_OP_lit31)
-
-        self.assertFalse(self.stackMachine.opcodeInRange(constants.DW_OP_ne, rangeTuple))
-        self.assertFalse(self.stackMachine.opcodeInRange(constants.DW_OP_reg0, rangeTuple))
-
-
-class TestLiteralEncoding(unittest.TestCase):
-    def setUp(self):
-        self.literalEncoding = LiteralEncoding()
-
-    def tearDown(self):
-        delattr(self, 'literalEncoding')
-
-    def testIsInitializedToNone(self):
-        self.assertIsNone(self.literalEncoding.value)
-
-    def testCouldBeWritten(self):
-        self.literalEncoding = 23
-        self.assertEquals(self.literalEncoding, 23)
-
-
-class TestUnsignedLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = UnsignedLiteral(0)
-
-    def tearDown(self):
-        delattr(self, 'literal')
-
-    def testIsSubclassOfLiteralEncodig(self):
-        self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
-
-    def testAtLeastOpLit0(self):
-        self.assertRaises(ValueError, setattr, self.literal, 'value', constants.DW_OP_lit0 - 1)
-
-    def testAtMostOpLit31(self):
-        self.assertRaises(ValueError, setattr, self.literal, 'value', constants.DW_OP_lit31 + 1)
-
-
-class TestAddressLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = AddressLiteral(16)
-
-    def tearDown(self):
-        delattr(self, 'literal')
 
     def testIsSubclassOfLiteralEncodig(self):
         self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
@@ -287,67 +182,4 @@ class TestAddressLiteral(unittest.TestCase):
 
     def testMaximumAddress(self):
         self.assertRaises(ValueError, setattr, self.literal, 'value', (2 ** 16) + 1)
-
-"""
-3.  DW_OP_const1u, DW_OP_const2u, DW_OP_const4u, DW_OP_const8u
-    The single operand of a DW_OP_constnu operation provides a 1, 2, 4, or 8-byte unsigned
-    integer constant, respectively.
-4.  DW_OP_const1s , DW_OP_const2s, DW_OP_const4s, DW_OP_const8s
-    The single operand of a DW_OP_constns operation provides a 1, 2, 4, or 8-byte signed
-    integer constant, respectively.
-5.  DW_OP_constu
-    The single operand of the DW_OP_constu operation provides an unsigned LEB128 integer
-    constant.
-6.  DW_OP_consts
-    The single operand of the DW_OP_consts operation provides a signed LEB128 integer
-    constant.
-"""
-
-
-
-"""
-class TestAddressLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = AddressLiteral(0)
-
-    def tearDown(self):
-        delattr(self, 'literal')
-
-    def testIsSubclassOfLiteralEncodig(self):
-        self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
-class TestAddressLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = AddressLiteral(0)
-
-    def tearDown(self):
-        delattr(self, 'literal')
-
-    def testIsSubclassOfLiteralEncodig(self):
-        self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
-class TestAddressLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = AddressLiteral(0)
-
-    def tearDown(self):
-        delattr(self, 'literal')
-
-    def testIsSubclassOfLiteralEncodig(self):
-        self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
-class TestAddressLiteral(unittest.TestCase):
-    def setUp(self):
-        self.literal = AddressLiteral(0)
-
-    def tearDown(self):
-        delattr(self, 'literal')
-
-    def testIsSubclassOfLiteralEncodig(self):
-        self.assertTrue(issubclass(type(self.literal), LiteralEncoding))
-
-"""
-
-def main():
-    unittest.main()
-
-if __name__ == '__main__':
-    main()
 
