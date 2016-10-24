@@ -32,8 +32,8 @@ dataFromFPC = dumps('srec', fromFPC, rowLength = 32, s5record = True)
 class TestRoundTrip(unittest.TestCase):
 
     def testFromSrec(self):
-        #self.assertEqual(dataFromSRec, FPC)
-        pass
+        self.assertEqual(dataFromSRec, FPC)
+        #pass
 
     def testFromFPC(self):
         self.assertEqual(dataFromFPC, SREC)

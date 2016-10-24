@@ -29,7 +29,7 @@ import operator
 import os
 import re
 import objutils.hexfile as hexfile
-from objutils.utils import createStringBuffer, slicer
+from objutils.utils import createStringBuffer, slicer, PYTHON_VERSION
 from objutils import checksums
 import objutils.utils as utils
 
@@ -164,7 +164,10 @@ class Writer(hexfile.Writer):
                 item = self.convertQuintuple(item)
                 res.append(item)
             result.append("{0}{1}".format(PREFIX, ''.join(res)))
-        return '\n'.join(result)
+        if PYTHON_VERSION.major == 3:
+            return bytes('\n'.join(result), "ascii")
+        else:
+            return bytes('\n'.join(result))            
 
     def convertQuintuple(self, value):
         result = []
