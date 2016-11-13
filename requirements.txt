@@ -2,4 +2,4 @@ enum34
 mock
 future
 mako
-construct
+construct >= 2.8

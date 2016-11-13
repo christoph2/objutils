@@ -16,7 +16,7 @@ setup(
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
     packages = packagez('objutils'),
-    install_requires = ['enum34', 'future', 'mako', 'construct'],
+    install_requires = ['enum34', 'future', 'mako', 'construct >= 2.8'],
     entry_points = {
         'console_scripts': [
                 'readelf.py = objutils.tools.readelf:main',
