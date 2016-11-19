@@ -25,30 +25,50 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from collections import namedtuple
 import os
 import struct
 import time
 
 
 import construct
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe
-from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, this
+from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString
+from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes
 
 from objutils.utils import memoryMap
 
 
 class UTCTimeStampAdapter(Adapter):
+
     def _decode(self, obj, context):
         return time.ctime(obj)
+
     def _encode(self, obj, context):
         return int(time.mktime(time.strptime(obj)))
+
 
 def UTCTimeStamp(name):
     return UTCTimeStampAdapter(name / Int32ul)
 
 
+class ListToBytesAdapter(Adapter):
+
+    def _decode(self, obj, context):
+        return bytes(obj)
+
+    def _encode(self, obj, context):
+        return list(obj)
+
+
+class PrintContext(Construct):
+
+    def _parse(self, stream, context, *args, **kws):
+        print("CTX: {} {} {}".format(context, args, kws))
+        print("CTX_END")
+
+
 symbol = Struct(
-    "name" / String(8, padchar = b"\x00"),
+    "name" / Bytes(8),
     "symbolValue" / Int32ul,
     "sectionNumber" / Int16ul,
     "reserved" / Int16ul,
@@ -100,10 +120,14 @@ fileHeader = Struct(
     "numSymbols" / Int32ul,
 
     "symbols" / Pointer(this.filePoimter,
-            #Byte[this.numSymbols * symbol.sizeof()],
             Bytes(this.numSymbols * symbol.sizeof()),
     ),
-    #GreedyRange(Byte("foo"))
+
+
+    "stringTable" / Pointer( (this.filePoimter + (this.numSymbols * symbol.sizeof()) + 0),
+            ListToBytesAdapter(GreedyRange(Byte))
+    ),
+
 
     "sizeOptHeader" / Int16ul,
 
@@ -141,13 +165,11 @@ fileHeader = Struct(
         )
     ),
 
-    Probe(),
-
-    "sections" / Array(this.numSectionHeaders,   #
+    "sections" / Array(this.numSectionHeaders,
         Struct(
 
-               "name" / String(8, padchar = b"\x00"),
-               "physiclAddress" / Int32ul,
+               "name" / Bytes(8),
+               "physicalAddress" / Int32ul,
                "virtualAddress" / Int32ul,
                "sectionSize" / Int32ul,
                "filePointer" / Int32ul,
@@ -185,16 +207,81 @@ fileHeader = Struct(
 )
 
 
+SymbolTuple = namedtuple("SymbolTuple", "name value sectionNumber storageClass sectionLength numberOfRelocationEntries numberOfLineNumberEntries")
 
-def parseSymbols(coff):
-    extraEntry = 0
-    for idx in range(coff.numSymbols):
-        if extraEntry:
-            sym = auxSymbol.parse(coff.symbols[ idx * auxSymbol.sizeof() : ])
-            print(sym)
-            extraEntry = 0
+
+class TICOFF(object):
+    """
+    """
+
+    def __init__(self, filename):
+        self.fp = memoryMap(filename)
+        self.coff = fileHeader.parse(self.fp, size = self.fp.size())
+
+        self.header = self.parseHeader()
+        self.symbols = self.parseSymbols()
+        self.sections = self.parseSections()
+
+
+    def symbolName(self, name):
+        if name.startswith(b'\x00\x00\x00\x00'):
+            vs = Struct(Padding(4), "value" / Int32ul).parse(name)
+            return CString().parse(self.coff.stringTable[vs.value : ]).decode("ascii")
         else:
-            sym = symbol.parse(coff.symbols[ idx * symbol.sizeof() : ])
-            print(sym)
-            extraEntry = sym.numberOfAuxiliaryEntries
+            return String(8, padchar = b"\x00").parse(name).decode("ascii")
 
+
+    def parseSymbols(self):
+        extraEntry = 0
+        result = []
+
+        SECTION_NUMBERS = {
+            0xfffd:  "N_RES",
+            0xfffe:  "N_ABS",
+            0     :  "N_UNDEF",
+        }
+        st = None
+        sectionLength = 0
+        numberOfRelocationEntries = 0
+        numberOfLineNumberEntries = 0
+        for idx in range(self.coff.numSymbols):
+            if extraEntry:
+                sym = auxSymbol.parse(self.coff.symbols[ idx * auxSymbol.sizeof() : ])
+
+                st = result.pop()
+                result.append(st._replace(sectionLength = sym.sectionLength, numberOfRelocationEntries = sym.numberOfRelocationEntries,
+                            numberOfLineNumberEntries = sym.numberOfLineNumberEntries
+                ))
+
+                extraEntry = 0
+            else:
+                sym = symbol.parse(self.coff.symbols[ idx * symbol.sizeof() : ])
+
+                name = self.symbolName(sym.name)
+                st = SymbolTuple(name, sym.symbolValue, sym.storageClass, SECTION_NUMBERS.get(sym.sectionNumber, sym.sectionNumber),0 ,0, 0)
+                result.append(st)
+                extraEntry = sym.numberOfAuxiliaryEntries
+        return result
+
+    Header = namedtuple('Tuple', 'versionID timestamp numSectionHeaders numSymbols flags targetID')
+
+    def parseHeader(self):
+        return self.Header(self.coff.versionID, self.coff.timestamp, self.coff.numSectionHeaders, self.coff.numSymbols,
+                self.coff.flags, self.coff.targetID)
+
+    Section = namedtuple("Section", "name physicalAddress virtualAddress sectionSize flags memoryPageNumber")
+
+    def parseSections(self):
+        result = []
+        for section in self.coff.sections:
+            name = self.symbolName(section.name)
+            result.append(self.Section(name, section.physicalAddress, section.virtualAddress, section.sectionSize,
+                section.flags, section.memoryPageNumber))
+            #print(name)
+        return result
+        """
+                       "name" / Bytes(8),
+               "physicalAddress" / Int32ul,
+               "virtualAddress" / Int32ul,
+               "sectionSize" / Int32ul,
+        """
