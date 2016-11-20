@@ -20,7 +20,7 @@ setup(
     entry_points = {
         'console_scripts': [
                 'readelf.py = objutils.tools.readelf:main',
-                'ticoff-dump = objutils.tools.ticoff-dump:main'
+                'ticoff-dump = objutils.tools.ticoffdump:main'
         ],
     },
     #data_files = [
