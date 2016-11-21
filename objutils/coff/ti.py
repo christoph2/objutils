@@ -32,8 +32,8 @@ import time
 
 
 import construct
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString
-from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes
+from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString, IfThenElse
+from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes, Switch
 
 from objutils.utils import memoryMap
 
@@ -112,6 +112,108 @@ auxSymbol = Struct(
     Padding(10),
 )
 
+relocationType = Enum(Int16ul,
+    R_ABS       = 0x0000,     # No relocation
+    R_REL24     = 0x0005,     # 24-bit reference to symbol's address
+    R_RELBYTE   = 0x000F,     # 8-bit direct reference to symbol's address
+    R_RELWORD   = 0x0010,     # 16-bit direct reference to symbol's address
+    R_RELLONG   = 0x0011,     # 32-bit direct reference to symbol's address
+    R_PCR23H    = 0x0016,     # 23-bit PC-relative reference to a symbol's address, in halfwords (divided by 2)
+
+    #R_RELBYTE   = 0x0017,     # 8-bit direct reference to symbol's address
+    #R_PCR24W    = 0x0017,     # 24-bit PC-relative reference to a symbol's address, in words (divided by 4)
+
+    #R_RELWORD   = 0x0020,     # 16-bit direct reference to symbol's address
+    #R_RELLONG   = 0x0021,     # 32-bit direct reference to symbol's address
+                              #
+    R_PARTLS7   = 0x0028,     # 7 LSBs of an address
+    R_PARTMS9   = 0x0029,     # 9 MSBs of an address
+    R_REL13     = 0x002A,     # 13-bit direct reference to symbol's address
+    R_C60BASE   = 0x0050,     # Data page pointer-based offset
+    R_C60DIR15  = 0x0051,     # Load or store long displacement
+    R_C60PCR21  = 0x0052,     # 21-bit packet, PC relative
+    R_C60PCR10  = 0x0053,     # 10-bit Packet PC Relative (BDEC, BPOS)
+    R_C60LO16   = 0x0054,     # MVK instruction low half register
+    R_C60HI16   = 0x0055,     # MVKH or MVKLH high half register
+    R_C60SECT   = 0x0056,     # Section-based offset
+    R_C60S16    = 0x0057,     # Signed 16-bit offset for MVK
+    R_PARTLS6   = 0x005D,     # 6-bit offset of a 22-bit address
+    R_PARTMID10 = 0x005E,     # Middle 10 bits of a 22-bit address
+    R_REL22     = 0x005F,     # 22-bit direct reference to a symbol's address
+    R_PARTMS6   = 0x0060,     # Upper 6 bits of an 22-bit address
+    R_PARTS16   = 0x0061,     # Upper 16 bits of an 22-bit address
+    R_C28PCR16  = 0x0062,     # PC relative 16-bit address
+    R_C28PCR8   = 0x0063,     # PC relative 8-bit address
+    R_C28PTR    = 0x0064,     # 22-bit pointer
+    R_C28HI16   = 0x0065,     # High 16 bits of address data
+    R_C28LOPTR  = 0x0066,     # Pointer to low 64K
+    R_C28NWORD  = 0x0067,     # 16-bit negated relocation
+    R_C28NBYTE  = 0x0068,     # 8-bit negated relocation
+    R_C28HIBYTE = 0x0069,     # High 8 bits of a 16-bit data
+    R_C28RELS13 = 0x006A,     # Signed 13-bit value relocated as a 16-bit value
+    R_C60PCR7   = 0x0070,     # 7-bit Packet PC Relative (ADDKPC)
+    R_C60PCR12  = 0x0071,     # 12-bit Packet PC Relative (BNOP)
+    R_LD3_DMA   = 0x0170,     # 7 MSBs of a byte, unsigned; used in DMA address
+    R_LD3_MDP   = 0x0172,     # 7 bits spanning 2 bytes, unsigned; used as MDP register value
+    R_LD3_PDP   = 0x0173,     # 9 bits spanning 2 bytes, unsigned; used as PDP register value
+    R_LD3_REL23 = 0x0174,     # 23-bit unsigned value in 24-bit field
+    R_LD3_k8    = 0x0210,     # 8-bit unsigned direct reference
+    R_LD3_k16   = 0x0211,     # 16-bit unsigned direct reference
+    R_LD3_K8    = 0x0212,     # 8-bit signed direct reference
+    R_LD3_K16   = 0x0213,     # 16-bit signed direct reference
+    R_LD3_I8    = 0x0214,     # 8-bit unsigned PC-relative reference
+    R_LD3_I16   = 0x0215,     # 16-bit unsigned PC-relative reference
+    R_LD3_L8    = 0x0216,     # 8-bit signed PC-relative reference
+    R_LD3_L16   = 0x0217,     # 16-bit signed PC-relative reference
+    R_LD3_k4    = 0x0220,     # Unsigned 4-bit shift immediate
+    R_LD3_k5    = 0x0221,     # Unsigned 5-bit shift immediate
+    R_LD3_K5    = 0x0222,     # Signed 5-bit shift immediate
+    R_LD3_k6    = 0x0223,     # Unsigned 6-bit shift immediate
+    R_LD3_k12   = 0x0224,     # Unigned 12-bit shift immediate
+                              #
+    RE_ADD      = 0x4000,     # Addition (+)
+    RE_SUB      = 0x4001,     # Subtraction (-)
+    RE_NEG      = 0x4002,     # Negate (-)
+    RE_MPY      = 0x4003,     # Multiplication (*)
+    RE_DIV      = 0x4004,     # Division (/)
+    RE_MOD      = 0x4005,     # Modulus (%)
+    RE_SR       = 0x4006,     # Logical shift right (unsigned >>)
+    RE_ASR      = 0x4007,     # Arithmetic shift right (signed >>)
+    RE_SL       = 0x4008,     # Shift left (<<)
+    RE_AND      = 0x4009,     # And (&)
+    RE_OR       = 0x400A,     # Or (|)
+    RE_XOR      = 0x400B,     # Exclusive Or (^)
+    RE_NOTB     = 0x400C,     # Not (~)
+    RE_ULDFLD   = 0x400D,     # Unsigned relocation field load
+    RE_SLDFLD   = 0x400E,     # Signed relocation field load
+    RE_USTFLD   = 0x400F,     # Unsigned relocation field store
+    RE_SSTFLD   = 0x4010,     # Signed relocation field store
+    RE_PUSH     = 0x4011,     # Push symbol on the stack
+    RE_PUSHSK   = 0x4012,     # Push signed constant on the stack
+    RE_PUSHUK   = 0x4013,     # Push unsigned constant on the stack
+    RE_PUSHPC   = 0x4014,     # Push current section PC on the stack
+    RE_DUP      = 0x4015,     # Duplicate top-of-stack and push a copy
+    RE_XSTFLD   = 0x4016,     # Relocation field store, signedness is irrelevant
+    RE_PUSHSV   = 0xC011,     # Push symbol: SEGVALUE flag is set
+)
+
+relocation10 = Struct(
+    "virtualAddress" / Int32ul,
+    "symbolTableIndex" / Int16ul,
+    Padding(2),
+    "relocationType" / Int16ul,
+    #relocationType
+)
+
+relocation12 = Struct(
+    "virtualAddress" / Int32ul,
+    "symbolTableIndex" / Int32ul,
+    "addressExtension" / Int16ul,
+    "relocationType" / Int16ul,
+    #relocationType
+)
+
+
 fileHeader = Struct(
     "versionID" / Int16ul,
     "numSectionHeaders" / Int16ul,
@@ -183,6 +285,58 @@ fileHeader = Struct(
                "numberOfRelocationEntries" / Int32ul,
                "numberOfLineNumberEntries" / Int32ul,
 
+               "parsedRelocations" / Pointer(this.relocationPointer,
+                    Array(this.numberOfRelocationEntries,
+                          Struct(
+                              "virtualAddress" / Int32ul,
+                              "symbolTableIndex" / IfThenElse(lambda ctx: ctx._._.targetID in ("TMS320C2800", "TMS320C6000", "TMS470", "MSP430"),
+                                    Int16ul,
+                                    Int32ul
+                              ),
+                              IfThenElse(lambda ctx: ctx._._.targetID in ("TMS320C2800", "TMS320C6000", "TMS470", "MSP430"),
+                                    Padding(2),
+                                    "addressExtension" / Int16ul
+                              ),
+                              "relocationType" / Int16ul,
+
+##
+##                              "relocationType" / Enum(Int16ul,
+##                                  Switch(lambda ctx: ctx._._.targetID,
+##                                    {
+##                                        1:Byte,
+##                                        2:Int32ub
+##                                    }
+##                                  ),
+##                                  RE_ADD      = 0x4000,     # Addition (+)
+##                                  RE_SUB      = 0x4001,     # Subtraction (-)
+##                                  RE_NEG      = 0x4002,     # Negate (-)
+##                                  RE_MPY      = 0x4003,     # Multiplication (*)
+##                                  RE_DIV      = 0x4004,     # Division (/)
+##                                  RE_MOD      = 0x4005,     # Modulus (%)
+##                                  RE_SR       = 0x4006,     # Logical shift right (unsigned >>)
+##                                  RE_ASR      = 0x4007,     # Arithmetic shift right (signed >>)
+##                                  RE_SL       = 0x4008,     # Shift left (<<)
+##                                  RE_AND      = 0x4009,     # And (&)
+##                                  RE_OR       = 0x400A,     # Or (|)
+##                                  RE_XOR      = 0x400B,     # Exclusive Or (^)
+##                                  RE_NOTB     = 0x400C,     # Not (~)
+##                                  RE_ULDFLD   = 0x400D,     # Unsigned relocation field load
+##                                  RE_SLDFLD   = 0x400E,     # Signed relocation field load
+##                                  RE_USTFLD   = 0x400F,     # Unsigned relocation field store
+##                                  RE_SSTFLD   = 0x4010,     # Signed relocation field store
+##                                  RE_PUSH     = 0x4011,     # Push symbol on the stack
+##                                  RE_PUSHSK   = 0x4012,     # Push signed constant on the stack
+##                                  RE_PUSHUK   = 0x4013,     # Push unsigned constant on the stack
+##                                  RE_PUSHPC   = 0x4014,     # Push current section PC on the stack
+##                                  RE_DUP      = 0x4015,     # Duplicate top-of-stack and push a copy
+##                                  RE_XSTFLD   = 0x4016,     # Relocation field store, signedness is irrelevant
+##                                  RE_PUSHSV   = 0xC011,     # Push symbol: SEGVALUE flag is set
+##                              )
+##
+                          )
+                    ),
+                ),
+               Probe(),
                "flags" / FlagsEnum(Int32ul,
                     STYP_REG        = 0x00000000,     # Regular section (allocated, relocated, loaded)
                     STYP_DSECT      = 0x00000001,     # Dummy section (relocated, not allocated, not loaded)
@@ -266,6 +420,8 @@ class TICOFF(object):
     Header = namedtuple('Tuple', 'versionID timestamp numSectionHeaders numSymbols flags targetID')
 
     def parseHeader(self):
+        self.coff.targetID
+
         return self.Header(self.coff.versionID, self.coff.timestamp, self.coff.numSectionHeaders, self.coff.numSymbols,
                 self.coff.flags, self.coff.targetID)
 
@@ -275,13 +431,13 @@ class TICOFF(object):
         result = []
         for section in self.coff.sections:
             name = self.symbolName(section.name)
+            # relocationPointer
+            # numberOfRelocationEntries
             result.append(self.Section(name, section.physicalAddress, section.virtualAddress, section.sectionSize,
                 section.flags, section.memoryPageNumber))
             #print(name)
         return result
-        """
-                       "name" / Bytes(8),
-               "physicalAddress" / Int32ul,
-               "virtualAddress" / Int32ul,
-               "sectionSize" / Int32ul,
-        """
+
+    def getRelocations(self, section):
+        pass
+
