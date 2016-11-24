@@ -25,7 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 import os
 import struct
 import time
@@ -387,6 +387,7 @@ class TICOFF(object):
 
     def parseSymbols(self):
         extraEntry = 0
+        #result = OrderedDict()
         result = []
 
         SECTION_NUMBERS = {
@@ -425,17 +426,14 @@ class TICOFF(object):
         return self.Header(self.coff.versionID, self.coff.timestamp, self.coff.numSectionHeaders, self.coff.numSymbols,
                 self.coff.flags, self.coff.targetID)
 
-    Section = namedtuple("Section", "name physicalAddress virtualAddress sectionSize flags memoryPageNumber")
+    Section = namedtuple("Section", "name physicalAddress virtualAddress sectionSize flags memoryPageNumber image")
 
     def parseSections(self):
-        result = []
+        result = OrderedDict()
         for section in self.coff.sections:
             name = self.symbolName(section.name)
-            # relocationPointer
-            # numberOfRelocationEntries
-            result.append(self.Section(name, section.physicalAddress, section.virtualAddress, section.sectionSize,
-                section.flags, section.memoryPageNumber))
-            #print(name)
+            result[name] = self.Section(name, section.physicalAddress, section.virtualAddress, section.sectionSize,
+                section.flags, section.memoryPageNumber, section.image)
         return result
 
     def getRelocations(self, section):

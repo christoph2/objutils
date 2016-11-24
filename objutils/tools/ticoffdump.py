@@ -89,7 +89,7 @@ def main():
                 else:
                     print("\nSection Header:")
                 print("  [Nr] Name               Phys Addr Virt Addr Size     Page Flags")
-                for idx, section in enumerate(coff.sections):
+                for idx, (key, section) in enumerate(coff.sections.items()):
                     print("  [{:>2}] {:18s} {:08X}  {:08X}  {:08X} {:04X} {}".format(idx, section.name, section.physicalAddress, section.virtualAddress,
                         section.sectionSize, section.memoryPageNumber, getFlags(str(section.flags))))
 
