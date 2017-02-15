@@ -31,21 +31,19 @@ import math
 def numberOfBits(value):
     return int(math.ceil(math.log(abs(value), 2)))
 
-##
-##def encodeULEB(value):
-##    if value < 0:
-##        raise ValueError('value must be non-negative.')
-##    result = []
-##    while True:
-##        bval = value & 0x7f
-##        value >>= 7
-##        if value != 0:
-##            bval |= 0x80
-##        result.append(bval)
-##        if value == 0:
-##            break
-##    return result
-##
+def encodeULEB(value):
+    if value < 0:
+        raise ValueError('value must be non-negative.')
+    result = []
+    while True:
+        bval = value & 0x7f
+        value >>= 7
+        if value != 0:
+            bval |= 0x80
+        result.append(bval)
+        if value == 0:
+            break
+    return result
 
 
 def encodeSLEB(value):
@@ -79,89 +77,13 @@ def decodeSLEB(values):
     return result
 
 
-##
-##def decodeULEB(values):
-##    result = 0
-##    shift = 0
-##    for bval in values:
-##        result |= ((bval & 0x7f) << shift)
-##        if bval & 0x80 == 0:
-##            break
-##        shift += 7
-##    return result
-##
+def decodeULEB(values):
+    result = 0
+    shift = 0
+    for bval in values:
+        result |= ((bval & 0x7f) << shift)
+        if bval & 0x80 == 0:
+            break
+        shift += 7
+    return result
 
-##
-##
-##
-
-from construct.core import Construct, AdaptationError
-from construct.core import Adapter, Struct
-
-class ULEBError(AdaptationError): pass
-
-class ULEB(Construct):
-
-    __slots__ = []
-
-    def __init__(self, *args):
-        super(ULEB, self).__init__(*args)
-
-    def _parse(self, stream, context, path = None):
-        result = 0
-        shift = 0
-        while True:
-            try:
-                bval = ord(stream.read(1))
-            except Exception as e:
-                raise ULEBError(str(e))
-            result |= ((bval & 0x7f) << shift)
-            if bval & 0x80 == 0:
-                break
-            shift += 7
-        return result
-
-
-    def _build(self, value, stream, context, path):
-        assert value is not None
-        if value < 0:
-            raise ULEBError('value must be non-negative.')
-        result = []
-        while True:
-            bval = value & 0x7f
-            value >>= 7
-            if value != 0:
-                bval |= 0x80
-            result.append(bval)
-            if value == 0:
-                break
-        stream.write(bytearray(result))
-
-class Schnap(Adapter):
-
-    def _decode(self, obj, context):
-        return time.ctime(obj)
-        return "Foo"
-
-    def _encode(self, obj, context):
-        return int(time.mktime(time.strptime(obj)))
-
-if False:
-    import sys
-    ULEB = ULEB(None)
-
-
-    fileHeader = Struct(
-    #    "versionID" / Schnap,
-        "versionID" / ULEB,
-    )
-
-    print(fileHeader.parse(b'\x82\x01\xb9\x64\x7f'))
-
-    values = [b"\x02", b'\x7f', b'\x80\x01', b'\x81\x01', b'\x82\x01', b'\xb9\x64']
-    for value in values:
-        print(ULEB.parse(value))
-
-    print()
-#print(ULEB.parse(ULEB.build(0xcaffebabe)))
-#print(ULEB.parse(ULEB.build(12857)))
