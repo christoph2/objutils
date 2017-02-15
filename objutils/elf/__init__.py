@@ -31,7 +31,7 @@ import os
 import sys
 import types
 import struct
-
+import six
 import enum
 
 from objutils.elf import defs
@@ -114,6 +114,14 @@ class ELFHeader(object):
             self.byteOrderPrefix = defs.BYTEORDER_PREFIX[defs.ELFDataEncoding(self.elfByteOrder)]
         else:
             self.byteOrderPrefix = '<' # Arbitrary, we don't know.
+
+    @property
+    def magicString(self):
+        if six.PY2:
+            return ' '.join(["{0:02x}".format(ord(x)) for x in self.magicBytes[:16]])
+        else:
+            return ' '.join(["{0:02x}".format(int(x)) for x in self.magicBytes[:16]])
+
 
     @property
     def elfTypeName(self):

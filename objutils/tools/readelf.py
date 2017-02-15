@@ -7,7 +7,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2017 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -642,7 +642,7 @@ class ELFReader(object):
     def printFileHeader(self, reader):
         if self.options.fileHeader:
             print("ELF Header:")
-            print("  Magic:   " + ' '.join(["{0:02x}".format((ord(x))) for x in reader.header.magicBytes[:16]]) + " ")
+            print("  Magic:   {} ".format(reader.header.magicString))
             print("  Class:                             {0!s}".format((reader.header.elfClassAsString())))
             print("  Data:                              {0!s}".format(reader.header.elfDataEncodingAsString()))
             print("  Version:                           {0:d} {1!s}".format(reader.header.elfVersion, reader.header.getVersionAsString()))
@@ -717,19 +717,19 @@ class ELFReader(object):
                     print("  %-14.14s 0x%6.6lx 0x%8.8lx 0x%8.8lx 0x%5.5lx 0x%5.5lx %-3s %d" % (header.phTypeName,
                         header.phOffset, header.phVirtualAddress, header.phPhysicalAddress, header.phFileSize,
                         header.phMemSize,flags, header.phAlign
-                    ))
+                    ), end = ' ')
                 elif self.options.wideScreen:
                     print("  %-14.14s 0x%6.6lx 0x%16.16lx 0x%16.16lx 0x%6.6lx 0x%6.6lx %-3s %d" % (header.phTypeName,
                         header.phOffset, header.phVirtualAddress, header.phPhysicalAddress, header.phFileSize,
                         header.phMemSize,flags,header.phAlign
-                    ))
+                    ), end = ' ')
                 else:
                     print("  %-14.14s 0x%6.6lx 0x%16.16lx 0x%16.16lx" % (header.phTypeName, header.phOffset,
                         header.phVirtualAddress, header.phPhysicalAddress
-                    ))
+                    ), end = ' ')
                     print("                 0x%16.16lx 0x%16.16lx %-3s %d" % (header.phFileSize, header.phMemSize,
                         flags, header.phAlign
-                    ))
+                    ), end = ' ')
             if header.phType == defs.PT_DYNAMIC:
                 if dynamicAddr:
                     raise TypeError("more than one dynamic segment")
@@ -867,14 +867,14 @@ class ELFReader(object):
             if self.doSectionDetails:
                 print("  [{0:2d}] {1}".format(idx, section.shName))
                 if self.options.wideScreen:
-                    print("       {0:<15}".format(section.shTypeName)),
+                    print("       {0:<15}".format(section.shTypeName), end = ' '),
                 else:
-                    print("       {0:<15.15}".format(section.shTypeName)),
+                    print("       {0:<15.15}".format(section.shTypeName), end = ' '),
             else:
                 if self.options.wideScreen:
-                    print("  [{0:2d}] {1:<17.17}{2:<15}".format(idx, section.shName, section.shTypeName)),
+                    print("  [{0:2d}] {1:<17.17}{2:<15}".format(idx, section.shName, section.shTypeName), end = ' ')
                 else:
-                    print("  [{0:2d}]  {1:<17.17}{2:<15.15}".format(idx, section.shName, section.shTypeName)),
+                    print("  [{0:2d}]  {1:<17.17}{2:<15.15}".format(idx, section.shName, section.shTypeName), end = ' ')
 
             if not self.reader.header.is64Bit:
                 linkToBig = ""
@@ -904,18 +904,18 @@ class ELFReader(object):
                 #if (link_too_big && ! * link_too_big)
                 #    warn (_("section %u: sh_link value of %u is larger than the number of sections\n"), i, section->sh_link);
             elif self.options.wideScreen:
-                print("{0:016x} {1:06x} {2:06x} {3:02x}".format(section.shAddress, section.shOffset, section.shSize, section.shEntitySize)),
+                print("{0:016x} {1:06x} {2:06x} {3:02x}".format(section.shAddress, section.shOffset, section.shSize, section.shEntitySize), end = ' ')
                 if self.doSectionDetails:
-                    print(" "),
+                    print(" ", end = ' ')
                 else:
-                    print("{0:3}".format(flags))
+                    print("{0:3}".format(flags), end = ' ')
                 print("{0:2d} {1:3d} {2:2d}".format(section.shLink, section.shInfo, section.shAddressAlign))
             elif self.doSectionDetails:
                 print("       {0:<15s}  {1:016x}  {2:016x}  {3:d}".format(section.shTypeName, section.shAddress, section.shOffset, section.shLink))
-                print("       {0:016x} {1:016x}  {2:<16d}  {3:d}".format(section.shSize, section.shEntitySize, section.shInfo, section.shAddressAlign))
+                print("       {0:016x} {1:016x}  {2:<16d}  {3:d}".format(section.shSize, section.shEntitySize, section.shInfo, section.shAddressAlign), end = ' ')
             else:
                 print(" {0:016x}  {1:08x}".format(section.shAddress, section.shOffset))
-                print("       {0:016x}  {1:016x}  {2:3s}".format(section.shSize, section.shEntitySize, flags)),
+                print("       {0:016x}  {1:016x}  {2:3s}".format(section.shSize, section.shEntitySize, flags), end = ' ')
                 print("    {0:2d}   {1:3d}     {2:d}".format(section.shLink, section.shInfo, section.shAddressAlign))
             if self.doSectionDetails:
                 if self.reader.header.is64Bit:
@@ -961,7 +961,7 @@ class ELFReader(object):
 
                 for idx, (_, symbol) in enumerate(section.symbols.items()):
                     print("{0:6d}: {1:016x} {2:5d} {3:<7} {4:<6} {5:<7}".format(idx, symbol.st_value, symbol.st_size,
-                        getSymbolType(symbol.st_info & 0x0f), getSymbolBinding(symbol.st_info >> 4), getSymbolVisibility(symbol.st_other))
+                        getSymbolType(symbol.st_info & 0x0f), getSymbolBinding(symbol.st_info >> 4), getSymbolVisibility(symbol.st_other)), end = ' '
                     ),
                     if (symbol.st_other ^ stVisibility (symbol.st_other)):
                         print(" [{0}] ".format(get_symbol_other(symbol.st_other ^ stVisibility(symbol.st_other))))
@@ -1197,7 +1197,7 @@ def printRelocationData(reader):
 
 import sys
 sys.argv.append(r'C:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile23')
-sys.argv.append(r'-H')
+sys.argv.append(r'-HsSt')
 
 def main():
     reader = ELFReader()
