@@ -64,4 +64,6 @@ Section #0000
 You may ask, what about addresses?
 
 
-For a list of supported codecs run the following command:
+For a list of supported `codecs` run the following command:
+
+
