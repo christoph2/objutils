@@ -146,21 +146,22 @@ class Schnap(Adapter):
     def _encode(self, obj, context):
         return int(time.mktime(time.strptime(obj)))
 
-import sys
-ULEB = ULEB(None)
+if False:
+    import sys
+    ULEB = ULEB(None)
 
 
-fileHeader = Struct(
-#    "versionID" / Schnap,
-    "versionID" / ULEB,
-)
+    fileHeader = Struct(
+    #    "versionID" / Schnap,
+        "versionID" / ULEB,
+    )
 
-print(fileHeader.parse(b'\x82\x01\xb9\x64\x7f'))
+    print(fileHeader.parse(b'\x82\x01\xb9\x64\x7f'))
 
-values = [b"\x02", b'\x7f', b'\x80\x01', b'\x81\x01', b'\x82\x01', b'\xb9\x64']
-for value in values:
-    print(ULEB.parse(value))
+    values = [b"\x02", b'\x7f', b'\x80\x01', b'\x81\x01', b'\x82\x01', b'\xb9\x64']
+    for value in values:
+        print(ULEB.parse(value))
 
-print()
+    print()
 #print(ULEB.parse(ULEB.build(0xcaffebabe)))
 #print(ULEB.parse(ULEB.build(12857)))
