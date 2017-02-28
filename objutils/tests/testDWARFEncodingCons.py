@@ -14,7 +14,7 @@ class TestEncodeULEB(unittest.TestCase):
             self.assertEqual(encoding.ULEB.build(value), bytes(result))
 
     def testExceptionOnNegativeNumber(self):
-        self.assertRaises(ValueError, encoding.encodeULEB, -1)
+        self.assertRaises(encoding.ULEBError, encoding.ULEB.build, -1)
 
 
 class TestEncodeSLEB(unittest.TestCase):
