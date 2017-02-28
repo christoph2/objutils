@@ -237,7 +237,7 @@ class DebugSectionReader(object):
                         constants.DW_AT_data_member_location):
                         dis = Dissector(attrValue, targetAddrSize)
                         attrValue = dis.run()
-                    print("   <{0:x}>   {1:18!s}    : {2!s}".format(offset, attribute, attrValue))
+                    print("   <{0:x}>   {1!s}    : {2!s}".format(offset, attribute, attrValue))
         dr.reset()
 
     def processPubNames(self):  # TODO: NameLookupTable

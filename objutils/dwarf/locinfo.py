@@ -26,7 +26,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from functools import partial
+import functools
 
 from objutils.dwarf import constants, encoding
 
@@ -341,7 +341,7 @@ class Dissector(object):
         return arr
 
     def arrayToNumber(self, arr):
-        return reduce(lambda x, y: (x * 256) + y, arr)
+        return functools.reduce(lambda x, y: (x * 256) + y, arr)
 
     ENCODINGS = {NO_OPERANDS : void, SINGLE_BYTE: readByte, DUAL_BYTES: readDualBytes, FOUR_BYTES: readFourBytes,
         EIGHT_BYTES: readEightByte, SINGLE_ULEB: readSingleULeb, SINGLE_SLEB: readSingleSLeb,
