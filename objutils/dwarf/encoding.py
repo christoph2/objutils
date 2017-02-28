@@ -140,6 +140,7 @@ class SLEB(Construct):
         result = 0
         shift = 0
         size = 32
+        idx = 0
         while True:
             try:
                 bval = ord(stream.read(1))
@@ -147,10 +148,11 @@ class SLEB(Construct):
                 raise SLEBError(str(e))
             result |= ((bval & 0x7f) << shift)
             shift += 7
+            idx += 1
             if bval & 0x80 == 0:
                 break
         if (shift < 32) or (bval & 0x40) == 0x40:
-            mask = - (1 << (len(values) * 7))
+            mask = - (1 << (idx * 7))
             result |= mask
         return result
 
