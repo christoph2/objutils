@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2017 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -297,13 +297,13 @@ class Dissector(object):
     def readSingleULeb(self):
         length = self.getLEBLength()
         arr = self.slice(length)
-        res = encoding.decodeULEB(arr)
+        res = encoding.ULEB.parse(arr)
         return res
 
     def readSingleSLeb(self):
         length = self.getLEBLength()
         arr = self.slice(length)
-        res = encoding.decodeSLEB(arr)
+        res = encoding.SLEB.parse(arr)
         return res
 
     def readULebFollowedBySLeb(self):
@@ -348,21 +348,4 @@ class Dissector(object):
         ULEB128_FOLLOWED_BY_SLEB128: readULebFollowedBySLeb, ULEB128_FOLLOWED_BY_ULEB128: readULebFollowedByULeb,
         ULEB128_FOLLOWED_BY_BLOCK: readULebFollowedByBlock, MACHINE_WORD: readMachineWord
     }
-
-##
-##d=Dissector([0x03, 0x00, 0x00, 0x40,0x39], 4)
-##result = d.run()
-##for r in result:
-##    print r
-##
-##def getLEB(values):
-##    for idx, bval in enumerate(values, 1):
-##         if bval & 0x80 == 0:
-##             break
-##    return values[ : idx], idx
-##
-##
-##leb, endIndex = getLEB([199, 155, 127])
-##
-##
 
