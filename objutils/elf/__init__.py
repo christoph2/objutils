@@ -35,6 +35,8 @@ import struct
 import six
 import enum
 
+from construct import CString
+
 from objutils.elf import defs
 from objutils.logger import Logger
 from objutils.utils import createMemoryMappedFileView, slicer, PYTHON_VERSION
@@ -627,10 +629,8 @@ class Reader(object):
         if (tableIndex, entry) in self._stringCache:
             return self._stringCache[(tableIndex, entry)]
         else:
-            unterminatedString = self.sectionHeaders[tableIndex].image[entry : ]
-            terminatedString = unterminatedString[ : unterminatedString.index(b'\x00')]
-            self._stringCache[(tableIndex, entry)] = terminatedString
-            return terminatedString
+            name = CString(encoding = "ascii").parse(self.sectionHeaders[tableIndex].image[entry : ])
+            return name
 
     def createSectionToSegmentMapping(self):
         mapping = OrderedDict()
