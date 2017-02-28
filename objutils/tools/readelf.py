@@ -786,7 +786,7 @@ class ELFReader(object):
             sectionsToSegments = reader.sectionsToSegments
 
             for idx, entry in enumerate(sectionsToSegments.values()):
-                print("   {0:02d}     {1}".format(idx, " ".join([x.shName for x in entry])))
+                print("   {0:02d}     {1}".format(idx, b" ".join([x.shName for x in entry])))
 
     def printSectionsHeaders(self, reader):
         if not self.reader.header.e_shnum:

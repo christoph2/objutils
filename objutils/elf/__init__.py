@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2017 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,6 +27,7 @@ __copyright__ = """
 
 import binascii
 from collections import namedtuple, OrderedDict
+import enum
 import os
 import sys
 import types
@@ -36,13 +37,16 @@ import enum
 
 from objutils.elf import defs
 from objutils.logger import Logger
-from objutils.utils import memoryMap, slicer, PYTHON_VERSION
+from objutils.utils import createMemoryMappedFileView, slicer, PYTHON_VERSION
 
 #
 #   Reference:
 #   ----------
 #   Tool Interface Standard (TIS): Executable and Linking Format (ELF) Specification Version 1.2
 #
+
+
+Symbol = namedtuple('Symbol', 'name value size type binding visibility index')
 
 
 class Alias(object):
@@ -310,7 +314,6 @@ class ELFSectionHeaderTable(object):
                 symbol = Attributor(format, attributes, parent.byteOrderPrefix)
                 symbol.apply(data, symbol)
                 self.symbols[idx] = symbol
-
         if self.shType in (defs.SHT_REL, defs.SHT_RELA):
             pass
 
@@ -559,7 +562,7 @@ class Relocation(object):
 
 class Reader(object):
     def __init__(self, filename):
-        self.fp = memoryMap(filename)
+        self.fp = createMemoryMappedFileView(filename)
         self.header = ELFHeader(self)
         self.is64Bit = self.header.is64Bit
 
@@ -567,7 +570,7 @@ class Reader(object):
         self.sectionHeaders = []
         self._sectionHeadersByName = {}
         self._stringCache = {}
-
+        self.symbols = OrderedDict()
         self.logger = Logger("ELF")
 
         pos = self.header.e_phoff
@@ -612,6 +615,7 @@ class Reader(object):
             section._name = name
             self._sectionHeadersByName[name] = section
         self.createSectionToSegmentMapping()
+        self.buildSymbols()
 
     def slice(self, start, length):
         return self.fp[start : start + length]
@@ -679,6 +683,79 @@ class Reader(object):
 
     def sectioInSegmentStrict(self, sectionHeader, segment):
         return self.sectionInSegment1(sectionHeader, segment, 1, 1)
+
+    def buildSymbols(self):
+        for section in self.sectionHeaders:
+            if section.shType in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
+                syms = []
+                for idx, symbol in section.symbols.items():
+                    sym = Symbol(
+                        self.getString(section.shLink, symbol.st_name),
+                        symbol.st_value,
+                                 symbol.st_size, self.getSymbolType(symbol.st_info & 0x0f),
+                                 self.getSymbolBinding(symbol.st_info >> 4), self.getSymbolVisibility(symbol.st_other),
+                        self.getSymbolIndexType(self.header, symbol.st_shndx))
+                    syms.append(sym)
+                self.symbols[section.shName] = syms
+
+
+    def getSymbolVisibility(self, visibility):
+        if visibility == defs.STV_DEFAULT:
+            return "DEFAULT"
+        elif visibility == defs.STV_INTERNAL:
+            return "INTERNAL"
+        elif visibility == defs.STV_HIDDEN:
+            return "HIDDEN"
+        elif visibility == defs.STV_PROTECTED:
+            return "PROTECTED"
+        else:
+            pass    # TODO: raise TypeError()!
+
+    def getSymbolIndexType(self, header, _type):
+        buf = ""
+        if _type == defs.SHN_UNDEF:
+            buf = "UND"
+        elif _type == defs.SHN_ABS:
+            buf = "ABS"
+        elif _type == defs.SHN_COMMON:
+            buf = "COM"
+        else:
+            if _type == defs.SHN_IA_64_ANSI_COMMON:
+                pass
+            else:
+                buf = "{0:3d}".format(_type)
+        return buf
+
+
+
+    def getSymbolType(self, value):
+        SYMBOL_TYPES={
+            defs.STT_NOTYPE  : "NOTYPE",
+            defs.STT_OBJECT  : "OBJECT",
+            defs.STT_FUNC    : "FUNC",
+            defs.STT_SECTION : "SECTION",
+            defs.STT_FILE    : "FILE"
+        }
+        if defs.STT_NOTYPE <= value <= defs.STT_FILE:
+            return SYMBOL_TYPES[value]
+        elif defs.STT_LOPROC <= value <= defs.STT_HIPROC:
+            return "PROC"
+        else:
+            return "UNKNOWN"
+
+    def getSymbolBinding(self, value):
+        SYMBOL_BINDINGS={
+            defs.STB_LOCAL   : "LOCAL",
+            defs.STB_GLOBAL  : "GLOBAL",
+            defs.STB_WEAK    : "WEAK",
+        }
+        if defs.STB_LOCAL<= value <=defs.STB_WEAK:
+            return SYMBOL_BINDINGS[value]
+        elif defs.STB_LOPROC<= value <=defs.STB_HIPROC:
+            return "PROC"
+        else:
+            return "UNK"
+
 
     @property
     def byteOrderPrefix(self):

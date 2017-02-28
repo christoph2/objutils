@@ -198,8 +198,8 @@ class RepresentationMixIn(object):
 
 import mmap
 
-def memoryMap(filename, writeable = False):
+def createMemoryMappedFileView(filename, writeable = False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
-    return mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ)
+    return memoryview(mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
 

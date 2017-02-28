@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2017 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -35,7 +35,7 @@ import construct
 from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString, IfThenElse
 from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes, Switch
 
-from objutils.utils import memoryMap
+from objutils.utils import createMemoryMappedFileView
 
 
 class UTCTimeStampAdapter(Adapter):
@@ -369,7 +369,7 @@ class TICOFF(object):
     """
 
     def __init__(self, filename):
-        self.fp = memoryMap(filename)
+        self.fp = createMemoryMappedFileView(filename)
         self.coff = fileHeader.parse(self.fp, size = self.fp.size())
 
         self.header = self.parseHeader()
