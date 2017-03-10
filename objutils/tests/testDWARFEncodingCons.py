@@ -6,7 +6,7 @@ import unittest
 from objutils.dwarf import encoding
 
 class TestEncodeULEB(unittest.TestCase):
-    values = [2, 127, 128, 129, 130, 12857]
+    values = [2,     127,   128,      129,      130,      12857]
     results = [[2], [127], [128, 1], [129, 1], [130, 1], [185, 100]]
 
     def testEncoding(self):
@@ -27,8 +27,8 @@ class TestEncodeSLEB(unittest.TestCase):
 
 
 class TestDecodeULEB(unittest.TestCase):
-    values = [[2], [127], [128, 1], [129, 1], [130, 1], [185, 100]]
-    results = [2, 127, 128, 129, 130, 12857]
+    values = [b'\x02', b'\x7f', b'\x80\x01', b'\x81\x01', b'\x82\x01', b'\xb9d']
+    results = [2,      127,     128,         129,         130,         12857]
 
     def testDecoding(self):
         for value, result in zip(self.values, self.results):
@@ -36,12 +36,13 @@ class TestDecodeULEB(unittest.TestCase):
 
 
 class TestDecodeSLEB(unittest.TestCase):
-    values = [[126], [129, 127], [128, 127], [255, 126], [254, 126], [199, 155, 127]]
+    values = [b'\x7e', b'\x81\x7f', b'\x80\x7f', b'\xff~', b'\xfe~', b'\xc7\x9b\x7f']
     results = [-2, -127, -128, -129, -130, -12857]
 
     def testEncoding(self):
         for value, result in zip(self.values, self.results):
-            self.assertEqual(encoding.SLEB.parse(bytes(value)), result)
+            #self.assertEqual(encoding.SLEB.parse(bytes(value)), result)
+            self.assertEqual(encoding.SLEB.parse(value), result)
 
 def main():
     unittest.main()
