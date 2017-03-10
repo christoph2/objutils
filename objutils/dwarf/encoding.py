@@ -28,6 +28,7 @@ __copyright__ = """
 
 from construct.core import Construct, ConstructError
 from construct.core import Adapter, Struct, singleton
+import six
 
 class ULEBError(ConstructError): pass
 class SLEBError(ConstructError): pass
@@ -36,7 +37,10 @@ class SLEBError(ConstructError): pass
 class ULEB(Construct):
 
     def __init__(self, *args):
-        super(__class__, self).__init__()
+        if six.PY3:
+            super(__class__, self).__init__()
+        else:
+            super(self.__class__, self).__init__()
 
     def _parse(self, stream, context, path = None):
         result = 0
@@ -73,7 +77,10 @@ class ULEB(Construct):
 class SLEB(Construct):
 
     def __init__(self, *args):
-        super(__class__, self).__init__()
+        if six.PY3:
+            super(__class__, self).__init__()
+        else:
+            super(self.__class__, self).__init__()
 
     def _parse(self, stream, context, path = None):
         result = 0
