@@ -30,6 +30,8 @@ import os
 import sys
 import threading
 
+import six
+
 def slicer(iterable, sliceLength, converter = None):
     if converter is None:
         converter = type(iterable)
@@ -201,5 +203,8 @@ import mmap
 def createMemoryMappedFileView(filename, writeable = False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
-    return memoryview(mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
+    if six.PY3:
+        return memoryview(mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
+    else:
+        return mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ)
 
