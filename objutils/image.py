@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2018 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -32,8 +32,6 @@ import operator
 import sys
 
 from objutils.section import Section, joinSections
-
-## TODO: diff interface!
 
 ## Adress-space constants.
 AS_16   = 0
@@ -62,6 +60,9 @@ class Image(object):
 
     def __iter__(self):
         return iter(self.sections)
+
+    def __getitem__(self, idx):
+        return self.sections[idx]
 
     def next(self):
         for segment in self.sections:
@@ -105,7 +106,7 @@ class Builder(object):
         if self.autoJoin:
             self.joinSections()
         self.address = address + len(data)
-        
+
     addSection = addSegment
 
     def addMetaData(self, metaData):
