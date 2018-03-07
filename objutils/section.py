@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2018 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -25,6 +25,8 @@ __copyright__ = """
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
+
+import sys
 
 from array import array
 from operator import itemgetter
@@ -97,8 +99,8 @@ class Section(object):
     def length(self, value):
         self._length = value
 
-    def hexdump(self, fp):
-        dumper = hexdump.CanonicalDumper(fp)  # TODO: cache dumpers.
+    def hexdump(self, fp = sys.stdout):
+        dumper = hexdump.CanonicalDumper(fp)
         dumper.dumpData(self)
 
 
@@ -114,7 +116,7 @@ def joinSections(sections, orderSections = True):
             lastSegment.data.extend(section.data)
             lastSegment.length += section.length
         else:
-            # Create a new Segment.
+            # Create a new section.
             resultSections.append(Section(section.address, section.data))
         prevSection = section
     if resultSections:
