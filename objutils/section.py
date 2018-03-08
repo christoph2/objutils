@@ -140,6 +140,14 @@ class Section(object):
             raise RuntimeError("Unterminated String!!!")
         return self.data[offset : offset + pos].decode(encoding = encoding)
 
+    def writeString(self, addr, value, encoding = "latin1"):
+        offset = addr - self.startAddress
+        if PYTHON_VERSION.major == 3:
+            self.data[offset : offset +  len(value)] = bytes(value, encoding = encoding)
+        else:
+            self.data[offset : offset +  len(value)] = bytes(value)
+        self.data[offset +  len(value)] = 0
+
 
 def joinSections(sections, orderSections = True):
     resultSections = []
