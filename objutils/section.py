@@ -26,19 +26,43 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import struct
 import sys
 
 from array import array
-from operator import itemgetter
+from operator import attrgetter
 import reprlib
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
 
 
+##
+## todo: find/search methode(n) mit slice funktion!
+## Basic patch-interface: (addr, datatype (endianess)) - readAs()/writeAs()
+##
+
+FORMATS = {
+    "uint8": "B",
+    "int8": "b",
+    "uint16": "H",
+    "int16": "h",
+    "uint32": "I",
+    "int32": "i",
+    "uint64": "Q",
+    "int64": "q",
+    "float32": "f",
+    "float64": "d",
+}
+
+BYTEORDER = {
+    "le": "<",
+    "be": ">",
+}
+
 class Section(object):
 
     def __init__(self, address = 0, data = None):
-        self.address = address
+        self.startAddress = address
         if data is None:
             self.data = bytearray()
         else:
@@ -53,37 +77,27 @@ class Section(object):
         self.repr.maxstring = 64
         self.repr.maxother = 64
 
-    def __getitem__(self, key):
-        if key == 0:
-            return self.address
-        elif key == 1:
-            return self.length
-        elif key == 2:
-            return self.data
-        else:
-            raise IndexError()
-
     def __eq__(self, other):
-        return self.address == other.address
+        return self.startAddress == self.startAddress
 
     def __ne__(self, other):
-        return self.address == other.address
+        return self.startAddress == self.startAddress
 
     def __lt__(self, other):
-        return self.address < other.address
+        return self.startAddress < self.startAddress
 
     def __le__(a, b):
-        return self.address <= other.address
+        return self.startAddress <= self.startAddress
 
     def __ge__(a, b):
-        return self.address >= other.address
+        return self.startAddress >= self.startAddress
 
     def __gt__(a, b):
-        return self.address > other.address
+        return self.startAddress > self.startAddress
 
     def __repr__(self):
         return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
-            self.address,
+            self.startAddress,
             self.length,
             self.repr.repr(memoryview(self.data).tobytes())
         )
@@ -103,21 +117,44 @@ class Section(object):
         dumper = hexdump.CanonicalDumper(fp)
         dumper.dumpData(self)
 
+    def _getformat(self, dtype):
+        dtype = dtype.lower()
+        fmt, bo = dtype.split("_")
+        return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
+
+    def readNumeric(self, addr, dtype, shape = (0, 0)):
+        offset = addr - self.startAddress
+        fmt = self._getformat(dtype)
+        data = self.data[offset : offset + struct.calcsize(fmt)]
+        return struct.unpack(fmt, data)[0]
+
+    def writeNumeric(self, addr, value, dtype, shape = (0, 0)):
+        offset = addr - self.startAddress
+        fmt = self._getformat(dtype)
+        self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
+
+    def readString(self, addr, encoding = "latin1"):
+        offset = addr - self.startAddress
+        pos = self.data[offset : ].find(b'\x00')
+        if pos == -1:
+            raise RuntimeError("Unterminated String!!!")
+        return self.data[offset : offset + pos].decode(encoding = encoding)
+
 
 def joinSections(sections, orderSections = True):
     resultSections = []
     if orderSections:
-        sections.sort(key = itemgetter(0))
+        sections.sort(key = attrgetter("startAddress"))
     prevSection = Section()
     while sections:
         section = sections.pop(0)
-        if section.address == prevSection.address + prevSection.length and resultSections:
+        if section.startAddress == prevSection.startAddress + prevSection.length and resultSections:
             lastSegment = resultSections[-1]
             lastSegment.data.extend(section.data)
             lastSegment.length += section.length
         else:
             # Create a new section.
-            resultSections.append(Section(section.address, section.data))
+            resultSections.append(Section(section.startAddress, section.data))
         prevSection = section
     if resultSections:
         return resultSections

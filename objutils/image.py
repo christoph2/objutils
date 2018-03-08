@@ -126,7 +126,7 @@ class Builder(object):
 def _validateSections(sections):
     """Test for required protocol
     """
-    ATTRIBUTES = ('address', 'length', 'data')
+    ATTRIBUTES = ('startAddress', 'length', 'data')
     if not '__iter__' in dir(sections):
         raise TypeError("Sections must be iteratable.")
     for section in sections:
