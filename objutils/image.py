@@ -99,7 +99,7 @@ class Image(object):
         self._callAddressFunction("writeNumeric", addr, value, dtype)
 
     def readString(self, addr, encoding = "latin1", length = -1):
-        return self._callAddressFunction("readNumeric", addr, encoding, length)
+        return self._callAddressFunction("readString", addr, encoding, length)
 
     def writeString(self, addr, value, encoding = "latin1"):
         self._callAddressFunction("writeString", addr, value, encoding)
