@@ -293,7 +293,7 @@ class Reader(BaseType):
                 return self.probe(createStringBuffer(bytes(image, "ascii")))
             else:
                 return self.probe(createStringBuffer(image))
-        else:        
+        else:
             return self.probe(createStringBuffer(image))
 
     def checkLine(self, line, formatType):
@@ -338,7 +338,7 @@ class Writer(BaseType):
         if header:
             result.append(header)
         for section in image:
-            address = section.address
+            address = section.startAddress
             rows = slicer(section.data, rowLength, lambda x:  [int(y) for y in x])
             for row in rows:
                 length = len(row)
@@ -348,13 +348,13 @@ class Writer(BaseType):
         if footer:
             result.append(footer)
         if PYTHON_VERSION.major == 3:
-            return self.postProcess(bytes('\n'.join(result), "ascii"))            
+            return self.postProcess(bytes('\n'.join(result), "ascii"))
         else:
             return self.postProcess(bytes('\n'.join(result)))
 
     def calculateAddressBits(self, image):
-        lastSegment = sorted(image.sections, key = lambda s: s.address)[-1]
-        highestAddress = lastSegment.address + lastSegment.length
+        lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+        highestAddress = lastSegment.startAddress + lastSegment.length
         return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
 
     def postProcess(self, data):

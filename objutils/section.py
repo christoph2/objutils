@@ -105,6 +105,9 @@ class Section(object):
     def __len__(self):
         return self.length
 
+    def __contains__(self, addr):
+        return self.startAddress <= addr < (self.startAddress + self.length)
+
     @property
     def length(self):
         return self._length
@@ -122,18 +125,18 @@ class Section(object):
         fmt, bo = dtype.split("_")
         return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
-    def readNumeric(self, addr, dtype, shape = (0, 0)):
+    def readNumeric(self, addr, dtype):
         offset = addr - self.startAddress
         fmt = self._getformat(dtype)
         data = self.data[offset : offset + struct.calcsize(fmt)]
         return struct.unpack(fmt, data)[0]
 
-    def writeNumeric(self, addr, value, dtype, shape = (0, 0)):
+    def writeNumeric(self, addr, value, dtype):
         offset = addr - self.startAddress
         fmt = self._getformat(dtype)
         self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
 
-    def readString(self, addr, encoding = "latin1"):
+    def readString(self, addr, encoding = "latin1", length = -1):
         offset = addr - self.startAddress
         pos = self.data[offset : ].find(b'\x00')
         if pos == -1:

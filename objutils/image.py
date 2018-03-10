@@ -33,6 +33,8 @@ import sys
 
 from objutils.section import Section, joinSections
 
+class AddressError(Exception): pass
+
 ## Adress-space constants.
 AS_16   = 0
 AS_24   = 1
@@ -82,6 +84,25 @@ class Image(object):
             print("\nSection #{0:04d}".format(idx ), file = fp)
             print("-" * 13, file = fp)
             section.hexdump(fp)
+
+    def _callAddressFunction(self, funcName, addr, *args):
+        for section in self.sections:
+            if addr in section:
+                func = getattr(section, funcName)
+                return func(addr, *args)
+        raise AddressError("Address 0x{:08x} not found.".format(addr))
+
+    def readNumeric(self, addr, dtype):
+        return self._callAddressFunction("readNumeric", addr, dtype)
+
+    def writeNumeric(self, addr, value, dtype):
+        self._callAddressFunction("writeNumeric", addr, value, dtype)
+
+    def readString(self, addr, encoding = "latin1", length = -1):
+        return self._callAddressFunction("readNumeric", addr, encoding, length)
+
+    def writeString(self, addr, value, encoding = "latin1"):
+        self._callAddressFunction("writeString", addr, value, encoding)
 
 
 class Builder(object):

@@ -152,8 +152,8 @@ class Writer(hexfile.Writer):
 
     def preProcessing(self, image):
         if self.recordType is None:
-            lastSegment = sorted(image.sections, key = lambda s: s.address)[-1]
-            highestAddress = lastSegment.address + lastSegment.length
+            lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+            highestAddress = lastSegment.startAddress + lastSegment.length
             if highestAddress <= 0x000000ffff:
                 self.recordType = 1
             elif highestAddress <= 0x00ffffff:
