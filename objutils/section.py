@@ -120,10 +120,28 @@ class Section(object):
         dumper = hexdump.CanonicalDumper(fp)
         dumper.dumpData(self)
 
+    def tobytes(self):
+        if PYTHON_VERSION.major == 3:
+            return  array('B', self.data).tobytes()
+        else:
+            return  array('B', self.data).tostring()
+
+    def tolist(self):
+        return  array('B', self.data).tolist()
+
     def _getformat(self, dtype):
         dtype = dtype.lower()
         fmt, bo = dtype.split("_")
         return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
+
+    def read(self, addr, length):
+        offset = addr - self.startAddress
+        data = self.data[offset : offset + length]
+        return Section(addr, data)
+
+    def write(self, addr, length, data):
+        offset = addr - self.startAddress
+        self.data[offset : offset + length] = data
 
     def readNumeric(self, addr, dtype):
         offset = addr - self.startAddress

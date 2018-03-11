@@ -92,6 +92,12 @@ class Image(object):
                 return func(addr, *args)
         raise AddressError("Address 0x{:08x} not found.".format(addr))
 
+    def read(self, addr, length):
+        return self._callAddressFunction("read", addr, length)
+
+    def write(self, addr, length, data):
+        self._callAddressFunction("write", addr, length, data)
+
     def readNumeric(self, addr, dtype):
         return self._callAddressFunction("readNumeric", addr, dtype)
 
