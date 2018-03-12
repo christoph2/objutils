@@ -324,7 +324,7 @@ class Writer(BaseType):
         result = []
         self.rowLength = rowLength
 
-        if not image.sections:
+        if hasattr(image, "sections") and  not image.sections:
             return ''
 
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
@@ -334,7 +334,7 @@ class Writer(BaseType):
 
         self.preProcessing(image)
 
-        header = self.composeHeader(image.meta)
+        header = self.composeHeader(image.meta if hasattr(image, 'meta') else {})
         if header:
             result.append(header)
         for section in image:
@@ -344,7 +344,7 @@ class Writer(BaseType):
                 length = len(row)
                 result.append(self.composeRow(address, length, row))
                 address += rowLength
-        footer = self.composeFooter(image.meta)
+        footer = self.composeFooter(image.meta if hasattr(image, 'meta') else {})
         if footer:
             result.append(footer)
         if PYTHON_VERSION.major == 3:
@@ -353,7 +353,10 @@ class Writer(BaseType):
             return self.postProcess(bytes('\n'.join(result)))
 
     def calculateAddressBits(self, image):
-        lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+        if hasattr(image, "sections"):
+            lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+        else:
+            lastSegment = image
         highestAddress = lastSegment.startAddress + lastSegment.length
         return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
 

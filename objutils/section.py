@@ -31,6 +31,7 @@ import sys
 
 from array import array
 from operator import attrgetter
+import re
 import reprlib
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
@@ -76,6 +77,9 @@ class Section(object):
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
         self.repr.maxother = 64
+
+    def __iter__(self):
+        yield self
 
     def __eq__(self, other):
         return self.startAddress == self.startAddress
@@ -168,6 +172,10 @@ class Section(object):
         else:
             self.data[offset : offset +  len(value)] = bytes(value)
         self.data[offset +  len(value)] = 0
+
+    def find(self, expr, addr = -1):
+        for item in re.finditer(bytes(expr), self.data):
+            yield (self.startAddress + item.start(), item.end()- item.start())
 
 
 def joinSections(sections, orderSections = True):
