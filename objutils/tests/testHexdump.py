@@ -85,10 +85,10 @@ Section #0000
 """
 
 #builder = Builder()
-#builder.addSegment(range(53), 0x1000)
-#builder.addSegment(range(0), 0x1000)
-#builder.addSegment([0] * 512)
-#builder.addSegment(range(64))
+#builder.addSection(range(53), 0x1000)
+#builder.addSection(range(0), 0x1000)
+#builder.addSection([0] * 512)
+#builder.addSection(range(64))
 #builder.joinSections()
 #builder.hexdump()
 
@@ -117,34 +117,34 @@ class BaseTest(unittest.TestCase):
 class TestHexdumper(BaseTest):
 
     def testDumpContinuousRange(self):
-        self.builder.addSegment(range(64), 0x1000)
+        self.builder.addSection(range(64), 0x1000)
         self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST1)
 
     def testDumpDiscontinuousRange(self):
-        self.builder.addSegment(range(64), 0x1000)
-        self.builder.addSegment(range(64), 0x2000)
+        self.builder.addSection(range(64), 0x1000)
+        self.builder.addSection(range(64), 0x2000)
         self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST2)
 
     def testDumpZeroBytesInBetween(self):
-        self.builder.addSegment(range(64), 0x1000)
-        self.builder.addSegment([0] * 512)
-        self.builder.addSegment(range(64))
+        self.builder.addSection(range(64), 0x1000)
+        self.builder.addSection([0] * 512)
+        self.builder.addSection(range(64))
         self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST3)
 
     def testDumpOddSizedRow(self):
-        self.builder.addSegment(range(53), 0x1000)
+        self.builder.addSection(range(53), 0x1000)
         self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST4)
 
     def testDumpEmptyRow(self):
-        self.builder.addSegment(range(0), 0x1000)
+        self.builder.addSection(range(0), 0x1000)
         self.builder.joinSections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST5)

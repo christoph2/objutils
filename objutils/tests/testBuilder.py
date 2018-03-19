@@ -26,7 +26,7 @@ class TestBasicFunctionality(unittest.TestCase):
         else:
             buf = createStringBuffer()
         b0 = Builder()
-        b0.addSegment("hello world!")
+        b0.addSection("hello world!")
         b0.joinSections()
         b0.hexdump(buf)
         buf.seek(0, os.SEEK_SET)
@@ -50,11 +50,11 @@ class TestBuilderParameters(unittest.TestCase):
 
     def createImage(self, autoSort = False, autoJoin = False):
         builder = Builder(autoSort = autoSort, autoJoin = autoJoin)
-        builder.addSegment(range(16), 0x90)
-        builder.addSegment(range(16), 0x80)
-        builder.addSegment(range(16), 0x70)
-        builder.addSegment(range(16), 0x60)
-        builder.addSegment(range(16), 0x50)
+        builder.addSection(range(16), 0x90)
+        builder.addSection(range(16), 0x80)
+        builder.addSection(range(16), 0x70)
+        builder.addSection(range(16), 0x60)
+        builder.addSection(range(16), 0x50)
         return [s.startAddress for s in builder.image]
 
     def testBuilderPreservesOrder(self):

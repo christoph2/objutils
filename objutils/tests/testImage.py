@@ -23,13 +23,13 @@ class BaseTest(unittest.TestCase):
 class Equality(BaseTest):
 
     def testEqualImagesShallCompareEqualCase1(self):
-        self.b0.addSegment("01234567890", 0x1000)
-        self.b1.addSegment("01234567890", 0x1000)
+        self.b0.addSection("01234567890", 0x1000)
+        self.b1.addSection("01234567890", 0x1000)
         self.assertTrue(self.b0.image == self.b1.image)
 
     def testEqualImagesShallCompareEqualCase2(self):
-        self.b0.addSegment("01234567890", 0x1000)
-        self.b1.addSegment("01234567890", 0x1000)
+        self.b0.addSection("01234567890", 0x1000)
+        self.b1.addSection("01234567890", 0x1000)
         self.assertFalse(self.b0.image != self.b1.image)
 
 
@@ -38,12 +38,12 @@ class TestCreateSections(BaseTest):
     SREC = b"S1131000000102030405060708090A0B0C0D0E0F64"
 
     def runSectionTestPass(self, data):
-        self.b0.addSegment(data, 0x1000)
+        self.b0.addSection(data, 0x1000)
         result = dumps('srec', self.b0.image)
         self.assertEqual(result, self.SREC)
 
     def runSectionTestFail(self, data):
-        self.assertRaises(ValueError, self.b0.addSegment, data, 0x1000)
+        self.assertRaises(ValueError, self.b0.addSection, data, 0x1000)
 
     def testCreateSectionFromStringWorks(self):
         self.runSectionTestPass('\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f')
@@ -59,13 +59,13 @@ class TestCreateSections(BaseTest):
 
     def testEnsureSectionHasCopySemantics(self):
         data = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]
-        self.b0.addSegment(data, 0x1000)
+        self.b0.addSection(data, 0x1000)
         data.extend([0x10, 0x20, 0x30, 0x40])
         result = dumps('srec', self.b0.image)
         self.assertEqual(result, self.SREC)
 
     def testEmptySectionProducesEmptiness(self):
-        self.b0.addSegment([], 0x1000)
+        self.b0.addSection([], 0x1000)
         result = dumps('srec', self.b0.image)
         self.assertEqual(result, b'')
 

@@ -130,7 +130,7 @@ class Builder(object):
         self.address = 0
         self.autoJoin = autoJoin
 
-    def addSegment(self, data, address = None, dontJoin = False):   # TODO: 'polymorph' signature, move 'dontJoin' to segment!
+    def addSection(self, data, address = None, dontJoin = False):   # TODO: 'polymorph' signature, move 'dontJoin' to segment!
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
@@ -140,8 +140,6 @@ class Builder(object):
         if self.autoJoin:
             self.joinSections()
         self.address += len(data)
-
-    addSection = addSegment
 
     def addMetaData(self, metaData):
         pass
