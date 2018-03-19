@@ -28,7 +28,7 @@ __copyright__ = """
 """
 
 import bisect
-import operator
+from operator import attrgetter, eq
 import sys
 
 from objutils.section import Section, joinSections
@@ -72,7 +72,7 @@ class Image(object):
 
     def __eq__(self, other):
         if len(self.sections) == len(other.sections):
-            return all( operator.eq(l, r) for l, r in zip(self.sections, other.sections))
+            return all( eq(l, r) for l, r in zip(self.sections, other.sections))
         else:
             return False
 
@@ -126,10 +126,9 @@ class Builder(object):
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
+        self._sections.append(Section(address, data))
         if self.autoSort:
-            bisect.insort(self._sections, Section(address, data))
-        else:
-            self._sections.append(Section(address, data))
+            self._sections.sort(key = attrgetter("startAddress"))
         if self.autoJoin:
             self.joinSections()
         self.address = address + len(data)
