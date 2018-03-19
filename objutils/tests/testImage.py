@@ -81,6 +81,11 @@ class TestCreateSections(BaseTest):
     def testCreateSectionFromArrayBWorks(self):
         self.runSectionTestPass(array('B', [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]))
 
+    def testOmittedAddressYieldsToZero(self):
+        self.b0.addSection(range(16))
+        data = self.b0.image
+        self.assertEqual(data[0].startAddress, 0X00000000)
+
     #def testCreateSectionFromArrayHWorks(self):
     #    if sys.byteorder == 'little':
     #        self.runSectionTestPass(array('H', [0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e]))

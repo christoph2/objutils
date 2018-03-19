@@ -139,7 +139,7 @@ class Builder(object):
             self._sections.sort(key = attrgetter("startAddress"))
         if self.autoJoin:
             self.joinSections()
-        self.address += len(data)
+        self.address = address + len(data)
 
     def addMetaData(self, metaData):
         pass
