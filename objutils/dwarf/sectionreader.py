@@ -122,8 +122,8 @@ class DebugSectionReader(object):
             print(name)
         #if '.debug_ranges' in self.sections:
         #    self.processRanges()
-        if '.debug_line' in self.sections:
-            self.processLineSection()
+#        if '.debug_line' in self.sections:
+#            self.processLineSection()
         if '.debug_abbrev' in self.sections:
             self.processAbbreviations()
         if '.debug_info' in self.sections:

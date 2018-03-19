@@ -27,7 +27,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import bisect
 from operator import attrgetter, eq
 import sys
 
@@ -116,22 +115,31 @@ class Builder(object):
     """
 
     def __init__(self, sections = None, autoJoin = False, autoSort = False):
-        self._sections = sections if sections else []
+        if autoSort:
+            self._needSorting = True
+            if sections:
+                self._sections = sorted(sections, key = attrgetter("startAddress"))
+            else:
+                self._sections = []
+        else:
+            self._needSorting = False
+            self._sections = sections if sections else []
+        if self._sections and autoJoin:
+            self.joinSections()
         _validateSections(self._sections)
         self.address = 0
         self.autoJoin = autoJoin
-        self.autoSort = autoSort
 
     def addSegment(self, data, address = None, dontJoin = False):   # TODO: 'polymorph' signature, move 'dontJoin' to segment!
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         self._sections.append(Section(address, data))
-        if self.autoSort:
+        if self._needSorting:
             self._sections.sort(key = attrgetter("startAddress"))
         if self.autoJoin:
             self.joinSections()
-        self.address = address + len(data)
+        self.address += len(data)
 
     addSection = addSegment
 
