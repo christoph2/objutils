@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from array import array
+import io
 import unittest
 import sys
 
 from objutils import loads, dumps
 from objutils.section  import Section
 from objutils.image  import Image, Builder
-from objutils.utils import PYTHON_VERSION
+from objutils.utils import PYTHON_VERSION, createStringBuffer
 
 class BaseTest(unittest.TestCase):
 
@@ -94,6 +95,41 @@ class TestCreateSections(BaseTest):
 
     #def testCreateSectionFromUnicodeFails(self):
     #    self.runSectionTestPass('\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f')
+
+class TestImageSlices(BaseTest):
+
+    def createImage(self):
+        self.b0.addSection(range(16), 0x1000)
+        self.b0.addSection(range(16), 0x2000)
+        self.b0.addSection(range(16), 0x3000)
+
+    def testLenWorks(self):
+        self.createImage()
+        image = self.b0.image
+        self.assertEqual(len(image), 3)
+
+    def testSlicingWorks(self):
+        self.createImage()
+        image = self.b0.image
+        section = image[1]
+        self.assertTrue(isinstance(section, Section))
+
+    def testIteration(self):
+        self.createImage()
+        image = self.b0.image
+        for section in image:
+            self.assertTrue(isinstance(section, Section))
+
+    def testHexdumpWorksOnSlice(self):
+        self.createImage()
+        image = self.b0.image
+        section = image[1]
+        if PYTHON_VERSION.major == 3:
+            buf = io.TextIOWrapper(createStringBuffer())
+        else:
+            buf = createStringBuffer()
+        section.hexdump(buf)
+
 
 if __name__ == '__main__':
     unittest.main()
