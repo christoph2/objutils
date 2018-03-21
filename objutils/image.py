@@ -65,10 +65,6 @@ class Image(object):
     def __getitem__(self, idx):
         return self.sections[idx]
 
-    def next(self):
-        for segment in self.sections:
-            yield segment
-
     def __eq__(self, other):
         if len(self.sections) == len(other.sections):
             return all( eq(l, r) for l, r in zip(self.sections, other.sections))
