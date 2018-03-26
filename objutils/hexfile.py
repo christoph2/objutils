@@ -6,7 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2018 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -187,9 +187,16 @@ class Reader(BaseType):
 
     def load(self, fp, **kws):
         if PYTHON_VERSION.major == 3:
-            return self.read(fp)#.decode()
+            data = self.read(fp)#.decode()
+            if hasattr(fp, "close"):
+                fp.close()
+            return data
         else:
-            return self.read(fp)
+            data = self.read(fp)
+            if hasattr(fp, "close"):
+                fp.close()
+            return data
+
 
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
@@ -319,6 +326,8 @@ class Writer(BaseType):
 
     def dump(self, fp, image, rowLength = 16, **kws):   # TODO: rename to bytesPerRow!
         fp.write(self.dumps(image, rowLength))
+        if hasattr(fp, "close"):
+            fp.close()
 
     def dumps(self, image, rowLength = 16, **kws):
         result = []
