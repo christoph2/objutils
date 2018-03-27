@@ -40,7 +40,7 @@ class TestRoundtrip(unittest.TestCase):
 
     def testLoadsWorks(self):
         builder = Builder()
-        builder.addSegment("Wow! Did you really go through al that trouble to read this?", 0xb000)
+        builder.addSection("Wow! Did you really go through al that trouble to read this?", 0xb000)
         builder.joinSections()
         self.assertEqual(dumps("srec", builder.image, recordType = 1, s5record = False, startAddress = 0x0000), SREC1)
 
@@ -61,7 +61,7 @@ class TestS19Options(unittest.TestCase):
 
     def createImage(self, recordType, s5record, startAddress = None):
         builder = Builder()
-        builder.addSegment(range(10), 0x1000)
+        builder.addSection(range(10), 0x1000)
         builder.joinSections()
         return dumps("srec", builder.image, recordType = recordType, s5record = s5record, startAddress = startAddress)
 
