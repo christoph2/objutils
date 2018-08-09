@@ -11,7 +11,7 @@ python:
 
 os:
   - linux
-  - osx
+  #- osx
 
 notifications:
   email: false
