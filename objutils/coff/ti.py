@@ -33,7 +33,7 @@ import time
 
 import construct
 from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import OnDemandPointer, Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes, Switch
+from construct import Pointer, Byte, GreedyRange, Bytes, Int16ul, Int32ul, Construct, this, GreedyBytes, Switch
 
 from objutils.utils import createMemoryMappedFileView
 
