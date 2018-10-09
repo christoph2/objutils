@@ -3,9 +3,15 @@
 import os
 from setuptools import setup, find_packages
 from glob import glob
+import sys
 
 def packagez(base):
     return  ["{0!s}{1!s}{2!s}".format(base, os.path.sep, p) for p in find_packages(base)]
+
+install_reqs = ['future', 'mako', 'six', 'construct == 2.8.17']
+
+if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
+    install_reqs.extend(['enum34', 'mock'])
 
 setup(
     name = 'objutils',
@@ -16,7 +22,7 @@ setup(
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
     packages = packagez('objutils'),
-    install_requires = ['enum34', 'future', 'mako', 'six', 'construct >= 2.8'],
+    install_requires = install_reqs,
     entry_points = {
         'console_scripts': [
                 'readelf.py = objutils.tools.readelf:main',
