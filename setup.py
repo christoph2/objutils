@@ -8,7 +8,7 @@ import sys
 def packagez(base):
     return  ["{0!s}{1!s}{2!s}".format(base, os.path.sep, p) for p in find_packages(base)]
 
-install_reqs = ['future', 'mako', 'six', 'construct == 2.8.17']
+install_reqs = ['future', 'mako', 'six', 'construct']
 
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(['enum34', 'mock'])
@@ -29,12 +29,13 @@ setup(
                 'ticoff-dump = objutils.tools.ticoffdump:main'
         ],
     },
+    tests_require=["pytest", "pytest-runner"],
+    test_suite="objutils.tests",
     #data_files = [
     #    ('objutils/tests/ELFFiles', glob('objutils/tests/ELFFiles*.*')),
     #],
     package_dir = {'tests': 'objutils/tests'},
     package_data = {'tests': ['ELFFiles/*.*']},
     #include_package_data = True,
-    test_suite = "objutils.tests"
 )
 
