@@ -34,6 +34,10 @@ reg = Registry()
 ##
 ##  Register codecs.
 ##
+
+import objutils.binfile
+reg.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
+
 import objutils.sig
 reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
 
