@@ -28,17 +28,10 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import defaultdict, namedtuple
-import logging
-from functools import partial
-import math
-import os
-import re
-import sys
+from array import array
 
-from objutils.section import Section, joinSections
+from objutils.section import Section
 from objutils.image import Image
-from operator import itemgetter
 from objutils.pickleif import PickleIF
 from objutils.utils import slicer, createStringBuffer, PYTHON_VERSION
 from objutils.logger import Logger
@@ -68,5 +61,31 @@ class Reader(object):
 
 
 class Writer(object):
-    pass
+    def dump(self, fp, image, filler = b'\xff', **kws):
+        fp.write(self.dumps(image, filler))
+        if hasattr(fp, "close"):
+            fp.close()
 
+    def dumps(self, image, filler = b'\xff', **kws):
+        if not isinstance(filler, (bytes, int)):
+            raise TypeError("filler must be of type 'bytes' or 'int'")
+        if isinstance(filler, bytes) and len(filler) > 1:
+            raise TypeError("filler must be a single byte")
+        elif isinstance(filler, int) and filler > 255:
+            raise ValueError("filler must be in range 0..255")
+        result = array('B')
+        previousAddress = None
+        previousLength = None
+        if hasattr(image, "sections") and  not image.sections:
+            return b''
+        sections = sorted(image.sections, key = lambda x: x.startAddress)
+        for section in sections:
+            print(section.startAddress, section.length)
+            if not previousAddress is None:
+                gap = section.startAddress - (previousAddress + previousLength)
+                if gap > 0:
+                    result.extend(filler * gap)
+            result.extend(section.data)
+            previousAddress = section.startAddress
+            previousLength = section.length
+        return result.tobytes()
