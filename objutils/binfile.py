@@ -28,11 +28,12 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from array import array
+from contextlib import closing
+import io
+import zipfile
 
 from objutils.section import Section
 from objutils.image import Image
-from objutils.pickleif import PickleIF
 from objutils.utils import slicer, createStringBuffer, PYTHON_VERSION
 from objutils.logger import Logger
 
@@ -73,14 +74,13 @@ class Writer(object):
             raise TypeError("filler must be a single byte")
         elif isinstance(filler, int) and filler > 255:
             raise ValueError("filler must be in range 0..255")
-        result = array('B')
+        result = bytearray()
         previousAddress = None
         previousLength = None
         if hasattr(image, "sections") and  not image.sections:
             return b''
         sections = sorted(image.sections, key = lambda x: x.startAddress)
         for section in sections:
-            print(section.startAddress, section.length)
             if not previousAddress is None:
                 gap = section.startAddress - (previousAddress + previousLength)
                 if gap > 0:
@@ -88,4 +88,44 @@ class Writer(object):
             result.extend(section.data)
             previousAddress = section.startAddress
             previousLength = section.length
-        return result.tobytes()
+        return result
+
+#
+
+class BinZipReader(object):
+    pass
+
+
+class BinZipWriter(object):
+
+    SECTION_FILE_NAME = "image{0:d}.bin"
+    MANIFEST_FILE_NAME = "IMAGES.mf"
+
+    def dump(self, fp, image, **kws):
+        fp.write(self.dumps(image))
+        if hasattr(fp, "close"):
+            fp.close()
+
+    def dumps(self, image, **kws):
+
+        if hasattr(image, "sections") and  not image.sections:
+            return b''
+        sections = sorted(image.sections, key = lambda x: x.startAddress)
+        manifestBuffer = io.StringIO()
+        outBuffer = io.BytesIO()
+        #outBuffer = io.StringIO()
+        print("BUF", outBuffer)
+        with closing(zipfile.ZipFile(outBuffer, mode = "w")) as outFile:
+            print(outFile)
+            for idx, section in enumerate(sections):
+                print(section.startAddress, section.length)
+                #print("FN", BinZipWriter.SECTION_FILE_NAME.format(idx))
+                manifestBuffer.write(BinZipWriter.SECTION_FILE_NAME.format(idx))
+                manifestBuffer.write("\t")
+                manifestBuffer.write(str(section.startAddress))
+                manifestBuffer.write("\t")
+                manifestBuffer.write(str(section.length))
+                manifestBuffer.write("\n")
+        manifestBuffer.seek(0)
+        print(manifestBuffer.read())
+        return ''
