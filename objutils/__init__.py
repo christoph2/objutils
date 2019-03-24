@@ -37,6 +37,7 @@ reg = Registry()
 
 import objutils.binfile
 reg.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
+reg.register('binzip', objutils.binfile.BinZipReader, objutils.binfile.BinZipWriter, "Zipped binary format.")
 
 import objutils.sig
 reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
