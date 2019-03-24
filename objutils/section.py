@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2018 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -39,8 +39,10 @@ from objutils.utils import PYTHON_VERSION
 
 ##
 ## todo: find/search methode(n) mit slice funktion!
-## Basic patch-interface: (addr, datatype (endianess)) - readAs()/writeAs()
-##
+## Basic patch-interface: (addr (plus ext!), datatype (endianess)) - readAs()/writeAs()
+## API to change startAddress (but not length!) /w check for overlapps.
+## split (for some reason) contingous regions into separate segments (splitAt [addresses], splitInto [n pieces]) inplace or new object.
+## cut/copy/paste/delete
 
 FORMATS = {
     "uint8": "B",
@@ -67,7 +69,10 @@ class Section(object):
         if data is None:
             self.data = bytearray()
         else:
-            self.data = bytearray(data) # bytearray seems to be the most appropriate canonical representation.
+            if PYTHON_VERSION.major == 3 and isinstance(data, str):
+                self.data = bytearray(data, encoding = "ascii")
+            else:
+                self.data = bytearray(data)
         self._length = len(self.data)
         if isinstance(data, array) and data.typecode != 'B':
             if PYTHON_VERSION.major == 3:
@@ -82,22 +87,22 @@ class Section(object):
         yield self
 
     def __eq__(self, other):
-        return self.startAddress == self.startAddress
+        return self.startAddress == other.startAddress
 
     def __ne__(self, other):
-        return self.startAddress == self.startAddress
+        return self.startAddress == other.startAddress
 
     def __lt__(self, other):
-        return self.startAddress < self.startAddress
+        return self.startAddress < other.startAddress
 
-    def __le__(a, b):
-        return self.startAddress <= self.startAddress
+    def __le__(self, other):
+        return self.startAddress <= other.startAddress
 
-    def __ge__(a, b):
-        return self.startAddress >= self.startAddress
+    def __ge__(self, other):
+        return self.startAddress >= other.startAddress
 
-    def __gt__(a, b):
-        return self.startAddress > self.startAddress
+    def __gt__(self, other):
+        return self.startAddress > other.startAddress
 
     def __repr__(self):
         return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
