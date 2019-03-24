@@ -23,19 +23,19 @@ setup(
     url = 'http://github.com/christoph2/objutils',
     packages = packagez('objutils'),
     install_requires = install_reqs,
-    entry_points = {
-        'console_scripts': [
-                'readelf.py = objutils.tools.readelf:main',
-                'ticoff-dump = objutils.tools.ticoffdump:main'
-        ],
-    },
+    #entry_points = {
+    #    'console_scripts': [
+    #            'readelf.py = objutils.tools.readelf:main',
+    #            'ticoff-dump = objutils.tools.ticoffdump:main'
+    #    ],
+    #},
     tests_require=["pytest", "pytest-runner"],
     test_suite="objutils.tests",
     #data_files = [
     #    ('objutils/tests/ELFFiles', glob('objutils/tests/ELFFiles*.*')),
     #],
     package_dir = {'tests': 'objutils/tests'},
-    package_data = {'tests': ['ELFFiles/*.*']},
+    #package_data = {'tests': ['ELFFiles/*.*']},
     #include_package_data = True,
 )
 
