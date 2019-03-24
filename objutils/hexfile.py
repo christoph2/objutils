@@ -6,7 +6,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2018 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -334,7 +334,7 @@ class Writer(BaseType):
         self.rowLength = rowLength
 
         if hasattr(image, "sections") and  not image.sections:
-            return ''
+            return b''
 
         if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
