@@ -5,6 +5,7 @@ from objutils import loads, dumps, probes
 from objutils.image import Builder
 import unittest
 
+import pytest
 
 
 SIG = b""":B00010A5576F77212044696420796F75207265617B
@@ -47,12 +48,15 @@ class TestRoundtrip(unittest.TestCase):
 
 class Test19Probe(unittest.TestCase):
 
+    @pytest.mark.skip
     def testS19ProbeS1(self):
         self.assertEqual(probes(SREC1), "srec")
 
+    @pytest.mark.skip
     def testS19ProbeS2(self):
         self.assertEqual(probes(SREC2), "srec")
 
+    @pytest.mark.skip
     def testS19ProbeS3(self):
         self.assertEqual(probes(SREC3), "srec")
 
