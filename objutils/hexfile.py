@@ -77,7 +77,7 @@ MAP_GROUP_TO_REGEX = {
     ADDR_CHECKSUM   : "(?P<addrChecksum>[0-9a-zA-Z]{%d})",
 }
 
-MAP_CHAR_TO_GROUP={
+MAP_CHAR_TO_GROUP = {
     'L': LENGTH,
     'T': TYPE,
     'A': ADDRESS,
@@ -87,11 +87,9 @@ MAP_CHAR_TO_GROUP={
     'B': ADDR_CHECKSUM,
 }
 
-TYPE_FROM_RECORD=0
+TYPE_FROM_RECORD = 0
 
 atoi = partial(int, base = 16)
-
-BYTES = re.compile('([0-9a-zA-Z]{2})')
 
 class InvalidRecordTypeError(Exception): pass
 class InvalidRecordLengthError(Exception): pass
@@ -232,7 +230,7 @@ class Reader(BaseType):
                                 setattr(container, key, value)
                         if 'chunk' in dict_:
                             if self.parseData(container, formatType):
-                                chunk = bytearray(map(atoi, BYTES.findall(dict_['chunk'])))
+                                chunk = bytearray.fromhex(dict_['chunk'])
                             else:
                                 # don't convert/parse stuff like symbols.
                                 chunk = dict_['chunk']
@@ -242,7 +240,6 @@ class Reader(BaseType):
                         # this is to handle esoteric stuff like Intel seg:offs addressing and symbols.
                         self.specialProcessing(container, formatType)
                         if self.isDataLine(container, formatType):
-                            # print chunk
                             sections.append(Section(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
