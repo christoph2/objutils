@@ -33,6 +33,9 @@ from array import array
 from operator import attrgetter
 import re
 import reprlib
+
+import attr
+
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
 
@@ -62,68 +65,49 @@ BYTEORDER = {
     "be": ">",
 }
 
-class Section(object):
 
-    def __init__(self, address = 0, data = None):
-        self.startAddress = address
-        if data is None:
-            self.data = bytearray()
+def data_converter(data):
+    if isinstance(data, bytearray):
+        pass    # no conversion needed.
+    elif isinstance(data, int):
+        raise ValueError("single int not permitted")
+    elif isinstance(data, str):
+        if PYTHON_VERSION.major == 3 :
+            data = bytearray(data, encoding = "ascii")
         else:
-            if PYTHON_VERSION.major == 3 and isinstance(data, str):
-                self.data = bytearray(data, encoding = "ascii")
-            else:
-                self.data = bytearray(data)
-        self._length = len(self.data)
-        if isinstance(data, array) and data.typecode != 'B':
-            if PYTHON_VERSION.major == 3:
-                data = array('B', data.tobytes())
-            else:
-                data = array('B', data.tostring())
+            data = bytearray(data)
+    elif isinstance(data, array) and data.typecode != 'B':
+        if PYTHON_VERSION.major == 3:
+            data = bytearray(data.tobytes())
+        else:
+            data = bytearray(data.tostring())
+    elif isinstance(data, Section):
+        data = data.data    # just copy data from other section.
+    else:
+        try:
+            data = bytearray(data)
+        except Exception:
+            raise ValueError("cannot convert '{}' to bytearray()".format(data))
+    return data
+
+
+@attr.s(repr = False, cmp = True)
+class Section(object):
+    startAddress = attr.ib(type = int, cmp = True, default = 0)
+    data = attr.ib(default = bytearray(), converter = data_converter, cmp = True)
+    length = attr.ib(init = False, cmp = True)
+
+    @length.default
+    def __init_length__(self):
+        return len(self.data)
+
+    def __attrs_post_init__(self):
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
         self.repr.maxother = 64
 
     def __iter__(self):
         yield self
-
-    def __eq__(self, other):
-        return self.startAddress == other.startAddress
-
-    def __ne__(self, other):
-        return self.startAddress == other.startAddress
-
-    def __lt__(self, other):
-        return self.startAddress < other.startAddress
-
-    def __le__(self, other):
-        return self.startAddress <= other.startAddress
-
-    def __ge__(self, other):
-        return self.startAddress >= other.startAddress
-
-    def __gt__(self, other):
-        return self.startAddress > other.startAddress
-
-    def __repr__(self):
-        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
-            self.startAddress,
-            self.length,
-            self.repr.repr(memoryview(self.data).tobytes())
-        )
-
-    def __len__(self):
-        return self.length
-
-    def __contains__(self, addr):
-        return self.startAddress <= addr < (self.startAddress + self.length)
-
-    @property
-    def length(self):
-        return self._length
-
-    @length.setter
-    def length(self, value):
-        self._length = value
 
     def hexdump(self, fp = sys.stdout):
         dumper = hexdump.CanonicalDumper(fp)
@@ -181,6 +165,19 @@ class Section(object):
     def find(self, expr, addr = -1):
         for item in re.finditer(bytes(expr), self.data):
             yield (self.startAddress + item.start(), item.end()- item.start())
+
+    def __repr__(self):
+        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
+            self.startAddress,
+            self.length,
+            self.repr.repr(memoryview(self.data).tobytes())
+        )
+
+    def __len__(self):
+        return self.length
+
+    def __contains__(self, addr):
+        return self.startAddress <= addr < (self.startAddress + self.length)
 
 
 def joinSections(sections, orderSections = True):
