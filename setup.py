@@ -8,7 +8,7 @@ import sys
 def packagez(base):
     return  ["{0!s}{1!s}{2!s}".format(base, os.path.sep, p) for p in find_packages(base)]
 
-install_reqs = ['future', 'mako', 'six', 'construct']
+install_reqs = ['future', 'mako', 'six', 'construct', 'attrs']
 
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(['enum34', 'mock'])
