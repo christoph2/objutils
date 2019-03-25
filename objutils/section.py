@@ -30,6 +30,7 @@ import struct
 import sys
 
 from array import array
+from copy import copy
 from operator import attrgetter
 import re
 import reprlib
@@ -66,7 +67,25 @@ BYTEORDER = {
 }
 
 
-def data_converter(data):
+def filler(ch, n):
+    """
+    :param ch: fill char
+    :type ch: int between 0 and 255
+    :param int n: repetition count
+    :return: bytearray
+    """
+    if not isinstance(ch, int):
+        raise TypeError("ch must be of type int")
+    if not (0 <= ch < 256):
+        raise ValueError("ch must be between 0 and 255")
+    if not isinstance(n, int):
+        raise TypeError("n must be of type int")
+    if n < 1:
+        raise ValueError("n must be >= 1")
+    return bytearray([ch] * n)
+
+
+def _data_converter(data):
     if isinstance(data, bytearray):
         pass    # no conversion needed.
     elif isinstance(data, int):
@@ -82,7 +101,7 @@ def data_converter(data):
         else:
             data = bytearray(data.tostring())
     elif isinstance(data, Section):
-        data = data.data    # just copy data from other section.
+        data = copy(data.data)    # just copy data from other section.
     else:
         try:
             data = bytearray(data)
@@ -93,8 +112,11 @@ def data_converter(data):
 
 @attr.s(repr = False, cmp = True)
 class Section(object):
+    """
+
+    """
     startAddress = attr.ib(type = int, cmp = True, default = 0)
-    data = attr.ib(default = bytearray(), converter = data_converter, cmp = True)
+    data = attr.ib(default = bytearray(), converter = _data_converter, cmp = True)
     length = attr.ib(init = False, cmp = True)
 
     @length.default
