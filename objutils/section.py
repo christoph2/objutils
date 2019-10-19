@@ -26,14 +26,14 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import struct
-import sys
-
 from array import array
+from collections import namedtuple
 from copy import copy
 from operator import attrgetter
 import re
 import reprlib
+import struct
+import sys
 
 import attr
 
@@ -65,6 +65,43 @@ BYTEORDER = {
     "le": "<",
     "be": ">",
 }
+
+DTYPE = re.compile(r"""
+      (?:(?P<uns>u)?int(?P<len>8 | 16 | 32 | 64)(?P<sep>[-/_:])(?P<end> be | le))
+    | (?P<byte>byte)
+    | (?P<flt>float)(?P<flen>32 | 64)""", re.IGNORECASE | re.VERBOSE)
+
+NumberRange = namedtuple("NumberRange", "lower upper")
+
+signed_range = lambda x: NumberRange( *(int(-(2 ** x / 2)), int((2 ** x / 2) - 1)))
+unsigned_range = lambda x: NumberRange( *(0, int((2 ** x) - 1)))
+
+INT8_RANGE  = signed_range(8)
+INT16_RANGE = signed_range(16)
+INT32_RANGE = signed_range(32)
+INT64_RANGE = signed_range(64)
+UINT8_RANGE  = unsigned_range(8)
+UINT16_RANGE = unsigned_range(16)
+UINT32_RANGE = unsigned_range(32)
+UINT64_RANGE = unsigned_range(64)
+
+RANGES = {
+    "byte": UINT8_RANGE,
+    "uint8": UINT8_RANGE,
+    "int8": INT8_RANGE,
+    "uint16": UINT16_RANGE,
+    "int16": INT16_RANGE,
+    "uint32": UINT32_RANGE,
+    "int32": INT32_RANGE,
+    "uint64": UINT64_RANGE,
+    "int64": INT64_RANGE,
+}
+
+
+class OutOfBoundsError(Exception):
+    """
+    """
+    pass
 
 
 def filler(ch, n):
@@ -145,8 +182,10 @@ class Section(object):
         return  array('B', self.data).tolist()
 
     def _getformat(self, dtype):
-        dtype = dtype.lower()
+        dtype = dtype.lower().strip()
+        match = DTYPE.match(dtype)
         fmt, bo = dtype.split("_")
+
         return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
     def read(self, addr, length):
