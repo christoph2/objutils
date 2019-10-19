@@ -105,6 +105,9 @@ class Image(object):
     def writeString(self, addr, value, encoding = "latin1"):
         self._callAddressFunction("writeString", addr, value, encoding)
 
+    def split(self, at = None, equalParts = None, remap = None):
+        print("SPLIT-IMAGE", at, equalParts, remap)
+
 
 class Builder(object):
     """Construct and `Image` object.
@@ -126,7 +129,7 @@ class Builder(object):
         self.address = 0
         self.autoJoin = autoJoin
 
-    def addSection(self, data, address = None, dontJoin = False):   # TODO: 'polymorph' signature, move 'dontJoin' to segment!
+    def addSection(self, data, address = None, dontJoin = False):   # TODO: 'polymorphic' signature, move 'dontJoin' to segment!
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)

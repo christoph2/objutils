@@ -41,6 +41,9 @@ from objutils.logger import Logger
 ## TODO: binzipped format: a separate file for each section + MANIFEST (csv: fname, address, length)
 ##
 
+class NoContiniousError(Exception): pass
+
+
 class Reader(object):
 
     def load(self, fp, address = 0x0000):
