@@ -49,7 +49,7 @@ class Registry(SingletonBase):
         return sorted(self.codecs.keys())
 
     def get(self, name):
-        codec = self.codecs.get(name)
+        codec = self.codecs.get(name.lower())
         if not codec:
             raise CodecDoesNotExistError(name)
         return codec
@@ -64,4 +64,4 @@ class Registry(SingletonBase):
     codecs = property(_getCodecs)
     formats = property(_getFormats)
 
-
+registry = Registry()

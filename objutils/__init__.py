@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,72 +27,70 @@ __copyright__ = """
 
 from collections import namedtuple
 
-from objutils.registry import Registry
-
-reg = Registry()
+from objutils.registry import registry
 
 ##
-##  Register codecs.
+##  registryister codecs.
 ##
 
 import objutils.binfile
-reg.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
-reg.register('binzip', objutils.binfile.BinZipReader, objutils.binfile.BinZipWriter, "Zipped binary format.")
+registry.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
+registry.register('binzip', objutils.binfile.BinZipReader, objutils.binfile.BinZipWriter, "Zipped binary format.")
 
 import objutils.sig
-reg.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
+registry.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
 
 import objutils.srec
-reg.register('srec', objutils.srec.Reader, objutils.srec.Writer, "Motorola S-Records (a.k.a. S19).")
+registry.register('srec', objutils.srec.Reader, objutils.srec.Writer, "Motorola S-Records (a.k.a. S19).")
 
 import objutils.titxt
-reg.register('titxt', objutils.titxt.Reader, objutils.titxt.Writer, "Texas Instruments MSP430 text format.")
+registry.register('titxt', objutils.titxt.Reader, objutils.titxt.Writer, "Texas Instruments MSP430 text format.")
 
 import objutils.emon52
-reg.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
+registry.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
 
 #import objutils.elf
 # TODO!!!
 
 import objutils.etek
-reg.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
+registry.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
 
 import objutils.fpc
-reg.register('fpc', objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
+registry.register('fpc', objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
 
 #import objutils.ieee695
 # TODO!!!
 
 import objutils.ihex
-reg.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
+registry.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
 
 import objutils.mostec
-reg.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
+registry.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
 
 import objutils.rca
-reg.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
+registry.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
 
 import objutils.tek
-reg.register('tek', objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
+registry.register('tek', objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
 
 import objutils.cosmac
-reg.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
+registry.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 
 import objutils.ash
-reg.register('ash', objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
+registry.register('ash', objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
 
 ##
 ##  Interface to objutils.
 ##
 def load(codecName, *args, **kws):
-    return reg.get(codecName).Reader().load(*args, **kws)
+    return registry.get(codecName).Reader().load(*args, **kws)
 
 def loads(codecName, *args, **kws):
-    return reg.get(codecName).Reader().loads(*args, **kws)
+    return registry.get(codecName).Reader().loads(*args, **kws)
 
 def probe(*args, **kws):
     found = False
-    for name, codec in reg._codecs.items():
+    for name, codec in registry._codecs.items():
         reader = codec.Reader()
         found = reader.probe(*args, **kws)
         if found:
@@ -101,7 +99,7 @@ def probe(*args, **kws):
 
 def probes(*args, **kws):
     found = False
-    for name, codec in reg:
+    for name, codec in registry:
         reader = codec.Reader()
         found = reader.probes(*args, **kws)
         if found:
@@ -109,8 +107,8 @@ def probes(*args, **kws):
     return reader.codecName if found else None
 
 def dump(codecName, *args, **kws):
-    reg.get(codecName).Writer().dump(*args, **kws)
+    registry.get(codecName).Writer().dump(*args, **kws)
 
 def dumps(codecName, *args, **kws):
-    return reg.get(codecName).Writer().dumps(*args, **kws)
+    return registry.get(codecName).Writer().dumps(*args, **kws)
 
