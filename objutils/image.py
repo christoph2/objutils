@@ -30,7 +30,7 @@ __copyright__ = """
 from operator import attrgetter, eq
 import sys
 
-from objutils.section import Section, joinSections
+from objutils.section import Section, join_sections
 
 class AddressError(Exception): pass
 
@@ -144,7 +144,7 @@ class Builder(object):
         pass
 
     def join_sections(self, order_segments = None):
-        self._sections = joinSections(self._sections, order_segments)
+        self._sections = join_sections(self._sections, order_segments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)

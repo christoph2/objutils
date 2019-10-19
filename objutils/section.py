@@ -197,25 +197,25 @@ class Section(object):
         offset = addr - self.startAddress
         self.data[offset : offset + length] = data
 
-    def readNumeric(self, addr, dtype):
+    def read_numeric(self, addr, dtype):
         offset = addr - self.startAddress
         fmt = self._getformat(dtype)
         data = self.data[offset : offset + struct.calcsize(fmt)]
         return struct.unpack(fmt, data)[0]
 
-    def writeNumeric(self, addr, value, dtype):
+    def write_numeric(self, addr, value, dtype):
         offset = addr - self.startAddress
         fmt = self._getformat(dtype)
         self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
 
-    def readString(self, addr, encoding = "latin1", length = -1):
+    def read_string(self, addr, encoding = "latin1", length = -1):
         offset = addr - self.startAddress
         pos = self.data[offset : ].find(b'\x00')
         if pos == -1:
             raise RuntimeError("Unterminated String!!!")
         return self.data[offset : offset + pos].decode(encoding = encoding)
 
-    def writeString(self, addr, value, encoding = "latin1"):
+    def write_string(self, addr, value, encoding = "latin1"):
         offset = addr - self.startAddress
         if PYTHON_VERSION.major == 3:
             self.data[offset : offset +  len(value)] = bytes(value, encoding = encoding)
@@ -241,9 +241,9 @@ class Section(object):
         return self.startAddress <= addr < (self.startAddress + self.length)
 
 
-def joinSections(sections, orderSections = True):
+def join_sections(sections, order_sections = True):
     resultSections = []
-    if orderSections:
+    if order_sections:
         sections.sort(key = attrgetter("startAddress"))
     prevSection = Section()
     while sections:
@@ -260,4 +260,3 @@ def joinSections(sections, orderSections = True):
         return resultSections
     else:
         return []
-

@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -33,7 +33,7 @@ from functools import partial
 import re
 import sys
 import objutils.hexfile as hexfile
-from objutils.section import Section, joinSections
+from objutils.section import Section, join_sections
 from objutils.image import Image
 from objutils.checksums import lrc, COMPLEMENT_NONE
 from objutils.utils import PYTHON_VERSION

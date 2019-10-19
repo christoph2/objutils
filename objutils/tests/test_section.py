@@ -68,7 +68,7 @@ def test_copy_really_works():
     assert section2.length == 16
     assert section2.data == b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f'
     assert section2.data == section1.data
-    section2.writeNumeric(0, 0xff, "uint8_le")
+    section2.write_numeric(0, 0xff, "uint8_le")
     assert section2.data == b'\xff\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f'
     assert section1.data != section2.data
 
@@ -127,115 +127,115 @@ def filler_0_16():
     return Section(data = filler(0x00, 16))
 
 def test_write_uint8_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0xff, "uint8_le")
+    filler_0_16.write_numeric(0, 0xff, "uint8_le")
     assert filler_0_16.data == bytearray([0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint8_le2(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, UINT8_RANGE.lower - 1, "uint8_le")
+        filler_0_16.write_numeric(0, UINT8_RANGE.lower - 1, "uint8_le")
 
 def test_write_uint8_le3(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, UINT8_RANGE.upper + 1, "uint8_le")
+        filler_0_16.write_numeric(0, UINT8_RANGE.upper + 1, "uint8_le")
 
 def test_write_uint8_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0xff, "uint8_be")
+    filler_0_16.write_numeric(0, 0xff, "uint8_be")
     assert filler_0_16.data == bytearray([0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint8_be2(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, UINT8_RANGE.lower - 1, "uint8_be")
+        filler_0_16.write_numeric(0, UINT8_RANGE.lower - 1, "uint8_be")
 
 def test_write_uint8_be3(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, UINT8_RANGE.upper + 1, "uint8_be")
+        filler_0_16.write_numeric(0, UINT8_RANGE.upper + 1, "uint8_be")
 
 def test_write_int8_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, -100, "int8_le")
+    filler_0_16.write_numeric(0, -100, "int8_le")
     assert filler_0_16.data == bytearray([0x9c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int8_le2(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, INT8_RANGE.lower - 1, "int8_le")
+        filler_0_16.write_numeric(0, INT8_RANGE.lower - 1, "int8_le")
 
 def test_write_int8_le3(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, INT8_RANGE.upper + 1, "int8_le")
+        filler_0_16.write_numeric(0, INT8_RANGE.upper + 1, "int8_le")
 
 def test_write_int8_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, -100, "int8_be")
+    filler_0_16.write_numeric(0, -100, "int8_be")
     assert filler_0_16.data == bytearray([0x9c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int8_be2(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, INT8_RANGE.lower - 1, "int8_be")
+        filler_0_16.write_numeric(0, INT8_RANGE.lower - 1, "int8_be")
 
 def test_write_int8_be3(filler_0_16):
     with pytest.raises(struct.error):
-        filler_0_16.writeNumeric(0, INT8_RANGE.upper + 1, "int8_be")
+        filler_0_16.write_numeric(0, INT8_RANGE.upper + 1, "int8_be")
 
 def test_write_uint16_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x1122, "uint16_le")
+    filler_0_16.write_numeric(0, 0x1122, "uint16_le")
     assert filler_0_16.data == bytearray([0x22, 0x11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint16_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x1122, "uint16_be")
+    filler_0_16.write_numeric(0, 0x1122, "uint16_be")
     assert filler_0_16.data == bytearray([0x11, 0x22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int16_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, -20000, "int16_le")
+    filler_0_16.write_numeric(0, -20000, "int16_le")
     assert filler_0_16.data == bytearray([0xe0, 0xb1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int16_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, -20000, "int16_be")
+    filler_0_16.write_numeric(0, -20000, "int16_be")
     assert filler_0_16.data == bytearray([0xb1, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint32_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x11223344, "uint32_le")
+    filler_0_16.write_numeric(0, 0x11223344, "uint32_le")
     assert filler_0_16.data == bytearray([0x44, 0x33, 0x22, 0x11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint32_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x11223344, "uint32_be")
+    filler_0_16.write_numeric(0, 0x11223344, "uint32_be")
     assert filler_0_16.data == bytearray([0x11, 0x22, 0x33, 0x44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int32_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, -3000000, "int32_le")
+    filler_0_16.write_numeric(0, -3000000, "int32_le")
     assert filler_0_16.data == bytearray([0x40, 0x39, 0xd2, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int32_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, -3000000, "int32_be")
+    filler_0_16.write_numeric(0, -3000000, "int32_be")
     assert filler_0_16.data == bytearray([0xff, 0xd2, 0x39, 0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint64_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x1122334455667788, "uint64_le")
+    filler_0_16.write_numeric(0, 0x1122334455667788, "uint64_le")
     assert filler_0_16.data == bytearray([0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_uint64_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, 0x1122334455667788, "uint64_be")
+    filler_0_16.write_numeric(0, 0x1122334455667788, "uint64_be")
     assert filler_0_16.data == bytearray([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int64_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, -400000000, "int64_le")
+    filler_0_16.write_numeric(0, -400000000, "int64_le")
     assert filler_0_16.data == bytearray([0x0, 0x7c, 0x28, 0xe8, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_int64_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, -400000000, "int64_be")
+    filler_0_16.write_numeric(0, -400000000, "int64_be")
     assert filler_0_16.data == bytearray([0xff, 0xff, 0xff, 0xff, 0xe8, 0x28, 0x7c, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_float32_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, math.pi, "float32_le")
+    filler_0_16.write_numeric(0, math.pi, "float32_le")
     assert filler_0_16.data == bytearray([0xdb, 0x0f, 0x49, 0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_float32_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, math.pi, "float32_be")
+    filler_0_16.write_numeric(0, math.pi, "float32_be")
     assert filler_0_16.data == bytearray([0x40, 0x49, 0x0f, 0xdb, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_float64_le1(filler_0_16):
-    filler_0_16.writeNumeric(0, math.pi, "float64_le")
+    filler_0_16.write_numeric(0, math.pi, "float64_le")
     assert filler_0_16.data == bytearray([0x18, 0x2d, 0x44, 0x54, 0xfb, 0x21, 0x09, 0x40, 0, 0, 0, 0, 0, 0, 0, 0])
 
 def test_write_float64_be1(filler_0_16):
-    filler_0_16.writeNumeric(0, math.pi, "float64_be")
+    filler_0_16.write_numeric(0, math.pi, "float64_be")
     assert filler_0_16.data == bytearray([0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18, 0, 0, 0, 0, 0, 0, 0, 0])
 
 

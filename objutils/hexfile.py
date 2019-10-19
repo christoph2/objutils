@@ -33,7 +33,7 @@ import os
 import re
 import sys
 
-from objutils.section import Section, joinSections
+from objutils.section import Section, join_sections
 from objutils.image import Image, Builder
 from operator import itemgetter
 from objutils.pickleif import PickleIF
@@ -249,7 +249,7 @@ class Reader(BaseType):
             if not matched:
                 self.warn("Ignoring garbage line #{0:d}".format(lineNumber))
         if sections:
-            return Image(joinSections(sections), metaData, self.valid)
+            return Image(join_sections(sections), metaData, self.valid)
         else:
             self.error("File seems to be invalid.")
             return Image([], valid = False)
@@ -454,7 +454,7 @@ class ASCIIHexReader(Reader):
                     break
             if breakRequest:
                 break
-        return Image(joinSections(self.sections))
+        return Image(join_sections(self.sections))
 
 
 class ASCIIHexWriter(Writer):
