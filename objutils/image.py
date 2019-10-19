@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     pyObjUtils - Object file library for Python.
 
-   (C) 2010-2018 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -46,7 +46,7 @@ class Image(object):
         if meta is None:
             meta = {}
         self.sections = sections if sections else []
-        _validateSections(self.sections)
+        _validate_sections(self.sections)
         self.meta = meta
         self.valid = valid
 
@@ -80,71 +80,71 @@ class Image(object):
             print("-" * 13, file = fp)
             section.hexdump(fp)
 
-    def _callAddressFunction(self, funcName, addr, *args):
+    def _call_address_function(self, func_name, addr, *args):
         for section in self.sections:
             if addr in section:
-                func = getattr(section, funcName)
+                func = getattr(section, func_name)
                 return func(addr, *args)
         raise AddressError("Address 0x{:08x} not found.".format(addr))
 
     def read(self, addr, length):
-        return self._callAddressFunction("read", addr, length)
+        return self._call_address_function("read", addr, length)
 
     def write(self, addr, length, data):
-        self._callAddressFunction("write", addr, length, data)
+        self._call_address_function("write", addr, length, data)
 
-    def readNumeric(self, addr, dtype):
-        return self._callAddressFunction("readNumeric", addr, dtype)
+    def read_numeric(self, addr, dtype):
+        return self._call_address_function("readNumeric", addr, dtype)
 
-    def writeNumeric(self, addr, value, dtype):
-        self._callAddressFunction("writeNumeric", addr, value, dtype)
+    def write_numeric(self, addr, value, dtype):
+        self._call_address_function("writeNumeric", addr, value, dtype)
 
-    def readString(self, addr, encoding = "latin1", length = -1):
-        return self._callAddressFunction("readString", addr, encoding, length)
+    def read_string(self, addr, encoding = "latin1", length = -1):
+        return self._call_address_function("readString", addr, encoding, length)
 
-    def writeString(self, addr, value, encoding = "latin1"):
-        self._callAddressFunction("writeString", addr, value, encoding)
+    def write_string(self, addr, value, encoding = "latin1"):
+        self._call_address_function("writeString", addr, value, encoding)
 
-    def split(self, at = None, equalParts = None, remap = None):
-        print("SPLIT-IMAGE", at, equalParts, remap)
+    def split(self, at = None, equal_parts = None, remap = None):
+        print("SPLIT-IMAGE", at, equal_parts, remap)
 
 
 class Builder(object):
     """Construct and `Image` object.
     """
 
-    def __init__(self, sections = None, autoJoin = False, autoSort = False):
-        if autoSort:
-            self._needSorting = True
+    def __init__(self, sections = None, auto_join = False, auto_sort = False):
+        if auto_sort:
+            self._need_sorting = True
             if sections:
                 self._sections = sorted(sections, key = attrgetter("startAddress"))
             else:
                 self._sections = []
         else:
-            self._needSorting = False
+            self._need_sorting = False
             self._sections = sections if sections else []
-        if self._sections and autoJoin:
-            self.joinSections()
-        _validateSections(self._sections)
+        if self._sections and auto_join:
+            self.join_sections()
+        _validate_sections(self._sections)
         self.address = 0
-        self.autoJoin = autoJoin
+        self.auto_join = auto_join
 
-    def addSection(self, data, address = None, dontJoin = False):   # TODO: 'polymorphic' signature, move 'dontJoin' to segment!
+    def add_section(self, data, address = None, dont_join = False):   # TODO: 'polymorphic' signature, move 'dontJoin' to segment!
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         self._sections.append(Section(address, data))
-        if self._needSorting:
+        if self._need_sorting:
             self._sections.sort(key = attrgetter("startAddress"))
-        if self.autoJoin:
-            self.joinSections()
+        if self.auto_join:
+            self.join_sections()
         self.address = address + len(data)
 
-    def addMetaData(self, metaData):
+    def add_metadata(self, meta_data):
         pass
 
-    def joinSections(self, orderSegments = None):
-        self._sections = joinSections(self._sections, orderSegments)
+    def join_sections(self, order_segments = None):
+        self._sections = joinSections(self._sections, order_segments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)
@@ -154,7 +154,7 @@ class Builder(object):
         return Image(self._sections)
 
 
-def _validateSections(sections):
+def _validate_sections(sections):
     """Test for required protocol
     """
     ATTRIBUTES = ('startAddress', 'length', 'data')

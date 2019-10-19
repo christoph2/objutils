@@ -26,8 +26,8 @@ class TestBasicFunctionality(unittest.TestCase):
         else:
             buf = createStringBuffer()
         b0 = Builder()
-        b0.addSection("hello world!")
-        b0.joinSections()
+        b0.add_section("hello world!")
+        b0.join_sections()
         b0.hexdump(buf)
         buf.seek(0, os.SEEK_SET)
         self.assertEqual(buf.read(), TEST1)
@@ -48,26 +48,26 @@ class TestBasicFunctionality(unittest.TestCase):
 
 class TestBuilderParameters(unittest.TestCase):
 
-    def createImage(self, autoSort = False, autoJoin = False):
-        builder = Builder(autoSort = autoSort, autoJoin = autoJoin)
-        builder.addSection(range(16), 0x90)
-        builder.addSection(range(16), 0x80)
-        builder.addSection(range(16), 0x70)
-        builder.addSection(range(16), 0x60)
-        builder.addSection(range(16), 0x50)
+    def createImage(self, auto_sort = False, auto_join = False):
+        builder = Builder(auto_sort = auto_sort, auto_join = auto_join)
+        builder.add_section(range(16), 0x90)
+        builder.add_section(range(16), 0x80)
+        builder.add_section(range(16), 0x70)
+        builder.add_section(range(16), 0x60)
+        builder.add_section(range(16), 0x50)
         return [s.startAddress for s in builder.image]
 
     def testBuilderPreservesOrder(self):
-        self.assertEqual(self.createImage(autoSort = False), [144, 128, 112, 96, 80])
+        self.assertEqual(self.createImage(auto_sort = False), [144, 128, 112, 96, 80])
 
     def testBuilderSortsSegments(self):
-        self.assertEqual(self.createImage(autoSort = True), [80, 96, 112, 128, 144])
+        self.assertEqual(self.createImage(auto_sort = True), [80, 96, 112, 128, 144])
 
     def testBuilderAutoJoinsSegments(self):
-        self.assertEqual(self.createImage(autoSort = True, autoJoin = True), [80])
+        self.assertEqual(self.createImage(auto_sort = True, auto_join = True), [80])
 
     def testBuilderCantJoinSegments(self):
-        self.assertEqual(self.createImage(autoSort = False, autoJoin = True), [144, 128, 112, 96, 80])
+        self.assertEqual(self.createImage(auto_sort = False, auto_join = True), [144, 128, 112, 96, 80])
 
 if __name__ == '__main__':
     unittest.main()

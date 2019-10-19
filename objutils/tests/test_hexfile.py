@@ -17,13 +17,13 @@ class TestHexfile(unittest.TestCase):
 
     def setUp(self):
         self.builder = Builder()
-        
+
     def tearDown(self):
         del self.builder
 
 
     def testAddSectionAliasWorks(self):
-        self.builder.addSection(range(64), 0x1000)
+        self.builder.add_section(range(64), 0x1000)
         # Ok, if no exception gets raised.
 
     def testRaisesInvalidChecksumError(self):
