@@ -26,13 +26,21 @@ And finally display it
 
    >>> builder.hexdump()
 
+::
+
    Section #0000
    -------------
    00001000  48 65 6c 6c 6f 20 48 45 58 20 77 6f 72 6c 64     |Hello HEX world |
    ---------------
           15 bytes
           ---------------
+
+
+.. code-block:: python
     >>> dumps("srec", builder)
+
+::
+
     b'S112100048656C6C6F2048455820776F726C649C'
 
 So what have we done here?
