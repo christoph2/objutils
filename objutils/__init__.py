@@ -15,7 +15,7 @@ Registers CODECS and implements an interface to them.
 The first parameter is always the codec name.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
