@@ -101,7 +101,6 @@ RANGES = {
 class OutOfBoundsError(Exception):
     """
     """
-    pass
 
 
 def filler(ch, n):
