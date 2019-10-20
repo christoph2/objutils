@@ -16,7 +16,7 @@ install_reqs = ['future', 'mako', 'six', 'construct', 'attrs']
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(['enum34', 'mock'])
 
-with open("README.md", "r") as fh:
+with open("docs/README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(
@@ -25,7 +25,7 @@ setup(
     provides = ['objutils'],
     description = "Objectfile library for Python",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     author = 'Christoph Schueler',
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
