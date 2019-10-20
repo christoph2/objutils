@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Contains :class:`Image` and :class:`Builder`
+
+"""
+
 from __future__ import print_function
 
 __version__ = "0.1.0"
@@ -41,7 +45,17 @@ AS_32   = 2
 AS_64   = 3
 
 class Image(object):
-    """
+    """Manage images.
+
+    An image is a collection of :class:`Section`s and meta-data.
+
+    Parameters
+    ----------
+    sections: iteratable (typically `list`or `tuple`
+        The sections the image should initialized with.
+    meta: object
+        Arbitrary meta-data.
+    valid: bool
     """
 
     def __init__(self, sections = None, meta = None, valid = False):
@@ -77,6 +91,9 @@ class Image(object):
         return not (self == other)
 
     def hexdump(self, fp = sys.stdout):
+        """
+
+        """
         for idx, section in enumerate(self.sections):
             print("\nSection #{0:04d}".format(idx ), file = fp)
             print("-" * 13, file = fp)
@@ -90,21 +107,38 @@ class Image(object):
         raise AddressError("Address 0x{:08x} not found.".format(addr))
 
     def read(self, addr, length):
+        """
+
+        """
         return self._call_address_function("read", addr, length)
 
     def write(self, addr, length, data):
+        """
+
+        """
         self._call_address_function("write", addr, length, data)
 
     def read_numeric(self, addr, dtype):
+        """
+
+        """
         return self._call_address_function("readNumeric", addr, dtype)
 
     def write_numeric(self, addr, value, dtype):
+        """
+        """
         self._call_address_function("writeNumeric", addr, value, dtype)
 
     def read_string(self, addr, encoding = "latin1", length = -1):
+        """
+
+        """
         return self._call_address_function("readString", addr, encoding, length)
 
     def write_string(self, addr, value, encoding = "latin1"):
+        """
+
+        """
         self._call_address_function("writeString", addr, value, encoding)
 
     def split(self, at = None, equal_parts = None, remap = None):
