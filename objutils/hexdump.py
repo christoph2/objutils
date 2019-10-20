@@ -5,9 +5,9 @@ from __future__ import print_function
 __version__ = "0.1.1"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -37,35 +37,35 @@ def unpack(*args):
 
 class Dumper(object):
 
-    def __init__(self, fp = sys.stdout, numAddressBits = 32):
+    def __init__(self, fp = sys.stdout, num_address_bits = 32):
         self._fp = fp
-        self._rolloverMask = 2 ** numAddressBits
-        self._nibbles = numAddressBits >> 2
+        self._rolloverMask = 2 ** num_address_bits
+        self._nibbles = num_address_bits >> 2
         self._addressMask = "%0{0:d}x ".format(self._nibbles)
-        self.previousRow = bytes()  # bytearray()
+        self.previous_row = bytes()  # bytearray()
         self.elided = False
 
-    def dumpData(self, section, offset = 0):
+    def dump_data(self, section, offset = 0):
         end = section.length
-        lineCount = math.ceil(len(section.data) / self.LINE_LENGTH)
-        startPos = 0
-        lineNum = 0
-        endPos = self.LINE_LENGTH
-        while endPos < end:
-            lineNum += 1
-            row = section.data[startPos : endPos]
-            if row == self.previousRow:
+        line_count = math.ceil(len(section.data) / self.LINE_LENGTH)
+        start_pos = 0
+        line_num = 0
+        end_pos = self.LINE_LENGTH
+        while end_pos < end:
+            line_num += 1
+            row = section.data[start_pos : end_pos]
+            if row == self.previous_row:
                 if not self.elided:
                     print("          *", file = self._fp)
                     self.elided = True
             else:
-                self.dumpRow(row, startPos + section.start_address)
+                self.dump_row(row, start_pos + section.start_address)
                 self.elided = False
-            startPos = endPos
-            endPos = endPos + self.LINE_LENGTH
-            self.previousRow = row
-        row = section.data[startPos : endPos]
-        self.dumpRow(row, startPos + section.start_address)
+            start_pos = end_pos
+            end_pos = end_pos + self.LINE_LENGTH
+            self.previous_row = row
+        row = section.data[start_pos : end_pos]
+        self.dump_row(row, start_pos + section.start_address)
         print("-" * 15, file = self._fp)
         print("{0:-9d} bytes".format(section.length), file = self._fp)
         print("-" * 15, file = self._fp)
@@ -74,19 +74,18 @@ class Dumper(object):
 class CanonicalDumper(Dumper):
     LINE_LENGTH = 0x10
 
-    def printHexBytes(self, row):
+    def printhex_bytes(self, row):
         row = list(row)
         filler = list([0x20] * (self.LINE_LENGTH - len(row)))
         print('|{0}|'.format(('%s' * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or '.' for x in row + filler] )), file = self._fp)
 
-    def dumpRow(self, row, startAddr):
-        startPos = 0
-        print(self._addressMask % ((startPos + startAddr) % self._rolloverMask), file = self._fp, end = " "),
+    def dump_row(self, row, startAddr):
+        start_pos = 0
+        print(self._addressMask % ((start_pos + startAddr) % self._rolloverMask), file = self._fp, end = " "),
         print('%02x ' * len(row) % unpack(*row), file = self._fp, end = " "),
         if len(row) == 0:
             print("", file = self._fp, end = "")
         if len(row) < self.LINE_LENGTH:
             spaces = "   " * (self.LINE_LENGTH - len(row))
             print(spaces, file = self._fp, end = ""),
-        self.printHexBytes(row)
-
+        self.printhex_bytes(row)

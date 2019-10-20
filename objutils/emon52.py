@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -36,26 +36,33 @@ START_LINEAR_ADDRESS        = 5
 
 
 class Codec(object):
-    def __init__(self, fileLike):
-        self.fileLike = fileLike
+    """
+
+    """
+
+    def __init__(self, file_like):
+        self.file_like = file_like
 
     def readlines(self):
-        for line in self.fileLike.readlines():
+        for line in self.file_like.readlines():
             yield line
 
     def writelines(self, lines):
         for line in lines:
-            self.fileLike.write(line)
+            self.file_like.write(line)
 
 
 class Reader(hexfile.Reader):
+    """
+
+    """
 
     FORMAT_SPEC = (
         (hexfile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
     )
     DATA_SEPARATOR =  " "
 
-    def checkLine(self, line, formatType):
+    def check_line(self, line, format_type):
         if line.length != len(line.chunk):
             raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
         # todo: factor out checksum calculation from line!!!
@@ -63,15 +70,17 @@ class Reader(hexfile.Reader):
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
 
-    def isDataLine(self, line, formatType):
+    def is_data_line(self, line, format_type):
         return True
 
 
 class Writer(hexfile.Writer):
+    """
+
+    """
 
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
+    def compose_row(self, address, length, row):
         checksum = sum(row) % 65536
-        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(length, address, Writer.hexBytes(row, spaced = True), checksum)
-
+        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(length, address, Writer.hex_bytes(row, spaced = True), checksum)

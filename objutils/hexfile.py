@@ -4,7 +4,7 @@
 __version__ = "0.1.1"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -37,7 +37,7 @@ from objutils.section import Section, join_sections
 from objutils.image import Image, Builder
 from operator import itemgetter
 from objutils.pickleif import PickleIF
-from objutils.utils import slicer, createStringBuffer, PYTHON_VERSION
+from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
 from objutils.logger import Logger
 
 
@@ -91,18 +91,18 @@ TYPE_FROM_RECORD = 0
 
 atoi = partial(int, base = 16)
 
-class InvalidRecordTypeError(Exception): pass
+class Invalidrecord_typeError(Exception): pass
 class InvalidRecordLengthError(Exception): pass
 class InvalidRecordChecksumError(Exception): pass
 class AddressRangeToLargeError(Exception): pass
 
-MetaRecord = namedtuple('MetaRecord', 'formatType address chunk')
+MetaRecord = namedtuple('MetaRecord', 'format_type address chunk')
 
 class FormatParser(object):
-    def __init__(self, fmt, dataSep = None):
+    def __init__(self, fmt, data_separator = None):
         self.fmt = fmt
-        self.translatedFmt = []
-        self.dataSep = dataSep
+        self.translated_format = []
+        self.data_separator = data_separator
 
     def parse(self):
         group = ''
@@ -115,42 +115,42 @@ class FormatParser(object):
             group += ch
             prevCh = ch
         self.translateFormat(group)
-        self.translatedFmt.append((0, 0, r"(?P<junk>(.*?))$"))  #??
-        ft = "^{0}".format(''.join(map(itemgetter(2), self.translatedFmt)))
+        self.translated_format.append((0, 0, r"(?P<junk>(.*?))$"))  #??
+        ft = "^{0}".format(''.join(map(itemgetter(2), self.translated_format)))
         return re.compile(ft, re.DOTALL | re.MULTILINE)
 
     def translateFormat(self, group):
-        groupNumber = MAP_CHAR_TO_GROUP.get(group[0])
+        group_number = MAP_CHAR_TO_GROUP.get(group[0])
         length = len(group)
-        if groupNumber is None:    # Handle invariants (i.e. fixed chars).
+        if group_number is None:    # Handle invariants (i.e. fixed chars).
             if group[0] == ' ':
                 expr = '\s{{{0!s}}}'.format(length )
             else:
                 expr = group[0] * length
         else:
-            expr = MAP_GROUP_TO_REGEX.get(groupNumber)
-            if groupNumber == START:
+            expr = MAP_GROUP_TO_REGEX.get(group_number)
+            if group_number == START:
                 expr = expr % (self.startSign, )
-            elif groupNumber == DATA:
+            elif group_number == DATA:
                 "(?P<chunk>[0-9a-zA-Z]*)"
-                if self.dataSep is not None:
-                    expr = "(?P<chunk>[0-9a-zA-Z{0!s}]*)".format(self.dataSep )
+                if self.data_separator is not None:
+                    expr = "(?P<chunk>[0-9a-zA-Z{0!s}]*)".format(self.data_separator )
                 else:
                     pass
-            elif groupNumber == UNPARSED:
+            elif group_number == UNPARSED:
                 #print expr
                 pass
             else:
                 expr = expr % (length, )
-        self.translatedFmt.append((groupNumber, length, expr))
+        self.translated_format.append((group_number, length, expr))
 
 
 class Container(object):
     def __init__(self):
-        self.processingInstructions = []
+        self.processing_instructions = []
 
-    def addPI(self, pi):
-        self.processingInstructions.append(pi)
+    def add_processing_instruction(self, pi):
+        self.processing_instructions.append(pi)
 
 
 class BaseType(object):
@@ -180,8 +180,8 @@ class Reader(BaseType):
             self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
-            for formatType, format in self.FORMAT_SPEC:
-                self.formats.append((formatType, FormatParser(format, self.DATA_SEPARATOR).parse()))
+            for format_type, format in self.FORMAT_SPEC:
+                self.formats.append((format_type, FormatParser(format, self.DATA_SEPARATOR).parse()))
 
     def load(self, fp, **kws):
         if PYTHON_VERSION.major == 3:
@@ -199,19 +199,19 @@ class Reader(BaseType):
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
             if isinstance(image, str):
-                return self.load(createStringBuffer(bytes(image, "ascii")))
+                return self.load(create_string_buffer(bytes(image, "ascii")))
             else:
-                return self.load(createStringBuffer(image))
+                return self.load(create_string_buffer(image))
         else:
-            return self.load(createStringBuffer(image))
+            return self.load(create_string_buffer(image))
 
     def read(self, fp):
         sections = []
         matched = False
         self.valid = True
-        metaData = defaultdict(list)
-        for (lineNumber, line) in enumerate(fp.readlines(), 1):
-            for formatType, format in self.formats:
+        meta_data = defaultdict(list)
+        for (line_number, line) in enumerate(fp.readlines(), 1):
+            for format_type, format in self.formats:
                 if isinstance(line, bytes):
                     match = format.match(line.decode())
                 else:
@@ -219,7 +219,7 @@ class Reader(BaseType):
                 if match:
                     matched = True
                     container = Container()
-                    container.lineNumber = lineNumber
+                    container.line_number = line_number
                     dict_ = match.groupdict()
                     if dict_ != {}:
                         # Handle scalar values.
@@ -229,32 +229,32 @@ class Reader(BaseType):
                             elif key == 'junk':
                                 setattr(container, key, value)
                         if 'chunk' in dict_:
-                            if self.parseData(container, formatType):
+                            if self.parseData(container, format_type):
                                 chunk = bytearray.fromhex(dict_['chunk'])
                             else:
                                 # don't convert/parse stuff like symbols.
                                 chunk = dict_['chunk']
                             dict_.pop('chunk')
                             setattr(container, 'chunk', chunk)
-                        self.checkLine(container, formatType)
+                        self.check_line(container, format_type)
                         # this is to handle esoteric stuff like Intel seg:offs addressing and symbols.
-                        self.specialProcessing(container, formatType)
-                        if self.isDataLine(container, formatType):
+                        self.special_processing(container, format_type)
+                        if self.is_data_line(container, format_type):
                             sections.append(Section(container.address, container.chunk))
                         else:
                             chunk = container.chunk if hasattr(container, 'chunk') else None
                             address = container.address if hasattr(container, 'address') else None
-                            metaData[formatType].append(MetaRecord(formatType, address, chunk))
+                            meta_data[format_type].append(MetaRecord(format_type, address, chunk))
                     break
             if not matched:
-                self.warn("Ignoring garbage line #{0:d}".format(lineNumber))
+                self.warn("Ignoring garbage line #{0:d}".format(line_number))
         if sections:
-            return Image(join_sections(sections), metaData, self.valid)
+            return Image(join_sections(sections), meta_data, self.valid)
         else:
             self.error("File seems to be invalid.")
             return Image([], valid = False)
 
-    def _addressSpace(self, value):
+    def _address_space(self, value):
         if value < 2**16:
             return SIXTEEN_BITS
         elif value < 2**20:
@@ -266,7 +266,7 @@ class Reader(BaseType):
         else:
             raise ValueError("Unsupported Addressspace size.")
 
-    def maybeBinaryFile(self, fp):
+    def maybe_binary_file(self, fp):
         fp.seek(0, os.SEEK_SET)
         header = fp.read(128)
         fp.seek(0, os.SEEK_SET)
@@ -275,11 +275,11 @@ class Reader(BaseType):
 
     def probe(self, fp):
         "Determine if object is valid."
-        if self.maybeBinaryFile(fp):
+        if self.maybe_binary_file(fp):
             return False
         matched = False
-        for (lineNumber, line) in enumerate(fp.readlines(), 1):
-            for formatType, format in self.formats: # NOTE: Same as in 'read()'!
+        for (line_number, line) in enumerate(fp.readlines(), 1):
+            for format_type, format in self.formats: # NOTE: Same as in 'read()'!
                 if isinstance(line, bytes):
                     match = format.match(line.decode())
                 else:
@@ -287,32 +287,32 @@ class Reader(BaseType):
                 if match:
                     matched = True
                     break
-            if matched or lineNumber > 3:
+            if matched or line_number > 3:
                 break
         return matched
 
     def probes(self, image):
         if PYTHON_VERSION.major == 3:
             if isinstance(image, str):
-                return self.probe(createStringBuffer(bytes(image, "ascii")))
+                return self.probe(create_string_buffer(bytes(image, "ascii")))
             else:
-                return self.probe(createStringBuffer(image))
+                return self.probe(create_string_buffer(image))
         else:
-            return self.probe(createStringBuffer(image))
+            return self.probe(create_string_buffer(image))
 
-    def checkLine(self, line, formatType):
+    def check_line(self, line, format_type):
         raise NotImplementedError()
 
-    def isDataLine(self, line, formatType):
+    def is_data_line(self, line, format_type):
         raise NotImplementedError()
 
     def classifyLine(self, line):
         raise NotImplementedError()
 
-    def specialProcessing(self, line, formatType):
+    def special_processing(self, line, format_type):
         pass
 
-    def parseData(self, line, formatType):
+    def parseData(self, line, format_type):
         return True
 
 
@@ -321,14 +321,14 @@ class Writer(BaseType):
     def __init__(self):
         self.logger = Logger("Writer")
 
-    def dump(self, fp, image, rowLength = 16, **kws):   # TODO: rename to bytesPerRow!
-        fp.write(self.dumps(image, rowLength))
+    def dump(self, fp, image, row_length = 16, **kws):   # TODO: rename to bytesPerRow!
+        fp.write(self.dumps(image, row_length))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, rowLength = 16, **kws):
+    def dumps(self, image, row_length = 16, **kws):
         result = []
-        self.rowLength = rowLength
+        self.row_length = row_length
 
         if isinstance(image, Builder):
             image = image.image     # Be tolerant.
@@ -336,48 +336,48 @@ class Writer(BaseType):
         if hasattr(image, "sections") and  not image.sections:
             return b''
 
-        if self.calculateAddressBits(image) > self.MAX_ADDRESS_BITS:
+        if self.calculate_address_bits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
 
-        params = self.setParameters(**kws)
+        params = self.set_parameters(**kws)
 
-        self.preProcessing(image)
+        self.pre_processing(image)
 
-        header = self.composeHeader(image.meta if hasattr(image, 'meta') else {})
+        header = self.compose_header(image.meta if hasattr(image, 'meta') else {})
         if header:
             result.append(header)
         for section in image:
             address = section.start_address
-            rows = slicer(section.data, rowLength, lambda x:  [int(y) for y in x])
+            rows = slicer(section.data, row_length, lambda x:  [int(y) for y in x])
             for row in rows:
                 length = len(row)
-                result.append(self.composeRow(address, length, row))
-                address += rowLength
-        footer = self.composeFooter(image.meta if hasattr(image, 'meta') else {})
+                result.append(self.compose_row(address, length, row))
+                address += row_length
+        footer = self.compose_footer(image.meta if hasattr(image, 'meta') else {})
         if footer:
             result.append(footer)
         if PYTHON_VERSION.major == 3:
-            return self.postProcess(bytes('\n'.join(result), "ascii"))
+            return self.post_processing(bytes('\n'.join(result), "ascii"))
         else:
-            return self.postProcess(bytes('\n'.join(result)))
+            return self.post_processing(bytes('\n'.join(result)))
 
-    def calculateAddressBits(self, image):
+    def calculate_address_bits(self, image):
         if isinstance(image, Builder):
             image = image.image     # Be tolerant.
         if hasattr(image, "sections"):
-            lastSegment = sorted(image.sections, key = lambda s: s.start_address)[-1]
+            last_segment = sorted(image.sections, key = lambda s: s.start_address)[-1]
         else:
-            lastSegment = image
-        highestAddress = lastSegment.start_address + lastSegment.length
-        return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
+            last_segment = image
+        highest_address = last_segment.start_address + last_segment.length
+        return int(math.ceil(math.log(highest_address + 1) / math.log(2)))
 
-    def postProcess(self, data):
+    def post_processing(self, data):
         return data
 
-    def preProcessing(self, image):
+    def pre_processing(self, image):
         pass
 
-    def setParameters(self, **kws):
+    def set_parameters(self, **kws):
         params = {}
         for k, v in kws.items():
             try:
@@ -388,23 +388,23 @@ class Writer(BaseType):
                 setattr(self, k, v)
         return params
 
-    def composeRow(self, address, length, row):
+    def compose_row(self, address, length, row):
         raise NotImplementedError()
 
-    def composeHeader(self, meta):
+    def compose_header(self, meta):
         return None
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         return None
 
-    def wordToBytes(self, word):
+    def word_to_bytes(self, word):
         word = int(word)
         h = (word & 0xff00) >> 8
         l = word & 0x00ff
         return h, l
 
     @staticmethod
-    def hexBytes(row, spaced = False):
+    def hex_bytes(row, spaced = False):
         spacer = ' ' if spaced else ''
         return spacer.join(["{0:02X}".format(x) for x in row])
 
@@ -413,25 +413,25 @@ class ASCIIHexReader(Reader):
 
     FORMAT_SPEC = None
 
-    def __init__(self, addressPattern, dataPattern, etxPattern, separators = ', '):
+    def __init__(self, address_pattern, data_pattern, etx_pattern, separators = ', '):
         self.separators = separators
-        self.DATA_PATTERN = re.compile(dataPattern.format(separators), re.DOTALL | re.MULTILINE)
-        self.ADDRESS_PATTERN = re.compile(addressPattern, re.DOTALL | re.MULTILINE)
-        self.ETX_PATTERN = re.compile(etxPattern, re.DOTALL | re.MULTILINE)
+        self.DATA_PATTERN = re.compile(data_pattern.format(separators), re.DOTALL | re.MULTILINE)
+        self.ADDRESS_PATTERN = re.compile(address_pattern, re.DOTALL | re.MULTILINE)
+        self.ETX_PATTERN = re.compile(etx_pattern, re.DOTALL | re.MULTILINE)
         self.SPLITTER = re.compile('[{0}]'.format(separators))
-        self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parseLine), (self.ETX_PATTERN, self.nop))
+        self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parse_line), (self.ETX_PATTERN, self.nop))
         self.formats = [(0, self.ADDRESS_PATTERN), (1, self.DATA_PATTERN), (2, self.ETX_PATTERN)]
         super(ASCIIHexReader, self).__init__()
 
     def getAddress(self, line, match):
         self.address = int(match.group('address'), 16)
-        self.previousAddress = self.address
+        self.previous_address = self.address
         return True
 
     def nop(self, line, match):
         return False
 
-    def parseLine(self, line, match):
+    def parse_line(self, line, match):
         section = Section(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
         self.sections.append(section)
         self.address += len(section)
@@ -460,25 +460,24 @@ class ASCIIHexReader(Reader):
 class ASCIIHexWriter(Writer):
 
     MAX_ADDRESS_BITS = 16
-    previousAddress = None
+    previous_address = None
 
-    def __init__(self, addressDesignator):
+    def __init__(self, address_designator):
         self.separator = ' '
-        self.addressDesignator = addressDesignator
+        self.address_designator = address_designator
         super(ASCIIHexWriter, self).__init__()
 
-    def composeRow(self, address, length, row):
-        prependAddress =  True if address != self.previousAddress else False
-        self.previousAddress = (address + length)
-        if prependAddress:
+    def compose_row(self, address, length, row):
+        prepend_address =  True if address != self.previous_address else False
+        self.previous_address = (address + length)
+        if prepend_address:
             line = "{0}\n{1}".format("{0}{1:04X}".format(
-                self.addressDesignator, address), "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row])
+                self.address_designator, address), "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row])
             )
         else:
             line = " ".join(["{0:02X}".format(x) for x in row])
-        self.rowCallout(address, length, row)
+        self.row_callout(address, length, row)
         return line
 
-    def rowCallout(self, address, length, row):
+    def row_callout(self, address, length, row):
         pass
-

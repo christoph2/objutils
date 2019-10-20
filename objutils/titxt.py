@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -42,16 +42,15 @@ class Reader(hexfile.ASCIIHexReader):
     """
     """
 
-    def __init__(self, addressPattern = r'^@(?P<address>[0-9a-zA-Z]{2,8})\s*$',
-                 dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
-        super(Reader, self).__init__(addressPattern, dataPattern, etxPattern)
+    def __init__(self, address_pattern = r'^@(?P<address>[0-9a-zA-Z]{2,8})\s*$',
+                 data_pattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etx_pattern = r'^q.*$'):
+        super(Reader, self).__init__(address_pattern, data_pattern, etx_pattern)
 
 
 class Writer(hexfile.ASCIIHexWriter):
 
-    def __init__(self, addressDesignator = '@'):
-        super(Writer, self).__init__(addressDesignator)
+    def __init__(self, address_designator = '@'):
+        super(Writer, self).__init__(address_designator)
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         return "q"
-

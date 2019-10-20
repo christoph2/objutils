@@ -25,10 +25,10 @@ $%%%%%"""
 
 
 fromSrec =  loads('srec', SREC)
-dataFromSRec = dumps('fpc', fromSrec)	# Fixme: Does _NOT_ return 'bytes'!
+dataFromSRec = dumps('fpc', fromSrec)   # Fixme: Does _NOT_ return 'bytes'!
 
 fromFPC =  loads('fpc', FPC)
-dataFromFPC = dumps('srec', fromFPC, rowLength = 32, s5record = True)
+dataFromFPC = dumps('srec', fromFPC, row_length = 32, s5record = True)
 
 
 class TestRoundTrip(unittest.TestCase):

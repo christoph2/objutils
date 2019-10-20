@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from __future__ import division
+
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -29,7 +31,7 @@ import operator
 import os
 import re
 import objutils.hexfile as hexfile
-from objutils.utils import createStringBuffer, slicer, PYTHON_VERSION
+from objutils.utils import create_string_buffer, slicer, PYTHON_VERSION
 from objutils import checksums
 import objutils.utils as utils
 
@@ -59,8 +61,8 @@ class Reader(hexfile.Reader):
     )
 
     def decode(self, fp):
-        self.lastAddress = 0    # TODO: decode!
-        outLines = []
+        self.last_address = 0    # TODO: decode!
+        out_lines = []
         for line in fp.readlines():
             line = line.strip()
             startSym, line = line[0], line[1:]
@@ -72,56 +74,56 @@ class Reader(hexfile.Reader):
                 pass # todo: FormatError!!!
 
             values = []
-            for quintuple in self.splitQuintuples(line):
-                value = self.convertQuintuple(quintuple)
+            for quintuple in self.split_quintuples(line):
+                value = self.convert_quintuple(quintuple)
                 values.append("{0:08X}".format(value))
-            outLines.append(''.join(values))
-        return '\n'.join(outLines)
+            out_lines.append(''.join(values))
+        return '\n'.join(out_lines)
 
     def read(self, fp):
         return super(Reader, self).read(
-            createStringBuffer(
+            create_string_buffer(
                 bytearray(self.decode(fp), "ascii")
             )
         )
 
-    def convertQuintuple(self, quintuple):
+    def convert_quintuple(self, quintuple):
         res = 0         # reduce(lambda accu, x: (accu * 85) + x, value, 0)
         for ch  in quintuple:
             v = REV_MAPPING[bytearray((ch, ))[0]]
             res = v + (res * 85)
         return res
 
-    def splitQuintuples(self, line):
+    def split_quintuples(self, line):
         res = []
         for i in range(0, len(line), 5):
             res.append(line[i : i + 5])
         return res
 
-    def checkLine(self, line, formatType):
-        if formatType == EOF:
+    def check_line(self, line, format_type):
+        if format_type == EOF:
             return True
         line.length -= 4
         if line.length != len(line.chunk):
             line.chunk = line.chunk[ : line.length] # Cut padding.
-        if formatType == DATA_ABS:
+        if format_type == DATA_ABS:
             tmp = 0
-            self.lastAddress = line.address + line.length
-        elif formatType == DATA_INC:
+            self.last_address = line.address + line.length
+        elif format_type == DATA_INC:
             tmp = 1
-            line.address = self.lastAddress
-        elif formatType == DATA_REL:
+            line.address = self.last_address
+        elif format_type == DATA_REL:
             self.error("relative adressing not supported.")
             tmp = 2
         else:
-            self.error("Invalid format type: '{0}'".format(formatType))
+            self.error("Invalid format type: '{0}'".format(format_type))
             tmp = 0
-        checksum = checksums.lrc(utils.makeList(tmp, line.length + 4, utils.intToArray(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
+        checksum = checksums.lrc(utils.make_list(tmp, line.length + 4, utils.int_to_array(line.address), line.chunk), 8, checksums.COMPLEMENT_TWOS)
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
 
-    def isDataLine(self, line, formatType):
-        return formatType in (DATA_ABS, DATA_INC, DATA_REL)
+    def is_data_line(self, line, format_type):
+        return format_type in (DATA_ABS, DATA_INC, DATA_REL)
 
     def probe(self, fp):
         for idx, line in enumerate(fp, 1):
@@ -132,7 +134,7 @@ class Reader(hexfile.Reader):
                 break
         fp.seek(0, os.SEEK_SET)
         return super(Reader, self).probe(
-            createStringBuffer(bytearray(self.decode(fp), "ascii"))
+            create_string_buffer(bytearray(self.decode(fp), "ascii"))
         )
 
 
@@ -140,20 +142,20 @@ class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
+    def compose_row(self, address, length, row):
         tmp = 0 # TODO: format type!?
-        checksum = checksums.lrc(utils.makeList(tmp, length + 4, utils.intToArray(address), row), 8, checksums.COMPLEMENT_TWOS)
-        if length < self.rowLength:
-            lengthToPad = self.rowLength - length
+        checksum = checksums.lrc(utils.make_list(tmp, length + 4, utils.int_to_array(address), row), 8, checksums.COMPLEMENT_TWOS)
+        if length < self.row_length:
+            lengthToPad = self.row_length - length
             padding = [0] * (lengthToPad)
             row.extend(padding)
-        line = "{0:02X}{1}0000{2:08X}{3}".format(checksum, length - 2, address, Writer.hexBytes(row))
+        line = "{0:02X}{1}0000{2:08X}{3}".format(checksum, length - 2, address, Writer.hex_bytes(row))
         return line
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         return "00000000"
 
-    def postProcess(self, data):
+    def post_processing(self, data):
         result = []
         for line in data.splitlines():
             if len(line) % 4:
@@ -161,15 +163,15 @@ class Writer(hexfile.Writer):
                 continue
             res = []
             for item in slicer(line, 8, atoi16):
-                item = self.convertQuintuple(item)
+                item = self.convert_quintuple(item)
                 res.append(item)
             result.append("{0}{1}".format(PREFIX, ''.join(res)))
         if PYTHON_VERSION.major == 3:
             return bytes('\n'.join(result), "ascii")
         else:
-            return bytes('\n'.join(result))            
+            return bytes('\n'.join(result))
 
-    def convertQuintuple(self, value):
+    def convert_quintuple(self, value):
         result = []
         while value:
             result.append(MAPPING[value % 85])
@@ -177,4 +179,3 @@ class Writer(hexfile.Writer):
         if len(result) < 5:
             result.extend([MAPPING[0]] * (5 - len(result)))
         return ''.join(reversed(result))
-

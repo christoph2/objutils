@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
@@ -170,7 +170,7 @@ class Section(object):
 
     def hexdump(self, fp = sys.stdout):
         dumper = hexdump.CanonicalDumper(fp)
-        dumper.dumpData(self)
+        dumper.dump_data(self)
 
     def tobytes(self):
         if PYTHON_VERSION.major == 3:
@@ -242,21 +242,21 @@ class Section(object):
 
 
 def join_sections(sections, order_sections = True):
-    resultSections = []
+    result_sections = []
     if order_sections:
         sections.sort(key = attrgetter("start_address"))
-    prevSection = Section()
+    prev_section = Section()
     while sections:
         section = sections.pop(0)
-        if section.start_address == prevSection.start_address + prevSection.length and resultSections:
-            lastSegment = resultSections[-1]
-            lastSegment.data.extend(section.data)
-            lastSegment.length += section.length
+        if section.start_address == prev_section.start_address + prev_section.length and result_sections:
+            last_segment = result_sections[-1]
+            last_segment.data.extend(section.data)
+            last_segment.length += section.length
         else:
             # Create a new section.
-            resultSections.append(Section(section.start_address, section.data))
-        prevSection = section
-    if resultSections:
-        return resultSections
+            result_sections.append(Section(section.start_address, section.data))
+        prev_section = section
+    if result_sections:
+        return result_sections
     else:
         return []

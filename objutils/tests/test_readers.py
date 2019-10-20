@@ -3,7 +3,7 @@
 
 
 import unittest
-from objutils.utils import createStringBuffer
+from objutils.utils import create_string_buffer
 from objutils.readers import PlainBinaryReader
 
 
@@ -11,7 +11,7 @@ class TestReader(unittest.TestCase):
 
     @staticmethod
     def _createReader():
-        return PlainBinaryReader(createStringBuffer(bytearray("hello world!", "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
+        return PlainBinaryReader(create_string_buffer(bytearray("hello world!", "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
 
     def testSize(self):
         reader = self._createReader()
@@ -34,13 +34,13 @@ class TestReader(unittest.TestCase):
 
     def testNextByte(self):
         reader = self._createReader()
-        self.assertEqual(reader.nextByte(), 104)
+        self.assertEqual(reader.next_byte(), 104)
 
 
 class Decoder(unittest.TestCase):
 
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(createStringBuffer(value), PlainBinaryReader.LITTLE_ENDIAN)
+        dr = PlainBinaryReader(create_string_buffer(value), PlainBinaryReader.LITTLE_ENDIAN)
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):

@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -42,27 +42,26 @@ class Reader(hexfile.Reader):
         (EOF,   ";00")
     )
 
-    def checkLine(self, line, formatType):
-        if formatType == DATA:
+    def check_line(self, line, format_type):
+        if format_type == DATA:
             if line.length != len(line.chunk):
                 raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-            checksum = checksums.lrc(utils.makeList(utils.intToArray(line.address), line.length, line.chunk), 16, checksums.COMPLEMENT_NONE)
+            checksum = checksums.lrc(utils.make_list(utils.int_to_array(line.address), line.length, line.chunk), 16, checksums.COMPLEMENT_NONE)
             if line.checksum != checksum:
                 raise hexfile.InvalidRecordChecksumError()
 
-    def isDataLine(self, line, formatType):
-        return formatType == DATA
+    def is_data_line(self, line, format_type):
+        return format_type == DATA
 
 
 class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
-        checksum = checksums.lrc(utils.makeList(utils.intToArray(address), length, row), 16, checksums.COMPLEMENT_NONE)
-        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(length, address, Writer.hexBytes(row), checksum)
+    def compose_row(self, address, length, row):
+        checksum = checksums.lrc(utils.make_list(utils.int_to_array(address), length, row), 16, checksums.COMPLEMENT_NONE)
+        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(length, address, Writer.hex_bytes(row), checksum)
         return line
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         return ";00"
-

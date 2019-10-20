@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -52,9 +52,9 @@ class Reader(hexfile.ASCIIHexReader):
     """
     VALID_CHARS = re.compile(r"^[a-fA-F0-9 %,\'\$\x02\x03\n\r]*$")
 
-    def __init__(self, addressPattern = r'^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$',
-                 dataPattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etxPattern = r'^q.*$'):
-        super(Reader, self).__init__(addressPattern, dataPattern, etxPattern, separators = ", %'")
+    def __init__(self, address_pattern = r'^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$',
+                 data_pattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etx_pattern = r'^q.*$'):
+        super(Reader, self).__init__(address_pattern, data_pattern, etx_pattern, separators = ", %'")
 
 
 class Writer(hexfile.ASCIIHexWriter):
@@ -62,19 +62,18 @@ class Writer(hexfile.ASCIIHexWriter):
     MAX_ADDRESS_BITS = 16
     ADDRESS_DESIGNATOR = '$A'
 
-    def __init__(self, addressDesignator = '$A'):
-        super(Writer, self).__init__(addressDesignator)
+    def __init__(self, address_designator = '$A'):
+        super(Writer, self).__init__(address_designator)
 
-    def composeHeader(self, meta):
+    def compose_header(self, meta):
         self.checksum = 0
-        self.previousAddress = None
+        self.previous_address = None
         line ="{0} ".format(STX)
         return line
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         line = "{0}$${1:04X},".format(ETX, self.checksum % 65536)
         return line
 
-    def rowCallout(self, address, length, row):
+    def row_callout(self, address, length, row):
         self.checksum += checksum(row)
-

@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
@@ -770,10 +770,10 @@ class Reader(object):
             pass
         if blockType == BB1:
             self.blockType.append(1)
-            moduleName = self.readString(self.fpos)
-            info.moduleName = moduleName
+            module_name = self.readString(self.fpos)
+            info.module_name = module_name
             info.name = "BB1"
-            self.logger.debug("MODULE-NAME: {0!s}".format(moduleName))
+            self.logger.debug("MODULE-NAME: {0!s}".format(module_name))
         elif blockType == BB2:
             self.blockType.append(2)
             zeroLengthName = self.readString(self.fpos)
@@ -781,8 +781,8 @@ class Reader(object):
             info.name = "BB2"
         elif blockType == BB3:
             self.blockType.append(3)
-            moduleName = self.readString(self.fpos)
-            info.moduleName = moduleName
+            module_name = self.readString(self.fpos)
+            info.module_name = module_name
             info.name = "BB3"
         elif blockType == BB4:
             self.blockType.append(4)
@@ -825,7 +825,7 @@ class Reader(object):
             info.name = "BB6"
         elif blockType == BB10:
             self.blockType.append(10)
-            moduleName = self.readString(self.fpos)
+            module_name = self.readString(self.fpos)
             objFileName = self.readString(self.fpos)
             toolType = self.readNumber(self.fpos)
             versionRevision = self.checkOptional(self.fpos, isString = True)
@@ -835,7 +835,7 @@ class Reader(object):
             hour = self.checkOptional(self.fpos)
             minute = self.checkOptional(self.fpos)
             second = self.checkOptional(self.fpos)
-            info.moduleName = moduleName
+            info.module_name = module_name
             info.objFileName = objFileName
             info.toolType = toolType
             info.versionRevision = versionRevision

@@ -6,7 +6,7 @@ import unittest
 from objutils import loads, dumps, probes
 from objutils.section import Section
 from objutils.image import Image, Builder
-from objutils.utils import createStringBuffer, PYTHON_VERSION
+from objutils.utils import create_string_buffer, PYTHON_VERSION
 from objutils import hexfile
 import os
 import io

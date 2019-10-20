@@ -6,7 +6,7 @@ from __future__ import print_function
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -165,5 +165,3 @@ def _validate_sections(sections):
     for section in sections:
         if not all( hasattr(section, attr) for attr in ATTRIBUTES):
             raise TypeError("Section '{0}' doesn't fulfills required protocol (missing attributes).")
-
-

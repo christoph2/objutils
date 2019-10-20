@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -35,31 +35,31 @@ class PlainBinaryReader(object):
     LITTLE_ENDIAN   = '<'
     BIG_ENDIAN      = '>'
 
-    def __init__(self, image, byteOrderPrefix = "@"):
+    def __init__(self, image, byte_order_prefix = "@"):
         self.image = image
         self.image.seek(0, os.SEEK_END)
         self._size = self.image.tell()
         self.image.seek(0, os.SEEK_SET)
-        self.byteOrderPrefix = byteOrderPrefix
+        self.byte_order_prefix = byte_order_prefix
         self.pos = 0
 
-    def _getPos(self):
+    def _get_pos(self):
         return self.image.tell()
 
-    def _setPos(self, pos):
+    def _set_pos(self, pos):
         self.image.seek(pos, os.SEEK_SET)
 
-    def _getSize(self):
+    def _get_size(self):
         return self._size
 
     def reset(self):
         self.pos = 0
 
-    def nextByte(self):
+    def next_byte(self):
         return self.u8()
 
-    def value(self, conversionCode, size):
-        res, = struct.unpack('%c%c' % (self.byteOrderPrefix, conversionCode, ), self.image.read(size))
+    def value(self, conversion_code, size):
+        res, = struct.unpack('%c%c' % (self.byte_order_prefix, conversion_code, ), self.image.read(size))
         return res
 
     def u8(self):
@@ -90,7 +90,7 @@ class PlainBinaryReader(object):
         result = 0
         shift = 0
         while True:
-            bval = self.nextByte()
+            bval = self.next_byte()
             result |= ((bval & 0x7f) << shift)
             if bval & 0x80 == 0:
                 break
@@ -102,7 +102,7 @@ class PlainBinaryReader(object):
         shift = 0
         idx =0
         while True:
-            bval = self.nextByte()
+            bval = self.next_byte()
             result |= ((bval & 0x7f) << shift)
             shift += 7
             idx += 1
@@ -116,13 +116,12 @@ class PlainBinaryReader(object):
     def asciiz(self):
         result = []
         while True:
-            ch = self.nextByte()
+            ch = self.next_byte()
             if ch == 0:
                 break
             else:
                 result.append(ch)
         return ''.join(chr(c) for c in result)
 
-    pos = property(_getPos, _setPos)
-    size = property(_getSize)
-
+    pos = property(_get_pos, _set_pos)
+    size = property(_get_size)

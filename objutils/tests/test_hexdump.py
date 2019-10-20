@@ -6,7 +6,7 @@ import unittest
 from objutils import loads, dumps, probes
 from objutils.section import Section
 from objutils.image import Image, Builder
-from objutils.utils import createStringBuffer, PYTHON_VERSION
+from objutils.utils import create_string_buffer, PYTHON_VERSION
 import os
 import io
 import sys
@@ -97,9 +97,9 @@ class BaseTest(unittest.TestCase):
 
     def setUp(self):
         if PYTHON_VERSION.major == 3:
-            self.buf = io.TextIOWrapper(createStringBuffer())
+            self.buf = io.TextIOWrapper(create_string_buffer())
         else:
-            self.buf = createStringBuffer()
+            self.buf = create_string_buffer()
         #self.stdout = sys.stdout
         #sys.stdout = self.buf
         self.builder = Builder()

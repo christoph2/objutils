@@ -43,7 +43,7 @@ class TestRoundtrip(unittest.TestCase):
         builder = Builder()
         builder.add_section("Wow! Did you really go through al that trouble to read this?", 0xb000)
         builder.join_sections()
-        self.assertEqual(dumps("srec", builder.image, recordType = 1, s5record = False, start_address = 0x0000), SREC1)
+        self.assertEqual(dumps("srec", builder.image, record_type = 1, s5record = False, start_address = 0x0000), SREC1)
 
 
 class Test19Probe(unittest.TestCase):
@@ -63,11 +63,11 @@ class Test19Probe(unittest.TestCase):
 
 class TestS19Options(unittest.TestCase):
 
-    def createImage(self, recordType, s5record, start_address = None):
+    def createImage(self, record_type, s5record, start_address = None):
         builder = Builder()
         builder.add_section(range(10), 0x1000)
         builder.join_sections()
-        return dumps("srec", builder.image, recordType = recordType, s5record = s5record, start_address = start_address)
+        return dumps("srec", builder.image, record_type = record_type, s5record = s5record, start_address = start_address)
 
     def testS19includeS5RecordS1(self):
         self.assertEqual(self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB")

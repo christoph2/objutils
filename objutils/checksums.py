@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -83,7 +83,7 @@ def rotatedXOR(values, width, rotator):
         cs = rotator(cs)
     return cs  % (2 ** width)
 
-def nibbleSum(data):
+def nibble_sum(data):
     result = 0
     for d in data:
         hn = (d & 0xf0) >> 4

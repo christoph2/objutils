@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -39,7 +39,7 @@ def slicer(iterable, sliceLength, converter = None):
     return [converter((iterable[item : item + sliceLength])) for item in range(0, length, sliceLength)]
 
 
-def makeList(*args):
+def make_list(*args):
     result = []
     for arg in args:
         if hasattr(arg, '__iter__'):
@@ -49,7 +49,7 @@ def makeList(*args):
     return result
 
 
-def intToArray(value):
+def int_to_array(value):
     result = []
     while value:
         result.append(value & 0xff)
@@ -77,10 +77,10 @@ class Curry:
 
 identity = lambda self,x: x
 
-def getPythonVersion():
+def get_python_version():
     return sys.version_info
 
-PYTHON_VERSION = getPythonVersion()
+PYTHON_VERSION = get_python_version()
 
 if PYTHON_VERSION.major == 3:
     from io import BytesIO as StringIO
@@ -91,12 +91,12 @@ else:
         from StringIO import StringIO
 
 
-def createStringBuffer(*args):
+def create_string_buffer(*args):
     """Create a string with file-like behaviour (StringIO on Python 2.x).
     """
     return StringIO(*args)
 
-def binExtractor(fname, offset, length):
+def bin_extractor(fname, offset, length):
     """Extract a junk of data from a file.
     """
     fp = open(fname)
@@ -106,12 +106,12 @@ def binExtractor(fname, offset, length):
 
 CYG_PREFIX = "/cygdrive/"
 
-def cygpathToWin(path):
+def cygpath_to_win(path):
     if path.startswith(CYG_PREFIX):
         path = path[len(CYG_PREFIX) : ]
-        driveLetter = "{0}:\\".format(path[0])
+        drive_letter = "{0}:\\".format(path[0])
         path = path[2 : ].replace("/", "\\")
-        path = "{0}{1}".format(driveLetter, path)
+        path = "{0}{1}".format(drive_letter, path)
     return path
 
 
@@ -200,7 +200,7 @@ class RepresentationMixIn(object):
 
 import mmap
 
-def createMemoryMappedFileView(filename, writeable = False):
+def create_memorymapped_fileview(filename, writeable = False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
     if six.PY3:

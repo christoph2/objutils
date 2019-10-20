@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -141,7 +141,7 @@ IHEX_32 = b""":020000040010EA
 :00000001FF
 """
 
-class TestIHexRecordTypes(unittest.TestCase):
+class TestIHexrecord_types(unittest.TestCase):
 
     def test16Bit(self):
         dataIn = loads("srec", S19_16)

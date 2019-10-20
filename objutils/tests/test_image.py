@@ -9,7 +9,7 @@ import sys
 from objutils import loads, dumps
 from objutils.section  import Section
 from objutils.image  import Image, Builder
-from objutils.utils import PYTHON_VERSION, createStringBuffer
+from objutils.utils import PYTHON_VERSION, create_string_buffer
 
 class BaseTest(unittest.TestCase):
 
@@ -125,9 +125,9 @@ class TestImageSlices(BaseTest):
         image = self.b0.image
         section = image[1]
         if PYTHON_VERSION.major == 3:
-            buf = io.TextIOWrapper(createStringBuffer())
+            buf = io.TextIOWrapper(create_string_buffer())
         else:
-            buf = createStringBuffer()
+            buf = create_string_buffer()
         section.hexdump(buf)
 
 

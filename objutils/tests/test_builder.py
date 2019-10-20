@@ -6,7 +6,7 @@ import os
 from objutils import loads, dumps
 from objutils.section import Section
 from objutils.image import Builder
-from objutils.utils import createStringBuffer, PYTHON_VERSION
+from objutils.utils import create_string_buffer, PYTHON_VERSION
 import unittest
 
 TEST1 = """
@@ -22,9 +22,9 @@ class TestBasicFunctionality(unittest.TestCase):
 
     def testBasic(self):
         if PYTHON_VERSION.major == 3:
-            buf = io.TextIOWrapper(createStringBuffer())
+            buf = io.TextIOWrapper(create_string_buffer())
         else:
-            buf = createStringBuffer()
+            buf = create_string_buffer()
         b0 = Builder()
         b0.add_section("hello world!")
         b0.join_sections()

@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -44,24 +44,23 @@ class Reader(hexfile.Reader):
         (EOF, ":0000")
     )
 
-    def checkLine(self, line, formatType):
-        if formatType == DATA:
+    def check_line(self, line, format_type):
+        if format_type == DATA:
             line.length = len(line.chunk)
 
-    def isDataLine(self, line, formatType):
-        return formatType == DATA
+    def is_data_line(self, line, format_type):
+        return format_type == DATA
 
 
 class Writer(hexfile.Writer):
     SEPARATOR = "{0!s}\x0d\x0a".format(('\x00' * 48))
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
-        return "{0:04X} {1!s};".format(address, Writer.hexBytes(row))
+    def compose_row(self, address, length, row):
+        return "{0:04X} {1!s};".format(address, Writer.hex_bytes(row))
 
-    def composeHeader(self, meta):
+    def compose_header(self, meta):
         return "{0!s}!M".format(Writer.SEPARATOR)
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         return "{0!s}".format(Writer.SEPARATOR)
-

@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -47,35 +47,34 @@ class Reader(hexfile.Reader):
         (EOF,      "%LL8CCAAAAADD"),
     )
 
-    def checkLine(self, line, formatType):
-        if formatType == DATA:
+    def check_line(self, line, format_type):
+        if format_type == DATA:
             line.length = (line.length / 2) - 5
-            checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(line.address), 6, ((line.length + 5) * 2), line.chunk))
+            checksum = checksums.nibble_sum(utils.make_list(utils.int_to_array(line.address), 6, ((line.length + 5) * 2), line.chunk))
             if line.length != len(line.chunk):
                 raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             if line.checksum!=checksum:
                 raise hexfile.InvalidRecordChecksumError()
-        elif formatType == SYMBOL:
-            checksum = checksums.nibbleSum(utils.makeList(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
+        elif format_type == SYMBOL:
+            checksum = checksums.nibble_sum(utils.make_list(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
             chunk = line.chunk.strip()
             address = int(chunk[-4 : ], 16)
             line.address = address
             #if line.checksum!=checksum:
             #    raise hexfile.InvalidRecordChecksumError()
 
-    def isDataLine(self, line, formatType):
-        return formatType == DATA
+    def is_data_line(self, line, format_type):
+        return format_type == DATA
 
-    def parseData(self, line, formatType):
-        return formatType != SYMBOL
+    def parseData(self, line, format_type):
+        return format_type != SYMBOL
 
 class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 24
 
-    def composeRow(self, address, length, row):
-        checksum = checksums.nibbleSum(utils.makeList(utils.intToArray(address), 6, ((length + 5) * 2), row))
+    def compose_row(self, address, length, row):
+        checksum = checksums.nibble_sum(utils.make_list(utils.int_to_array(address), 6, ((length + 5) * 2), row))
 
-        line = "%{0:02X}6{1:02X}{2:04X}{3!s}".format((length + 5) * 2, checksum, address, Writer.hexBytes(row) )
+        line = "%{0:02X}6{1:02X}{2:04X}{3!s}".format((length + 5) * 2, checksum, address, Writer.hex_bytes(row) )
         return line
-

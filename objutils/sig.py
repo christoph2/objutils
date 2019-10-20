@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -40,30 +40,30 @@ class Reader(objutils.hexfile.Reader):
         (EOF, ":00")
     )
 
-    def checkLine(self, line, formatType):
-        if formatType == DATA:
+    def check_line(self, line, format_type):
+        if format_type == DATA:
             if line.length != len(line.chunk):
                 raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-            addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(line.address), line.length), 8, checksums.ROTATE_LEFT)
-            if line.addrChecksum != addressChecksum:
+            address_checksum = checksums.rotatedXOR(utils.make_list(utils.int_to_array(line.address), line.length), 8, checksums.ROTATE_LEFT)
+            if line.addrChecksum != address_checksum:
                 raise hexfile.InvalidRecordChecksumError()
-            dataChecksum = checksums.rotatedXOR(line.chunk, 8, checksums.ROTATE_LEFT)
-            if line.checksum != dataChecksum:
+            data_checksum = checksums.rotatedXOR(line.chunk, 8, checksums.ROTATE_LEFT)
+            if line.checksum != data_checksum:
                 raise hexfile.InvalidRecordChecksumError()
 
-    def isDataLine(self,line,formatType):
-        return formatType == DATA
+    def is_data_line(self,line,format_type):
+        return format_type == DATA
 
 class Writer(objutils.hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
-        addressChecksum = checksums.rotatedXOR(utils.makeList(utils.intToArray(address), length), 8, checksums.ROTATE_LEFT)
-        dataChecksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
-        line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, addressChecksum, Writer.hexBytes(row), dataChecksum)
-        self.lastAddress = address + length
+    def compose_row(self, address, length, row):
+        address_checksum = checksums.rotatedXOR(utils.make_list(utils.int_to_array(address), length), 8, checksums.ROTATE_LEFT)
+        data_checksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
+        line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(address, length, address_checksum, Writer.hex_bytes(row), data_checksum)
+        self.last_address = address + length
         return line
 
-    def composeFooter(self, meta):
-      return ":{0:04X}00".format(self.lastAddress)
+    def compose_footer(self, meta):
+      return ":{0:04X}00".format(self.last_address)

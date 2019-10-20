@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -28,7 +28,7 @@ __copyright__ = """
 from functools import partial
 import re
 from objutils.checksums import lrc, COMPLEMENT_ONES
-from objutils.utils import makeList
+from objutils.utils import make_list
 import objutils.hexfile as hexfile
 import objutils.utils as utils
 
@@ -74,64 +74,64 @@ class Reader(hexfile.Reader):
 
         ## todo: extract Symbols and wipe them out.
         """
-        symbolTables = SYMBOLTABLE.findall(data)
-        if symbolTables:
-            self._stripSymbols(symbolTables)
+        symbol_tables = SYMBOLTABLE.findall(data)
+        if symbol_tables:
+            self._strip_symbols(symbol_tables)
         records = SYMBOLTABLE.sub('', data).strip()
         """
 
         return data
 
-    def checkLine(self, line, formatType):
+    def check_line(self, line, format_type):
         # todo: Fkt.!!!
-        if formatType in (S0, S1, S5, S9):
-            checkSumOfAddress = ((line.address & 0xff00) >> 8) + (line.address & 0xff)
-        elif formatType in (S2, S8):
-            checkSumOfAddress = ((line.address & 0xff0000) >> 16) + ((line.address & 0xff00) >> 8) + (line.address & 0xff)
-        elif formatType in (S3, S7):
-            checkSumOfAddress = (((line.address & 0xff000000) >> 24)+((line.address & 0xff0000) >> 16) +
+        if format_type in (S0, S1, S5, S9):
+            checksum_of_address = ((line.address & 0xff00) >> 8) + (line.address & 0xff)
+        elif format_type in (S2, S8):
+            checksum_of_address = ((line.address & 0xff0000) >> 16) + ((line.address & 0xff00) >> 8) + (line.address & 0xff)
+        elif format_type in (S3, S7):
+            checksum_of_address = (((line.address & 0xff000000) >> 24)+((line.address & 0xff0000) >> 16) +
                 ((line.address & 0xff00) >>8 )+(line.address & 0xff)
             )
         else:
-            raise TypeError("Invalid format type '{0!s}'.".format(formatType))
+            raise TypeError("Invalid format type '{0!s}'.".format(format_type))
         if hasattr(line, 'chunk'):
-            checksum = (~(sum([line.length,checkSumOfAddress]) + sum(line.chunk))) & 0xff
+            checksum = (~(sum([line.length,checksum_of_address]) + sum(line.chunk))) & 0xff
         else:
-            checksum = (~(sum([line.length,checkSumOfAddress]))) & 0xff
+            checksum = (~(sum([line.length,checksum_of_address]))) & 0xff
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
-        line.length -= BIAS[formatType]   # calculate actual data length.
+        line.length -= BIAS[format_type]   # calculate actual data length.
         if hasattr(line, 'chunk') and line.length and (line.length != len(line.chunk)):
             raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
-    def isDataLine(self, line, formatType):
-        return formatType in (S1, S2, S3)
+    def is_data_line(self, line, format_type):
+        return format_type in (S1, S2, S3)
 
-    def specialProcessing(self, line, formatType):
-        if formatType == S0:
+    def special_processing(self, line, format_type):
+        if format_type == S0:
             #print "S0: [%s]" % line.chunk
             pass
-        elif formatType == S5:
+        elif format_type == S5:
             #print "S5: [%s]" % line.chunk
             start_address = line.address
-        elif formatType == S7:
+        elif format_type == S7:
             start_address = line.address
             #print "Startaddress[S7]: %u" % start_address
             #print "32-Bit Start-Address: ", hex(start_address)
-        elif formatType == S8:
+        elif format_type == S8:
             start_address = line.address
             #print "Startaddress[S8]: %u" % start_address
             #print "24-Bit Start-Address: ", hex(start_address)
-        elif formatType == S9:
+        elif format_type == S9:
             start_address = line.address
             #print "Startaddress[S9]: %u" % start_address
             #print "16-Bit Start-Address: ", hex(start_address)
 
-    def _stripSymbols(self, symbolTables):
+    def _strip_symbols(self, symbol_tables):
         self.symbols=[]
-        for _, moduleName, symbolTable in symbolTables:
+        for _, module_name, symbol_table in symbol_tables:
             sb = []
-            for symbol in symbolTable.splitlines():
+            for symbol in symbol_table.splitlines():
                 ma = SYMBOL.match(symbol)
                 if ma:
                     #print ma.groupdict()
@@ -142,7 +142,7 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    recordType = None
+    record_type = None
     s5record = False
     start_address = None
 
@@ -150,62 +150,62 @@ class Writer(hexfile.Writer):
 
     checksum = partial(lrc, width = 8, comp = COMPLEMENT_ONES)
 
-    def preProcessing(self, image):
-        if self.recordType is None:
+    def pre_processing(self, image):
+        if self.record_type is None:
             if hasattr(image, "sections"):
-                lastSegment = sorted(image.sections, key = lambda s: s.start_address)[-1]
+                last_segment = sorted(image.sections, key = lambda s: s.start_address)[-1]
             else:
-                lastSegment = image
-            highestAddress = lastSegment.start_address + lastSegment.length
-            if highestAddress <= 0x000000ffff:
-                self.recordType = 1
-            elif highestAddress <= 0x00ffffff:
-                self.recordType = 2
-            elif highestAddress <= 0xffffffff:
-                self.recordType = 3
-        self.addressMask = "%0{0:d}X".format((self.recordType + 1) * 2 )
-        self.offset = self.recordType + 2
+                last_segment = image
+            highest_address = last_segment.start_address + last_segment.length
+            if highest_address <= 0x000000ffff:
+                self.record_type = 1
+            elif highest_address <= 0x00ffffff:
+                self.record_type = 2
+            elif highest_address <= 0xffffffff:
+                self.record_type = 3
+        self.address_mask = "%0{0:d}X".format((self.record_type + 1) * 2 )
+        self.offset = self.record_type + 2
 
 
-    def srecord(self, recordType, length, address, data = None):
+    def srecord(self, record_type, length, address, data = None):
         if data is None:
             data = []
         length += self.offset
-        addressBytes = utils.intToArray(address)
-        checksum = self.checksum(makeList(addressBytes, length, data))
-        mask = "S%u%02X{0!s}%s%02X".format(self.addressMask)
-        return mask % (recordType, length, address, Writer.hexBytes(data), checksum)
+        address_bytes = utils.int_to_array(address)
+        checksum = self.checksum(make_list(address_bytes, length, data))
+        mask = "S%u%02X{0!s}%s%02X".format(self.address_mask)
+        return mask % (record_type, length, address, Writer.hex_bytes(data), checksum)
 
-    def composeRow(self, address, length, row):
-        self.recordCount += 1
-        return self.srecord(self.recordType, length, address, row)
+    def compose_row(self, address, length, row):
+        self.record_count += 1
+        return self.srecord(self.record_type, length, address, row)
 
-    def composeHeader(self, meta):
-        self.recordCount = 0
+    def compose_header(self, meta):
+        self.record_count = 0
         result = []
         if S0 in meta:  # Usually only one S0 record, but be tolerant.
             for meta in meta[S0]:
                 result.append(self.srecord(0, len(meta.chunk), meta.address, meta.chunk))
         return '\n'.join(result)
 
-    def composeFooter(self, meta):
+    def compose_footer(self, meta):
         result = []
         if self.s5record:
-            result.append(self.srecord(5, 0, self.recordCount))
+            result.append(self.srecord(5, 0, self.record_count))
         if self.start_address is not None:
-            if self.recordType == 1:    # 16bit.
+            if self.record_type == 1:    # 16bit.
                 if S9 in meta:
                     s9 = meta[S9][0]
                     result.append(self.srecord(9, 0, s9.address))
                 else:
                     result.append(self.srecord(9, 0, self.start_address))
-            elif self.recordType == 2:  # 24bit.
+            elif self.record_type == 2:  # 24bit.
                 if S8 in meta:
                     s8 = meta[S8][0]
                     result.append(self.srecord(8, 0, s8.address))
                 else:
                     result.append(self.srecord(8, 0, self.start_address))
-            elif self.recordType == 3:  # 32bit.
+            elif self.record_type == 3:  # 32bit.
                 if S7 in meta:
                     s7 = meta[S7][0]
                     result.append(self.srecord(7, 0, s7.address))

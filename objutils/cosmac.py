@@ -4,9 +4,9 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -43,34 +43,33 @@ class Reader(hexfile.Reader):
         (DATA2,  "AAAA DD"),
         (DATA3,  "DD"),
     )
-    previousAddress = 0
-    previousLength = 0
+    previous_address = 0
+    previous_length = 0
 
-    def checkLine(self, line, formatType):
+    def check_line(self, line, format_type):
         return True
 
-    def isDataLine(self, line, formatType):
-        if formatType == DATA3:
+    def is_data_line(self, line, format_type):
+        if format_type == DATA3:
             if line.junk in ("!M", "?M"):   # Startsymbol, address ommited.
                 return False
-            line.address = self.previousAddress + self.previousLength
-            self.previousAddress = line.address
-            self.previousLength = len(line.chunk)
+            line.address = self.previous_address + self.previous_length
+            self.previous_address = line.address
+            self.previous_length = len(line.chunk)
         else:
             if hasattr(line, 'chunk'):
                 length = len(line.chunk)
             else:
                 length = 0
-            self.previousAddress = line.address
-            self.previousLength = length
-        return formatType in (DATA0, DATA1, DATA2, DATA3)
+            self.previous_address = line.address
+            self.previous_length = length
+        return format_type in (DATA0, DATA1, DATA2, DATA3)
 
 
 class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 
-    def composeRow(self, address, length, row):
-        line = "!M{0:04X} {1}".format(address, Writer.hexBytes(row))
+    def compose_row(self, address, length, row):
+        line = "!M{0:04X} {1}".format(address, Writer.hex_bytes(row))
         return line
-

@@ -4,7 +4,7 @@
 __version__ = "0.1.0"
 
 __copyright__ = """
-    pyObjUtils - Object file library for Python.
+    objutils - Object file library for Python.
 
    (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
 
@@ -42,10 +42,10 @@ class Registry(SingletonBase):
     def __iter__(self):
         return iter(self._codecs.items())
 
-    def _getCodecs(self):
+    def _get_codecs(self):
         return self._codecs
 
-    def _getFormats(self):
+    def _get_formats(self):
         return sorted(self.codecs.keys())
 
     def get(self, name):
@@ -61,7 +61,7 @@ class Registry(SingletonBase):
         readerClass.codecName = name
         writerClass.codecName = name
 
-    codecs = property(_getCodecs)
-    formats = property(_getFormats)
+    codecs = property(_get_codecs)
+    formats = property(_get_formats)
 
 registry = Registry()
