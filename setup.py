@@ -25,7 +25,7 @@ setup(
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
     packages=find_packages(),
-    include_package_data=True,
+    #include_package_data=True,
     extras_require={
        "docs": [
            'sphinxcontrib-napoleon'
