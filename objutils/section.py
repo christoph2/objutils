@@ -151,7 +151,9 @@ def _data_converter(data):
 
 @attr.s(repr = False, cmp = True)
 class Section(object):
-    """
+    """Manage sections.
+
+    A section is a continuous block of bytes, with a start-address and known length.
 
     """
     start_address = attr.ib(type = int, cmp = True, default = 0)

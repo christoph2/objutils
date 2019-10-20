@@ -36,7 +36,9 @@ import sys
 
 from objutils.section import Section, join_sections
 
-class AddressError(Exception): pass
+class InvalidAddressError(Exception):
+    """Raised if address information is out of range.
+    """
 
 ## Adress-space constants.
 AS_16   = 0
@@ -104,16 +106,55 @@ class Image(object):
             if addr in section:
                 func = getattr(section, func_name)
                 return func(addr, *args)
-        raise AddressError("Address 0x{:08x} not found.".format(addr))
+        raise InvalidAddressError("Address 0x{:08x} not in range.".format(addr))
 
     def read(self, addr, length):
-        """
+        """Read bytes from image.
 
+        Parameters
+        ----------
+        addr: int
+            Startaddress.
+
+        length: int
+            Number of bytes to read.
+
+        Returns
+        -------
+        bytes
+
+        Raises
+        ------
+        :class:`InvalidAddressError`
+            if `addr` is out of range
+
+        Note
+        ----
+            if `addr` + `len` is out of range, result is silently truncated, i.e. without raising an exception.
         """
         return self._call_address_function("read", addr, length)
 
     def write(self, addr, length, data):
-        """
+        """Write bytes to image.
+
+        Parameters
+        ----------
+        addr: int
+            Startaddress.
+
+        length: int
+            Number of bytes to write.
+
+        data: bytes
+
+        Raises
+        ------
+        :class:`InvalidAddressError`
+            if `addr` is out of range
+
+        Note
+        ----
+            if `addr` + `len` is out of range, result is silently truncated, i.e. without raising an exception.
 
         """
         self._call_address_function("write", addr, length, data)
