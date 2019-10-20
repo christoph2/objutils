@@ -85,7 +85,7 @@ class TestCreateSections(BaseTest):
     def testOmittedAddressYieldsToZero(self):
         self.b0.add_section(range(16))
         data = self.b0.image
-        self.assertEqual(data[0].startAddress, 0X00000000)
+        self.assertEqual(data[0].start_address, 0X00000000)
 
     #def testCreateSectionFromArrayHWorks(self):
     #    if sys.byteorder == 'little':

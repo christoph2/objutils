@@ -55,7 +55,7 @@ class TestBuilderParameters(unittest.TestCase):
         builder.add_section(range(16), 0x70)
         builder.add_section(range(16), 0x60)
         builder.add_section(range(16), 0x50)
-        return [s.startAddress for s in builder.image]
+        return [s.start_address for s in builder.image]
 
     def testBuilderPreservesOrder(self):
         self.assertEqual(self.createImage(auto_sort = False), [144, 128, 112, 96, 80])

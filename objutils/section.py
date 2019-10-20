@@ -44,7 +44,7 @@ from objutils.utils import PYTHON_VERSION
 ##
 ## todo: find/search methode(n) mit slice funktion!
 ## Basic patch-interface: (addr (plus ext!), datatype (endianess)) - readAs()/writeAs()
-## API to change startAddress (but not length!) /w check for overlapps.
+## API to change start_address (but not length!) /w check for overlapps.
 ## split (for some reason) contingous regions into separate segments (splitAt [addresses], splitInto [n pieces]) inplace or new object.
 ## cut/copy/paste/delete
 
@@ -152,7 +152,7 @@ class Section(object):
     """
 
     """
-    startAddress = attr.ib(type = int, cmp = True, default = 0)
+    start_address = attr.ib(type = int, cmp = True, default = 0)
     data = attr.ib(default = bytearray(), converter = _data_converter, cmp = True)
     length = attr.ib(init = False, cmp = True)
 
@@ -189,34 +189,34 @@ class Section(object):
         return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
     def read(self, addr, length):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         data = self.data[offset : offset + length]
         return Section(addr, data)
 
     def write(self, addr, length, data):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         self.data[offset : offset + length] = data
 
     def read_numeric(self, addr, dtype):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         fmt = self._getformat(dtype)
         data = self.data[offset : offset + struct.calcsize(fmt)]
         return struct.unpack(fmt, data)[0]
 
     def write_numeric(self, addr, value, dtype):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         fmt = self._getformat(dtype)
         self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
 
     def read_string(self, addr, encoding = "latin1", length = -1):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         pos = self.data[offset : ].find(b'\x00')
         if pos == -1:
             raise RuntimeError("Unterminated String!!!")
         return self.data[offset : offset + pos].decode(encoding = encoding)
 
     def write_string(self, addr, value, encoding = "latin1"):
-        offset = addr - self.startAddress
+        offset = addr - self.start_address
         if PYTHON_VERSION.major == 3:
             self.data[offset : offset +  len(value)] = bytes(value, encoding = encoding)
         else:
@@ -225,11 +225,11 @@ class Section(object):
 
     def find(self, expr, addr = -1):
         for item in re.finditer(bytes(expr), self.data):
-            yield (self.startAddress + item.start(), item.end()- item.start())
+            yield (self.start_address + item.start(), item.end()- item.start())
 
     def __repr__(self):
         return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
-            self.startAddress,
+            self.start_address,
             self.length,
             self.repr.repr(memoryview(self.data).tobytes())
         )
@@ -238,23 +238,23 @@ class Section(object):
         return self.length
 
     def __contains__(self, addr):
-        return self.startAddress <= addr < (self.startAddress + self.length)
+        return self.start_address <= addr < (self.start_address + self.length)
 
 
 def join_sections(sections, order_sections = True):
     resultSections = []
     if order_sections:
-        sections.sort(key = attrgetter("startAddress"))
+        sections.sort(key = attrgetter("start_address"))
     prevSection = Section()
     while sections:
         section = sections.pop(0)
-        if section.startAddress == prevSection.startAddress + prevSection.length and resultSections:
+        if section.start_address == prevSection.start_address + prevSection.length and resultSections:
             lastSegment = resultSections[-1]
             lastSegment.data.extend(section.data)
             lastSegment.length += section.length
         else:
             # Create a new section.
-            resultSections.append(Section(section.startAddress, section.data))
+            resultSections.append(Section(section.start_address, section.data))
         prevSection = section
     if resultSections:
         return resultSections

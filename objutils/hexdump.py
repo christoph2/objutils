@@ -59,13 +59,13 @@ class Dumper(object):
                     print("          *", file = self._fp)
                     self.elided = True
             else:
-                self.dumpRow(row, startPos + section.startAddress)
+                self.dumpRow(row, startPos + section.start_address)
                 self.elided = False
             startPos = endPos
             endPos = endPos + self.LINE_LENGTH
             self.previousRow = row
         row = section.data[startPos : endPos]
-        self.dumpRow(row, startPos + section.startAddress)
+        self.dumpRow(row, startPos + section.start_address)
         print("-" * 15, file = self._fp)
         print("{0:-9d} bytes".format(section.length), file = self._fp)
         print("-" * 15, file = self._fp)

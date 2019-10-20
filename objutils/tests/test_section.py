@@ -14,57 +14,57 @@ from objutils.section import (Section, filler, INT8_RANGE, INT16_RANGE,
 def test_default_section():
     section = Section()
     #section = Section2(data=[10, 20, 30, 40])
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 0
     assert section.data == b''
 
 def test_default_startAddress():
-    section = Section(startAddress = 0x10000)
-    assert section.startAddress == 0x10000
+    section = Section(start_address = 0x10000)
+    assert section.start_address == 0x10000
     assert section.length == 0
     assert section.data == b''
 
 def test_initialize_from_list():
     section = Section(data = [10, 20, 30, 40])
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 4
     assert section.data == b'\n\x14\x1e('
 
 def test_initialize_from_array1():
     section = Section(data = array.array('B', [10, 20, 30, 40]))
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 4
     assert section.data == b'\n\x14\x1e('
 
 def test_initialize_from_array2():
     section = Section(data = array.array('H', [0x1010, 0x2020, 0x3030, 0x4040]))
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 8
     assert section.data == b'\x10\x10  00@@'
 
 def test_initialize_from_range():
     section = Section(data = range(16))
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 16
     assert section.data == b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f'
 
 def test_initialize_from_string():
     section = Section(data = "abcd")
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 4
     assert section.data == b'abcd'
 
 def test_copy_data_from_other_section():
-    data = Section(data = "abcd", startAddress = 0x8000)
+    data = Section(data = "abcd", start_address = 0x8000)
     section = Section(data = data)
-    assert section.startAddress == 0
+    assert section.start_address == 0
     assert section.length == 4
     assert section.data == b'abcd'
 
 def test_copy_really_works():
-    section1 = Section(data = range(16), startAddress = 0x8000)
+    section1 = Section(data = range(16), start_address = 0x8000)
     section2 = Section(data = section1)
-    assert section2.startAddress == 0
+    assert section2.start_address == 0
     assert section2.length == 16
     assert section2.data == b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f'
     assert section2.data == section1.data

@@ -347,7 +347,7 @@ class Writer(BaseType):
         if header:
             result.append(header)
         for section in image:
-            address = section.startAddress
+            address = section.start_address
             rows = slicer(section.data, rowLength, lambda x:  [int(y) for y in x])
             for row in rows:
                 length = len(row)
@@ -365,10 +365,10 @@ class Writer(BaseType):
         if isinstance(image, Builder):
             image = image.image     # Be tolerant.
         if hasattr(image, "sections"):
-            lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+            lastSegment = sorted(image.sections, key = lambda s: s.start_address)[-1]
         else:
             lastSegment = image
-        highestAddress = lastSegment.startAddress + lastSegment.length
+        highestAddress = lastSegment.start_address + lastSegment.length
         return int(math.ceil(math.log(highestAddress + 1) / math.log(2)))
 
     def postProcess(self, data):

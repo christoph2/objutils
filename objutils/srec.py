@@ -113,19 +113,19 @@ class Reader(hexfile.Reader):
             pass
         elif formatType == S5:
             #print "S5: [%s]" % line.chunk
-            startAddress = line.address
+            start_address = line.address
         elif formatType == S7:
-            startAddress = line.address
-            #print "Startaddress[S7]: %u" % startAddress
-            #print "32-Bit Start-Address: ", hex(startAddress)
+            start_address = line.address
+            #print "Startaddress[S7]: %u" % start_address
+            #print "32-Bit Start-Address: ", hex(start_address)
         elif formatType == S8:
-            startAddress = line.address
-            #print "Startaddress[S8]: %u" % startAddress
-            #print "24-Bit Start-Address: ", hex(startAddress)
+            start_address = line.address
+            #print "Startaddress[S8]: %u" % start_address
+            #print "24-Bit Start-Address: ", hex(start_address)
         elif formatType == S9:
-            startAddress = line.address
-            #print "Startaddress[S9]: %u" % startAddress
-            #print "16-Bit Start-Address: ", hex(startAddress)
+            start_address = line.address
+            #print "Startaddress[S9]: %u" % start_address
+            #print "16-Bit Start-Address: ", hex(start_address)
 
     def _stripSymbols(self, symbolTables):
         self.symbols=[]
@@ -144,7 +144,7 @@ class Reader(hexfile.Reader):
 class Writer(hexfile.Writer):
     recordType = None
     s5record = False
-    startAddress = None
+    start_address = None
 
     MAX_ADDRESS_BITS = 32
 
@@ -153,10 +153,10 @@ class Writer(hexfile.Writer):
     def preProcessing(self, image):
         if self.recordType is None:
             if hasattr(image, "sections"):
-                lastSegment = sorted(image.sections, key = lambda s: s.startAddress)[-1]
+                lastSegment = sorted(image.sections, key = lambda s: s.start_address)[-1]
             else:
                 lastSegment = image
-            highestAddress = lastSegment.startAddress + lastSegment.length
+            highestAddress = lastSegment.start_address + lastSegment.length
             if highestAddress <= 0x000000ffff:
                 self.recordType = 1
             elif highestAddress <= 0x00ffffff:
@@ -192,23 +192,23 @@ class Writer(hexfile.Writer):
         result = []
         if self.s5record:
             result.append(self.srecord(5, 0, self.recordCount))
-        if self.startAddress is not None:
+        if self.start_address is not None:
             if self.recordType == 1:    # 16bit.
                 if S9 in meta:
                     s9 = meta[S9][0]
                     result.append(self.srecord(9, 0, s9.address))
                 else:
-                    result.append(self.srecord(9, 0, self.startAddress))
+                    result.append(self.srecord(9, 0, self.start_address))
             elif self.recordType == 2:  # 24bit.
                 if S8 in meta:
                     s8 = meta[S8][0]
                     result.append(self.srecord(8, 0, s8.address))
                 else:
-                    result.append(self.srecord(8, 0, self.startAddress))
+                    result.append(self.srecord(8, 0, self.start_address))
             elif self.recordType == 3:  # 32bit.
                 if S7 in meta:
                     s7 = meta[S7][0]
                     result.append(self.srecord(7, 0, s7.address))
                 else:
-                    result.append(self.srecord(7, 0, self.startAddress))
+                    result.append(self.srecord(7, 0, self.start_address))
         return '\n'.join(result)

@@ -41,6 +41,8 @@ AS_32   = 2
 AS_64   = 3
 
 class Image(object):
+    """
+    """
 
     def __init__(self, sections = None, meta = None, valid = False):
         if meta is None:
@@ -110,14 +112,14 @@ class Image(object):
 
 
 class Builder(object):
-    """Construct and `Image` object.
+    """Construct and :class:`Image` object.
     """
 
     def __init__(self, sections = None, auto_join = False, auto_sort = False):
         if auto_sort:
             self._need_sorting = True
             if sections:
-                self._sections = sorted(sections, key = attrgetter("startAddress"))
+                self._sections = sorted(sections, key = attrgetter("start_address"))
             else:
                 self._sections = []
         else:
@@ -135,7 +137,7 @@ class Builder(object):
             data = [ord(x) for x in data] # array.array('B',data)
         self._sections.append(Section(address, data))
         if self._need_sorting:
-            self._sections.sort(key = attrgetter("startAddress"))
+            self._sections.sort(key = attrgetter("start_address"))
         if self.auto_join:
             self.join_sections()
         self.address = address + len(data)
@@ -157,7 +159,7 @@ class Builder(object):
 def _validate_sections(sections):
     """Test for required protocol
     """
-    ATTRIBUTES = ('startAddress', 'length', 'data')
+    ATTRIBUTES = ('start_address', 'length', 'data')
     if not '__iter__' in dir(sections):
         raise TypeError("Sections must be iteratable.")
     for section in sections:
