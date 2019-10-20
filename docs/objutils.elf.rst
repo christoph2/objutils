@@ -27,6 +27,14 @@ objutils.elf.defs module
     :undoc-members:
     :show-inheritance:
 
+objutils.elf.elfcons module
+---------------------------
+
+.. automodule:: objutils.elf.elfcons
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 objutils.elf.relocs module
 --------------------------
 

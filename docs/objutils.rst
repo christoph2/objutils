@@ -14,21 +14,6 @@ Subpackages
 Submodules
 ----------
 
-objutils.PECOFF\_old module
----------------------------
-
-.. automodule:: objutils.PECOFF_old
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-objutils.armabi module
-----------------------
-
-.. automodule:: objutils.armabi
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 objutils.ash module
 -------------------
@@ -46,13 +31,6 @@ objutils.binfile module
     :undoc-members:
     :show-inheritance:
 
-objutils.btester module
------------------------
-
-.. automodule:: objutils.btester
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 objutils.cc2vmc module
 ----------------------
@@ -134,14 +112,6 @@ objutils.hexfile module
     :undoc-members:
     :show-inheritance:
 
-objutils.ieee695 module
------------------------
-
-.. automodule:: objutils.ieee695
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 objutils.ihex module
 --------------------
 
@@ -174,21 +144,6 @@ objutils.mostec module
     :undoc-members:
     :show-inheritance:
 
-objutils.pdb module
--------------------
-
-.. automodule:: objutils.pdb
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-objutils.pecoff module
-----------------------
-
-.. automodule:: objutils.pecoff
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 objutils.pickleif module
 ------------------------
@@ -254,13 +209,6 @@ objutils.tek module
     :undoc-members:
     :show-inheritance:
 
-objutils.testrunner module
---------------------------
-
-.. automodule:: objutils.testrunner
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 objutils.titxt module
 ---------------------

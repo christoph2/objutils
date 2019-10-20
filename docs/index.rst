@@ -6,6 +6,10 @@ Welcome to objutils's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   tutorial
+   howto
+   modules
 
 Indices and tables
 ==================
