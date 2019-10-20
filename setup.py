@@ -16,11 +16,16 @@ install_reqs = ['future', 'mako', 'six', 'construct', 'attrs']
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(['enum34', 'mock'])
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name = 'objutils',
     version = version,
     provides = ['objutils'],
     description = "Objectfile library for Python",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author = 'Christoph Schueler',
     author_email = 'cpu12.gems@googlemail.com',
     url = 'http://github.com/christoph2/objutils',
@@ -49,6 +54,18 @@ setup(
     package_dir = {'tests': 'objutils/tests'},
     license='GPLv2',
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    keywords = [
+        'hex files',
+        'intel hex',
+        's19',
+        'srec',
+        'srecords',
+        'object files',
+        'map files',
+        'embedded',
+        'microcontroller',
+        'ECU'
+    ],
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
