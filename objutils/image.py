@@ -53,6 +53,7 @@ class AddressSpace(enum.IntEnum):
     AS_32   = 2
     AS_64   = 3
 
+
 class Image(object):
     """Manage images.
 
@@ -67,7 +68,7 @@ class Image(object):
     valid: bool
     """
 
-    def __init__(self, sections = None, auto_join = True, auto_sort = False, meta = None, valid = False, ):
+    def __init__(self, sections = None, auto_join = True, auto_sort = False, meta = None, valid = False):
         if meta is None:
             meta = {}
         if not sections:
@@ -78,23 +79,18 @@ class Image(object):
             self.sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
-
         if auto_sort:
             self._need_sorting = True
-        #    if sections:
             self.sections = sorted(self.sections, key = attrgetter("start_address"))
-        #    else:
-        #        self._sections = []
         else:
             self._need_sorting = False
-        #    self._sections = sections if sections else []
         if self.sections and auto_join:
             self.join_sections()
-        #_validate_sections(self._sections)
-
         _validate_sections(self.sections)
         self.address = 0
         self.auto_join = auto_join
+        #if meta and not isinstance(meta, MetaRecord):
+        #    raise TypeError("meta-data must be of instance 'MetaRecord'")
         self.meta = meta
         self.valid = valid
 

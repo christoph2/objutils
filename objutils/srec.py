@@ -109,7 +109,7 @@ class Reader(hexfile.Reader):
 
     def special_processing(self, line, format_type):
         if format_type == S0:
-            #print "S0: [%s]" % line.chunk
+            #print("S0: [{}]".format(line.chunk))
             pass
         elif format_type == S5:
             #print "S5: [%s]" % line.chunk
