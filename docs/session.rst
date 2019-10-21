@@ -17,7 +17,7 @@ Add our message
 
 .. code-block:: python
 
-   >>> builder.addSection("Hello HEX world", 0x1000)
+   >>> builder.add_section("Hello HEX world", 0x1000)
 
 
 And finally display it
