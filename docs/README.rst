@@ -69,12 +69,12 @@ Authors
 
 -  `Christoph Schueler <cpu12.gems@googlemail.com>`_ - Initial work and project lead.
 
-See also the list of  `contributors <CONTRIBUTORS>`_ who participated in this project.
+See also the list of  `contributors <../CONTRIBUTORS>`_ who participated in this project.
 
 License
 -------
 
-This project is licensed under the GNU General Public License v2.0 - see the `LICENSE <LICENSE>`_ file for details.
+This project is licensed under the GNU General Public License v2.0 - see the `LICENSE <../LICENSE>`_ file for details.
 
 Contribution
 ------------
