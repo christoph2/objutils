@@ -252,6 +252,8 @@ def join_sections(sections, order_sections = True):
     prev_section = Section()
     while sections:
         section = sections.pop(0)
+        if not isinstance(section, Section):
+            raise TypeError("'{}' is not a 'Section' instance", section)
         if section.start_address == prev_section.start_address + prev_section.length and result_sections:
             last_segment = result_sections[-1]
             last_segment.data.extend(section.data)
