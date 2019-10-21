@@ -31,6 +31,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import enum
 from operator import attrgetter, eq
 import sys
 
@@ -44,11 +45,13 @@ class InvalidAddressError(Exception):
 # TODO: Use crypto hashes (comparison, optimized storage, ...)
 #
 
-## Adress-space constants.
-AS_16   = 0
-AS_24   = 1
-AS_32   = 2
-AS_64   = 3
+class AddressSpace(enum.IntEnum):
+    """Adress-space constants.
+    """
+    AS_16   = 0
+    AS_24   = 1
+    AS_32   = 2
+    AS_64   = 3
 
 class Image(object):
     """Manage images.
@@ -64,18 +67,34 @@ class Image(object):
     valid: bool
     """
 
-    def __init__(self, sections = None, meta = None, valid = False):
+    def __init__(self, sections = None, auto_join = True, auto_sort = False, meta = None, valid = False, ):
         if meta is None:
             meta = {}
         if not sections:
             self.sections = []
         elif isinstance(sections, Section):
-            self.sections = tuple(sections)
+            self.sections = list(sections)
         elif hasattr(sections, "__iter__"):
-            self.sections = sections
+            self.sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
+
+        if auto_sort:
+            self._need_sorting = True
+        #    if sections:
+            self.sections = sorted(self.sections, key = attrgetter("start_address"))
+        #    else:
+        #        self._sections = []
+        else:
+            self._need_sorting = False
+        #    self._sections = sections if sections else []
+        if self.sections and auto_join:
+            self.join_sections()
+        #_validate_sections(self._sections)
+
         _validate_sections(self.sections)
+        self.address = 0
+        self.auto_join = auto_join
         self.meta = meta
         self.valid = valid
 
@@ -195,6 +214,21 @@ class Image(object):
         """
         self._call_address_function("writeString", addr, value, encoding)
 
+
+    def add_section(self, data, address = None, dont_join = False):
+        address = address if address else self.address  # If Address omitted, create continuous address space.
+        if isinstance(data, str):
+            data = [ord(x) for x in data] # array.array('B',data)
+        self.sections.append(Section(address, data))
+        if self._need_sorting:
+            self.sections.sort(key = attrgetter("start_address"))
+        if self.auto_join:
+            self.join_sections()
+        self.address = address + len(data)
+
+    def join_sections(self, order_segments = False):
+        self.sections = join_sections(self.sections, order_segments)
+
     def split(self, at = None, equal_parts = None, remap = None):
         print("SPLIT-IMAGE", at, equal_parts, remap)
 
@@ -214,47 +248,25 @@ class Builder(object):
     """
 
     def __init__(self, sections = None, auto_join = True, auto_sort = False):
-        #print("\nBuilder c-tor: sections-type: {} image: '{}'\n".format(type(sections), Image(sections)))
-        self._image = Image(sections)
-
-        if auto_sort:
-            self._need_sorting = True
-            if sections:
-                self._sections = sorted(sections, key = attrgetter("start_address"))
-            else:
-                self._sections = []
-        else:
-            self._need_sorting = False
-            self._sections = sections if sections else []
-        if self._sections and auto_join:
-            self.join_sections()
-        _validate_sections(self._sections)
+        self._image = Image(sections, auto_join, auto_sort)
         self.address = 0
         self.auto_join = auto_join
 
     def add_section(self, data, address = None, dont_join = False):
-        address = address if address else self.address  # If Address omitted, create continuous address space.
-        if isinstance(data, str):
-            data = [ord(x) for x in data] # array.array('B',data)
-        self._sections.append(Section(address, data))
-        if self._need_sorting:
-            self._sections.sort(key = attrgetter("start_address"))
-        if self.auto_join:
-            self.join_sections()
-        self.address = address + len(data)
+        self.image.add_section(data, address, dont_join)
 
     def add_metadata(self, meta_data):
         pass
 
-    def join_sections(self, order_segments = None):
-        self._sections = join_sections(self._sections, order_segments)
+    def join_sections(self, order_segments = False):
+        self.image.join_sections(order_segments)
 
     def hexdump(self, fp = sys.stdout):
         self.image.hexdump(fp)
 
     @property
     def image(self):
-        return Image(self._sections)
+        return self._image
 
     def __str__(self):
         return str(self.image)
