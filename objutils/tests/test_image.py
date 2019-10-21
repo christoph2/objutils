@@ -43,6 +43,9 @@ class TestImageConstructors(unittest.TestCase):
         img = Image((sec0, sec1))
         self.assertEqual(len(img.sections), 2)
 
+    def testFailOnUnsupportedType(self):
+        self.assertRaises(TypeError, Image, 4711)
+
 
 class Equality(BaseTest):
 

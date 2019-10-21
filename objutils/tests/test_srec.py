@@ -3,6 +3,7 @@
 
 from objutils import loads, dumps, probes
 from objutils.image import Builder
+from objutils.hexfile import MetaRecord
 import unittest
 
 import pytest
@@ -36,6 +37,18 @@ S3150000B0206C20746861742074726F75626C6520742C
 S3110000B0306F207265616420746869733FCC
 S70500000000FA"""
 
+SREC4 = b"""S00D000073616D706C652E73313965
+S315017FC0003B1879210016C07816C04B10EF87C76C95
+S315017FC01080B74618586CEA2102186280EC808C0042
+"""
+
+def test_meta_data1():
+    img = loads("srec", SREC1)
+    assert img.meta == {8: [MetaRecord(format_type=8, address=0, chunk=None)]}
+
+def test_meta_data2():
+    img = loads("srec", SREC4)
+    assert img.meta == {1: [MetaRecord(format_type=1, address=0, chunk=bytearray(b'sample.s19'))]}
 
 class TestRoundtrip(unittest.TestCase):
 

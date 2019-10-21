@@ -3,11 +3,16 @@
 
 import io
 import os
+import sys
+import unittest
+
+import pytest
+
 from objutils import loads, dumps
 from objutils.section import Section
-from objutils.image import Builder
+from objutils.image import Builder, Image
 from objutils.utils import create_string_buffer, PYTHON_VERSION
-import unittest
+
 
 TEST1 = """
 Section #0000
@@ -18,33 +23,33 @@ Section #0000
 ---------------
 """
 
-class TestBasicFunctionality(unittest.TestCase):
+LORUM_IPSUM = b"""Lorem ipsum dolor sit amet, corripit ars tolle mei ad nomine Stranguillio sit aliquip
+ipsa Invitamus me. Accipiet duxit a lenoni nutrix ignoras misericordia mucrone possit caput vero diam
+nostra praedicabilium subsannio oculos ut libertatem adhuc. Male nuptiarum condono hunc matrimonium
+nisi se in modo invenit iuvenem quasi regnum diabolum limo. Athenagorae principio intus vero non dum,
+litus Ephesum iube enim est in. Solum puella eius sed esse ait Cumque persequatur sic, credo puella
+eius ad suis est Apollonius."""
 
-    def testBasic(self):
-        if PYTHON_VERSION.major == 3:
-            buf = io.TextIOWrapper(create_string_buffer())
-        else:
-            buf = create_string_buffer()
-        b0 = Builder()
-        b0.add_section("hello world!")
-        b0.join_sections()
-        b0.hexdump(buf)
-        buf.seek(0, os.SEEK_SET)
-        self.assertEqual(buf.read(), TEST1)
-
-    def testFailIfSectionsAreNotIterateble(self):
-        self.assertRaises(TypeError, Builder, 4711)
-
-    def testFailIfSectionIsNotValid(self):
-        self.assertRaises(TypeError, Builder, ["abc"])
-
-    def testValidSections(self):
-        builder = Builder([Section(0x1000, range(128))])
+def test_builder_hexdump(capsys):
+    b0 = Builder()
+    b0.add_section("hello world!")
+    b0.join_sections()
+    b0.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == TEST1
 
 
-    def testFailIfSectionsAreNotIterateble2(self):
-        builder = Builder([])
-        print(builder.image)
+def testFailIfSectionsAreNotIterateble():
+    with pytest.raises(TypeError):
+        bld = Builder(4711)
+
+def testFailIfSectionIsNotValid():
+    with pytest.raises(TypeError):
+        bld = Builder(["abc"])
+
+def testValidSections():
+    builder = Builder([Section(0x1000, range(128))])
+
 
 class TestBuilderParameters(unittest.TestCase):
 
@@ -68,6 +73,30 @@ class TestBuilderParameters(unittest.TestCase):
 
     def testBuilderCantJoinSegments(self):
         self.assertEqual(self.createImage(auto_sort = False, auto_join = True), [144, 128, 112, 96, 80])
+
+    def testBuilderConstructor1(self):
+        builder = Builder()
+        self.assertIsInstance(builder.image, Image)
+        self.assertEqual(len(builder.image), 0)
+
+    def testBuilderConstructor2(self):
+        builder = Builder(None)
+        self.assertIsInstance(builder.image, Image)
+        self.assertEqual(len(builder.image), 0)
+
+    def testBuilderConstructor3(self):
+        sec0 = Section(data = "hello", start_address = 0x100)
+        builder = Builder(sec0)
+        self.assertIsInstance(builder.image, Image)
+        self.assertEqual(len(builder.image), 1)
+
+    def testBuilderConstructor4(self):
+        sec0 = Section(data = "hello", start_address = 0x100)
+        sec1 = Section(data = "world", start_address = 0x200)
+        builder = Builder((sec0, sec1))
+        self.assertIsInstance(builder.image, Image)
+        self.assertEqual(len(builder.image), 2)
+
 
 if __name__ == '__main__':
     unittest.main()
