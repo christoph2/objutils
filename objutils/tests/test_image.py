@@ -21,6 +21,29 @@ class BaseTest(unittest.TestCase):
         del self.b0
         del self.b1
 
+
+class TestImageConstructors(unittest.TestCase):
+
+    def testEmpty(self):
+        img = Image()
+        self.assertEqual(img.sections, [])
+
+    def testNone(self):
+        img = Image(None)
+        self.assertEqual(img.sections, [])
+
+    def testSingle(self):
+        sec0 = Section(data = "hello", start_address = 0x100)
+        img = Image(sec0)
+        self.assertEqual(len(img.sections), 1)
+
+    def testTwo(self):
+        sec0 = Section(data = "hello", start_address = 0x100)
+        sec1 = Section(data = "world", start_address = 0x200)
+        img = Image((sec0, sec1))
+        self.assertEqual(len(img.sections), 2)
+
+
 class Equality(BaseTest):
 
     def testEqualImagesShallCompareEqualCase1(self):

@@ -40,6 +40,10 @@ class InvalidAddressError(Exception):
     """Raised if address information is out of range.
     """
 
+#
+# TODO: Use crypto hashes (comparison, optimized storage, ...)
+#
+
 ## Adress-space constants.
 AS_16   = 0
 AS_24   = 1
@@ -63,7 +67,14 @@ class Image(object):
     def __init__(self, sections = None, meta = None, valid = False):
         if meta is None:
             meta = {}
-        self.sections = sections if sections else []
+        if not sections:
+            self.sections = []
+        elif isinstance(sections, Section):
+            self.sections = tuple(sections)
+        elif hasattr(sections, "__iter__"):
+            self.sections = sections
+        else:
+            raise TypeError("Argument section is of wrong type '{}'".format(sections))
         _validate_sections(self.sections)
         self.meta = meta
         self.valid = valid
@@ -73,6 +84,8 @@ class Image(object):
         for segment in self.sections:
             result.append(repr(segment))
         return '\n'.join(result)
+
+    __str__ = __repr__
 
     def __len__(self):
         return len(self.sections)
@@ -187,10 +200,23 @@ class Image(object):
 
 
 class Builder(object):
-    """Construct and :class:`Image` object.
+    """Construct an :class:`Image` object.
+
+    Parameters
+    ----------
+    sections: iteratable (typically list or tuple)
+
+    auto_join: bool
+        Automatically join adjacent sections.
+
+    auto_sort: bool
+        Sort sections by startaddress (ascending).
     """
 
-    def __init__(self, sections = None, auto_join = False, auto_sort = False):
+    def __init__(self, sections = None, auto_join = True, auto_sort = False):
+        #print("\nBuilder c-tor: sections-type: {} image: '{}'\n".format(type(sections), Image(sections)))
+        self._image = Image(sections)
+
         if auto_sort:
             self._need_sorting = True
             if sections:
@@ -206,7 +232,7 @@ class Builder(object):
         self.address = 0
         self.auto_join = auto_join
 
-    def add_section(self, data, address = None, dont_join = False):   # TODO: 'polymorphic' signature, move 'dontJoin' to segment!
+    def add_section(self, data, address = None, dont_join = False):
         address = address if address else self.address  # If Address omitted, create continuous address space.
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
@@ -229,6 +255,12 @@ class Builder(object):
     @property
     def image(self):
         return Image(self._sections)
+
+    def __str__(self):
+        return str(self.image)
+
+    def __repr__(self):
+        return str(self.image)
 
 
 def _validate_sections(sections):
