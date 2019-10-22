@@ -149,16 +149,16 @@ def _data_converter(data):
     return data
 
 
-@attr.s(repr = False, cmp = True)
+@attr.s(repr = False, eq = True, order = True)
 class Section(object):
     """Manage sections.
 
     A section is a continuous block of bytes, with a start-address and known length.
 
     """
-    start_address = attr.ib(type = int, cmp = True, default = 0)
-    data = attr.ib(default = bytearray(), converter = _data_converter, cmp = True)
-    length = attr.ib(init = False, cmp = True)
+    start_address = attr.ib(type = int, eq = True, order = True, default = 0)
+    data = attr.ib(default = bytearray(), converter = _data_converter, eq = True, order = True)
+    length = attr.ib(init = False, eq = True, order = True)
 
     @length.default
     def __init_length__(self):
