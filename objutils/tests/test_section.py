@@ -54,6 +54,22 @@ def test_initialize_from_string():
     assert section.length == 4
     assert section.data == b'abcd'
 
+def test_adress_in_range1():
+    s0 = Section(start_address = 0x10, data = "hello")
+    assert 0x10 in s0
+
+def test_adress_in_range2():
+    s0 = Section(start_address = 0x10, data = "hello")
+    assert 0x14 in s0
+
+def test_adress_out_of_range1():
+    s0 = Section(start_address = 0x10, data = "hello")
+    assert not 0x09 in s0
+
+def test_adress_out_of_range2():
+    s0 = Section(start_address = 0x10, data = "hello")
+    assert not 0x15 in s0
+
 def test_copy_data_from_other_section():
     data = Section(data = "abcd", start_address = 0x8000)
     section = Section(data = data)
