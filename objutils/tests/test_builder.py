@@ -32,7 +32,7 @@ eius ad suis est Apollonius."""
 
 def test_builder_hexdump(capsys):
     b0 = Builder()
-    b0.add_section("hello world!")
+    b0.insert_section("hello world!")
     b0.join_sections()
     b0.hexdump(sys.stdout)
     captured = capsys.readouterr()
@@ -55,11 +55,11 @@ class TestBuilderParameters(unittest.TestCase):
 
     def createImage(self, auto_sort = False, auto_join = False):
         builder = Builder(auto_sort = auto_sort, auto_join = auto_join)
-        builder.add_section(range(16), 0x90)
-        builder.add_section(range(16), 0x80)
-        builder.add_section(range(16), 0x70)
-        builder.add_section(range(16), 0x60)
-        builder.add_section(range(16), 0x50)
+        builder.insert_section(range(16), 0x90)
+        builder.insert_section(range(16), 0x80)
+        builder.insert_section(range(16), 0x70)
+        builder.insert_section(range(16), 0x60)
+        builder.insert_section(range(16), 0x50)
         return [s.start_address for s in builder.image]
 
     def testBuilderPreservesOrder(self):

@@ -17,7 +17,7 @@ class TestRepr(unittest.TestCase):
 
     def testImageRepresentation(self):
         builder = Builder()
-        builder.add_section([x % 256 for x in range(10000)])
+        builder.insert_section([x % 256 for x in range(10000)])
         builder.join_sections()
         self.assertEqual(repr(builder.image), RESULT)
 

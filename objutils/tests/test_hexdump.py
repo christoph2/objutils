@@ -85,10 +85,10 @@ Section #0000
 """
 
 #builder = Builder()
-#builder.add_section(range(53), 0x1000)
-#builder.add_section(range(0), 0x1000)
-#builder.add_section([0] * 512)
-#builder.add_section(range(64))
+#builder.insert_section(range(53), 0x1000)
+#builder.insert_section(range(0), 0x1000)
+#builder.insert_section([0] * 512)
+#builder.insert_section(range(64))
 #builder.join_sections()
 #builder.hexdump()
 
@@ -117,34 +117,34 @@ class BaseTest(unittest.TestCase):
 class TestHexdumper(BaseTest):
 
     def testDumpContinuousRange(self):
-        self.builder.add_section(range(64), 0x1000)
+        self.builder.insert_section(range(64), 0x1000)
         self.builder.join_sections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST1)
 
     def testDumpDiscontinuousRange(self):
-        self.builder.add_section(range(64), 0x1000)
-        self.builder.add_section(range(64), 0x2000)
+        self.builder.insert_section(range(64), 0x1000)
+        self.builder.insert_section(range(64), 0x2000)
         self.builder.join_sections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST2)
 
     def testDumpZeroBytesInBetween(self):
-        self.builder.add_section(range(64), 0x1000)
-        self.builder.add_section([0] * 512)
-        self.builder.add_section(range(64))
+        self.builder.insert_section(range(64), 0x1000)
+        self.builder.insert_section([0] * 512)
+        self.builder.insert_section(range(64))
         self.builder.join_sections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST3)
 
     def testDumpOddSizedRow(self):
-        self.builder.add_section(range(53), 0x1000)
+        self.builder.insert_section(range(53), 0x1000)
         self.builder.join_sections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST4)
 
     def testDumpEmptyRow(self):
-        self.builder.add_section(range(0), 0x1000)
+        self.builder.insert_section(range(0), 0x1000)
         self.builder.join_sections()
         self.builder.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST5)

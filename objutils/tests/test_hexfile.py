@@ -23,7 +23,7 @@ class TestHexfile(unittest.TestCase):
 
 
     def testAddSectionAliasWorks(self):
-        self.builder.add_section(range(64), 0x1000)
+        self.builder.insert_section(range(64), 0x1000)
         # Ok, if no exception gets raised.
 
     def testRaisesInvalidChecksumError(self):

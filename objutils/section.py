@@ -100,18 +100,19 @@ RANGES = {
     "int64": INT64_RANGE,
 }
 
-
-class OutOfBoundsError(Exception):
-    """
-    """
-
-
 def filler(ch, n):
-    """
-    :param ch: fill char
-    :type ch: int between 0 and 255
-    :param int n: repetition count
-    :return: bytearray
+    """Create an bytearray consisting of `n` `ch`s.
+
+    Parameters
+    ----------
+    ch: int (0 <= ch <= 255)
+        fill char
+    n: int
+        repetition count
+
+    Returns
+    -------
+    bytearray
     """
     if not isinstance(ch, int):
         raise TypeError("ch must be of type int")

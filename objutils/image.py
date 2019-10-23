@@ -73,9 +73,7 @@ class Image(object):
             meta = {}
         if not sections:
             self.sections = []
-        elif isinstance(sections, Section):
-            self.sections = list(sections)
-        elif hasattr(sections, "__iter__"):
+        elif isinstance(sections, Section) or hasattr(sections, "__iter__"):
             self.sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
@@ -119,6 +117,9 @@ class Image(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __contains__(self, addr):
+        return any(addr in sec for sec in self.sections)
 
     def hexdump(self, fp = sys.stdout):
         """
@@ -211,16 +212,42 @@ class Image(object):
         self._call_address_function("writeString", addr, value, encoding)
 
 
-    def add_section(self, data, address = None, dont_join = False):
-        address = address if address else self.address  # If Address omitted, create continuous address space.
+    def insert_section(self, data, start_address = None, dont_join = False):
+        """
+        Parameters
+        ----------
+        data: convertible to bytearray()
+            Bytes making up the section.
+        start_address: int
+        dont_join: bool
+            Don't join/merge adjacent section.
+
+        Notes
+        -----
+        Overlapping sections are not supported.
+        To relace a section use :meth:`replace_section`.
+        """
+        start_address = start_address if start_address else self.address  # If Address omitted, create continuous address space.
+        if start_address in self or (start_address + len(data) - 1) in self:
+            raise InvalidAddressError("Overlapping adress-space")
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
-        self.sections.append(Section(address, data))
+        self.sections.append(Section(start_address, data))
         if self._need_sorting:
             self.sections.sort(key = attrgetter("start_address"))
         if self.auto_join:
             self.join_sections()
-        self.address = address + len(data)
+        self.address = start_address + len(data)
+
+    def replace_section(self, data, address = None):
+        """
+
+        """
+
+    def delete_section(self, address = None):
+        """
+
+        """
 
     def join_sections(self, order_segments = False):
         self.sections = join_sections(self.sections, order_segments)
@@ -248,8 +275,8 @@ class Builder(object):
         self.address = 0
         self.auto_join = auto_join
 
-    def add_section(self, data, address = None, dont_join = False):
-        self.image.add_section(data, address, dont_join)
+    def insert_section(self, data, address = None, dont_join = False):
+        self.image.insert_section(data, address, dont_join)
 
     def add_metadata(self, meta_data):
         pass
