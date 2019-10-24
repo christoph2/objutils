@@ -31,9 +31,12 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import bisect
 import enum
 from operator import attrgetter, eq
 import sys
+
+from sortedcontainers import SortedDict
 
 from objutils.section import Section, join_sections
 
@@ -78,14 +81,18 @@ class Image(object):
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
         if auto_sort:
-            self._need_sorting = True
+            self._sorted = True
             self.sections = sorted(self.sections, key = attrgetter("start_address"))
         else:
-            self._need_sorting = False
+            self._sorted = False
         if self.sections and auto_join:
             self.join_sections()
         _validate_sections(self.sections)
         self.address = 0
+        self._addressMap = SortedDict()
+        for idx in range(len(self.sections)):
+            self._addressMap[self.sections[idx].start_address] = self.sections[idx]
+
         self.auto_join = auto_join
         #if meta and not isinstance(meta, MetaRecord):
         #    raise TypeError("meta-data must be of instance 'MetaRecord'")
@@ -212,39 +219,83 @@ class Image(object):
         self._call_address_function("writeString", addr, value, encoding)
 
 
-    def insert_section(self, data, start_address = None, dont_join = False):
-        """
+    def _address_contained(self, address, length):
+        """Check if address space exists.
+
         Parameters
         ----------
-        data: convertible to bytearray()
+        address: int
+        length: int
+
+        Returns
+        -------
+        bool
+        """
+        return address in self or (address + length - 1) in self
+
+    def insert_section(self, data, start_address = None, dont_join = False):
+        """Insert/add a new section to image.
+
+        Parameters
+        ----------
+        data: convertible to bytearray() -- s. :func:`_data_converter`.
             Bytes making up the section.
         start_address: int
         dont_join: bool
             Don't join/merge adjacent section.
 
+        Raises
+        ------
+        :class:`InvalidAddressError`
+
         Notes
         -----
         Overlapping sections are not supported.
-        To relace a section use :meth:`replace_section`.
+        To relace a section use :meth:`update_section`.
         """
         start_address = start_address if start_address else self.address  # If Address omitted, create continuous address space.
-        if start_address in self or (start_address + len(data) - 1) in self:
-            raise InvalidAddressError("Overlapping adress-space")
+        if self._address_contained(start_address, len(data)):
+            raise InvalidAddressError("Overlapping address-space")
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         self.sections.append(Section(start_address, data))
-        if self._need_sorting:
+        if self._sorted:
             self.sections.sort(key = attrgetter("start_address"))
         if self.auto_join:
             self.join_sections()
         self.address = start_address + len(data)
 
-    def replace_section(self, data, address = None):
+    def get_section(self, address = None):
+        """Get :class:`Section` containing `address`.
+        Parameters
+        ----------
+        address: int
+
+        Returns
+        -------
+        :class:`Section`
+
+        Raises
+        ------
+        :class:`InvalidAddressError`
+        """
+        if not start_address in self:
+            raise InvalidAddressError("Address not in range")
+        if self._sorted:
+            pass # TODO: bisect
+        else:
+            pass # Lin-scan
+
+
+    def update_section(self, data, start_address = None):
         """
 
         """
+        if not self._address_contained(start_address, len(data)):
+            raise InvalidAddressError("Address-space not in range")
 
-    def delete_section(self, address = None):
+
+    def delete_section(self, start_address = None):
         """
 
         """

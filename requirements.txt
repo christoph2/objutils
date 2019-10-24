@@ -7,3 +7,4 @@ construct >= 2.8
 pytest
 pytest-runner
 attrs
+sortedcontainers
