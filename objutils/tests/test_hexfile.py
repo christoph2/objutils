@@ -5,7 +5,7 @@ import unittest
 
 from objutils import loads, dumps, probes
 from objutils.section import Section
-from objutils.image import Image, Builder
+from objutils.image import Image
 from objutils.utils import create_string_buffer, PYTHON_VERSION
 from objutils import hexfile
 import os
@@ -16,14 +16,14 @@ import sys
 class TestHexfile(unittest.TestCase):
 
     def setUp(self):
-        self.builder = Builder()
+        self.image = Image()
 
     def tearDown(self):
-        del self.builder
+        del self.image
 
 
     def testAddSectionAliasWorks(self):
-        self.builder.insert_section(range(64), 0x1000)
+        self.image.insert_section(range(64), 0x1000)
         # Ok, if no exception gets raised.
 
     def testRaisesInvalidChecksumError(self):

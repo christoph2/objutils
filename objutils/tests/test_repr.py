@@ -3,7 +3,7 @@
 
 from objutils import loads, dumps
 from objutils.section import Section
-from objutils.image import Builder
+from objutils.image import Image
 from objutils.utils import PYTHON_VERSION
 import unittest
 
@@ -16,10 +16,10 @@ else:
 class TestRepr(unittest.TestCase):
 
     def testImageRepresentation(self):
-        builder = Builder()
-        builder.insert_section([x % 256 for x in range(10000)])
-        builder.join_sections()
-        self.assertEqual(repr(builder.image), RESULT)
+        image = Image()
+        image.insert_section([x % 256 for x in range(10000)])
+        image.join_sections()
+        self.assertEqual(repr(image), RESULT)
 
 if __name__ == '__main__':
     unittest.main()

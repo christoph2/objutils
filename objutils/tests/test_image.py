@@ -10,14 +10,14 @@ import pytest
 
 from objutils import loads, dumps
 from objutils.section  import Section
-from objutils.image  import Image, Builder, InvalidAddressError
+from objutils.image  import Image, InvalidAddressError
 from objutils.utils import PYTHON_VERSION, create_string_buffer
 
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.b0 = Builder()
-        self.b1 = Builder()
+        self.b0 = Image()
+        self.b1 = Image()
 
     def tearDown(self):
         del self.b0
@@ -97,17 +97,36 @@ def test_insert_overlapping5(images):
     img0.insert_section(data = b"0123456789", start_address = 0x114)
     img0.insert_section(data = b"0123456789", start_address = 0x10a)
 
+def test_replace1(images):
+    img0, _ = images
+    img0.insert_section(data = b"0123456789", start_address = 0x100)
+    with pytest.raises(InvalidAddressError):
+        img0.update_section(data = b"abcdefghij", start_address = 0x10a)
+
+def test_replace2(images):
+    img0, _ = images
+    img0.insert_section(data = b"0123456789", start_address = 0x100)
+    img0.update_section(data = b"abcdefghij", start_address = 0x109)
+
+"""
+
+
+    b0.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == TEST1
+"""
+
 class Equality(BaseTest):
 
     def testEqualImagesShallCompareEqualCase1(self):
         self.b0.insert_section("01234567890", 0x1000)
         self.b1.insert_section("01234567890", 0x1000)
-        self.assertTrue(self.b0.image == self.b1.image)
+        self.assertTrue(self.b0 == self.b1)
 
     def testEqualImagesShallCompareEqualCase2(self):
         self.b0.insert_section("01234567890", 0x1000)
         self.b1.insert_section("01234567890", 0x1000)
-        self.assertFalse(self.b0.image != self.b1.image)
+        self.assertFalse(self.b0 != self.b1)
 
 
 class TestCreateSections(BaseTest):
@@ -116,7 +135,7 @@ class TestCreateSections(BaseTest):
 
     def runSectionTestPass(self, data):
         self.b0.insert_section(data, 0x1000)
-        result = dumps('srec', self.b0.image)
+        result = dumps('srec', self.b0)
         self.assertEqual(result, self.SREC)
 
     def runSectionTestFail(self, data):
@@ -138,12 +157,12 @@ class TestCreateSections(BaseTest):
         data = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]
         self.b0.insert_section(data, 0x1000)
         data.extend([0x10, 0x20, 0x30, 0x40])
-        result = dumps('srec', self.b0.image)
+        result = dumps('srec', self.b0)
         self.assertEqual(result, self.SREC)
 
     def testEmptySectionProducesEmptiness(self):
         self.b0.insert_section([], 0x1000)
-        result = dumps('srec', self.b0.image)
+        result = dumps('srec', self.b0)
         self.assertEqual(result, b'')
 
     def testCreateSectionFromBytesWorks(self):
@@ -160,7 +179,7 @@ class TestCreateSections(BaseTest):
 
     def testOmittedAddressYieldsToZero(self):
         self.b0.insert_section(range(16))
-        data = self.b0.image
+        data = self.b0
         self.assertEqual(data[0].start_address, 0X00000000)
 
     #def testCreateSectionFromArrayHWorks(self):
@@ -181,24 +200,24 @@ class TestImageSlices(BaseTest):
 
     def testLenWorks(self):
         self.createImage()
-        image = self.b0.image
+        image = self.b0
         self.assertEqual(len(image), 3)
 
     def testSlicingWorks(self):
         self.createImage()
-        image = self.b0.image
+        image = self.b0
         section = image[1]
         self.assertTrue(isinstance(section, Section))
 
     def testIteration(self):
         self.createImage()
-        image = self.b0.image
+        image = self.b0
         for section in image:
             self.assertTrue(isinstance(section, Section))
 
     def testHexdumpWorksOnSlice(self):
         self.createImage()
-        image = self.b0.image
+        image = self.b0
         section = image[1]
         if PYTHON_VERSION.major == 3:
             buf = io.TextIOWrapper(create_string_buffer())

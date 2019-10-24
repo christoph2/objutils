@@ -33,7 +33,7 @@ import io
 import zipfile
 
 from objutils.section import Section
-from objutils.image import Image, Builder
+from objutils.image import Image
 from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
 from objutils.logger import Logger
 
@@ -80,9 +80,6 @@ class Writer(object):
         result = bytearray()
         previous_address = None
         previous_length = None
-
-        if isinstance(image, Builder):
-            image = image.image     # Be tolerant.
 
         if hasattr(image, "sections") and  not image.sections:
             return b''

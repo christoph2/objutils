@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Contains :class:`Image` and :class:`Builder`
+"""
 
 """
 
@@ -305,49 +305,6 @@ class Image(object):
 
     def split(self, at = None, equal_parts = None, remap = None):
         print("SPLIT-IMAGE", at, equal_parts, remap)
-
-
-class Builder(object):
-    """Construct an :class:`Image` object.
-
-    Parameters
-    ----------
-    sections: iteratable (typically list or tuple)
-
-    auto_join: bool
-        Automatically join adjacent sections.
-
-    auto_sort: bool
-        Sort sections by startaddress (ascending).
-    """
-
-    def __init__(self, sections = None, auto_join = True, auto_sort = False):
-        self._image = Image(sections, auto_join, auto_sort)
-        self.address = 0
-        self.auto_join = auto_join
-
-    def insert_section(self, data, address = None, dont_join = False):
-        self.image.insert_section(data, address, dont_join)
-
-    def add_metadata(self, meta_data):
-        pass
-
-    def join_sections(self, order_segments = False):
-        self.image.join_sections(order_segments)
-
-    def hexdump(self, fp = sys.stdout):
-        self.image.hexdump(fp)
-
-    @property
-    def image(self):
-        return self._image
-
-    def __str__(self):
-        return str(self.image)
-
-    def __repr__(self):
-        return str(self.image)
-
 
 def _validate_sections(sections):
     """Test for required protocol

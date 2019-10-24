@@ -3,7 +3,7 @@
 
 from objutils import loads, dumps
 from objutils.section import Section
-from objutils.image import Image, Builder
+from objutils.image import Image
 import unittest
 
 

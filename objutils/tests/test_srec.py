@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps, probes
-from objutils.image import Builder
 from objutils.hexfile import MetaRecord
+from objutils.image import Image
 import unittest
 
 import pytest
@@ -53,10 +53,10 @@ def test_meta_data2():
 class TestRoundtrip(unittest.TestCase):
 
     def testLoadsWorks(self):
-        builder = Builder()
-        builder.insert_section("Wow! Did you really go through al that trouble to read this?", 0xb000)
-        builder.join_sections()
-        self.assertEqual(dumps("srec", builder.image, record_type = 1, s5record = False, start_address = 0x0000), SREC1)
+        image = Image()
+        image.insert_section("Wow! Did you really go through al that trouble to read this?", 0xb000)
+        image.join_sections()
+        self.assertEqual(dumps("srec", image, record_type = 1, s5record = False, start_address = 0x0000), SREC1)
 
 
 class Test19Probe(unittest.TestCase):
@@ -77,10 +77,10 @@ class Test19Probe(unittest.TestCase):
 class TestS19Options(unittest.TestCase):
 
     def createImage(self, record_type, s5record, start_address = None):
-        builder = Builder()
-        builder.insert_section(range(10), 0x1000)
-        builder.join_sections()
-        return dumps("srec", builder.image, record_type = record_type, s5record = s5record, start_address = start_address)
+        image = Image()
+        image.insert_section(range(10), 0x1000)
+        image.join_sections()
+        return dumps("srec", image, record_type = record_type, s5record = s5record, start_address = start_address)
 
     def testS19includeS5RecordS1(self):
         self.assertEqual(self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB")

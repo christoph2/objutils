@@ -5,7 +5,7 @@ import unittest
 
 from objutils import loads, dumps, probes
 from objutils.section import Section
-from objutils.image import Image, Builder
+from objutils.image import Image
 from objutils.utils import create_string_buffer, PYTHON_VERSION
 import os
 import io
@@ -84,14 +84,6 @@ Section #0000
 ---------------
 """
 
-#builder = Builder()
-#builder.insert_section(range(53), 0x1000)
-#builder.insert_section(range(0), 0x1000)
-#builder.insert_section([0] * 512)
-#builder.insert_section(range(64))
-#builder.join_sections()
-#builder.hexdump()
-
 
 class BaseTest(unittest.TestCase):
 
@@ -102,12 +94,12 @@ class BaseTest(unittest.TestCase):
             self.buf = create_string_buffer()
         #self.stdout = sys.stdout
         #sys.stdout = self.buf
-        self.builder = Builder()
+        self.image = Image()
 
     def tearDown(self):
         #sys.stdout = self.stdout
         del self.buf
-        del self.builder
+        del self.image
 
     def getBuffer(self):
         self.buf.seek(0, os.SEEK_SET)
@@ -117,36 +109,36 @@ class BaseTest(unittest.TestCase):
 class TestHexdumper(BaseTest):
 
     def testDumpContinuousRange(self):
-        self.builder.insert_section(range(64), 0x1000)
-        self.builder.join_sections()
-        self.builder.hexdump(self.buf)
+        self.image.insert_section(range(64), 0x1000)
+        self.image.join_sections()
+        self.image.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST1)
 
     def testDumpDiscontinuousRange(self):
-        self.builder.insert_section(range(64), 0x1000)
-        self.builder.insert_section(range(64), 0x2000)
-        self.builder.join_sections()
-        self.builder.hexdump(self.buf)
+        self.image.insert_section(range(64), 0x1000)
+        self.image.insert_section(range(64), 0x2000)
+        self.image.join_sections()
+        self.image.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST2)
 
     def testDumpZeroBytesInBetween(self):
-        self.builder.insert_section(range(64), 0x1000)
-        self.builder.insert_section([0] * 512)
-        self.builder.insert_section(range(64))
-        self.builder.join_sections()
-        self.builder.hexdump(self.buf)
+        self.image.insert_section(range(64), 0x1000)
+        self.image.insert_section([0] * 512)
+        self.image.insert_section(range(64))
+        self.image.join_sections()
+        self.image.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST3)
 
     def testDumpOddSizedRow(self):
-        self.builder.insert_section(range(53), 0x1000)
-        self.builder.join_sections()
-        self.builder.hexdump(self.buf)
+        self.image.insert_section(range(53), 0x1000)
+        self.image.join_sections()
+        self.image.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST4)
 
     def testDumpEmptyRow(self):
-        self.builder.insert_section(range(0), 0x1000)
-        self.builder.join_sections()
-        self.builder.hexdump(self.buf)
+        self.image.insert_section(range(0), 0x1000)
+        self.image.join_sections()
+        self.image.hexdump(self.buf)
         self.assertEqual(self.getBuffer(), TEST5)
 
 

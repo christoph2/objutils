@@ -34,7 +34,7 @@ import re
 import sys
 
 from objutils.section import Section, join_sections
-from objutils.image import Image, Builder
+from objutils.image import Image
 from operator import itemgetter
 from objutils.pickleif import PickleIF
 from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
@@ -330,9 +330,6 @@ class Writer(BaseType):
         result = []
         self.row_length = row_length
 
-        if isinstance(image, Builder):
-            image = image.image     # Be tolerant.
-
         if hasattr(image, "sections") and  not image.sections:
             return b''
 
@@ -362,8 +359,6 @@ class Writer(BaseType):
             return self.post_processing(bytes('\n'.join(result)))
 
     def calculate_address_bits(self, image):
-        if isinstance(image, Builder):
-            image = image.image     # Be tolerant.
         if hasattr(image, "sections"):
             last_segment = sorted(image.sections, key = lambda s: s.start_address)[-1]
         else:
