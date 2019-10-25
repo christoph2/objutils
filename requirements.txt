@@ -6,5 +6,5 @@ mako
 construct >= 2.8
 pytest
 pytest-runner
-attrs
+attrs >= 19.3.0
 sortedcontainers
