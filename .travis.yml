@@ -1,4 +1,5 @@
 # https://travis-ci.org/christoph2/objutils
+dist: xenial
 language: python
 sudo: required
 python:
@@ -20,12 +21,10 @@ install:
   - travis_retry pip install pytest-cov coverage coveralls codacy-coverage
 
 script:
-#  python -m unittest discover ./objutils/tests/
-#   python ./objutils/tools/readelf.py
    coverage run --source=objutils setup.py test
 
 after_success:
-  - pylint app
+  - pylint objutils
   - coveralls
   - coverage xml && python-codacy-coverage -r coverage.xml
   - codeclimate-test-reporter
