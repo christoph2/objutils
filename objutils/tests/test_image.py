@@ -600,6 +600,21 @@ Section #0000
     captured = capsys.readouterr()
     assert captured.out == RES
 
+def test_get_section1():
+    img = Image(auto_sort = True, auto_join = False)
+    img.insert_section(data = range(16), start_address = 0x030)
+    img.insert_section(data = range(16), start_address = 0x020)
+    img.insert_section(data = range(16), start_address = 0x010)
+    img.insert_section(data = range(16), start_address = 0x000)
+    sec = img.get_section(0x33)
+    print(sec)
+    sec = img.get_section(0x22)
+    print(sec)
+    sec = img.get_section(0x11)
+    print(sec)
+    sec = img.get_section(0x02)
+    print(sec)
+
 class Equality(BaseTest):
 
     def testEqualImagesShallCompareEqualCase1(self):

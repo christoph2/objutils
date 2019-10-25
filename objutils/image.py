@@ -31,6 +31,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from collections import namedtuple
 import bisect
 import enum
 from operator import attrgetter, eq
@@ -39,6 +40,8 @@ import sys
 from sortedcontainers import SortedDict, SortedList
 
 from objutils.section import Section, join_sections
+
+SearchType = namedtuple("SearchType", "start_address")
 
 class InvalidAddressError(Exception):
     """Raised if address information is out of range.
@@ -270,7 +273,7 @@ class Image(object):
             self.join_sections()
         self.address = start_address + len(data)
 
-    def get_section(self, address = None):
+    def get_section(self, address):
         """Get :class:`Section` containing `address`.
         Parameters
         ----------
@@ -284,10 +287,11 @@ class Image(object):
         ------
         :class:`InvalidAddressError`
         """
-        if not start_address in self:
+        if not address in self:
             raise InvalidAddressError("Address not in range")
         if self._sorted:
-            pass # TODO: bisect
+            result = self.sections.bisect_right(SearchType(address))
+            return self.sections[result - 1]
         else:
             pass # Lin-scan
 
