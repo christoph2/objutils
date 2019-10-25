@@ -9,8 +9,8 @@ import sys
 import pytest
 
 from objutils import loads, dumps
-from objutils.section  import Section
-from objutils.image  import Image, InvalidAddressError
+from objutils.section import Section
+from objutils.image import Image, InvalidAddressError
 from objutils.utils import PYTHON_VERSION, create_string_buffer
 
 class BaseTest(unittest.TestCase):
@@ -97,13 +97,13 @@ def test_insert_overlapping5(images):
     img0.insert_section(data = b"0123456789", start_address = 0x114)
     img0.insert_section(data = b"0123456789", start_address = 0x10a)
 
-def test_replace1(images):
+def test_update1(images):
     img0, _ = images
     img0.insert_section(data = b"0123456789", start_address = 0x100)
     with pytest.raises(InvalidAddressError):
         img0.update_section(data = b"abcdefghij", start_address = 0x10a)
 
-def test_replace2(images):
+def test_update2(images):
     img0, _ = images
     img0.insert_section(data = b"0123456789", start_address = 0x100)
     img0.update_section(data = b"abcdefghij", start_address = 0x109)
@@ -115,6 +115,490 @@ def test_replace2(images):
     captured = capsys.readouterr()
     assert captured.out == TEST1
 """
+def test_sorting1(capsys):
+    RES = """
+Section #0000
+-------------
+00000010  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0001
+-------------
+00000020  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0002
+-------------
+00000030  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0003
+-------------
+00000040  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0004
+-------------
+00000050  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0005
+-------------
+00000060  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0006
+-------------
+00000070  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0007
+-------------
+00000080  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0008
+-------------
+00000090  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0009
+-------------
+00000100  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+"""
+    img = Image(auto_sort = True, auto_join = True)
+    img.insert_section(data = b"0123456789", start_address = 0x100)
+    img.insert_section(data = b"0123456789", start_address = 0x090)
+    img.insert_section(data = b"0123456789", start_address = 0x080)
+    img.insert_section(data = b"0123456789", start_address = 0x070)
+    img.insert_section(data = b"0123456789", start_address = 0x060)
+    img.insert_section(data = b"0123456789", start_address = 0x050)
+    img.insert_section(data = b"0123456789", start_address = 0x040)
+    img.insert_section(data = b"0123456789", start_address = 0x030)
+    img.insert_section(data = b"0123456789", start_address = 0x020)
+    img.insert_section(data = b"0123456789", start_address = 0x010)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting2(capsys):
+    RES = """
+Section #0000
+-------------
+00000010  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0001
+-------------
+00000020  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0002
+-------------
+00000030  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0003
+-------------
+00000040  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0004
+-------------
+00000050  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0005
+-------------
+00000060  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0006
+-------------
+00000070  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0007
+-------------
+00000080  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0008
+-------------
+00000090  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0009
+-------------
+00000100  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+"""
+    img = Image(auto_sort = True, auto_join = False)
+    img.insert_section(data = b"0123456789", start_address = 0x100)
+    img.insert_section(data = b"0123456789", start_address = 0x090)
+    img.insert_section(data = b"0123456789", start_address = 0x080)
+    img.insert_section(data = b"0123456789", start_address = 0x070)
+    img.insert_section(data = b"0123456789", start_address = 0x060)
+    img.insert_section(data = b"0123456789", start_address = 0x050)
+    img.insert_section(data = b"0123456789", start_address = 0x040)
+    img.insert_section(data = b"0123456789", start_address = 0x030)
+    img.insert_section(data = b"0123456789", start_address = 0x020)
+    img.insert_section(data = b"0123456789", start_address = 0x010)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting3(capsys):
+    RES = """
+Section #0000
+-------------
+00000100  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0001
+-------------
+00000090  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0002
+-------------
+00000080  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0003
+-------------
+00000070  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0004
+-------------
+00000060  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0005
+-------------
+00000050  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0006
+-------------
+00000040  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0007
+-------------
+00000030  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0008
+-------------
+00000020  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0009
+-------------
+00000010  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+"""
+    img = Image(auto_sort = False, auto_join = False)
+    img.insert_section(data = b"0123456789", start_address = 0x100)
+    img.insert_section(data = b"0123456789", start_address = 0x090)
+    img.insert_section(data = b"0123456789", start_address = 0x080)
+    img.insert_section(data = b"0123456789", start_address = 0x070)
+    img.insert_section(data = b"0123456789", start_address = 0x060)
+    img.insert_section(data = b"0123456789", start_address = 0x050)
+    img.insert_section(data = b"0123456789", start_address = 0x040)
+    img.insert_section(data = b"0123456789", start_address = 0x030)
+    img.insert_section(data = b"0123456789", start_address = 0x020)
+    img.insert_section(data = b"0123456789", start_address = 0x010)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting4(capsys):
+    RES = """
+Section #0000
+-------------
+00000100  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0001
+-------------
+00000090  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0002
+-------------
+00000080  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0003
+-------------
+00000070  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0004
+-------------
+00000060  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0005
+-------------
+00000050  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0006
+-------------
+00000040  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0007
+-------------
+00000030  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0008
+-------------
+00000020  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+
+Section #0009
+-------------
+00000010  30 31 32 33 34 35 36 37 38 39                    |0123456789      |
+---------------
+       10 bytes
+---------------
+"""
+    img = Image(auto_sort = False, auto_join = True)
+    img.insert_section(data = b"0123456789", start_address = 0x100)
+    img.insert_section(data = b"0123456789", start_address = 0x090)
+    img.insert_section(data = b"0123456789", start_address = 0x080)
+    img.insert_section(data = b"0123456789", start_address = 0x070)
+    img.insert_section(data = b"0123456789", start_address = 0x060)
+    img.insert_section(data = b"0123456789", start_address = 0x050)
+    img.insert_section(data = b"0123456789", start_address = 0x040)
+    img.insert_section(data = b"0123456789", start_address = 0x030)
+    img.insert_section(data = b"0123456789", start_address = 0x020)
+    img.insert_section(data = b"0123456789", start_address = 0x010)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting5(capsys):
+    RES = """
+Section #0000
+-------------
+00000030  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0001
+-------------
+00000020  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0002
+-------------
+00000010  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0003
+-------------
+00000000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+"""
+    img = Image(auto_sort = False, auto_join = False)
+    img.insert_section(data = range(16), start_address = 0x030)
+    img.insert_section(data = range(16), start_address = 0x020)
+    img.insert_section(data = range(16), start_address = 0x010)
+    img.insert_section(data = range(16), start_address = 0x000)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting6(capsys):
+    RES = """
+Section #0000
+-------------
+00000030  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0001
+-------------
+00000020  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0002
+-------------
+00000010  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0003
+-------------
+00000000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+"""
+    img = Image(auto_sort = False, auto_join = True)
+    img.insert_section(data = range(16), start_address = 0x030)
+    img.insert_section(data = range(16), start_address = 0x020)
+    img.insert_section(data = range(16), start_address = 0x010)
+    img.insert_section(data = range(16), start_address = 0x000)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting7(capsys):
+    RES = """
+Section #0000
+-------------
+00000000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0001
+-------------
+00000010  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0002
+-------------
+00000020  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+
+Section #0003
+-------------
+00000030  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       16 bytes
+---------------
+"""
+    img = Image(auto_sort = True, auto_join = False)
+    img.insert_section(data = range(16), start_address = 0x030)
+    img.insert_section(data = range(16), start_address = 0x020)
+    img.insert_section(data = range(16), start_address = 0x010)
+    img.insert_section(data = range(16), start_address = 0x000)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
+
+def test_sorting8(capsys):
+    RES = """
+Section #0000
+-------------
+00000000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+          *
+00000030  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  |................|
+---------------
+       64 bytes
+---------------
+"""
+    img = Image(auto_sort = True, auto_join = True)
+    img.insert_section(data = range(16), start_address = 0x030)
+    img.insert_section(data = range(16), start_address = 0x020)
+    img.insert_section(data = range(16), start_address = 0x010)
+    img.insert_section(data = range(16), start_address = 0x000)
+    img.hexdump(sys.stdout)
+    captured = capsys.readouterr()
+    assert captured.out == RES
 
 class Equality(BaseTest):
 

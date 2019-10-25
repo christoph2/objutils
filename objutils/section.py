@@ -39,6 +39,7 @@ import struct
 import sys
 
 import attr
+from sortedcontainers import SortedList
 
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
@@ -246,10 +247,11 @@ class Section(object):
         return self.start_address <= addr < (self.start_address + self.length)
 
 
-def join_sections(sections, order_sections = True):
-    result_sections = []
-    if order_sections:
-        sections.sort(key = attrgetter("start_address"))
+def join_sections(sections):
+    if isinstance(sections, SortedList):
+        result_sections = SortedList(key = attrgetter("start_address"))
+    else:
+        result_sections = []
     prev_section = Section()
     while sections:
         section = sections.pop(0)
@@ -261,9 +263,15 @@ def join_sections(sections, order_sections = True):
             last_segment.length += section.length
         else:
             # Create a new section.
-            result_sections.append(Section(section.start_address, section.data))
+            if isinstance(sections, SortedList):
+                result_sections.add(Section(section.start_address, section.data))
+            else:
+                result_sections.append(Section(section.start_address, section.data))
         prev_section = section
     if result_sections:
         return result_sections
     else:
-        return []
+        if isinstance(sections, SortedList):
+            return SortedList(key = attrgetter("start_address"))
+        else:
+            return []

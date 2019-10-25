@@ -36,7 +36,7 @@ import enum
 from operator import attrgetter, eq
 import sys
 
-from sortedcontainers import SortedDict
+from sortedcontainers import SortedDict, SortedList
 
 from objutils.section import Section, join_sections
 
@@ -75,16 +75,18 @@ class Image(object):
         if meta is None:
             meta = {}
         if not sections:
-            self.sections = []
+            sections = []
         elif isinstance(sections, Section) or hasattr(sections, "__iter__"):
-            self.sections = list(sections)
+            sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
         if auto_sort:
             self._sorted = True
-            self.sections = sorted(self.sections, key = attrgetter("start_address"))
+            #self.sections = sorted(self.sections, key = attrgetter("start_address"))
+            self.sections = SortedList(sections, key = attrgetter("start_address"))
         else:
             self._sorted = False
+            self.sections = sections
         if self.sections and auto_join:
             self.join_sections()
         _validate_sections(self.sections)
@@ -253,14 +255,17 @@ class Image(object):
         Overlapping sections are not supported.
         To relace a section use :meth:`update_section`.
         """
-        start_address = start_address if start_address else self.address  # If Address omitted, create continuous address space.
+        start_address = start_address if start_address is not None else self.address  # If Address omitted, create continuous address space.
         if self._address_contained(start_address, len(data)):
             raise InvalidAddressError("Overlapping address-space")
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
-        self.sections.append(Section(start_address, data))
         if self._sorted:
-            self.sections.sort(key = attrgetter("start_address"))
+            self.sections.add(Section(start_address, data))
+        else:
+            self.sections.append(Section(start_address, data))
+        #if self._sorted:
+        #    self.sections.sort(key = attrgetter("start_address"))
         if self.auto_join:
             self.join_sections()
         self.address = start_address + len(data)
@@ -300,8 +305,8 @@ class Image(object):
 
         """
 
-    def join_sections(self, order_segments = False):
-        self.sections = join_sections(self.sections, order_segments)
+    def join_sections(self):
+        self.sections = join_sections(self.sections)
 
     def split(self, at = None, equal_parts = None, remap = None):
         print("SPLIT-IMAGE", at, equal_parts, remap)
