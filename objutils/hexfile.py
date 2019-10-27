@@ -249,7 +249,7 @@ class Reader(BaseType):
             if not matched:
                 self.warn("Ignoring garbage line #{0:d}".format(line_number))
         if sections:
-            return Image(sections = join_sections(sections), meta = meta_data, valid = self.valid)
+            return Image(sections = join_sections(sections), meta = meta_data)
         else:
             self.error("File seems to be invalid.")
             return Image([], valid = False)

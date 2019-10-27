@@ -229,6 +229,14 @@ class Section(object):
             self.data[offset : offset +  len(value)] = bytes(value)
         self.data[offset +  len(value)] = 0
 
+    """
+    def write_timestamp():
+        pass
+
+    def read_timestamp():
+        pass
+    """
+
     def find(self, expr, addr = -1):
         for item in re.finditer(bytes(expr), self.data):
             yield (self.start_address + item.start(), item.end()- item.start())

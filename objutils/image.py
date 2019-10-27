@@ -71,10 +71,9 @@ class Image(object):
         The sections the image should initialized with.
     meta: object
         Arbitrary meta-data.
-    valid: bool
     """
 
-    def __init__(self, sections = None, auto_join = True, auto_sort = False, meta = None, valid = False):
+    def __init__(self, sections = None, join = True, meta = None):
         if meta is None:
             meta = {}
         if not sections:
@@ -83,26 +82,15 @@ class Image(object):
             sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
-        if auto_sort:
-            self._sorted = True
-            #self.sections = sorted(self.sections, key = attrgetter("start_address"))
-            self.sections = SortedList(sections, key = attrgetter("start_address"))
-        else:
-            self._sorted = False
-            self.sections = sections
-        if self.sections and auto_join:
+        self._sections = SortedList(sections, key = attrgetter("start_address"))
+        self._join = join
+        if join:
             self.join_sections()
-        _validate_sections(self.sections)
+        _validate_sections(self._sections)
         self.address = 0
-        self._addressMap = SortedDict()
-        for idx in range(len(self.sections)):
-            self._addressMap[self.sections[idx].start_address] = self.sections[idx]
-
-        self.auto_join = auto_join
         #if meta and not isinstance(meta, MetaRecord):
         #    raise TypeError("meta-data must be of instance 'MetaRecord'")
         self.meta = meta
-        self.valid = valid
 
     def __repr__(self):
         result = []
@@ -123,7 +111,7 @@ class Image(object):
 
     def __eq__(self, other):
         if len(self.sections) == len(other.sections):
-            return all( eq(l, r) for l, r in zip(self.sections, other.sections))
+            return all(eq(l, r) for l, r in zip(self.sections, other.sections))
         else:
             return False
 
@@ -263,15 +251,14 @@ class Image(object):
             raise InvalidAddressError("Overlapping address-space")
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
-        if self._sorted:
-            self.sections.add(Section(start_address, data))
-        else:
-            self.sections.append(Section(start_address, data))
-        #if self._sorted:
-        #    self.sections.sort(key = attrgetter("start_address"))
-        if self.auto_join:
+        self._sections.add(Section(start_address, data))
+        if self._join:
             self.join_sections()
         self.address = start_address + len(data)
+
+    @property
+    def sections(self):
+        return self._sections
 
     def get_section(self, address):
         """Get :class:`Section` containing `address`.
@@ -289,11 +276,8 @@ class Image(object):
         """
         if not address in self:
             raise InvalidAddressError("Address not in range")
-        if self._sorted:
-            result = self.sections.bisect_right(SearchType(address))
-            return self.sections[result - 1]
-        else:
-            pass # Lin-scan
+        result = self._sections.bisect_right(SearchType(address))
+        return self._sections[result - 1]
 
 
     def update_section(self, data, start_address = None):
@@ -303,14 +287,16 @@ class Image(object):
         if not self._address_contained(start_address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 
-
     def delete_section(self, start_address = None):
         """
 
         """
 
     def join_sections(self):
-        self.sections = join_sections(self.sections)
+        """
+
+        """
+        self._sections = join_sections(self._sections)
 
     def split(self, at = None, equal_parts = None, remap = None):
         print("SPLIT-IMAGE", at, equal_parts, remap)
