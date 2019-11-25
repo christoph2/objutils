@@ -226,7 +226,7 @@ class Image(object):
         """
         return address in self or (address + length - 1) in self
 
-    def insert_section(self, data, start_address = None, dont_join = False):
+    def insert_section(self, data, start_address = None, join = True):
         """Insert/add a new section to image.
 
         Parameters
@@ -234,8 +234,8 @@ class Image(object):
         data: convertible to bytearray() -- s. :func:`_data_converter`.
             Bytes making up the section.
         start_address: int
-        dont_join: bool
-            Don't join/merge adjacent section.
+        join: bool
+            Join/merge adjacent section.
 
         Raises
         ------
@@ -244,7 +244,7 @@ class Image(object):
         Notes
         -----
         Overlapping sections are not supported.
-        To relace a section use :meth:`update_section`.
+        To update/replace a section use :meth:`update_section`.
         """
         start_address = start_address if start_address is not None else self.address  # If Address omitted, create continuous address space.
         if self._address_contained(start_address, len(data)):
@@ -252,7 +252,7 @@ class Image(object):
         if isinstance(data, str):
             data = [ord(x) for x in data] # array.array('B',data)
         self._sections.add(Section(start_address, data))
-        if self._join:
+        if join:
             self.join_sections()
         self.address = start_address + len(data)
 
@@ -280,14 +280,14 @@ class Image(object):
         return self._sections[result - 1]
 
 
-    def update_section(self, data, start_address = None):
+    def update_section(self, data, address = None):
         """
 
         """
         if not self._address_contained(start_address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 
-    def delete_section(self, start_address = None):
+    def delete_section(self, address = None):
         """
 
         """
