@@ -11,7 +11,7 @@ with open(os.path.join('objutils', 'version.py'), 'r') as f:
             version = line.split('=')[-1].strip().strip('"')
             break
 
-install_reqs = ['future', 'mako', 'six', 'construct', 'attrs >= 19.3.0', 'sortedcontainers']
+install_reqs = ['future', 'mako', 'six', 'construct', 'attrs >= 19.3.0', 'sortedcontainers', 'SQLAlchemy']
 
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(['enum34', 'mock'])
