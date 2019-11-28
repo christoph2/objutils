@@ -716,64 +716,35 @@ ELF64_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT64)
 
 STN_UNDEF           = 0
 
-STB_LOCAL           = 0
-STB_GLOBAL          = 1
-STB_WEAK            = 2
-STB_LOPROC          = 13
-STB_HIPROC          = 15
+class SymbolBinding(enum.IntEnum):
+    STB_LOCAL           = 0
+    STB_GLOBAL          = 1
+    STB_WEAK            = 2
+    STB_LOPROC          = 13
+    STB_HIPROC          = 15
 
+class SymbolType(enum.IntEnum):
+    STT_NOTYPE          = 0
+    STT_OBJECT          = 1
+    STT_FUNC            = 2
+    STT_SECTION         = 3
+    STT_FILE            = 4
+    STT_LOPROC          = 13
+    STT_HIPROC          = 15
 
-STT_NOTYPE          = 0
-STT_OBJECT          = 1
-STT_FUNC            = 2
-STT_SECTION         = 3
-STT_FILE            = 4
-STT_LOPROC          = 13
-STT_HIPROC          = 15
-
-# Symbol visibility specification encoded in the st_other field.
-STV_DEFAULT         = 0 # Default symbol visibility rules
-STV_INTERNAL        = 1 # Processor specific hidden class
-STV_HIDDEN          = 2 # Sym unavailable in other modules
-STV_PROTECTED       = 3 # Not preemptible, not exported
-
-##
-##
-##   ELF Relocation.
-##
-##
-REL_FMT32 = "II"
-RELA_FMT32 = "IIi"
-
-ELF_RELOCATION_SIZE32     = struct.calcsize(REL_FMT32)
-ELF_RELOCATION_A_SIZE32   = struct.calcsize(RELA_FMT32)
-
-##
-#
-REL_FMT64 = "QQ"
-RELA_FMT64 = "QQq"
-
-ELF_RELOCATION_SIZE64     = struct.calcsize(REL_FMT64)
-ELF_RELOCATION_A_SIZE64   = struct.calcsize(RELA_FMT64)
-
-Elf_Rel   = namedtuple("Elf_Rel", "r_offset r_info")
-Elf_Rela  = namedtuple("Elf_Rela", "r_offset r_info r_addend")
+class SymbolVisibility(enum.IntEnum):
+    """Symbol visibility specification encoded in the st_other field.
+    """
+    STV_DEFAULT         = 0 # Default symbol visibility rules
+    STV_INTERNAL        = 1 # Processor specific hidden class
+    STV_HIDDEN          = 2 # Sym unavailable in other modules
+    STV_PROTECTED       = 3 # Not preemptible, not exported
 
 ##
 ##
 ##   ELF Program Header
 ##
 ##
-PHDR_FMT32 = "IIIIIIII"
-
-ELF_PHDR_SIZE32   = struct.calcsize(PHDR_FMT32)
-Elf32_Phdr      = namedtuple("Elf32_Phdr", "p_type p_offset p_vaddr p_paddr p_filesz p_memsz p_flags p_align")
-
-Elf64_Phdr      = namedtuple("Elf32_Phdr", "p_type p_flags p_offset p_vaddr p_paddr p_filesz p_memsz p_align")
-PHDR_FMT64 = "IIQQQQQQ"
-ELF_PHDR_SIZE64   = struct.calcsize(PHDR_FMT64)
-
-
 PT_NULL             = 0             # Program header table entry unused.
 PT_LOAD             = 1             # Loadable program segment.
 PT_DYNAMIC          = 2             # Dynamic linking information.

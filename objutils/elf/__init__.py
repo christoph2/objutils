@@ -35,13 +35,18 @@ import time
 
 
 from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, GreedyBytes, RepeatUntil
+from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, GreedyBytes, RepeatUntil, BitStruct, BitsInteger
 from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell, Computed
 from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
 from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
 from objutils.utils import create_memorymapped_fileview
 from objutils.elf import defs
+
+from objutils.dwarf import DwarfProcessor
+
+def is_hidden_symbol(sym):
+    return sym.st_other in (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
 
 @singleton
 class Pass2(Construct):
@@ -207,7 +212,7 @@ class ElfParser(object):
         self._parser_extended_header()
         self._parse_section_headers()
         self._parse_program_headers()
-        print(self.create_section_to_segment_mapping())
+        self.create_section_to_segment_mapping()
 
     def _parser_extended_header(self):
         ExtendedHeader = Struct(
@@ -263,6 +268,8 @@ class ElfParser(object):
                 if section.sh_type == Sh_Type.SHT_NOTE:
                     print("NOTE!!! {:08X} {:04X}".format(section.sh_offset, section.sh_size))
                     self._parse_note(self.fp[section.sh_offset : section.sh_offset + section.sh_size])
+                elif section.sh_type in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
+                    self._parse_symbol_section(section)
 
     def get_string(self, table_index, entry):
         name = self.asciiCString.parse(self._images[table_index][entry : ])
@@ -300,6 +307,25 @@ class ElfParser(object):
             if self.e_shnum:
                 print("PG_size: {}".format(ProgramHeaders.sizeof() / self.e_phnum))
             self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff : ])
+
+    def _parse_symbol_section(self, section):
+        Symbol = Struct(
+            "st_name" / self.Word,
+            "st_value" / self.Addr,
+            "st_size" / self.Word,
+            "st_info" / BitStruct(
+                "bind" / BitsInteger(4),
+                "type" / BitsInteger(4),
+            ),
+            "st_other" / Int8ul,
+            "st_shndx" / self.Half,
+             "hidden" / Computed(lambda ctx: ctx.st_other in
+                 (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)),
+        )
+        num_symbols = len(section.image) // Symbol.sizeof()
+        for offset in range(0, len(section.image), Symbol.sizeof()):
+            sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
+            print(sym)
 
     def _parse_note(self, data):
         Note = Struct(
@@ -354,8 +380,7 @@ class ElfParser(object):
             or (section_header.sh_addr > segment.p_vaddr \
             and (section_header.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
         )
-        result = valid_segment and has_offset and has_VMA and has_dynamic_size
-        return result
+        return (valid_segment and has_offset and has_VMA and has_dynamic_size)
 
     def section_in_segment(self, section_header, segment):
         return self.section_in_segment1(section_header, segment, 1, 0)
@@ -371,7 +396,7 @@ class ElfParser(object):
             for j in range(self.e_shnum):
                 section = self.sections[j]
                 if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
-                    mapping[idx].append(section)
+                    mapping[idx].append(j)
                     print(section)
         self.sections_to_segments = mapping
         return self.sections_to_segments
@@ -380,6 +405,19 @@ class ElfParser(object):
        return ((section_header.sh_flags & defs.SHF_TLS) != 0 and
            section_header.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS
         )
+
+    def buildSymbols(self):
+        for section in self.sectionHeaders:
+            if section.shType in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
+                syms = []
+                for idx, symbol in section.symbols.items():
+#                    sym = Symbol(self.getString(section.shLink, symbol.st_name), symbol.st_value, symbol.st_size,
+#                                 self.getSymbolType(symbol.st_info & 0x0f),
+#                                 self.getSymbolBinding(symbol.st_info >> 4), self.getSymbolVisibility(symbol.st_other),
+#                        self.getSymbolIndexType(self.header, symbol.st_shndx))
+                    syms.append(sym)
+                self.symbols[section.shName] = syms
+
 
     def section_size(self, section_header, segment):
         return 0 if self.tbss_special(section_header, segment) else section_header.sh_size
@@ -487,6 +525,10 @@ def main():
     dbSecs = ep.debug_sections()
     abbrevs = dbSecs['.debug_abbrev']
 
+    dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
+    dp.doAbbrevs()
+    dp.doMacInfo()
+
     #doAbbrevs(abbrevs)
     #macs = dbSecs['.debug_macinfo']
     #doMacInfo(macs)
@@ -495,26 +537,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-"""
-ei_osabi
---------
-Value   ABI
-0x00    System V
-0x01    HP-UX
-0x02    NetBSD
-0x03    Linux
-0x06    Solaris
-0x07    AIX
-0x08    IRIX
-0x09    FreeBSD
-0x0A    Tru64
-0x0B    Novell Modesto
-0x0C    OpenBSD
-0x0D    OpenVMS
-0x0E    NonStop Kernel
-0x0F    AROS
-0x10    Fenix OS
-0x11    CloudABI
-0x53    Sortix
-"""
