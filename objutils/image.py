@@ -284,7 +284,7 @@ class Image(object):
         """
 
         """
-        if not self._address_contained(start_address, len(data)):
+        if not self._address_contained(address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 
     def delete_section(self, address = None):
