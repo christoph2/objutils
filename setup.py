@@ -40,12 +40,12 @@ setup(
        ]
     } ,
     install_requires = install_reqs,
-    #entry_points = {
-    #    'console_scripts': [
-    #            'readelf.py = objutils.tools.readelf:main',
+    entry_points = {
+        'console_scripts': [
+                'oj-elf-info = objutils.scripts.oj_elf_info:main',
     #            'ticoff-dump = objutils.tools.ticoffdump:main'
-    #    ],
-    #},
+        ],
+    },
     tests_require=["pytest", "pytest-runner"],
     test_suite="objutils.tests",
     #data_files = [
