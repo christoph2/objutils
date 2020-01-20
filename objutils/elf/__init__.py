@@ -44,7 +44,61 @@ from objutils.utils import create_memorymapped_fileview
 from objutils.elf import defs
 
 from objutils.dwarf import DwarfProcessor
+##
+##
+##
+from sqlalchemy import (MetaData, schema, types, orm, event,
+    create_engine, Column, ForeignKey, ForeignKeyConstraint, func,
+    PassiveDefault, UniqueConstraint, CheckConstraint
+)
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relationship
+from objutils.utils import sqa
 
+Base = sqa.declarative_base()
+
+class Elf_Symbol(Base, sqa.MixInBase):
+    __tablename__ = "symbol"
+
+    id = Column(types.Integer, primary_key = True)
+    st_name = Column(types.Integer)
+    st_value = Column(types.Integer)
+    st_info = Column(types.Integer)
+    st_size = Column(types.Integer)
+    st_bind = Column(types.Integer)
+    st_type = Column(types.Integer)
+    st_other = Column(types.Integer)
+    st_shndx = Column(types.Integer)
+    section_name = Column(types.VARCHAR, index = True)
+    symbol_name = Column(types.VARCHAR, index = True)
+    hidden = Column(types.Boolean)
+
+
+class Elf_Section(Base, sqa.MixInBase):
+    __tablename__ = "section"
+
+    index = Column(types.Integer, primary_key = True)
+    """
+            "sections" / Array(lambda ctx: self.e_shnum,
+                "section" / Struct(
+                    "sh_name" / self.Word,
+                    "sh_type" / self.Word,
+                    "sh_flags" / self.Xword,
+                    "sh_addr" / self.Addr,
+                    "sh_offset" / self.Off,
+                    "sh_size" / self.Xword,
+                    "sh_link" / self.Word,
+                    "sh_info" / self.Word,
+                    "sh_addralign" / self.Xword,
+                    "sh_entsize" /self.Xword,
+                    "allocate" / Computed(lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)),
+                )
+    )"""
+
+##
+##
+##
 def is_hidden_symbol(sym):
     return sym.st_other in (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
 
@@ -113,27 +167,6 @@ import datetime
 import time
 import mmap
 
-class Sh_Type(enum.IntEnum):
-    """
-
-    """
-    SHT_NULL        = 0
-    SHT_PROGBITS    = 1
-    SHT_SYMTAB      = 2
-    SHT_STRTAB      = 3
-    SHT_RELA        = 4
-    SHT_HASH        = 5
-    SHT_DYNAMIC     = 6
-    SHT_NOTE        = 7
-    SHT_NOBITS      = 8
-    SHT_REL         = 9
-    SHT_SHLIB       = 10
-    SHT_DYNSYM      = 11
-    SHT_LOPROC      = 0x70000000
-    SHT_HIPROC      = 0x7fffffff
-    SHT_LOUSER      = 0x80000000
-    SHT_HIUSER      = 0xffffffff
-
 
 class ElfFileStruct(Struct):
 
@@ -145,7 +178,6 @@ class ElfFileStruct(Struct):
 
     def setByteOrder(self):
         print("*** {}".format(self))
-
 
 
 DebugInfo = namedtuple('DebugInfo', 'section image')
@@ -191,6 +223,8 @@ class ElfParser(object):
     )
 
     def __init__(self, filename):
+        self.db = sqa.Model(Base)
+        self.session = self.db.session
         self._images = dict()
         self._sections_by_name = OrderedDict()
         self.asciiCString = CString(encoding = "ascii")
@@ -213,6 +247,7 @@ class ElfParser(object):
         self._parse_section_headers()
         self._parse_program_headers()
         self.create_section_to_segment_mapping()
+        self.session.commit()
 
     def _parser_extended_header(self):
         ExtendedHeader = Struct(
@@ -265,15 +300,14 @@ class ElfParser(object):
                 name = self.get_string(self.e_shstrndx, section.sh_name)
                 section.name = name
                 self._sections_by_name[name] = section
-                if section.sh_type == Sh_Type.SHT_NOTE:
+                if section.sh_type == defs.SectionType.SHT_NOTE:
                     print("NOTE!!! {:08X} {:04X}".format(section.sh_offset, section.sh_size))
                     self._parse_note(self.fp[section.sh_offset : section.sh_offset + section.sh_size])
-                elif section.sh_type in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
+                elif section.sh_type in (defs.SectionType.SHT_SYMTAB, defs.SectionType.SHT_DYNSYM):
                     self._parse_symbol_section(section)
 
     def get_string(self, table_index, entry):
         name = self.asciiCString.parse(self._images[table_index][entry : ])
-        print("get_string: {}".format(name))
         return name
 
     def _parse_program_headers(self):
@@ -309,23 +343,58 @@ class ElfParser(object):
             self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff : ])
 
     def _parse_symbol_section(self, section):
+        sh_link = section.sh_link
+        if self.b64:
+            pass
+        else:
+            pass
         Symbol = Struct(
             "st_name" / self.Word,
             "st_value" / self.Addr,
             "st_size" / self.Word,
             "st_info" / BitStruct(
-                "bind" / BitsInteger(4),
-                "type" / BitsInteger(4),
+                "st_bind" / BitsInteger(4),
+                "st_type" / BitsInteger(4),
             ),
             "st_other" / Int8ul,
+            "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
             "st_shndx" / self.Half,
+            "section_name" / Computed(lambda ctx: defs.section_name(ctx.st_shndx)),
              "hidden" / Computed(lambda ctx: ctx.st_other in
                  (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)),
         )
+        """
+        typedef struct {
+            Elf32_Word  st_name;
+            Elf32_Addr  st_value;
+            Elf32_Word  st_size;
+            unsigned char   st_info;
+            unsigned char   st_other;
+            Elf32_Half  st_shndx;
+        } Elf32_Sym;
+
+        typedef struct {
+            Elf64_Word  st_name;
+            unsigned char   st_info;
+            unsigned char   st_other;
+            Elf64_Half  st_shndx;
+            Elf64_Addr  st_value;
+            Elf64_Xword st_size;
+        } Elf64_Sym;
+        """
         num_symbols = len(section.image) // Symbol.sizeof()
         for offset in range(0, len(section.image), Symbol.sizeof()):
             sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
-            print(sym)
+            db_sym = Elf_Symbol(st_name = sym.st_name, st_value = sym.st_value, st_size = sym.st_size,
+                st_bind = sym.st_info.st_bind, st_type = sym.st_info.st_type, st_other = sym.st_other,
+                st_shndx = sym.st_shndx, symbol_name = sym.symbol_name, section_name = sym.section_name,
+                hidden = sym.hidden)
+            self.session.add(db_sym)
+        #print(db_sym)
+        self.session.commit()
+        query = self.session.query(Elf_Symbol)
+        aaa = query.filter(Elf_Symbol.section_name == "SHN_ABS").all()
+        print("SECTIONS",  [a.symbol_name for a in aaa])
 
     def _parse_note(self, data):
         Note = Struct(
@@ -365,7 +434,7 @@ class ElfParser(object):
             segment.p_type == defs.PT_GNU_RELRO or segment.p_type == defs.PT_LOAD) or \
             ((section_header.sh_flags & defs.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and \
             segment.p_type != defs.PT_PHDR)
-        has_offset = section_header.sh_type == defs.SHT_NOBITS or (section_header.sh_offset >= segment.p_offset \
+        has_offset = section_header.sh_type == defs.SectionType.SHT_NOBITS or (section_header.sh_offset >= segment.p_offset \
             and (not strict or (section_header.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
             and ((section_header.sh_offset - segment.p_offset + self.section_size(section_header, segment)) <= \
             (segment.p_filesz)))
@@ -374,7 +443,7 @@ class ElfParser(object):
             and ((section_header.sh_addr - segment.p_vaddr + self.section_size(section_header, segment)) <= segment.p_memsz))
         )
         has_dynamic_size = (segment.p_type != defs.PT_DYNAMIC or section_header.sh_size != 0 or segment.p_memsz == 0 \
-            or ((section_header.sh_type == defs.SHT_NOBITS or (section_header.sh_offset > segment.p_offset \
+            or ((section_header.sh_type == defs.SectionType.SHT_NOBITS or (section_header.sh_offset > segment.p_offset \
             and (section_header.sh_offset - segment.p_offset < segment.p_filesz))) \
             and ((section_header.sh_flags & defs.SHF_ALLOC) == 0 \
             or (section_header.sh_addr > segment.p_vaddr \
@@ -403,12 +472,12 @@ class ElfParser(object):
 
     def tbss_special(self, section_header, segment):
        return ((section_header.sh_flags & defs.SHF_TLS) != 0 and
-           section_header.sh_type == defs.SHT_NOBITS and segment.p_type != defs.PT_TLS
+           section_header.sh_type == defs.SectionType.SHT_NOBITS and segment.p_type != defs.PT_TLS
         )
 
     def buildSymbols(self):
         for section in self.sectionHeaders:
-            if section.shType in (defs.SHT_SYMTAB, defs.SHT_DYNSYM):
+            if section.shType in (defs.SectionType.SHT_SYMTAB, defs.SectionType.SHT_DYNSYM):
                 syms = []
                 for idx, symbol in section.symbols.items():
 #                    sym = Symbol(self.getString(section.shLink, symbol.st_name), symbol.st_value, symbol.st_size,
@@ -521,7 +590,6 @@ def main():
     print(ep.e_machine)
     print(ep.header_bytes)
     #pprint(ep._sections_by_name)
-    print(Sh_Type.SHT_NOTE == 7)
     dbSecs = ep.debug_sections()
     abbrevs = dbSecs['.debug_abbrev']
 

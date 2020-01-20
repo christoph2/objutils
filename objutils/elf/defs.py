@@ -597,89 +597,101 @@ Elf_Shdr = namedtuple("Elf_Shdr", """sh_name sh_type sh_flags sh_addr sh_offset 
 )
 
 
-# Section Indices.
-SHN_UNDEF       = 0
-    # SHN_UNDEF This value marks an undefined, missing, irrelevant, or otherwise
-    # meaningless section reference. For example, a symbol "defined'' relative to
-    # section number SHN_UNDEF is an undefined symbol.
+class SectionName(enum.IntEnum):
+    SHN_UNDEF       = 0
+        # SHN_UNDEF This value marks an undefined, missing, irrelevant, or otherwise
+        # meaningless section reference. For example, a symbol "defined'' relative to
+        # section number SHN_UNDEF is an undefined symbol.
 
-SHN_LORESERVE   = 0xff00
-    # This value specifies the lower bound of the range of reserved indexes
-SHN_LOPROC      = 0xff00
-SHN_BEFORE      = 0xff00
-    # Order section before all others (Solaris).
-SHN_AFTER       = 0xff01
-    # Order section after all others (Solaris).
-SHN_HIPROC      = 0xff1f
-    # SHN_LOPROC through SHN_HIPROC: Values in this inclusive range are reserved for
-    # processor-specific semantics.
-SHN_LOOS        = 0xff20
-# Start of OS-specific
-SHN_HIOS        = 0xff3f
-# End of OS-specific
-SHN_ABS         = 0xfff1
-    # SHN_ABS This value specifies absolute values for the corresponding reference. For
-    # example, symbols defined relative to section number SHN_ABS have
-    # absolute values and are not affected by relocation.
-SHN_COMMON      = 0xfff2
-    # SHN_COMMON Symbols defined relative to this section are common symbols, such as
-    # FORTRAN COMMON or unallocated C external variables.
-SHN_XINDEX      = 0xffff
-    # Index is in extra table.
-SHN_HIRESERVE   = 0xffff
-    # SHN_HIRESERVE This value specifies the upper bound of the range of reserved indexes.
-    # The system reserves indexes between SHN_LORESERVE and SHN_HIRESERVE, inclusive;
-    # the values do not reference the section header table.That is, the section header
-    # table does not contain entries for the  reserved indexes.
+    SHN_LORESERVE   = 0xff00
+        # This value specifies the lower bound of the range of reserved indexes
+    SHN_LOPROC      = 0xff00
+    SHN_BEFORE      = 0xff00
+        # Order section before all others (Solaris).
+    SHN_AFTER       = 0xff01
+        # Order section after all others (Solaris).
+    SHN_HIPROC      = 0xff1f
+        # SHN_LOPROC through SHN_HIPROC: Values in this inclusive range are reserved for
+        # processor-specific semantics.
+    SHN_LOOS        = 0xff20
+    # Start of OS-specific
+    SHN_HIOS        = 0xff3f
+    # End of OS-specific
+    SHN_ABS         = 0xfff1
+        # SHN_ABS This value specifies absolute values for the corresponding reference. For
+        # example, symbols defined relative to section number SHN_ABS have
+        # absolute values and are not affected by relocation.
+    SHN_COMMON      = 0xfff2
+        # SHN_COMMON Symbols defined relative to this section are common symbols, such as
+        # FORTRAN COMMON or unallocated C external variables.
+    SHN_XINDEX      = 0xffff
+        # Index is in extra table.
+    SHN_HIRESERVE   = 0xffff
+        # SHN_HIRESERVE This value specifies the upper bound of the range of reserved indexes.
+        # The system reserves indexes between SHN_LORESERVE and SHN_HIRESERVE, inclusive;
+        # the values do not reference the section header table.That is, the section header
+        # table does not contain entries for the  reserved indexes.
 
-SHN_IA_64_ANSI_COMMON   = 0xFF00
-    # This section only used by HP-UX, The HP linker gives weak symbols
-    # precedence over regular common symbols.  We want common to override
-    # weak.  Using this common instead of SHN_COMMON does that.
+    SHN_IA_64_ANSI_COMMON   = 0xFF00
+        # This section only used by HP-UX, The HP linker gives weak symbols
+        # precedence over regular common symbols.  We want common to override
+        # weak.  Using this common instead of SHN_COMMON does that.
 
-SHT_NULL            = 0             # Section header table entry unused.
-SHT_PROGBITS        = 1             # Program data.
-SHT_SYMTAB          = 2             # Symbol table.
-SHT_STRTAB          = 3             # String table.
-SHT_RELA            = 4             # Relocation entries with addends.
-SHT_HASH            = 5             # Symbol hash table.
-SHT_DYNAMIC         = 6             # Dynamic linking information.
-SHT_NOTE            = 7             # Notes.
-SHT_NOBITS          = 8             # Program space with no data (bss).
-SHT_REL             = 9             # Relocation entries, no addends.
-SHT_SHLIB           = 10            # Reserved.
-SHT_DYNSYM          = 11            # Dynamic linker symbol table.
-SHT_INIT_ARRAY      = 14            # Array of constructors.
-SHT_FINI_ARRAY      = 15            # Array of destructors.
-SHT_PREINIT_ARRAY   = 16            # Array of pre-constructors.
-SHT_GROUP           = 17            # Section group.
-SHT_SYMTAB_SHNDX    = 18            # Extended section indeces.
-SHT_NUM             = 19            # Number of defined types.
-SHT_LOOS            = 0x60000000    # Start OS-specific.
-SHT_GNU_ATTRIBUTES  = 0x6ffffff5    # Object attributes.
-SHT_GNU_HASH        = 0x6ffffff6    # GNU-style hash table.
-SHT_GNU_LIBLIST     = 0x6ffffff7    # Prelink library list
-SHT_CHECKSUM        = 0x6ffffff8    # Checksum for DSO content.
-SHT_LOSUNW          = 0x6ffffffa    # Sun-specific low bound.
-SHT_SUNW_move       = 0x6ffffffa
-SHT_SUNW_COMDAT     = 0x6ffffffb
-SHT_SUNW_syminfo    = 0x6ffffffc
-SHT_GNU_verdef      = 0x6ffffffd    # Version definition section.
-SHT_GNU_verneed     = 0x6ffffffe    # Version needs section.
-SHT_GNU_versym      = 0x6fffffff    # Version symbol table.
-SHT_HISUNW          = 0x6fffffff    # Sun-specific high bound.
-SHT_HIOS            = 0x6fffffff    # End OS-specific type.
-SHT_LOPROC          = 0x70000000    # Start of processor-specific.
+SectionNameValues = {v: k for k, v in SectionName.__members__.items()}
 
-SHT_ARM_EXIDX       = 0x70000001    # Section holds ARM unwind info.
-SHT_ARM_PREEMPTMAP  = 0x70000002    # Section pre-emption details.
-SHT_ARM_ATTRIBUTES  = 0x70000003    # Section holds attributes.
-SHT_ARM_DEBUGOVERLAY    = 0x70000004    # Section holds overlay debug info.
-SHT_ARM_OVERLAYSECTION  = 0x70000005    # Section holds GDB and overlay integration info.
+def section_name(ndx):
+    if ndx in SectionNameValues:
+        return SectionName(ndx).name
+    else:
+        return str(ndx)
 
-SHT_HIPROC          = 0x7fffffff    # End of processor-specific.
-SHT_LOUSER          = 0x80000000    # Start of application-specific.
-SHT_HIUSER          = 0xffffffff    # End of application-specific.
+class SectionType(enum.IntEnum):
+    """
+    """
+    SHT_NULL            = 0             # Section header table entry unused.
+    SHT_PROGBITS        = 1             # Program data.
+    SHT_SYMTAB          = 2             # Symbol table.
+    SHT_STRTAB          = 3             # String table.
+    SHT_RELA            = 4             # Relocation entries with addends.
+    SHT_HASH            = 5             # Symbol hash table.
+    SHT_DYNAMIC         = 6             # Dynamic linking information.
+    SHT_NOTE            = 7             # Notes.
+    SHT_NOBITS          = 8             # Program space with no data (bss).
+    SHT_REL             = 9             # Relocation entries, no addends.
+    SHT_SHLIB           = 10            # Reserved.
+    SHT_DYNSYM          = 11            # Dynamic linker symbol table.
+    SHT_INIT_ARRAY      = 14            # Array of constructors.
+    SHT_FINI_ARRAY      = 15            # Array of destructors.
+    SHT_PREINIT_ARRAY   = 16            # Array of pre-constructors.
+    SHT_GROUP           = 17            # Section group.
+    SHT_SYMTAB_SHNDX    = 18            # Extended section indeces.
+    SHT_NUM             = 19            # Number of defined types.
+    SHT_LOOS            = 0x60000000    # Start OS-specific.
+    SHT_GNU_ATTRIBUTES  = 0x6ffffff5    # Object attributes.
+    SHT_GNU_HASH        = 0x6ffffff6    # GNU-style hash table.
+    SHT_GNU_LIBLIST     = 0x6ffffff7    # Prelink library list
+    SHT_CHECKSUM        = 0x6ffffff8    # Checksum for DSO content.
+    SHT_LOSUNW          = 0x6ffffffa    # Sun-specific low bound.
+    SHT_SUNW_move       = 0x6ffffffa
+    SHT_SUNW_COMDAT     = 0x6ffffffb
+    SHT_SUNW_syminfo    = 0x6ffffffc
+    SHT_GNU_verdef      = 0x6ffffffd    # Version definition section.
+    SHT_GNU_verneed     = 0x6ffffffe    # Version needs section.
+    SHT_GNU_versym      = 0x6fffffff    # Version symbol table.
+    SHT_HISUNW          = 0x6fffffff    # Sun-specific high bound.
+    SHT_HIOS            = 0x6fffffff    # End OS-specific type.
+    SHT_LOPROC          = 0x70000000    # Start of processor-specific.
+
+    SHT_ARM_EXIDX       = 0x70000001    # Section holds ARM unwind info.
+    SHT_ARM_PREEMPTMAP  = 0x70000002    # Section pre-emption details.
+    SHT_ARM_ATTRIBUTES  = 0x70000003    # Section holds attributes.
+    SHT_ARM_DEBUGOVERLAY    = 0x70000004    # Section holds overlay debug info.
+    SHT_ARM_OVERLAYSECTION  = 0x70000005    # Section holds GDB and overlay integration info.
+
+    SHT_HIPROC          = 0x7fffffff    # End of processor-specific.
+    SHT_LOUSER          = 0x80000000    # Start of application-specific.
+    SHT_HIUSER          = 0xffffffff    # End of application-specific.
+
 
 SHF_WRITE               = 0x1           # Writable.
 SHF_ALLOC               = 0x2           # Occupies memory during execution
