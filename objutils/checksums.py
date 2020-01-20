@@ -107,7 +107,7 @@ class Algorithm(enum.IntEnum):
     CHK_ADD_24 = 5
     CHK_ADD_44 = 6
     CHK_CRC_16 = 7
-    CHK_CRC_16_CITT = 8
+    CHK_CRC_16_CCITT = 8
     CHK_CRC_32 = 9
     CHK_USER_DEFINED = 10
 
@@ -319,7 +319,7 @@ CRC16_CCITT = Crc16(CRC16_CCITT, 0xffff, 0x0000, False, False)
 
 
 def CRC32(x):
-    return zlib.crc32(x) & 0xffffffff
+    return zlib.crc32(bytes(x)) & 0xffffffff
 
 
 def userDefined(x):
@@ -337,7 +337,7 @@ ALGO = {
     "CHK_ADD_24":       ADD24,
     "CHK_ADD_44":       ADD44,
     "CHK_CRC_16":       CRC16,
-    "CHK_CRC_16_CITT":  CRC16_CCITT,
+    "CHK_CRC_16_CCITT":  CRC16_CCITT,
     "CHK_CRC_32":       CRC32,
     "CHK_USER_DEFINED": userDefined
 }
