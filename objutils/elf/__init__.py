@@ -4,11 +4,11 @@ from __future__ import division
 __version__ = "0.1.0"
 
 __copyright__ = """
-    objutils - Object file library for Python.
+   objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
-   All Rights Reserved
+  All Rights Reserved
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ import struct
 import time
 
 
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, String, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, GreedyBytes, RepeatUntil, BitStruct, BitsInteger
-from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell, Computed
+from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
+from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil, BitStruct, BitsInteger
+from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell
 from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
 from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
@@ -117,10 +117,8 @@ class Pass2(Construct):
         super(self.__class__, self).__init__()
         self.flagbuildnone = True
     def _parse(self, stream, context, path):
-        #print("ÜÜÜ", context)
         return None
     def _build(self, obj, stream, context, path):
-        #print(obj)
         pass
     def _sizeof(self, context, path):
         return 0
@@ -255,8 +253,8 @@ class ElfParser(object):
             "e_machine" / self.Half,     # Machine type
             "e_version" / self.Word,     # Object file version
             "e_entry" / self.Addr,       # Entry point address
-            "e_phoff" / self.Off,         # Program header offset
-            "e_shoff" / self.Off,         # Section header offset
+            "e_phoff" / self.Off,        # Program header offset
+            "e_shoff" / self.Off,        # Section header offset
             "e_flags" / self.Word,       # Processor-specific flags
             "e_ehsize" / self.Half,      # ELF header size
             "e_phentsize" / self.Half,   # Size of program header entry
@@ -406,7 +404,6 @@ class ElfParser(object):
         )
         print(len(data), data.tobytes())
         result = Note.parse(data)
-        #result.name = binascii.b2a_hex(result.name).decode()
         result.desc = binascii.b2a_hex(result.desc).decode()
         print(result.desc)
         print(result)
@@ -580,28 +577,3 @@ class ElfParser(object):
     @property
     def segments(self):
         return self._program_headers['segments']
-
-def main():
-    #fname = r'f:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\lib_with_two_dynstr_sections_reversed.so.1.elf'
-    fname = r'f:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile51'
-    #fname = r'C:\projekte\csProjects\yOBJl\objutils\tests\ELFFiles\testfile_i686_core'
-    ep = ElfParser(fname)
-    print(ep.ei_class)
-    print(ep.e_machine)
-    print(ep.header_bytes)
-    #pprint(ep._sections_by_name)
-    dbSecs = ep.debug_sections()
-    abbrevs = dbSecs['.debug_abbrev']
-
-    dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-    dp.doAbbrevs()
-    dp.doMacInfo()
-
-    #doAbbrevs(abbrevs)
-    #macs = dbSecs['.debug_macinfo']
-    #doMacInfo(macs)
-    #print(bytes(macs.image))
-
-if __name__ == '__main__':
-    main()
-
