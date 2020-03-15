@@ -502,6 +502,109 @@ class TestImageSlices(BaseTest):
             buf = create_string_buffer()
         section.hexdump(buf)
 
+def test_read_write_datatypes_require_suffix():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "uint8")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "int8")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "uint16")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "int16")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "uint32")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "int32")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "uint64")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "int64")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "float32")
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "float64")
+
+def test_invalid_read_write_datatype_raises():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    with pytest.raises(TypeError):
+        img.read_numeric(0x1000, "foobar_le")
+
+def test_read_write():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write(0x1000, 5, b'hello')
+    assert img.read(0x1000, 5) == b"hello"
+
+def test_read_write_uint8():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 0x55, "uint8_be")
+    assert img.read_numeric(0x1000, "uint8_be") == 0x55
+    img.write_numeric(0x1000, 0x55, "uint8_le")
+    assert img.read_numeric(0x1000, "uint8_le") == 0x55
+
+def test_read_write_int8():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, -20, "int8_be")
+    assert img.read_numeric(0x1000, "int8_be") == -20
+    img.write_numeric(0x1000, -20, "int8_le")
+    assert img.read_numeric(0x1000, "int8_le") == -20
+
+def test_read_write_uint16():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 0x5555, "uint16_be")
+    assert img.read_numeric(0x1000, "uint16_be") == 0x5555
+    img.write_numeric(0x1000, 0x5555, "uint16_le")
+    assert img.read_numeric(0x1000, "uint16_le") == 0x5555
+
+def test_read_write_int16():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, -2000, "int16_be")
+    assert img.read_numeric(0x1000, "int16_be") == -2000
+    img.write_numeric(0x1000, -2000, "int16_le")
+    assert img.read_numeric(0x1000, "int16_le") == -2000
+
+def test_read_write_uint32():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 0x55555555, "uint32_be")
+    assert img.read_numeric(0x1000, "uint32_be") == 0x55555555
+    img.write_numeric(0x1000, 0x55555555, "uint32_le")
+    assert img.read_numeric(0x1000, "uint32_le") == 0x55555555
+
+def test_read_write_int32():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, -20000000, "int32_be")
+    assert img.read_numeric(0x1000, "int32_be") == -20000000
+    img.write_numeric(0x1000, -20000000, "int32_le")
+    assert img.read_numeric(0x1000, "int32_le") == -20000000
+
+def test_read_write_uint64():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 0x5555555555555555, "uint64_be")
+    assert img.read_numeric(0x1000, "uint64_be") == 0x5555555555555555
+    img.write_numeric(0x1000, 0x5555555555555555, "uint64_le")
+    assert img.read_numeric(0x1000, "uint64_le") == 0x5555555555555555
+
+def test_read_write_int64():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, -200000000000, "int64_be")
+    assert img.read_numeric(0x1000, "int64_be") == -200000000000
+    img.write_numeric(0x1000, -200000000000, "int64_le")
+    assert img.read_numeric(0x1000, "int64_le") == -200000000000
+
+def test_read_write_float32():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 1234.5678, "float32_be")
+    assert img.read_numeric(0x1000, "float32_be") == 1234.5677490234375
+    img.write_numeric(0x1000, 1234.5678, "float32_le")
+    assert img.read_numeric(0x1000, "float32_le") == 1234.5677490234375
+
+def test_read_write_float64():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric(0x1000, 1234.5678, "float64_be")
+    assert img.read_numeric(0x1000, "float64_be") == 1234.5678
+    img.write_numeric(0x1000, 1234.5678, "float64_le")
+    assert img.read_numeric(0x1000, "float64_le") == 1234.5678
+
 
 if __name__ == '__main__':
     unittest.main()
