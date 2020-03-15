@@ -9,7 +9,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -51,6 +51,9 @@ from objutils.utils import PYTHON_VERSION
 ## API to change start_address (but not length!) /w check for overlapps.
 ## split (for some reason) contingous regions into separate segments (splitAt [addresses], splitInto [n pieces]) inplace or new object.
 ## cut/copy/paste/delete
+##
+## {read|write}_numeric_array
+
 
 FORMATS = {
     "uint8": "B",
@@ -188,18 +191,38 @@ class Section(object):
         return  array('B', self.data).tolist()
 
     def _getformat(self, dtype):
+        if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
+                raise TypeError("dtype must be suffixed with '_be' or '_le'")
         dtype = dtype.lower().strip()
         match = DTYPE.match(dtype)
+        if not match:
+            raise TypeError("Invalid datatype '{}'".format(dtype))
         fmt, bo = dtype.split("_")
 
         return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
     def read(self, addr, length):
+        """
+        Parameters
+        ----------
+        addr: int
+
+        length: int
+        """
         offset = addr - self.start_address
         data = self.data[offset : offset + length]
-        return Section(addr, data)
+        return data
 
     def write(self, addr, length, data):
+        """
+        Parameters
+        ----------
+        addr: int
+
+        length: int
+
+        data: array-like
+        """
         offset = addr - self.start_address
         self.data[offset : offset + length] = data
 
