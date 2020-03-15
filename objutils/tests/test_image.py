@@ -605,6 +605,92 @@ def test_read_write_float64():
     img.write_numeric(0x1000, 1234.5678, "float64_le")
     assert img.read_numeric(0x1000, "float64_le") == 1234.5678
 
+def test_read_write_string():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_string(0x1000, 'hello')
+    assert img.read_string(0x1000) == "hello"
+
+def test_read_unterminated_string_raises():
+    img = Image(Section(data = bytearray(b"\x0a" * 32), start_address = 0x1000))
+    img.write(0x1000, 5, b'hello')
+    with pytest.raises(TypeError):
+        data = img.read_string(0x1000)
+##
+def test_write_array_data_must_be_iterable():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    with pytest.raises(TypeError):
+        img.write_numeric_array(0x1000, 0x55, "uint8_be")
+
+def test_read_write_uint8_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+    assert img.read_numeric_array(0x1000, 10, "uint8_be") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_le")
+    assert img.read_numeric_array(0x1000, 10, "uint8_le") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+def test_read_write_int8_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int8_be")
+    assert img.read_numeric_array(0x1000, 10, "int8_be") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int8_le")
+    assert img.read_numeric_array(0x1000, 10, "int8_le") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+
+def test_read_write_uint16_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint16_be")
+    assert img.read_numeric_array(0x1000, 10, "uint16_be") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint16_le")
+    assert img.read_numeric_array(0x1000, 10, "uint16_le") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+def test_read_write_int16_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int16_be")
+    assert img.read_numeric_array(0x1000, 10, "int16_be") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int16_le")
+    assert img.read_numeric_array(0x1000, 10, "int16_le") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+
+def test_read_write_uint32_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint32_be")
+    assert img.read_numeric_array(0x1000, 10, "uint32_be") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint32_le")
+    assert img.read_numeric_array(0x1000, 10, "uint32_le") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+def test_read_write_int32_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int32_be")
+    assert img.read_numeric_array(0x1000, 10, "int32_be") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int32_le")
+    assert img.read_numeric_array(0x1000, 10, "int32_le") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+
+def test_read_write_uint64_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint64_be")
+    assert img.read_numeric_array(0x1000, 10, "uint64_be") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint64_le")
+    assert img.read_numeric_array(0x1000, 10, "uint64_le") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+def test_read_write_int64_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int64_be")
+    assert img.read_numeric_array(0x1000, 10, "int64_be") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+    img.write_numeric_array(0x1000, [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10], "int64_le")
+    assert img.read_numeric_array(0x1000, 10, "int64_le") == (-1, -2, -3, -4, -5, -6, -7, -8, -9, -10)
+#
+def test_read_write_float32_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], "float32_be")
+    assert img.read_numeric_array(0x1000, 10, "float32_be") == (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+    img.write_numeric_array(0x1000, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], "float32_le")
+    assert img.read_numeric_array(0x1000, 10, "float32_le") == (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+
+def test_read_write_float64_array():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], "float64_be")
+    assert img.read_numeric_array(0x1000, 10, "float64_be") == (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+    img.write_numeric_array(0x1000, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], "float64_le")
+    assert img.read_numeric_array(0x1000, 10, "float64_le") == (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+
 
 if __name__ == '__main__':
     unittest.main()

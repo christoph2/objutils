@@ -52,8 +52,6 @@ from objutils.utils import PYTHON_VERSION
 ## split (for some reason) contingous regions into separate segments (splitAt [addresses], splitInto [n pieces]) inplace or new object.
 ## cut/copy/paste/delete
 ##
-## {read|write}_numeric_array
-
 
 FORMATS = {
     "uint8": "B",
@@ -190,7 +188,7 @@ class Section(object):
     def tolist(self):
         return  array('B', self.data).tolist()
 
-    def _getformat(self, dtype):
+    def _getformat(self, dtype, length = 1):
         if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
                 raise TypeError("dtype must be suffixed with '_be' or '_le'")
         dtype = dtype.lower().strip()
@@ -198,8 +196,10 @@ class Section(object):
         if not match:
             raise TypeError("Invalid datatype '{}'".format(dtype))
         fmt, bo = dtype.split("_")
-
-        return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
+        if length > 1:
+            return "{}{}{}".format(BYTEORDER.get(bo), length, FORMATS.get(fmt))
+        else:
+            return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
     def read(self, addr, length):
         """
@@ -237,11 +237,25 @@ class Section(object):
         fmt = self._getformat(dtype)
         self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
 
+    def read_numeric_array(self, addr, length, dtype):
+        offset = addr - self.start_address
+        fmt = self._getformat(dtype, length)
+        data = self.data[offset : offset + struct.calcsize(fmt)]
+        return struct.unpack(fmt, data)
+
+    def write_numeric_array(self, addr, data, dtype):
+        if not hasattr(data, '__iter__'):
+            raise TypeError("data must be iterable")
+        length = len(data)
+        offset = addr - self.start_address
+        fmt = self._getformat(dtype, length)
+        self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, *data)
+
     def read_string(self, addr, encoding = "latin1", length = -1):
         offset = addr - self.start_address
         pos = self.data[offset : ].find(b'\x00')
         if pos == -1:
-            raise RuntimeError("Unterminated String!!!")
+            raise TypeError("Unterminated String!!!")   # TODO: Testcase.
         return self.data[offset : offset + pos].decode(encoding = encoding)
 
     def write_string(self, addr, value, encoding = "latin1"):

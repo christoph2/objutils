@@ -199,6 +199,17 @@ class Image(object):
         """
         self._call_address_function("write_numeric", addr, value, dtype)
 
+    def read_numeric_array(self, addr, length, dtype):
+        """
+
+        """
+        return self._call_address_function("read_numeric_array", addr, length, dtype)
+
+    def write_numeric_array(self, addr, data, dtype):# TODO: bounds-checking.
+        """
+        """
+        self._call_address_function("write_numeric_array", addr, data, dtype)
+
     def read_string(self, addr, encoding = "latin1", length = -1):
         """
 
