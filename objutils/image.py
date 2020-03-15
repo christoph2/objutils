@@ -12,7 +12,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -192,24 +192,24 @@ class Image(object):
         """
 
         """
-        return self._call_address_function("readNumeric", addr, dtype)
+        return self._call_address_function("read_numeric", addr, dtype)
 
     def write_numeric(self, addr, value, dtype):
         """
         """
-        self._call_address_function("writeNumeric", addr, value, dtype)
+        self._call_address_function("write_numeric", addr, value, dtype)
 
     def read_string(self, addr, encoding = "latin1", length = -1):
         """
 
         """
-        return self._call_address_function("readString", addr, encoding, length)
+        return self._call_address_function("read_string", addr, encoding, length)
 
     def write_string(self, addr, value, encoding = "latin1"):
         """
 
         """
-        self._call_address_function("writeString", addr, value, encoding)
+        self._call_address_function("write_string", addr, value, encoding)
 
 
     def _address_contained(self, address, length):
