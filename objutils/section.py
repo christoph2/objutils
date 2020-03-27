@@ -161,11 +161,11 @@ class Section(object):
     """
     start_address = attr.ib(type = int, eq = True, order = True, default = 0)
     data = attr.ib(default = bytearray(), converter = _data_converter, eq = True, order = True)
-    length = attr.ib(init = False, eq = True, order = True)
+    #length = attr.ib(init = False, eq = True, order = True)
 
-    @length.default
-    def __init_length__(self):
-        return len(self.data)
+    #@length.default
+    #def __init_length__(self):
+    #    return len(self.data)
 
     def __attrs_post_init__(self):
         self.repr = reprlib.Repr()
@@ -286,7 +286,11 @@ class Section(object):
         )
 
     def __len__(self):
-        return self.length
+        return len(self.data)
+
+    @property
+    def length(self):
+        return len(self)
 
     def __contains__(self, addr):
         return self.start_address <= addr < (self.start_address + self.length)
@@ -305,7 +309,6 @@ def join_sections(sections):
         if section.start_address == prev_section.start_address + prev_section.length and result_sections:
             last_segment = result_sections[-1]
             last_segment.data.extend(section.data)
-            last_segment.length += section.length
         else:
             # Create a new section.
             if isinstance(sections, SortedList):
