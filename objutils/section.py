@@ -211,6 +211,8 @@ class Section(object):
         length: int
         """
         offset = addr - self.start_address
+        if offset + length > self.length:
+            raise InvalidAddressError("read() access out of bounds.")
         data = self.data[offset : offset + length]
         return data
 
@@ -225,23 +227,34 @@ class Section(object):
         data: array-like
         """
         offset = addr - self.start_address
+        if offset + length > self.length:
+            raise InvalidAddressError("write() access out of bounds.")
         self.data[offset : offset + length] = data
 
     def read_numeric(self, addr, dtype):
         offset = addr - self.start_address
         fmt = self._getformat(dtype)
-        data = self.data[offset : offset + struct.calcsize(fmt)]
+        data_size = struct.calcsize(fmt)
+        if offset + data_size > self.length:
+            raise InvalidAddressError("read_numeric() access out of bounds.")
+        data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)[0]
 
     def write_numeric(self, addr, value, dtype):
         offset = addr - self.start_address
         fmt = self._getformat(dtype)
-        self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, value)
+        data_size = struct.calcsize(fmt)
+        if offset + data_size > self.length:
+            raise InvalidAddressError("write_numeric() access out of bounds.")
+        self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
     def read_numeric_array(self, addr, length, dtype):
         offset = addr - self.start_address
         fmt = self._getformat(dtype, length)
-        data = self.data[offset : offset + struct.calcsize(fmt)]
+        data_size = struct.calcsize(fmt)
+        if offset + data_size > self.length:
+            raise InvalidAddressError("read_numeric_array() access out of bounds.")
+        data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
     def write_numeric_array(self, addr, data, dtype):
