@@ -1,13 +1,7 @@
 [run]
 branch = True
 omit = 
-    pya2l/tests/*
-    pya2l/model/*
-    pya2l/classes.py
-    pya2l/amlLexer.py
-    pya2l/amlParser.py
-    pya2l/a2lParser.py
-    pya2l/a2lLexer.py
+    objutils/tests/*
 
 [report]
 exclude_lines =
