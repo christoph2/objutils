@@ -40,12 +40,10 @@ import sys
 from sortedcontainers import SortedDict, SortedList
 
 from objutils.section import Section, join_sections
+from objutils.exceptions import InvalidAddressError
 
 SearchType = namedtuple("SearchType", "start_address")
 
-class InvalidAddressError(Exception):
-    """Raised if address information is out of range.
-    """
 
 #
 # TODO: Use crypto hashes (comparison, optimized storage, ...)

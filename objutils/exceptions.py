@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -28,3 +28,7 @@ __copyright__ = """
 class FileCorruptedError(Exception): pass
 
 class PrematureEndOfFileError(Exception): pass
+
+class InvalidAddressError(Exception):
+    """Raised if address information is out of range.
+    """

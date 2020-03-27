@@ -41,6 +41,7 @@ import sys
 import attr
 from sortedcontainers import SortedList
 
+from objutils.exceptions import InvalidAddressError
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
 
@@ -249,7 +250,10 @@ class Section(object):
         length = len(data)
         offset = addr - self.start_address
         fmt = self._getformat(dtype, length)
-        self.data[offset : offset + struct.calcsize(fmt)] = struct.pack(fmt, *data)
+        data_size = struct.calcsize(fmt)
+        if offset + data_size > self.length:
+            raise InvalidAddressError("write_numeric_array() access out of bounds.")
+        self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
     def read_string(self, addr, encoding = "latin1", length = -1):
         offset = addr - self.start_address
