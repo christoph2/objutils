@@ -10,6 +10,8 @@ from objutils.section import (Section, filler, INT8_RANGE, INT16_RANGE,
         INT32_RANGE, INT64_RANGE, UINT8_RANGE, UINT16_RANGE, UINT32_RANGE,
         UINT64_RANGE)
 
+from objutils.exceptions import InvalidAddressError
+
 
 def test_default_section():
     section = Section()
@@ -254,4 +256,126 @@ def test_write_float64_be1(filler_0_16):
     filler_0_16.write_numeric(0, math.pi, "float64_be")
     assert filler_0_16.data == bytearray([0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18, 0, 0, 0, 0, 0, 0, 0, 0])
 
+def test_write_uint8_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "uint8_le")
 
+def test_write_uint16_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "uint16_le")
+
+def test_write_uint32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "uint32_le")
+
+def test_write_uint64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "uint64_le")
+
+def test_write_int8_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "int8_le")
+
+def test_write_int16_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "int16_le")
+
+def test_write_int32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "int32_le")
+
+def test_write_int64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 0xff, "int64_le")
+
+def test_write_float32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 3.14159, "float32_le")
+
+def test_write_float64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric(-1, 3.14159, "float64_le")
+
+def test_read_uint8_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "uint8_le")
+
+def test_read_uint16_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "uint16_le")
+
+def test_read_uint32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "uint32_le")
+
+def test_read_uint64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "uint64_le")
+
+def test_read_int8_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "int8_le")
+
+def test_read_int16_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "int16_le")
+
+def test_read_int32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "int32_le")
+
+def test_read_int64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "int64_le")
+
+def test_read_float32_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "float32_le")
+
+def test_read_float64_negative_offset(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric(-1, "float64_le")
+
+def test_write_boundary_case1(filler_0_16):
+    filler_0_16.write(0x0, 5, b'hello')
+
+def test_write_boundary_case2(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write(0x10, 5, b'hello')
+
+def test_write_boundary_case3(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write(-1, 5, b'hello')
+
+def test_read_boundary_case1(filler_0_16):
+    assert filler_0_16.read(0x0, 5) == b"\x00\x00\x00\x00\x00"
+
+def test_read_boundary_case2(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read(0x10, 5)
+
+def test_read_boundary_case3(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read(-1, 5)
+
+def test_read_uint8_array_boundary_case1(filler_0_16):
+    assert filler_0_16.read_numeric_array(0, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case2(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric_array(0x10, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case3(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.read_numeric_array(-1, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_write_uint8_array_boundary_case1(filler_0_16):
+    filler_0_16.write_numeric_array(0, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+def test_write_uint8_array_boundary_case2(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric_array(0x10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+def test_write_uint8_array_boundary_case3(filler_0_16):
+    with pytest.raises(InvalidAddressError):
+        filler_0_16.write_numeric_array(-1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")

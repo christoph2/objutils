@@ -536,6 +536,34 @@ def test_read_write():
     img.write(0x1000, 5, b'hello')
     assert img.read(0x1000, 5) == b"hello"
 
+def test_write_boundary_case1():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    img.write(0x1000, 5, b'hello')
+
+def test_write_boundary_case2():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write(0x1001, 5, b'hello')
+
+def test_write_boundary_case3():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write(0x0fff, 5, b'hello')
+
+def test_read_boundary_case1():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    assert img.read(0x1000, 5) == b"\x00\x00\x00\x00\x00"
+
+def test_read_boundary_case2():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read(0x1001, 5)
+
+def test_read_boundary_case3():
+    img = Image(Section(data = bytearray(5), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read(0x0fff, 5)
+
 def test_read_write_uint8():
     img = Image(Section(data = bytearray(32), start_address = 0x1000))
     img.write_numeric(0x1000, 0x55, "uint8_be")
@@ -637,6 +665,29 @@ def test_write_uint8_array_boundary_case3():
     with pytest.raises(InvalidAddressError):
         img.write_numeric_array(0x1006, [1, 2, 3, 4, 5], "uint8_be")
 
+def test_write_uint8_array_boundary_case4():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric_array(0x0fff, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+def test_read_uint8_array_boundary_case1():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    assert img.read_numeric_array(0x1000, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case2():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    assert img.read_numeric_array(0x1005, 5, "uint8_be") == (0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case3():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric_array(0x1006, 5, "uint8_be") == (0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case4():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric_array(0x0fff, 5, "uint8_be") == (0, 0, 0, 0, 0)
+
 def test_read_write_uint8_array():
     img = Image(Section(data = bytearray(32), start_address = 0x1000))
     img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
@@ -681,7 +732,6 @@ def test_read_write_uint32_array():
     img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint32_le")
     assert img[0].length == 64
     assert img.read_numeric_array(0x1000, 10, "uint32_le") == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-    img.hexdump()
 
 def test_read_write_int32_array():
     img = Image(Section(data = bytearray(64), start_address = 0x1000))
@@ -728,6 +778,134 @@ def test_read_write_float64_array():
     assert img[0].length == 128
     assert img.read_numeric_array(0x1000, 10, "float64_le") == (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
 
+#
+def test_write_uint8_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "uint8_le")
+
+def test_write_uint16_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "uint16_le")
+
+def test_write_uint32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "uint32_le")
+
+def test_write_uint64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "uint64_le")
+
+def test_write_int8_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "int8_le")
+
+def test_write_int16_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "int16_le")
+
+def test_write_int32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "int32_le")
+
+def test_write_int64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 0xff, "int64_le")
+
+def test_write_float32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 3.14159, "float32_le")
+
+def test_write_float64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric(0x0fff, 3.14159, "float64_le")
+
+def test_read_uint8_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "uint8_le")
+
+def test_read_uint16_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "uint16_le")
+
+def test_read_uint32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "uint32_le")
+
+def test_read_uint64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "uint64_le")
+
+def test_read_int8_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "int8_le")
+
+def test_read_int16_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "int16_le")
+
+def test_read_int32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "int32_le")
+
+def test_read_int64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "int64_le")
+
+def test_read_float32_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "float32_le")
+
+def test_read_float64_negative_offset():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric(0x0fff, "float64_le")
+
+def test_read_uint8_array_boundary_case1():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    assert img.read_numeric_array(0x1000, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case2():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric_array(0x1001, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_read_uint8_array_boundary_case3():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.read_numeric_array(0x0fff, 10, "uint8_be") == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+def test_write_uint8_array_boundary_case1():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    img.write_numeric_array(0x1000, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+def test_write_uint8_array_boundary_case2():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric_array(0x1001, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+def test_write_uint8_array_boundary_case3():
+    img = Image(Section(data = bytearray(10), start_address = 0x1000))
+    with pytest.raises(InvalidAddressError):
+        img.write_numeric_array(0x0fff, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
 
 if __name__ == '__main__':
     unittest.main()
