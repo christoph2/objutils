@@ -533,22 +533,22 @@ def test_invalid_read_write_datatype_raises():
 
 def test_read_write():
     img = Image(Section(data = bytearray(32), start_address = 0x1000))
-    img.write(0x1000, 5, b'hello')
+    img.write(0x1000, b'hello')
     assert img.read(0x1000, 5) == b"hello"
 
 def test_write_boundary_case1():
     img = Image(Section(data = bytearray(5), start_address = 0x1000))
-    img.write(0x1000, 5, b'hello')
+    img.write(0x1000, b'hello')
 
 def test_write_boundary_case2():
     img = Image(Section(data = bytearray(5), start_address = 0x1000))
     with pytest.raises(InvalidAddressError):
-        img.write(0x1001, 5, b'hello')
+        img.write(0x1001, b'hello')
 
 def test_write_boundary_case3():
     img = Image(Section(data = bytearray(5), start_address = 0x1000))
     with pytest.raises(InvalidAddressError):
-        img.write(0x0fff, 5, b'hello')
+        img.write(0x0fff, b'hello')
 
 def test_read_boundary_case1():
     img = Image(Section(data = bytearray(5), start_address = 0x1000))
@@ -641,7 +641,7 @@ def test_read_write_string():
 
 def test_read_unterminated_string_raises():
     img = Image(Section(data = bytearray(b"\x0a" * 32), start_address = 0x1000))
-    img.write(0x1000, 5, b'hello')
+    img.write(0x1000, b'hello')
     with pytest.raises(TypeError):
         data = img.read_string(0x1000)
 ##

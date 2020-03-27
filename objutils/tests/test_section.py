@@ -337,15 +337,15 @@ def test_read_float64_negative_offset(filler_0_16):
         filler_0_16.read_numeric(-1, "float64_le")
 
 def test_write_boundary_case1(filler_0_16):
-    filler_0_16.write(0x0, 5, b'hello')
+    filler_0_16.write(0x0, b'hello')
 
 def test_write_boundary_case2(filler_0_16):
     with pytest.raises(InvalidAddressError):
-        filler_0_16.write(0x10, 5, b'hello')
+        filler_0_16.write(0x10, b'hello')
 
 def test_write_boundary_case3(filler_0_16):
     with pytest.raises(InvalidAddressError):
-        filler_0_16.write(-1, 5, b'hello')
+        filler_0_16.write(-1, b'hello')
 
 def test_read_boundary_case1(filler_0_16):
     assert filler_0_16.read(0x0, 5) == b"\x00\x00\x00\x00\x00"

@@ -218,7 +218,7 @@ class Section(object):
         data = self.data[offset : offset + length]
         return data
 
-    def write(self, addr, length, data):    # TODO: remove length param!
+    def write(self, addr, data):
         """
         Parameters
         ----------
@@ -228,6 +228,7 @@ class Section(object):
 
         data: array-like
         """
+        length = len(data)
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write() access out of bounds.")

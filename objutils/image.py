@@ -161,7 +161,7 @@ class Image(object):
         """
         return self._call_address_function("read", addr, length)
 
-    def write(self, addr, length, data):
+    def write(self, addr, data):
         """Write bytes to image.
 
         Parameters
@@ -169,22 +169,14 @@ class Image(object):
         addr: int
             Startaddress.
 
-        length: int
-            Number of bytes to write.
-
         data: bytes
 
         Raises
         ------
         :class:`InvalidAddressError`
             if `addr` is out of range
-
-        Note
-        ----
-            if `addr` + `len` is out of range, result is silently truncated, i.e. without raising an exception.
-
         """
-        self._call_address_function("write", addr, length, data)
+        self._call_address_function("write", addr, data)
 
     def read_numeric(self, addr, dtype):
         """
