@@ -59,57 +59,10 @@ from sqlalchemy import (MetaData, schema, types, orm, event,
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
-from objutils.utils import sqa
+from objutils.elf import model
 
 MAGIC = b'\x7fELF'
 
-Base = sqa.declarative_base()
-
-class Elf_Symbol(Base, sqa.MixInBase):
-    __tablename__ = "symbol"
-
-    id = Column(types.Integer, primary_key = True)
-    st_name = Column(types.Integer)
-    st_value = Column(types.Integer)
-    st_info = Column(types.Integer)
-    st_size = Column(types.Integer)
-    st_bind = Column(types.Integer)
-    st_type = Column(types.Integer)
-    st_other = Column(types.Integer)
-    st_shndx = Column(types.Integer)
-    section_name = Column(types.VARCHAR, index = True)
-    symbol_name = Column(types.VARCHAR, index = True)
-    hidden = Column(types.Boolean)
-
-
-class Elf_Section(Base, sqa.MixInBase):
-    __tablename__ = "section"
-
-    index = Column(types.Integer, primary_key = True)
-    """
-            "sections" / Array(lambda ctx: self.e_shnum,
-                "section" / Struct(
-                    "sh_name" / self.Word,
-                    "sh_type" / self.Word,
-                    "sh_flags" / self.Xword,
-                    "sh_addr" / self.Addr,
-                    "sh_offset" / self.Off,
-                    "sh_size" / self.Xword,
-                    "sh_link" / self.Word,
-                    "sh_info" / self.Word,
-                    "sh_addralign" / self.Xword,
-                    "sh_entsize" /self.Xword,
-                    "allocate" / Computed(lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)),
-                )
-    )"""
-
-##
-##
-##
-def is_hidden_symbol(sym):
-    """Check for symbol visibility.
-    """
-    return sym.st_other in (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
 
 @singleton
 class Pass2(Construct):
@@ -123,7 +76,7 @@ class Pass2(Construct):
         0
     """
     def __init__(self):
-        super(self.__class__, self).__init__()
+        super().__init__()
         self.flagbuildnone = True
     def _parse(self, stream, context, path):
         return None
@@ -245,13 +198,12 @@ class ElfParser(object):
     )
 
     def __init__(self, filename):
-        self.db = sqa.Model(Base)
+        self.db = model.Model()
         self.session = self.db.session
         self._images = dict()
         self._sections_by_name = OrderedDict()
         self.asciiCString = CString(encoding = "ascii")
         self.fp = create_memorymapped_fileview(filename)
-        print(filename, flush = True)
         self._basic_header = ElfParser.BasicHeader.parse(self.fp)
         self.b64 = (self.ei_class == 2)
         self.endianess = self.ei_data
@@ -364,6 +316,7 @@ class ElfParser(object):
 
     def _parse_symbol_section(self, section):
         sh_link = section.sh_link
+        symbols = []
         Symbol = Struct(
             "st_name" / self.Word,
             "st_value" / self.Addr,
@@ -376,21 +329,21 @@ class ElfParser(object):
             "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
             "st_shndx" / self.Half,
             "section_name" / Computed(lambda ctx: defs.section_name(ctx.st_shndx)),
-             "hidden" / Computed(lambda ctx: ctx.st_other in
-                 (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)),
         )
         num_symbols = len(section.image) // Symbol.sizeof()
         for offset in range(0, len(section.image), Symbol.sizeof()):
             sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
-            db_sym = Elf_Symbol(st_name = sym.st_name, st_value = sym.st_value, st_size = sym.st_size,
+            db_sym = model.Elf_Symbol(st_name = sym.st_name, st_value = sym.st_value, st_size = sym.st_size,
                 st_bind = sym.st_info.st_bind, st_type = sym.st_info.st_type, st_other = sym.st_other,
-                st_shndx = sym.st_shndx, symbol_name = sym.symbol_name, section_name = sym.section_name,
-                hidden = sym.hidden)
-            self.session.add(db_sym)
+                st_shndx = sym.st_shndx, symbol_name = sym.symbol_name, section_name = sym.section_name
+            )
+            symbols.append(db_sym)
+            print(db_sym, db_sym.hidden, end = "\n\n")
+            #bulk_save_objects
+        #self.session.add_all(symbols)
+        self.session.bulk_save_objects(symbols)
         self.session.commit()
-        query = self.session.query(Elf_Symbol)
-        aaa = query.filter(Elf_Symbol).all()
-        print("SYM",  [a.symbol_name for a in aaa])
+
 
     def _parse_note(self, data):
         Note = Struct(
@@ -464,14 +417,6 @@ class ElfParser(object):
        return ((section_header.sh_flags & defs.SHF_TLS) != 0 and
            section_header.sh_type == defs.SectionType.SHT_NOBITS and segment.p_type != defs.PT_TLS
         )
-
-    def buildSymbols(self):
-        for section in self.sectionHeaders:
-            if section.shType in (Sh_Type.SHT_SYMTAB, Sh_Type.SHT_DYNSYM):
-                syms = []
-                for idx, symbol in section.symbols.items():
-                    syms.append(sym)
-                self.symbols[section.shName] = syms
 
     def section_size(self, section_header, segment):
         return 0 if self.tbss_special(section_header, segment) else section_header.sh_size

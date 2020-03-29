@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -181,6 +181,7 @@ class SingletonBase(object):
         return cls._instance
 
 
+"""
 class RepresentationMixIn(object):
 
     def __repr__(self):
@@ -189,9 +190,9 @@ class RepresentationMixIn(object):
         result.append("{0!s} {{".format(self.__class__.__name__))
         for key in keys:
             value = getattr(self, key)
-            if isinstance(value, (int, long)):
+            if isinstance(value, int):
                 line = "    {0!s} = 0x{1:X}".format(key, value)
-            elif isinstance(value, (float, types.NoneType)):
+            elif isinstance(value, (float, type(None))):
                 line = "    {0!s} = {1!s}".format(key, value)
             elif isinstance(value, array):
                 line = "    {0!s} = {1!s}".format(key, helper.hexDump(value))
@@ -200,6 +201,7 @@ class RepresentationMixIn(object):
             result.append(line)
         result.append("}")
         return '\n'.join(result)
+"""
 
 import mmap
 

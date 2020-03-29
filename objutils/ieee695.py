@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -29,6 +29,7 @@ __copyright__ = """
 
 from collections import namedtuple
 from datetime import datetime
+from functools import reduce
 import os
 import sys
 
@@ -867,7 +868,7 @@ class Reader(object):
         parent = self.diParents[-1]
         parent.add(info)
         self.diParents.append(info)
-        self.logger.debug(" " * len(self.diParents), "BB{0:d}".format(blockType))
+        #self.logger.debug(" " * len(self.diParents), "BB{0:d}".format(blockType))
 
     def onBE(self):
         blockType = self.blockType.pop()

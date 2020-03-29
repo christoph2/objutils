@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -25,7 +25,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import objutils.hexfile
+from objutils import hexfile
 from objutils import utils
 import objutils.checksums as checksums
 
@@ -33,7 +33,7 @@ DATA = 1
 EOF = 2
 
 
-class Reader(objutils.hexfile.Reader):
+class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
         (DATA, ":AAAALLBBDDCC"),
@@ -54,7 +54,7 @@ class Reader(objutils.hexfile.Reader):
     def is_data_line(self,line,format_type):
         return format_type == DATA
 
-class Writer(objutils.hexfile.Writer):
+class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 16
 

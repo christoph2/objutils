@@ -29,6 +29,7 @@ __copyright__ = """
 """
 
 from collections import namedtuple, OrderedDict
+import io
 
 from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
 from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil
@@ -38,10 +39,11 @@ from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
 from objutils.dwarf import constants
 from objutils.dwarf import encoding
-from objutils.dwarf.encoding import ULEB, SLEB
+from objutils.dwarf.encoding import ULEB, SLEB, Address, StrP, Block1, BlockUleb
 
 Abbreviation = namedtuple('Abbreviation', 'tag children attrs')
 
+ident = lambda x: x
 
 class DwarfProcessor:
     """
@@ -221,7 +223,7 @@ class DwarfProcessor:
                 for enc, form in abbr.attrs:
                     reader = readers.get(form)
                     start = image.tell()
-                    if form != constants.AttributeForm.DW_FORM_flag_present:
+                    if form != constants.DW_FORM_flag_present:
                         value = reader.parse_stream(image)
                     else:
                         value = 1
@@ -312,7 +314,7 @@ class DwarfProcessor:
                 if not abbr:
                     print("<{:02x}>: {}".format(start, "Abbrev Number: 0"))
                 else:
-                    print("<{:02x}>: Abbrev Number: {} ({})".format(start, enc.name, value))
+                    #print("<{:02x}>: Abbrev Number: {} ({})".format(start, enc.name, value))
                     for enc, form in abbr.attrs:
                         reader = formReaders.get(form)
                         start = image.tell()

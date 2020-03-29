@@ -87,7 +87,7 @@ class SLEB(Construct):
         if six.PY3:
             super(__class__, self).__init__()
         else:
-            super(self.__class__, self).__init__()
+            super().__init__()
 
     def _parse(self, stream, context, path = None):
         result = 0
@@ -134,7 +134,7 @@ class Block(Construct):
         if six.PY3:
             super(__class__, self).__init__()
         else:
-            super(self.__class__, self).__init__()
+            super().__init__()
 
     def _parse(self, stream, context, path = None):
         msk = "{}{}".format(self.BYTEORDER, self.MASK)
@@ -222,7 +222,7 @@ class Address(Construct):
         if six.PY3:
             super(__class__, self).__init__()
         else:
-            super(self.__class__, self).__init__()
+            super().__init__()
         idx = endianess
         if size not in (1, 2, 4, 8):
             raise ValueError("Address size '{}' not supported.")
@@ -249,7 +249,7 @@ class StrP(Construct):
         if six.PY3:
             super(__class__, self).__init__()
         else:
-            super(self.__class__, self).__init__()
+            super().__init__()
 
     def _parse(self, stream, context, path = None):
         offset = self.ntype.parse_stream(stream)
