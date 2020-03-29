@@ -8,8 +8,9 @@ objutils
 .. image:: https://coveralls.io/repos/github/christoph2/objutils/badge.svg?branch=master
     :target: https://coveralls.io/github/christoph2/objutils?branch=master
 
-.. image:: https://travis-ci.org/christoph2/objutils.svg
-    :target: https://travis-ci.org/christoph2/objutils
+.. image:: https://github.com/christoph2/objutils/workflows/objutils/badge.svg
+    :target: https://github.com/christoph2/objutils
+
 .. image:: https://ci.appveyor.com/api/projects/status/owpi324b6wbwocq9?svg=true
     :target: https://ci.appveyor.com/project/christoph2/objutils
 
