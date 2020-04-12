@@ -37,3 +37,17 @@ jobs:
       run: |
         pip install pytest
         pytest
+    - name: Build dists
+      run: |
+           python setup.py bdist_wheel
+           python setup.py sdist --formats=zip,gztar
+    - name: Publish distribution to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+          password: ${{secrets.test_pypi_password}}
+          repository_url: https://test.pypi.org/legacy/
+      #    - name: Publish distibution to PyPI
+      #if: startsWith(github.event.ref, 'refs/tags')
+      #uses: pypa/gh-action-pypi-publish@master
+      #with:
+      #password: ${{secrets.pypi_password}}
