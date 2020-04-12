@@ -388,14 +388,28 @@ def test_write_uint8_array_boundary_case3(filler_0_16):
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_write_ndarray1():
     sec = Section(start_address = 0x1000, data = bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype = "int32")
     sec.write_ndarray(0x1000, arr)
     assert sec.data == b'\x0b\x00\x00\x00\x16\x00\x00\x00!\x00\x00\x00,\x00\x00\x007\x00\x00\x00B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_ndarray_out_of_bounds1():
+    sec = Section(start_address = 0x1000, data = bytearray(32))
+    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype = "int64")
+    with pytest.raises(InvalidAddressError):
+        sec.write_ndarray(0x1000, arr)
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_ndarray_out_of_bounds2():
+    sec = Section(start_address = 0x1000, data = bytearray(32))
+    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype = "int64")
+    with pytest.raises(InvalidAddressError):
+        sec.write_ndarray(0x9ff, arr)
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_read_ndarray_reshaped():
     sec = Section(start_address = 0x1000, data = bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype = "int32")
     sec.write_ndarray(0x1000, arr)
 
     result =sec.read_ndarray(0x1000, 24, "int32_le", shape = (2, 3))
@@ -404,7 +418,7 @@ def test_read_ndarray_reshaped():
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_read_ndarray_flat():
     sec = Section(start_address = 0x1000, data = bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype = "int32")
     sec.write_ndarray(0x1000, arr)
 
     result =sec.read_ndarray(0x1000, 24, "int32_le")
