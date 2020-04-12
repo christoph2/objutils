@@ -41,7 +41,7 @@ import sys
 import attr
 from sortedcontainers import SortedList
 
-from objutils.exceptions import InvalidAddressError
+from objutils.exceptions import InvalidAddressError, FeatureNotAvailableError
 import objutils.hexdump as hexdump
 from objutils.utils import PYTHON_VERSION
 
@@ -189,14 +189,22 @@ class Section(object):
     def tolist(self):
         return  array('B', self.data).tolist()
 
-    def _getformat(self, dtype, length = 1):
+    def _verify_dtype(self, dtype):
+        """
+        """
         if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
                 raise TypeError("dtype must be suffixed with '_be' or '_le'")
         dtype = dtype.lower().strip()
         match = DTYPE.match(dtype)
         if not match:
             raise TypeError("Invalid datatype '{}'".format(dtype))
-        fmt, bo = dtype.split("_")
+        return dtype.split("_")
+
+    def _getformat(self, dtype, length = 1):
+        """
+        """
+        fmt, bo = self._verify_dtype(dtype)
+
         if length > 1:
             return "{}{}{}".format(BYTEORDER.get(bo), length, FORMATS.get(fmt))
         else:
@@ -299,6 +307,52 @@ class Section(object):
         else:
             self.data[offset : offset +  len(value)] = bytes(value)
         self.data[offset +  len(value)] = 0
+
+    def write_ndarray(self, addr, array, order = None):
+        """
+
+        """
+        try:
+            import numpy as np
+        except ImportError:
+            raise FeatureNotAvailableError("write_ndarray() requires Numpy.")
+        offset = addr - self.start_address
+        if offset < 0:
+            raise InvalidAddressError("write_numeric() access out of bounds.")
+        if not isinstance(array, np.ndarray):
+            raise TypeError("array must be of type numpy.ndarray.")
+        data_size = array.nbytes
+        if offset + data_size > self.length:
+            raise InvalidAddressError("write_numeric() access out of bounds.")
+        self.data[offset : offset + data_size] = array.tobytes()
+
+    def read_ndarray(self, addr, length, dtype, shape = None, order = None):
+        """
+
+        """
+        try:
+            import numpy as np
+        except ImportError:
+            raise FeatureNotAvailableError("read_ndarray() requires Numpy.")
+        offset = addr - self.start_address
+        if offset < 0:
+            raise InvalidAddressError("read_ndarray() access out of bounds.")
+        if offset + length > self.length:
+            raise InvalidAddressError("read_ndarray() access out of bounds.")
+
+        """
+        If the buffer has data that is not in machine byte-order, this should
+        be specified as part of the data-type, e.g.::
+
+          >>> dt = np.dtype(int)
+          >>> dt = dt.newbyteorder('>')
+          >>> np.frombuffer(buf, dtype=dt)
+        """
+        type_, byte_order = self._verify_dtype(dtype)
+        dt = np.dtype(type_)
+        dt = dt.newbyteorder(BYTEORDER.get(byte_order))
+        return np.frombuffer(self.data[offset : offset + length], dtype = dt).reshape(shape)
+
 
     """
     def write_timestamp():

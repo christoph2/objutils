@@ -5,13 +5,18 @@ import struct
 
 import pytest
 
-
 from objutils.section import (Section, filler, INT8_RANGE, INT16_RANGE,
         INT32_RANGE, INT64_RANGE, UINT8_RANGE, UINT16_RANGE, UINT32_RANGE,
         UINT64_RANGE)
 
 from objutils.exceptions import InvalidAddressError
 
+try:
+    import numpy as np
+except ImportError:
+    NUMPY_SUPPORT = False
+else:
+    NUMPY_SUPPORT = True
 
 def test_default_section():
     section = Section()
@@ -379,3 +384,29 @@ def test_write_uint8_array_boundary_case2(filler_0_16):
 def test_write_uint8_array_boundary_case3(filler_0_16):
     with pytest.raises(InvalidAddressError):
         filler_0_16.write_numeric_array(-1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_ndarray1():
+    sec = Section(start_address = 0x1000, data = bytearray(32))
+    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    sec.write_ndarray(0x1000, arr)
+    assert sec.data == b'\x0b\x00\x00\x00\x16\x00\x00\x00!\x00\x00\x00,\x00\x00\x007\x00\x00\x00B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_read_ndarray_reshaped():
+    sec = Section(start_address = 0x1000, data = bytearray(32))
+    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    sec.write_ndarray(0x1000, arr)
+
+    result =sec.read_ndarray(0x1000, 24, "int32_le", shape = (2, 3))
+    assert np.array_equal(result, np.array([[11, 22, 33], [44, 55, 66]]))
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_read_ndarray_flat():
+    sec = Section(start_address = 0x1000, data = bytearray(32))
+    arr = np.array([[11, 22, 33], [44, 55, 66]])
+    sec.write_ndarray(0x1000, arr)
+
+    result =sec.read_ndarray(0x1000, 24, "int32_le")
+    assert np.array_equal(result, np.array([11, 22, 33, 44, 55, 66]))
+
