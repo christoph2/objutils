@@ -32,3 +32,8 @@ class PrematureEndOfFileError(Exception): pass
 class InvalidAddressError(Exception):
     """Raised if address information is out of range.
     """
+
+class FeatureNotAvailableError(Exception):
+    """Raised if something is missing, e.g. Numpy for certain operations.
+    """
+
