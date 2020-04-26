@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -27,23 +27,32 @@ __copyright__ = """
 """
 
 
-from collections import namedtuple, OrderedDict
-from io import BytesIO
-from pprint import pprint
-import unittest
-import struct
+from collections import namedtuple
 
-import enum
+from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
+from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil, BitStruct, BitsInteger
+from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell
+from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
+from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
-## elf TODO: parsedSections  (ARM.Attributes, Notes, etc) as oppossed to blobs, like .text.
+from enum import IntEnum
+
+from objutils.dwarf.encoding import ULEB, SLEB
 
 
 Attribute = namedtuple("Attribute", "tag value parameterType conv")
 
 ARM_ATTRS = b'A,\x00\x00\x00aeabi\x00\x01"\x00\x00\x00\x05ARM v6K\x00\x06\t\x07M\x08\x01\t\x01\x12\x04\x14\x01\x15\x01\x17\x03\x18\x01\x1a\x01'
 
-CCA = b'C2.06\x00\x058-A.32\x00\x06\n\x07A\x08\x01\t\x02\n\x05\x0c\x02\x11\x01\x12\x02\x14\x02\x17\x01\x18\x01\x19\x01\x1a\x01\x1c\x01\x1e\x03"\x01$\x01B\x01D\x03F\x01,'
+ATMEL_SAMD21 = b"A'\x00\x00\x00aeabi\x00\x01\x1d\x00\x00\x00\x056S-M\x00\x06\x0c\x07M\t\x01\x12\x04\x14\x01\x15\x01\x17\x03\x18\x01\x1a\x01"
 
+
+class Reader(IntEnum):
+    """
+    """
+    INT32   = 1
+    CSTRING = 2
+    ULEB    = 3
 
 Ident = {}
 
@@ -286,219 +295,142 @@ Tag_ABI_FP_optimization_goals = {
 
 
 ATTRIBUTES = {
-    1:  Attribute("Tag_File", 1, "uint32", Ident),
-    2:  Attribute("Tag_Section", 2, "uint32", Ident),
-    3:  Attribute("Tag_Symbol", 3, "uint32", Ident),
-    4:  Attribute("Tag_CPU_raw_name", 4, "ntbs", Ident),
-    5:  Attribute("Tag_CPU_name", 5, "ntbs", Ident),
-    6:  Attribute("Tag_CPU_arch", 6, "uleb128", Tag_CPU_arch),
-    7:  Attribute("Tag_CPU_arch_profile", 7, "uleb128", Tag_CPU_arch_profile),
-    8:  Attribute("Tag_ARM_ISA_use", 8, "uleb128", Tag_ARM_ISA_use),
-    9:  Attribute("Tag_THUMB_ISA_use", 9, "uleb128", Tag_THUMB_ISA_use),
-    10: Attribute("Tag_FP_arch", 10, "uleb128", Tag_FP_arch),
-    11: Attribute("Tag_WMMX_arch", 11, "uleb128", Tag_WMMX_arch),
-    12: Attribute("Tag_Advanced_SIMD_arch", 12, "uleb128", Tag_Advanced_SIMD_arch),
-    13: Attribute("Tag_PCS_config", 13, "uleb128", Tag_PCS_config),
-    14: Attribute("Tag_ABI_PCS_R9_use",  14, "uleb128", Tag_ABI_PCS_R9_use),
-    15: Attribute("Tag_ABI_PCS_RW_data", 15, "uleb128",Tag_ABI_PCS_RW_data),
-    16: Attribute("Tag_ABI_PCS_RO_data", 16, "uleb128", Tag_ABI_PCS_RO_data),
-    17: Attribute("Tag_ABI_PCS_GOT_use", 17, "uleb128", Tag_ABI_PCS_GOT_use),
-    18: Attribute("Tag_ABI_PCS_wchar_t", 18, "uleb128", Tag_ABI_PCS_wchar_t),
-    19: Attribute("Tag_ABI_FP_rounding", 19, "uleb128", Tag_ABI_FP_rounding),
-    20: Attribute("Tag_ABI_FP_denormal", 20, "uleb128", Tag_ABI_FP_rounding),
-    21: Attribute("Tag_ABI_FP_exceptions", 21, "uleb128", Tag_ABI_FP_exceptions),
-    22: Attribute("Tag_ABI_FP_user_exceptions", 22, "uleb128", Tag_ABI_FP_user_exceptions),
-    23: Attribute("Tag_ABI_FP_number_model", 23, "uleb128", Tag_ABI_FP_number_model),
-    24: Attribute("Tag_ABI_align_needed", 24, "uleb128", Tag_ABI_align_needed),
-    25: Attribute("Tag_ABI_align8_preserved", 25, "uleb128", Tag_ABI_align_preserved),
-    26: Attribute("Tag_ABI_enum_size", 26, "uleb128", Tag_ABI_enum_size),
-    27: Attribute("Tag_ABI_HardFP_use", 27, "uleb128", Tag_ABI_HardFP_use),
-    28: Attribute("Tag_ABI_VFP_args", 28, "uleb128", Tag_ABI_VFP_args),
-    29: Attribute("Tag_ABI_WMMX_args", 29, "uleb128", Tag_ABI_WMMX_args),
-    30: Attribute("Tag_ABI_optimization_goals", 30, "uleb128", Tag_ABI_optimization_goals),
-    31: Attribute("Tag_ABI_FP_optimization_goals", 31, "uleb128", Tag_ABI_FP_optimization_goals),
-    32: Attribute("Tag_compatibility", 32, "ntbs", Ident),
-    34: Attribute("Tag_CPU_unaligned_access", 34, "uleb128", Tag_CPU_unaligned_access),
-    36: Attribute("Tag_FP_HP_extension (was Tag_VFP_HP_extension)",  36, "uleb128", Tag_FP_HP_extension),
-    38: Attribute("Tag_ABI_FP_16bit_format", 38, "uleb128", Tag_ABI_FP_16bit_format),
-    42: Attribute("Tag_MPextension_use", 42, "uleb128", Tag_MPextension_use),
-    44: Attribute("Tag_DIV_use", 44, "uleb128", Tag_DIV_use),
-    64: Attribute("Tag_nodefaults", 64, "uleb128", Ident),
-    65: Attribute("Tag_also_compatible_with", 65, "ntbs", Ident),
-    67: Attribute("Tag_conformance", 67, "ntbs", Ident),
-    66: Attribute("Tag_T2EE_use", 66, "uleb128", Tag_T2EE_use),
-    68: Attribute("Tag_Virtualization_use", 68, "uleb128", Tag_Virtualization_use),
-    70: Attribute("Tag_MPextension_use", 70, "uleb128", Tag_MPextension_use),
+    1:  Attribute("Tag_File", 1, Reader.INT32, Ident),
+    2:  Attribute("Tag_Section", 2, Reader.INT32, Ident),
+    3:  Attribute("Tag_Symbol", 3, Reader.INT32, Ident),
+    4:  Attribute("Tag_CPU_raw_name", 4, Reader.CSTRING, Ident),
+    5:  Attribute("Tag_CPU_name", 5, Reader.CSTRING, Ident),
+    6:  Attribute("Tag_CPU_arch", 6, Reader.ULEB, Tag_CPU_arch),
+    7:  Attribute("Tag_CPU_arch_profile", 7, Reader.ULEB, Tag_CPU_arch_profile),
+    8:  Attribute("Tag_ARM_ISA_use", 8, Reader.ULEB, Tag_ARM_ISA_use),
+    9:  Attribute("Tag_THUMB_ISA_use", 9, Reader.ULEB, Tag_THUMB_ISA_use),
+    10: Attribute("Tag_FP_arch", 10, Reader.ULEB, Tag_FP_arch),
+    11: Attribute("Tag_WMMX_arch", 11, Reader.ULEB, Tag_WMMX_arch),
+    12: Attribute("Tag_Advanced_SIMD_arch", 12, Reader.ULEB, Tag_Advanced_SIMD_arch),
+    13: Attribute("Tag_PCS_config", 13, Reader.ULEB, Tag_PCS_config),
+    14: Attribute("Tag_ABI_PCS_R9_use",  14, Reader.ULEB, Tag_ABI_PCS_R9_use),
+    15: Attribute("Tag_ABI_PCS_RW_data", 15, Reader.ULEB,Tag_ABI_PCS_RW_data),
+    16: Attribute("Tag_ABI_PCS_RO_data", 16, Reader.ULEB, Tag_ABI_PCS_RO_data),
+    17: Attribute("Tag_ABI_PCS_GOT_use", 17, Reader.ULEB, Tag_ABI_PCS_GOT_use),
+    18: Attribute("Tag_ABI_PCS_wchar_t", 18, Reader.ULEB, Tag_ABI_PCS_wchar_t),
+    19: Attribute("Tag_ABI_FP_rounding", 19, Reader.ULEB, Tag_ABI_FP_rounding),
+    20: Attribute("Tag_ABI_FP_denormal", 20, Reader.ULEB, Tag_ABI_FP_rounding),
+    21: Attribute("Tag_ABI_FP_exceptions", 21, Reader.ULEB, Tag_ABI_FP_exceptions),
+    22: Attribute("Tag_ABI_FP_user_exceptions", 22, Reader.ULEB, Tag_ABI_FP_user_exceptions),
+    23: Attribute("Tag_ABI_FP_number_model", 23, Reader.ULEB, Tag_ABI_FP_number_model),
+    24: Attribute("Tag_ABI_align_needed", 24, Reader.ULEB, Tag_ABI_align_needed),
+    25: Attribute("Tag_ABI_align8_preserved", 25, Reader.ULEB, Tag_ABI_align_preserved),
+    26: Attribute("Tag_ABI_enum_size", 26, Reader.ULEB, Tag_ABI_enum_size),
+    27: Attribute("Tag_ABI_HardFP_use", 27, Reader.ULEB, Tag_ABI_HardFP_use),
+    28: Attribute("Tag_ABI_VFP_args", 28, Reader.ULEB, Tag_ABI_VFP_args),
+    29: Attribute("Tag_ABI_WMMX_args", 29, Reader.ULEB, Tag_ABI_WMMX_args),
+    30: Attribute("Tag_ABI_optimization_goals", 30, Reader.ULEB, Tag_ABI_optimization_goals),
+    31: Attribute("Tag_ABI_FP_optimization_goals", 31, Reader.ULEB, Tag_ABI_FP_optimization_goals),
+    32: Attribute("Tag_compatibility", 32, Reader.CSTRING, Ident),
+    34: Attribute("Tag_CPU_unaligned_access", 34, Reader.ULEB, Tag_CPU_unaligned_access),
+    36: Attribute("Tag_FP_HP_extension (was Tag_VFP_HP_extension)",  36, Reader.ULEB, Tag_FP_HP_extension),
+    38: Attribute("Tag_ABI_FP_16bit_format", 38, Reader.ULEB, Tag_ABI_FP_16bit_format),
+    42: Attribute("Tag_MPextension_use", 42, Reader.ULEB, Tag_MPextension_use),
+    44: Attribute("Tag_DIV_use", 44, Reader.ULEB, Tag_DIV_use),
+    64: Attribute("Tag_nodefaults", 64, Reader.ULEB, Ident),
+    65: Attribute("Tag_also_compatible_with", 65, Reader.CSTRING, Ident),
+    67: Attribute("Tag_conformance", 67, Reader.CSTRING, Ident),
+    66: Attribute("Tag_T2EE_use", 66, Reader.ULEB, Tag_T2EE_use),
+    68: Attribute("Tag_Virtualization_use", 68, Reader.ULEB, Tag_Virtualization_use),
+    70: Attribute("Tag_MPextension_use", 70, Reader.ULEB, Tag_MPextension_use),
 }
 
+"""
+ADI         Analog Devices
+acle        Reserved for use by Arm C Language Extensions.
+aeabi       Reserved to the ABI for the Arm Architecture (EABI pseudo-vendor)
+AnonXyz
+anonXyz     Reserved to private experiments by the Xyz vendor. Guaranteed not to clash with any registered vendor name.
+ARM Arm     Ltd (Note: the company, not the processor).
+cxa         C++ ABI pseudo-vendor
+FSL         Freescale Semiconductor Inc.
+GHS         Green Hills Systems
+gnu         GNU compilers and tools (Free Software Foundation)
+iar         IAR Systems
+icc         ImageCraft Creations Inc (ImageCraft C Compiler)
+intel       Intel Corporation
+ixs         Intel Xscale
+llvm        The LLVM/Clang projects
+PSI         PalmSource Inc.
+RAL         Rowley Associates Ltd
+SEGGER      SEGGER Microcontroller GmbH
+somn        SOMNIUM Technologies Limited.
+TASKING     Altium Ltd.
+TI          TI Inc.
+tls         Reserved for use in thread-local storage routines.
+WRS         Wind River Systems.
+"""
 
-class PrematureEndOfSectionError(Exception): pass
-class MalformedStructureError(Exception): pass
+"""
+<format-version>
+    [ <section-length> "vendor-name"
+        [ <file-tag> <size> <attribute>*
+        | <section-tag> <size> <section-number>* 0 <attribute>*
+        | <symbol-tag> <size> <symbol-number>* 0 <attribute>*
+        ]+
+]*
+"""
 
+class ResultAttribute:
 
-class ArmAttributes(object):
+    def __init__(self, name, value, display_value = None):
+        self.name = name
+        self.value = value
+        if display_value is None:
+            self.display_value = value
 
-    def __init__(self, attrs, endianess = "<"):
-        print(len(attrs))
-        #version = ord(attrs[0])
-        version = attrs[0]
-        print("VERSION:", version)
-        self.idx = 0
-        self.version = version
-        self.endianess = endianess
-        self.blob = attrs[1 : ]
-        print("BLOB", self.blob)
-        self.attrs = OrderedDict()
-        self.sections = self._splitSections(self.blob)
-        pprint(self.attrs)
-
-    ###############################
-    def uleb128(self):
-        result = 0
-        shift = 0
-        idx = 0
-        for bval in self.next():
-            bval = ord(bval)
-            result |= ((bval & 0x7f) << shift)
-            idx += 1
-            if bval & 0x80 == 0:
-                break
-            shift += 7
-        return result
-
-    def ntbs(self):
-        result = []
-        while True:
-            octet = self.next()
-            if octet != '\x00':
-                result.append(octet)
-            else:
-                break
-        return ''.join(result)
-
-    def uint32(self):
-        result = struct.unpack("{}L".format(self.endianess), self.next(4))[0]
-        return result
-    ###############################
+    def __repr__(self):
+        return "ResultAttribute(name = {}, value = {}, display_value = {})".format(self.name, self.value, self.display_value)
 
 
-    def next(self, count = 1):
-        """
-        """
-        data = self.blob[self.idx : self.idx + count]
-        print("CHUNK", data)
-        self.idx += count
-        return data
+def parse(buffer, byteorder = "<"):
+    Integer = Int32ul if byteorder == "<" else Int32ub
+    Section = Struct(
+        "len" / Integer,
+        "vendor" / CString(encoding = "ascii"),
+        "_pos" / Tell,
+        "data" / Bytes(this.len - this._pos),
+    )
+    SubSectionHeader = Struct(
+        "tag" / Byte,
+        "len" / Integer,
+        "_pos" / Tell,
+        "data" / Bytes(this.len - this._pos),
+    )
 
-
-    def pos(self):
-        #return self.blob.tell()
-        return self.idx
-
-    def _splitSections(self, attrs):
-        ctr = 0
-        while attrs:
-            size = self.uint32()
-            vendor = self.ntbs()
-            print("SV", size, vendor)
+    Attribute = Struct(
+        "tag" / ULEB,
+        "parameterType" / Computed(lambda ctx: ATTRIBUTES[ctx.tag].parameterType),
+        "name" / Computed(lambda ctx: ATTRIBUTES[ctx.tag].tag),
+        "_conv" / Computed(lambda ctx: ATTRIBUTES[ctx.tag].conv),
+        "value" / Switch(this.parameterType, { Reader.INT32: Integer, Reader.ULEB: ULEB, Reader.CSTRING: CString(encoding = "ascii") }),
+        "pos" / Tell,
+    )
+    format_version = buffer[0]
+    i = 1
+    length = len(buffer)
+    result = []
+    while True:
+        section = Section.parse(buffer[i : ])
+        i += section.len
+        res = SubSectionHeader.parse(section.data)
+        j = 0
+        while j < len(res.data):
+            tag = Attribute.parse(res.data[j : ])
+            r = ResultAttribute(tag.name, tag.value)
+            if tag._conv != Ident:
+                r.display_value = tag._conv[tag.value]
+            result.append(r)
+            j += tag.pos
+        if i >= length:
             break
-            self.attrs.setdefault(vendor, OrderedDict())
-            print(size, vendor)
-            self._splitSubSections(vendor)
-            if self.pos() >= size:
-                break
-            ctr += 1
-            if ctr > 64:
-                break
+    return result
 
-    def _splitSubSections(self, key):
-        tag = self.next()
-        size = self.uint32()
-        start = self.pos()
-        print(size)
-        ctr = 0
-        while True:
-            attr = self.uleb128()
-            attr = ATTRIBUTES[attr]
-            value = self.FUNCTIONS[attr.parameterType](self)
-            attrValue = attr.conv.get(value, value)
-            pos = self.pos() + 5
-            print("{0} ==> {1} [{2}]  <{3}>".format(attr.tag, value, attrValue, pos - start))
-            self.attrs[key][attr.tag] = value
-            if pos - start >= size:
-                break
-            ctr += 1
-            if ctr > 64:
-                break
-
-    FUNCTIONS = {
-        "ntbs": ntbs,
-        "uleb128": uleb128,
-        "uint32": uint32,
-    }
-
-
-
-attrs = ArmAttributes(ARM_ATTRS)
-
-class TestAttrs(unittest.TestCase):
-
-    def testVersion(self):
-        self.assertEqual(ARM_ATTRS[0], 'A')
-
-    def testSizeMatches(self):
-        pass
-
-
-class VerifyAttributes(unittest.TestCase):
-
-    def testParameterTypes(self):
-        for att in ATTRIBUTES.values():
-            self.assertIn(att.parameterType, ("uint32", "ntbs", "uleb128"))
-
-    def testConsitentNumbering(self):
-        for num, att in ATTRIBUTES.items():
-            self.assertEqual(num, att.value)
-
-
-
-unittest.main()
-
-
-"""
-** Section #10 '.ARM.attributes' (SHT_ARM_ATTRIBUTES)
-    Size   : 89 bytes
-
-    'aeabi' file build attributes:
-    0x000000:   43 32 2e 30 36 00 05 38 2d 41 2e 33 32 00 06 0a    C2.06..8-A.32...
-    0x000010:   07 41 08 01 09 02 0a 05 0c 02 11 01 12 02 14 02    .A..............
-    0x000020:   17 01 18 01 19 01 1a 01 1c 01 1e 03 22 01 24 01    ............".$.
-    0x000030:   42 01 44 03 46 01 2c 02                            B.D.F.,.
-        Tag_conformance = "2.06"
-        Tag_CPU_name = "8-A.32"
-        Tag_CPU_arch = ARM v7 (=10)
-        Tag_CPU_arch_profile = The application profile 'A' (e.g. for Cortex A8) (=65)
-        Tag_ARM_ISA_use = ARM instructions were permitted to be used (=1)
-        Tag_THUMB_ISA_use = Thumb2 instructions were permitted (implies Thumb instructions permitted) (=2)
-        Tag_VFP_arch = VFPv4 instructions were permitted (implies VFPv3 instructions were permitted) (=5)
-        Tag_NEON_arch = Use of Advanced SIMD Architecture version 2 was permitted (=2)
-        Tag_ABI_PCS_GOT_use = Data are imported directly (=1)
-        Tag_ABI_PCS_wchar_t = Size of wchar_t is 2 (=2)
-        Tag_ABI_FP_denormal = This code was permitted to require that the sign of a flushed-to-zero number be preserved in the sign of 0 (=2)
-        Tag_ABI_FP_number_model = This code was permitted to use only IEEE 754 format FP numbers (=1)
-        Tag_ABI_align8_needed = Code was permitted to depend on the 8-byte alignment of 8-byte data items (=1)
-        Tag_ABI_align8_preserved = Code was required to preserve 8-byte alignment of 8-byte data objects (=1)
-        Tag_ABI_enum_size = Enum values occupy the smallest container big enough to hold all values (=1)
-        Tag_ABI_VFP_args = FP parameter/result passing conforms to the VFP variant of the AAPCS (=1)
-        Tag_ABI_optimization_goals = Optimized for small size, but speed and debugging illusion preserved (=3)
-        Tag_CPU_unaligned_access = The producer was permitted to generate architecture v6-style unaligned data accesses (=1)
-        Tag_VFP_HP_extension = The producer was permitted to use the VFPv3/Advanced SIMD optional half-precision extension (=1)
-        Tag_T2EE_use = Use of the T2EE extension was permitted (=1)
-        Tag_Virtualization_use = Use of TrustZone and virtualization extensions was permitted (=3)
-        Tag_MPextension_use = Use of the ARM v7 MP extension was permitted (=1)
-        Tag_v7DIV_use = Code was permitted to use SDIV and UDIV; code is intended to execute on a CPU conforming to architecture v7 with the integer division extension (=2)
-
-    'ARM' file build attributes:
-    0x000000:   12 01 16 01
-"""
+#print(parse(ATMEL_SAMD21))
+#print(parse(ARM_ATTRS))
 
