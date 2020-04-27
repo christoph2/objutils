@@ -236,10 +236,10 @@ Tag_ABI_FP_user_exceptions = {
 }
 
 Tag_ABI_FP_number_model = {
-    0: " The user intended that this code should not use floating point numbers ",
-    1: " The user permitted this code to use IEEE 754 format normal numbers only ",
-    2: " The user permitted numbers, infinities, and one quiet NaN (see [RTABI]) ",
-    3: " The user permitted this code to use all the IEEE 754-defined FP encodings",
+    0: "The user intended that this code should not use floating point numbers ",
+    1: "The user permitted this code to use IEEE 754 format normal numbers only ",
+    2: "The user permitted numbers, infinities, and one quiet NaN (see [RTABI]) ",
+    3: "The user permitted this code to use all the IEEE 754-defined FP encodings",
 }
 
 Tag_ABI_FP_16bit_format = {
