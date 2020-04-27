@@ -40,7 +40,7 @@ from enum import IntEnum
 from objutils.dwarf.encoding import ULEB, SLEB
 
 
-Attribute = namedtuple("Attribute", "tag value parameterType conv")
+AttributeDescription = namedtuple("AttributeDescription", "tag value parameterType conv")
 
 
 class Reader(IntEnum):
@@ -291,49 +291,49 @@ Tag_ABI_FP_optimization_goals = {
 
 
 ATTRIBUTES = {
-    1:  Attribute("Tag_File", 1, Reader.INT32, Ident),
-    2:  Attribute("Tag_Section", 2, Reader.INT32, Ident),
-    3:  Attribute("Tag_Symbol", 3, Reader.INT32, Ident),
-    4:  Attribute("Tag_CPU_raw_name", 4, Reader.CSTRING, Ident),
-    5:  Attribute("Tag_CPU_name", 5, Reader.CSTRING, Ident),
-    6:  Attribute("Tag_CPU_arch", 6, Reader.ULEB, Tag_CPU_arch),
-    7:  Attribute("Tag_CPU_arch_profile", 7, Reader.ULEB, Tag_CPU_arch_profile),
-    8:  Attribute("Tag_ARM_ISA_use", 8, Reader.ULEB, Tag_ARM_ISA_use),
-    9:  Attribute("Tag_THUMB_ISA_use", 9, Reader.ULEB, Tag_THUMB_ISA_use),
-    10: Attribute("Tag_FP_arch", 10, Reader.ULEB, Tag_FP_arch),
-    11: Attribute("Tag_WMMX_arch", 11, Reader.ULEB, Tag_WMMX_arch),
-    12: Attribute("Tag_Advanced_SIMD_arch", 12, Reader.ULEB, Tag_Advanced_SIMD_arch),
-    13: Attribute("Tag_PCS_config", 13, Reader.ULEB, Tag_PCS_config),
-    14: Attribute("Tag_ABI_PCS_R9_use",  14, Reader.ULEB, Tag_ABI_PCS_R9_use),
-    15: Attribute("Tag_ABI_PCS_RW_data", 15, Reader.ULEB,Tag_ABI_PCS_RW_data),
-    16: Attribute("Tag_ABI_PCS_RO_data", 16, Reader.ULEB, Tag_ABI_PCS_RO_data),
-    17: Attribute("Tag_ABI_PCS_GOT_use", 17, Reader.ULEB, Tag_ABI_PCS_GOT_use),
-    18: Attribute("Tag_ABI_PCS_wchar_t", 18, Reader.ULEB, Tag_ABI_PCS_wchar_t),
-    19: Attribute("Tag_ABI_FP_rounding", 19, Reader.ULEB, Tag_ABI_FP_rounding),
-    20: Attribute("Tag_ABI_FP_denormal", 20, Reader.ULEB, Tag_ABI_FP_rounding),
-    21: Attribute("Tag_ABI_FP_exceptions", 21, Reader.ULEB, Tag_ABI_FP_exceptions),
-    22: Attribute("Tag_ABI_FP_user_exceptions", 22, Reader.ULEB, Tag_ABI_FP_user_exceptions),
-    23: Attribute("Tag_ABI_FP_number_model", 23, Reader.ULEB, Tag_ABI_FP_number_model),
-    24: Attribute("Tag_ABI_align_needed", 24, Reader.ULEB, Tag_ABI_align_needed),
-    25: Attribute("Tag_ABI_align8_preserved", 25, Reader.ULEB, Tag_ABI_align_preserved),
-    26: Attribute("Tag_ABI_enum_size", 26, Reader.ULEB, Tag_ABI_enum_size),
-    27: Attribute("Tag_ABI_HardFP_use", 27, Reader.ULEB, Tag_ABI_HardFP_use),
-    28: Attribute("Tag_ABI_VFP_args", 28, Reader.ULEB, Tag_ABI_VFP_args),
-    29: Attribute("Tag_ABI_WMMX_args", 29, Reader.ULEB, Tag_ABI_WMMX_args),
-    30: Attribute("Tag_ABI_optimization_goals", 30, Reader.ULEB, Tag_ABI_optimization_goals),
-    31: Attribute("Tag_ABI_FP_optimization_goals", 31, Reader.ULEB, Tag_ABI_FP_optimization_goals),
-    32: Attribute("Tag_compatibility", 32, Reader.CSTRING, Ident),
-    34: Attribute("Tag_CPU_unaligned_access", 34, Reader.ULEB, Tag_CPU_unaligned_access),
-    36: Attribute("Tag_FP_HP_extension (was Tag_VFP_HP_extension)",  36, Reader.ULEB, Tag_FP_HP_extension),
-    38: Attribute("Tag_ABI_FP_16bit_format", 38, Reader.ULEB, Tag_ABI_FP_16bit_format),
-    42: Attribute("Tag_MPextension_use", 42, Reader.ULEB, Tag_MPextension_use),
-    44: Attribute("Tag_DIV_use", 44, Reader.ULEB, Tag_DIV_use),
-    64: Attribute("Tag_nodefaults", 64, Reader.ULEB, Ident),
-    65: Attribute("Tag_also_compatible_with", 65, Reader.CSTRING, Ident),
-    67: Attribute("Tag_conformance", 67, Reader.CSTRING, Ident),
-    66: Attribute("Tag_T2EE_use", 66, Reader.ULEB, Tag_T2EE_use),
-    68: Attribute("Tag_Virtualization_use", 68, Reader.ULEB, Tag_Virtualization_use),
-    70: Attribute("Tag_MPextension_use", 70, Reader.ULEB, Tag_MPextension_use),
+    1:  AttributeDescription("Tag_File", 1, Reader.INT32, Ident),
+    2:  AttributeDescription("Tag_Section", 2, Reader.INT32, Ident),
+    3:  AttributeDescription("Tag_Symbol", 3, Reader.INT32, Ident),
+    4:  AttributeDescription("Tag_CPU_raw_name", 4, Reader.CSTRING, Ident),
+    5:  AttributeDescription("Tag_CPU_name", 5, Reader.CSTRING, Ident),
+    6:  AttributeDescription("Tag_CPU_arch", 6, Reader.ULEB, Tag_CPU_arch),
+    7:  AttributeDescription("Tag_CPU_arch_profile", 7, Reader.ULEB, Tag_CPU_arch_profile),
+    8:  AttributeDescription("Tag_ARM_ISA_use", 8, Reader.ULEB, Tag_ARM_ISA_use),
+    9:  AttributeDescription("Tag_THUMB_ISA_use", 9, Reader.ULEB, Tag_THUMB_ISA_use),
+    10: AttributeDescription("Tag_FP_arch", 10, Reader.ULEB, Tag_FP_arch),
+    11: AttributeDescription("Tag_WMMX_arch", 11, Reader.ULEB, Tag_WMMX_arch),
+    12: AttributeDescription("Tag_Advanced_SIMD_arch", 12, Reader.ULEB, Tag_Advanced_SIMD_arch),
+    13: AttributeDescription("Tag_PCS_config", 13, Reader.ULEB, Tag_PCS_config),
+    14: AttributeDescription("Tag_ABI_PCS_R9_use",  14, Reader.ULEB, Tag_ABI_PCS_R9_use),
+    15: AttributeDescription("Tag_ABI_PCS_RW_data", 15, Reader.ULEB,Tag_ABI_PCS_RW_data),
+    16: AttributeDescription("Tag_ABI_PCS_RO_data", 16, Reader.ULEB, Tag_ABI_PCS_RO_data),
+    17: AttributeDescription("Tag_ABI_PCS_GOT_use", 17, Reader.ULEB, Tag_ABI_PCS_GOT_use),
+    18: AttributeDescription("Tag_ABI_PCS_wchar_t", 18, Reader.ULEB, Tag_ABI_PCS_wchar_t),
+    19: AttributeDescription("Tag_ABI_FP_rounding", 19, Reader.ULEB, Tag_ABI_FP_rounding),
+    20: AttributeDescription("Tag_ABI_FP_denormal", 20, Reader.ULEB, Tag_ABI_FP_rounding),
+    21: AttributeDescription("Tag_ABI_FP_exceptions", 21, Reader.ULEB, Tag_ABI_FP_exceptions),
+    22: AttributeDescription("Tag_ABI_FP_user_exceptions", 22, Reader.ULEB, Tag_ABI_FP_user_exceptions),
+    23: AttributeDescription("Tag_ABI_FP_number_model", 23, Reader.ULEB, Tag_ABI_FP_number_model),
+    24: AttributeDescription("Tag_ABI_align_needed", 24, Reader.ULEB, Tag_ABI_align_needed),
+    25: AttributeDescription("Tag_ABI_align8_preserved", 25, Reader.ULEB, Tag_ABI_align_preserved),
+    26: AttributeDescription("Tag_ABI_enum_size", 26, Reader.ULEB, Tag_ABI_enum_size),
+    27: AttributeDescription("Tag_ABI_HardFP_use", 27, Reader.ULEB, Tag_ABI_HardFP_use),
+    28: AttributeDescription("Tag_ABI_VFP_args", 28, Reader.ULEB, Tag_ABI_VFP_args),
+    29: AttributeDescription("Tag_ABI_WMMX_args", 29, Reader.ULEB, Tag_ABI_WMMX_args),
+    30: AttributeDescription("Tag_ABI_optimization_goals", 30, Reader.ULEB, Tag_ABI_optimization_goals),
+    31: AttributeDescription("Tag_ABI_FP_optimization_goals", 31, Reader.ULEB, Tag_ABI_FP_optimization_goals),
+    32: AttributeDescription("Tag_compatibility", 32, Reader.CSTRING, Ident),
+    34: AttributeDescription("Tag_CPU_unaligned_access", 34, Reader.ULEB, Tag_CPU_unaligned_access),
+    36: AttributeDescription("Tag_FP_HP_extension (was Tag_VFP_HP_extension)",  36, Reader.ULEB, Tag_FP_HP_extension),
+    38: AttributeDescription("Tag_ABI_FP_16bit_format", 38, Reader.ULEB, Tag_ABI_FP_16bit_format),
+    42: AttributeDescription("Tag_MPextension_use", 42, Reader.ULEB, Tag_MPextension_use),
+    44: AttributeDescription("Tag_DIV_use", 44, Reader.ULEB, Tag_DIV_use),
+    64: AttributeDescription("Tag_nodefaults", 64, Reader.ULEB, Ident),
+    65: AttributeDescription("Tag_also_compatible_with", 65, Reader.CSTRING, Ident),
+    67: AttributeDescription("Tag_conformance", 67, Reader.CSTRING, Ident),
+    66: AttributeDescription("Tag_T2EE_use", 66, Reader.ULEB, Tag_T2EE_use),
+    68: AttributeDescription("Tag_Virtualization_use", 68, Reader.ULEB, Tag_Virtualization_use),
+    70: AttributeDescription("Tag_MPextension_use", 70, Reader.ULEB, Tag_MPextension_use),
 }
 
 """
@@ -372,16 +372,19 @@ WRS         Wind River Systems.
 ]*
 """
 
-class ResultAttribute:
+class Attribute:
 
-    def __init__(self, name, value, display_value = None):
-        self.name = name
+    def __init__(self, tag, tag_name, value, description = None):
+        self.tag = tag
+        self.tag_name = tag_name
         self.value = value
-        if display_value is None:
-            self.display_value = value
+        if description is None:
+            self.description = value
 
     def __repr__(self):
-        return "ResultAttribute(name = {}, value = {}, display_value = {})".format(self.name, self.value, self.display_value)
+        return "Attribute(tag = {}, tag_name = {}, value = {}, description = {})".format(
+            self.tag, self.tag_name, self.value, self.description
+        )
 
 
 def parse(buffer, byteorder = "<"):
@@ -399,7 +402,7 @@ def parse(buffer, byteorder = "<"):
         "data" / Bytes(this.len - this._pos),
     )
 
-    Attribute = Struct(
+    RawAttribute = Struct(
         "tag" / ULEB,
         "parameterType" / Computed(lambda ctx: ATTRIBUTES[ctx.tag].parameterType),
         "name" / Computed(lambda ctx: ATTRIBUTES[ctx.tag].tag),
@@ -417,16 +420,12 @@ def parse(buffer, byteorder = "<"):
         res = SubSectionHeader.parse(section.data)
         j = 0
         while j < len(res.data):
-            tag = Attribute.parse(res.data[j : ])
-            r = ResultAttribute(tag.name, tag.value)
-            if tag._conv != Ident:
-                r.display_value = tag._conv[tag.value]
+            attr = RawAttribute.parse(res.data[j : ])
+            r = Attribute(attr.tag, attr.name, attr.value)
+            if attr._conv != Ident:
+                r.description = attr._conv[attr.value]
             result.append(r)
-            j += tag.pos
+            j += attr.pos
         if i >= length:
             break
     return result
-
-#print(parse(ATMEL_SAMD21))
-#print(parse(ARM_ATTRS))
-
