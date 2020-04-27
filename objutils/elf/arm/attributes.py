@@ -388,6 +388,21 @@ class Attribute:
 
 
 def parse(buffer, byteorder = "<"):
+    """
+    Parameters
+    ----------
+    buffer: bytes-like
+
+    byteorder: char
+        "<": Little-endian
+        ">": Big-endian
+
+    Returns
+    -------
+    dict
+        key: Vendor name
+        values: list of attributes
+    """
     Integer = Int32ul if byteorder == "<" else Int32ub
     Section = Struct(
         "len" / Integer,
@@ -413,9 +428,11 @@ def parse(buffer, byteorder = "<"):
     format_version = buffer[0]
     i = 1
     length = len(buffer)
-    result = []
+    result = {}
     while True:
         section = Section.parse(buffer[i : ])
+        if not section.vendor in result:
+            result[section.vendor] = []
         i += section.len
         res = SubSectionHeader.parse(section.data)
         j = 0
@@ -424,7 +441,7 @@ def parse(buffer, byteorder = "<"):
             r = Attribute(attr.tag, attr.name, attr.value)
             if attr._conv != Ident:
                 r.description = attr._conv[attr.value]
-            result.append(r)
+            result[section.vendor].append(r)
             j += attr.pos
         if i >= length:
             break
