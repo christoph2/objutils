@@ -95,7 +95,7 @@ class Elf_Section(Base, RidMixIn):
 
     @hybrid_property
     def allocate(self):
-        self.sh_type not in (SectionType.SHT_NOBITS, SectionType.SHT_NULL) and self.sh_size > 0
+        self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and self.sh_size > 0
 
 
 class Elf_Symbol(Base, RidMixIn):
