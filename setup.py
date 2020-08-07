@@ -43,6 +43,8 @@ setup(
     entry_points = {
         'console_scripts': [
                 'oj-elf-info = objutils.scripts.oj_elf_info:main',
+                'oj-hex-info = objutils.scripts.oj_hex_info:main',
+                'oj-elf-arm-attrs = objutils.scripts.oj_elf_arm_attrs:main',
     #            'ticoff-dump = objutils.tools.ticoffdump:main'
         ],
     },
