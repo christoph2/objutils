@@ -253,6 +253,8 @@ class Section(object):
         if offset + data_size > self.length:
             raise InvalidAddressError("read_numeric() access out of bounds.")
         data = self.data[offset : offset + data_size]
+        if 'bit_mask' in kws:
+            bit_mask = kws.pop("bit_mask")
         return struct.unpack(fmt, data)[0]
 
     def write_numeric(self, addr, value, dtype, **kws):
@@ -263,6 +265,8 @@ class Section(object):
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
             raise InvalidAddressError("write_numeric() access out of bounds.")
+        if 'bit_mask' in kws:
+            bit_mask = kws.pop("bit_mask")
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
     def read_numeric_array(self, addr, length, dtype, **kws):
@@ -293,7 +297,10 @@ class Section(object):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_numeric() access out of bounds.")
-        pos = self.data[offset : ].find(b'\x00')
+        if length == -1:
+            pos = self.data[offset : ].find(b'\x00')
+        else:
+            pos = length
         if pos == -1:
             raise TypeError("Unterminated String!!!")   # TODO: Testcase.
         return self.data[offset : offset + pos].decode(encoding = encoding)

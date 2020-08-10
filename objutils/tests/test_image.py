@@ -639,6 +639,11 @@ def test_read_write_string():
     img.write_string(0x1000, 'hello')
     assert img.read_string(0x1000) == "hello"
 
+def test_read_write_string_length():
+    img = Image(Section(data = bytearray(32), start_address = 0x1000))
+    img.write_string(0x1000, 'hello world!!!')
+    assert img.read_string(0x1000, length = 5) == "hello"
+
 def test_read_unterminated_string_raises():
     img = Image(Section(data = bytearray(b"\x0a" * 32), start_address = 0x1000))
     img.write(0x1000, b'hello')
