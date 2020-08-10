@@ -383,6 +383,10 @@ class Section(object):
     def __contains__(self, addr):
         return self.start_address <= addr < (self.start_address + self.length)
 
+    @property
+    def address(self):  # Alias
+        return self.start_address
+
 
 def join_sections(sections):
     if isinstance(sections, SortedList):

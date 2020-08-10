@@ -35,7 +35,7 @@ def main():
 
     parser = argparse.ArgumentParser(description = 'Display informations about HEX files.')
     parser.add_argument("file_type", help = "file type", choices = [
-        'ash', 'cosmac', 'emon52', 'etek', 'fpc', "ihex", 'mostec', 'rca', 'sig', "srec", 'tek', 'titxt'
+        'ash', 'cosmac', 'emon52', 'etek', 'fpc', "ihex", 'mostec', 'rca', 'shf', 'sig', "srec", 'tek', 'titxt'
     ])
     parser.add_argument("hex_file", help = "ELF file")
     parser.add_argument("-d", '--dump', dest = 'dump', action = "store_true", default = False,

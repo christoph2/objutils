@@ -20,7 +20,7 @@ __version__ = "0.3.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -55,6 +55,10 @@ import objutils.rca
 import objutils.tek
 import objutils.cosmac
 import objutils.ash
+import objutils.shf
+
+from objutils.image import Image
+from objutils.section import Section
 
 registry.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
 registry.register('binzip', objutils.binfile.BinZipReader, objutils.binfile.BinZipWriter, "Zipped binary format.")
@@ -70,6 +74,7 @@ registry.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format."
 registry.register('tek', objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
 registry.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 registry.register('ash', objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
+registry.register('shf', objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 def load(codec_name, *args, **kws):
     """Load hex data from file.
