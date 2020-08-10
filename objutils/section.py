@@ -210,7 +210,7 @@ class Section(object):
         else:
             return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
 
-    def read(self, addr, length):
+    def read(self, addr, length, **kws):
         """
         Parameters
         ----------
@@ -226,7 +226,7 @@ class Section(object):
         data = self.data[offset : offset + length]
         return data
 
-    def write(self, addr, data):
+    def write(self, addr, data, **kws):
         """
         Parameters
         ----------
@@ -244,7 +244,7 @@ class Section(object):
             raise InvalidAddressError("write() access out of bounds.")
         self.data[offset : offset + length] = data
 
-    def read_numeric(self, addr, dtype):
+    def read_numeric(self, addr, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("read_numeric() access out of bounds.")
@@ -255,7 +255,7 @@ class Section(object):
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)[0]
 
-    def write_numeric(self, addr, value, dtype):
+    def write_numeric(self, addr, value, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_numeric() access out of bounds.")
@@ -265,7 +265,7 @@ class Section(object):
             raise InvalidAddressError("write_numeric() access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
-    def read_numeric_array(self, addr, length, dtype):
+    def read_numeric_array(self, addr, length, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_numeric() access out of bounds.")
@@ -276,7 +276,7 @@ class Section(object):
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
-    def write_numeric_array(self, addr, data, dtype):
+    def write_numeric_array(self, addr, data, dtype, **kws):
         if not hasattr(data, '__iter__'):
             raise TypeError("data must be iterable")
         length = len(data)
@@ -289,7 +289,7 @@ class Section(object):
             raise InvalidAddressError("write_numeric_array() access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
-    def read_string(self, addr, encoding = "latin1", length = -1):
+    def read_string(self, addr, encoding = "latin1", length = -1, **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_numeric() access out of bounds.")
@@ -298,7 +298,7 @@ class Section(object):
             raise TypeError("Unterminated String!!!")   # TODO: Testcase.
         return self.data[offset : offset + pos].decode(encoding = encoding)
 
-    def write_string(self, addr, value, encoding = "latin1"):
+    def write_string(self, addr, value, encoding = "latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_numeric() access out of bounds.")
@@ -308,7 +308,7 @@ class Section(object):
             self.data[offset : offset +  len(value)] = bytes(value)
         self.data[offset +  len(value)] = 0
 
-    def write_ndarray(self, addr, array, order = None):
+    def write_ndarray(self, addr, array, order = None, **kws):
         """
 
         """
@@ -326,7 +326,7 @@ class Section(object):
             raise InvalidAddressError("write_numeric() access out of bounds.")
         self.data[offset : offset + data_size] = array.tobytes()
 
-    def read_ndarray(self, addr, length, dtype, shape = None, order = None):
+    def read_ndarray(self, addr, length, dtype, shape = None, order = None, **kws):
         """
 
         """

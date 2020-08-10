@@ -128,14 +128,14 @@ class Image(object):
             print("-" * 13, file = fp)
             section.hexdump(fp)
 
-    def _call_address_function(self, func_name, addr, *args):
+    def _call_address_function(self, func_name, addr, *args, **kws):
         for section in self.sections:
             if addr in section:
                 func = getattr(section, func_name)
-                return func(addr, *args)
+                return func(addr, *args, **kws)
         raise InvalidAddressError("Address 0x{:08x} not in range.".format(addr))
 
-    def read(self, addr, length):
+    def read(self, addr, length, **kws):
         """Read bytes from image.
 
         Parameters
@@ -159,9 +159,9 @@ class Image(object):
         ----
             if `addr` + `len` is out of range, result is silently truncated, i.e. without raising an exception.
         """
-        return self._call_address_function("read", addr, length)
+        return self._call_address_function("read", addr, length, **kws)
 
-    def write(self, addr, data):
+    def write(self, addr, data, **kws):
         """Write bytes to image.
 
         Parameters
@@ -176,41 +176,41 @@ class Image(object):
         :class:`InvalidAddressError`
             if `addr` is out of range
         """
-        self._call_address_function("write", addr, data)
+        self._call_address_function("write", addr, data, **kws)
 
-    def read_numeric(self, addr, dtype):
+    def read_numeric(self, addr, dtype, **kws):
         """
 
         """
-        return self._call_address_function("read_numeric", addr, dtype)
+        return self._call_address_function("read_numeric", addr, dtype, **kws)
 
-    def write_numeric(self, addr, value, dtype):
+    def write_numeric(self, addr, value, dtype, **kws):
         """
         """
-        self._call_address_function("write_numeric", addr, value, dtype)
+        self._call_address_function("write_numeric", addr, value, dtype, **kws)
 
-    def read_numeric_array(self, addr, length, dtype):
+    def read_numeric_array(self, addr, length, dtype, **kws):
         """
 
         """
-        return self._call_address_function("read_numeric_array", addr, length, dtype)
+        return self._call_address_function("read_numeric_array", addr, length, dtype, **kws)
 
-    def write_numeric_array(self, addr, data, dtype):# TODO: bounds-checking.
+    def write_numeric_array(self, addr, data, dtype, **kws):# TODO: bounds-checking.
         """
         """
         self._call_address_function("write_numeric_array", addr, data, dtype)
 
-    def read_string(self, addr, encoding = "latin1", length = -1):
+    def read_string(self, addr, encoding = "latin1", length = -1, **kws):
         """
 
         """
-        return self._call_address_function("read_string", addr, encoding, length)
+        return self._call_address_function("read_string", addr, encoding, length, **kws)
 
-    def write_string(self, addr, value, encoding = "latin1"):
+    def write_string(self, addr, value, encoding = "latin1", **kws):
         """
 
         """
-        self._call_address_function("write_string", addr, value, encoding)
+        self._call_address_function("write_string", addr, value, encoding, **kws)
 
 
     def _address_contained(self, address, length):
