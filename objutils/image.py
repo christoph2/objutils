@@ -200,6 +200,17 @@ class Image(object):
         """
         self._call_address_function("write_numeric_array", addr, data, dtype)
 
+    def write_ndarray(self, addr, array, order = None, **kws):
+        """
+        """
+        self._call_address_function("write_ndarray", addr, array, order = None, **kws)
+
+    def read_ndarray(self, addr, length, dtype, shape = None, order = None, **kws):
+        """
+        """
+        return self._call_address_function("read_ndarray", addr, length, dtype, shape, order, **kws)
+
+
     def read_string(self, addr, encoding = "latin1", length = -1, **kws):
         """
 
