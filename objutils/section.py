@@ -358,7 +358,11 @@ class Section(object):
         type_, byte_order = self._verify_dtype(dtype)
         dt = np.dtype(type_)
         dt = dt.newbyteorder(BYTEORDER.get(byte_order))
-        return np.frombuffer(self.data[offset : offset + length], dtype = dt).reshape(shape)
+        arr = np.frombuffer(self.data[offset : offset + length], dtype = dt).reshape(shape)
+        if order == "F":
+            return arr.T    # Fortran deposit, i.e. col-maj means transposition.
+        else:
+            return arr
 
 
     """
