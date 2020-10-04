@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2016 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -30,72 +30,6 @@ from collections import namedtuple
 import types
 import struct
 
-##
-##
-##   ELF Header.
-##
-##
-
-# Types.
-
-"""
-/* Type for a 16-bit quantity.  */
-typedef uint16_t Elf32_Half;
-typedef uint16_t Elf64_Half;
-
-/* Types for signed and unsigned 32-bit quantities.  */
-typedef uint32_t Elf32_Word;
-typedef int32_t  Elf32_Sword;
-
-typedef uint32_t Elf64_Word;
-typedef int32_t  Elf64_Sword;
-
-/* Types for signed and unsigned 64-bit quantities.  */
-typedef uint64_t Elf32_Xword;
-typedef int64_t  Elf32_Sxword;
-
-typedef uint64_t Elf64_Xword;
-typedef int64_t  Elf64_Sxword;
-
-/* Type of addresses.  */
-typedef uint32_t Elf32_Addr;
-typedef uint64_t Elf64_Addr;
-
-/* Type of file offsets.  */
-typedef uint32_t Elf32_Off;
-typedef uint64_t Elf64_Off;
-
-/* Type for section indices, which are 16-bit quantities.  */
-typedef uint16_t Elf32_Section;
-typedef uint16_t Elf64_Section;
-
-/* Type for version symbol information.  */
-typedef Elf32_Half Elf32_Versym;
-typedef Elf64_Half Elf64_Versym;
-"""
-
-"""
-Elf64_Addr      8 8 Unsigned program address
-Elf64_Off       8 8 Unsigned file offset
-Elf64_Half      2 2 Unsigned medium integer
-Elf64_Word      4 4 Unsigned integer
-Elf64_Sword     4 4 Signed integer
-Elf64_Xword     8 8 Unsigned long integer
-Elf64_Sxword    8 8 Signed long integer
-unsigned char   1 1 Unsigned small integer
-
-typedef struct
-{
-    Elf64_Word st_name; /* Symbol name */
-    unsigned char st_info; /* Type and Binding attributes */
-    unsigned char st_other; /* Reserved */
-    Elf64_Half st_shndx; /* Section table index */
-    Elf64_Addr st_value; /* Symbol value */
-    Elf64_Xword st_size; /* Size of object (e.g., common) */
-} Elf64_Sym
-
-IBBHQQ
-"""
 
 ELF_MAGIC = b'\x7fELF'
 
@@ -109,33 +43,33 @@ Elf32_Ehdr = namedtuple("Elf32_Ehdr", """e_type e_machine e_version e_entry e_ph
 
 class ELFType(enum.IntEnum):
     ET_NONE     = 0
-    " No file type."
+    " No file type"
     ET_REL      = 1
-    " Relocatable file."
+    " Relocatable file"
     ET_EXEC     = 2
-    " Executable file."
+    " Executable file"
     ET_DYN      = 3
-    " Shared object file."
+    " Shared object file"
     ET_CORE     = 4
-    " Core file."
+    " Core file"
     ET_NUM      = 5
-    "Number of defined types "
+    "Number of defined types"
     ET_LOOS     = 0xFE00
-    "Operating system-specific "
+    "Operating system-specific"
     ET_HIOS     = 0xFEFF
-    "Operating system-specific "
+    "Operating system-specific"
     ET_LOPROC   = 0xff00
-    " Processor-specific."
+    " Processor-specific"
     ET_HIPROC   = 0xffff
-    "Processor-specific."
+    "Processor-specific"
 
 
 ELF_TYPE_NAMES = {
-    ELFType.ET_NONE : "No file type.",
-    ELFType.ET_REL  : "Relocatable file.",
-    ELFType.ET_EXEC : "Executable file.",
-    ELFType.ET_DYN  : "Shared object file.",
-    ELFType.ET_CORE : "Core file."
+    ELFType.ET_NONE : "No file type",
+    ELFType.ET_REL  : "Relocatable file",
+    ELFType.ET_EXEC : "Executable file",
+    ELFType.ET_DYN  : "Shared object file",
+    ELFType.ET_CORE : "Core file"
 }
 
 
@@ -540,9 +474,9 @@ class ELFClass(enum.IntEnum):
 
 
 ELF_CLASS_NAMES = {
-    ELFClass.ELFCLASSNONE   : "Invalid class.",
-    ELFClass.ELFCLASS32     : "32-bit objects.",
-    ELFClass.ELFCLASS64     : "64-bit objects."
+    ELFClass.ELFCLASSNONE   : "Invalid class",
+    ELFClass.ELFCLASS32     : "32-bit objects",
+    ELFClass.ELFCLASS64     : "64-bit objects"
 }
 
 
@@ -553,9 +487,9 @@ class ELFDataEncoding(enum.IntEnum):
 
 
 ELF_BYTE_ORDER_NAMES = {
-    ELFDataEncoding.ELFDATANONE : "Invalid data encoding.",
-    ELFDataEncoding.ELFDATA2LSB : "Little-Endian.",
-    ELFDataEncoding.ELFDATA2MSB : "Big-Endian."
+    ELFDataEncoding.ELFDATANONE : "Invalid data encoding",
+    ELFDataEncoding.ELFDATA2LSB : "Little-Endian",
+    ELFDataEncoding.ELFDATA2MSB : "Big-Endian"
 }
 
 class ELFAbiType(enum.IntEnum):
@@ -637,10 +571,10 @@ class SectionName(enum.IntEnum):
         # precedence over regular common symbols.  We want common to override
         # weak.  Using this common instead of SHN_COMMON does that.
 
-SectionNameValues = {v: k for k, v in SectionName.__members__.items()}
+SpecialSections = {v: k for k, v in SectionName.__members__.items()}
 
-def section_name(ndx):
-    if ndx in SectionNameValues:
+def special_section_name(ndx):
+    if ndx in SpecialSections:
         return SectionName(ndx).name
     else:
         return str(ndx)
@@ -667,6 +601,7 @@ class SectionType(enum.IntEnum):
     SHT_SYMTAB_SHNDX    = 18            # Extended section indeces.
     SHT_NUM             = 19            # Number of defined types.
     SHT_LOOS            = 0x60000000    # Start OS-specific.
+    SHT_GNU_INCREMENTAL_INPUTS = 0x6fff4700 # incremental build data
     SHT_GNU_ATTRIBUTES  = 0x6ffffff5    # Object attributes.
     SHT_GNU_HASH        = 0x6ffffff6    # GNU-style hash table.
     SHT_GNU_LIBLIST     = 0x6ffffff7    # Prelink library list
@@ -693,23 +628,25 @@ class SectionType(enum.IntEnum):
     SHT_HIUSER          = 0xffffffff    # End of application-specific.
 
 
-SHF_WRITE               = 0x1           # Writable.
-SHF_ALLOC               = 0x2           # Occupies memory during execution
-SHF_EXECINSTR           = 0x4           # Executable.
+class SectionFlags(enum.IntEnum):
+    SHF_WRITE               = 0x1           # Writeable.
+    SHF_ALLOC               = 0x2           # Occupies memory during execution
+    SHF_EXECINSTR           = 0x4           # Executable.
 
-SHF_MERGE               = 16            # Might be merged
-SHF_STRINGS             = 32            # Contains nul-terminated strings
-SHF_INFO_LINK           = 64            # `sh_info' contains SHT index
-SHF_LINK_ORDER          = 128           # Preserve order after combining
-SHF_OS_NONCONFORMING    = 256           # Non-standard OS specific handling required
-SHF_GROUP               = 512           # Section is member of a group.
-SHF_TLS                 = 1024          # Section hold thread-local data.
-SHF_MASKOS              = 0x0ff00000    # OS-specific.
+    SHF_MERGE               = 16            # Might be merged
+    SHF_STRINGS             = 32            # Contains nul-terminated strings
+    SHF_INFO_LINK           = 64            # `sh_info' contains SHT index
+    SHF_LINK_ORDER          = 128           # Preserve order after combining
+    SHF_OS_NONCONFORMING    = 256           # Non-standard OS specific handling required
+    SHF_GROUP               = 512           # Section is member of a group.
+    SHF_TLS                 = 1024          # Section hold thread-local data.
+    SHF_COMPRESSED          = 2048          # Section with compressed data.
 
-SHF_MASKPROC            = 0xf0000000    # Processor-specific.
+    SHF_MASKOS              = 0x0ff00000    # OS-specific.
+    SHF_MASKPROC            = 0xf0000000    # Processor-specific.
 
-SHF_ORDERED             = 1073741824    # Special ordering requirement (Solaris).
-SHF_EXCLUDE             = 2147483648    # Section is excluded unless referenced or allocated (Solaris).
+    SHF_ORDERED             = 1073741824    # Special ordering requirement (Solaris).
+    SHF_EXCLUDE             = 2147483648    # Section is excluded unless referenced or allocated (Solaris).
 
 ##
 ##
@@ -729,9 +666,11 @@ ELF64_SYM_TABLE_SIZE = struct.calcsize(SYMTAB_FMT64)
 STN_UNDEF           = 0
 
 class SymbolBinding(enum.IntEnum):
-    STB_LOCAL           = 0
+    STB_LOCAL           = 0     # i.e. `static`
     STB_GLOBAL          = 1
     STB_WEAK            = 2
+    STB_GNU_UNIQUE      = 10    # Symbol is unique in namespace.
+
     STB_LOPROC          = 13
     STB_HIPROC          = 15
 
@@ -741,6 +680,11 @@ class SymbolType(enum.IntEnum):
     STT_FUNC            = 2
     STT_SECTION         = 3
     STT_FILE            = 4
+    STT_COMMON          = 5
+    STT_TLS             = 6
+    STT_RELC            = 8     # Complex relocation expression.
+    STT_SRELC           = 9     # Signed Complex relocation expression.
+    STT_GNU_IFUNC       = 10    # Symbol is an indirect code object.
     STT_LOPROC          = 13
     STT_HIPROC          = 15
 
@@ -770,6 +714,8 @@ PT_LOOS             = 0x60000000    # Start of OS-specific
 PT_GNU_EH_FRAME     = 0x6474e550    # GCC .eh_frame_hdr segment
 PT_GNU_STACK        = 0x6474e551    # Indicates stack executability
 PT_GNU_RELRO        = 0x6474e552    # Read-only after relocation
+PT_GNU_PROPERTY     = 0x6474e553    # GNU property
+
 PT_LOSUNW           = 0x6ffffffa
 PT_SUNWBSS          = 0x6ffffffa    # Sun Specific segment
 PT_SUNWSTACK        = 0x6ffffffb    # Stack segment
