@@ -124,6 +124,27 @@ class SLEB(Construct):
             result.append(bval)
         stream.write(bytes(result))
 
+@singleton
+class One(Construct):
+
+    def __init__(self, *args):
+        if six.PY3:
+            super(__class__, self).__init__()
+        else:
+            super().__init__()
+
+    def _parse(self, stream, context, path = None):
+        return 1
+
+    def _build(self, value, stream, context, path):
+        count = struct.pack(msk, len(1))
+        value = 1
+        stream.write(count)
+        if six.PY3:
+            stream.write(bytes(value, encoding = "ascii"))
+        else:
+            stream.write(bytes(value))
+
 class Block(Construct):
 
     BYTEORDER = ''
@@ -225,7 +246,11 @@ class Address(Construct):
             super().__init__()
         idx = endianess
         if size not in (1, 2, 4, 8):
-            raise ValueError("Address size '{}' not supported.")
+            raise ValueError("Address size '{}' not supported.".format(size))
+        if not isinstance(size, int):
+            print("**SIZE is not int", size, endianess, idx, type(str))
+        if not isinstance(idx, int):
+            print("**IDX is not int", size, endianess, idx, type(idx))
         self.type = self.TYPES[size][idx]
 
     def _parse(self, stream, context, path = None):
@@ -253,8 +278,9 @@ class StrP(Construct):
 
     def _parse(self, stream, context, path = None):
         offset = self.ntype.parse_stream(stream)
-        self.image.seek(offset)
-        result = self.stype.parse_stream(self.image)
+        #self.image.seek(offset)
+        data = self.image[offset : ]
+        result = self.stype.parse(data)
         return result
 
     def _build(self, value, stream, context, path):
