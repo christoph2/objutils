@@ -248,15 +248,15 @@ class Elf_Symbol(Base, RidMixIn):
 
     @hybrid_property
     def writeable(self):
-        return (self.access & defs.SHF_WRITE) == defs.SHF_WRITE
+        return (self.access & defs.SectionFlags.SHF_WRITE) == defs.SectionFlags.SHF_WRITE
 
     @hybrid_property
     def executeable(self):
-        return (self.access & defs.SHF_EXECINSTR) == defs.SHF_EXECINSTR
+        return (self.access & defs.SectionFlags.SHF_EXECINSTR) == defs.SectionFlags.SHF_EXECINSTR
 
     @hybrid_property
     def allocate(self):
-        return (self.access & defs.SHF_ALLOC) == defs.SHF_ALLOC
+        return (self.access & defs.SectionFlags.SHF_ALLOC) == defs.SectionFlags.SHF_ALLOC
 
     @hybrid_property
     def symbol_bind(self):
