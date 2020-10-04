@@ -67,10 +67,26 @@ FORMATS = {
     "float64": "d",
 }
 
+TYPE_SIZES = {
+    "uint8":    1,
+    "int8":     1,
+    "uint16":   2,
+    "int16":    2,
+    "uint32":   4,
+    "int32":    4,
+    "uint64":   8,
+    "int64":    8,
+    "float32":  4,
+    "float64":  8,
+}
+
+
 BYTEORDER = {
     "le": "<",
     "be": ">",
 }
+
+TypeInformation = namedtuple("TypeInformation", "type byte_order size")
 
 DTYPE = re.compile(r"""
       (?:(?P<uns>u)?int(?P<len>8 | 16 | 32 | 64)(?P<sep>[-/_:])(?P<end> be | le))
@@ -255,7 +271,19 @@ class Section(object):
         data = self.data[offset : offset + data_size]
         if 'bit_mask' in kws:
             bit_mask = kws.pop("bit_mask")
+            data = self.apply_bitmask(data, dtype, bit_mask)
         return struct.unpack(fmt, data)[0]
+
+    def apply_bitmask(self, data, dtype, bit_mask):
+        """
+        """
+        dtype, byteorder = dtype.lower().strip().split("_")
+        byteorder = "little" if byteorder == "le" else "big"
+        type_size = TYPE_SIZES.get(dtype)
+        data_size = len(data)
+        tmp = int.from_bytes(data, byteorder, signed = False)
+        tmp &= bit_mask
+        return tmp.to_bytes(data_size, byteorder, signed = False)
 
     def write_numeric(self, addr, value, dtype, **kws):
         offset = addr - self.start_address
