@@ -76,6 +76,8 @@ class Reader(object):
     logger = Logger(__name__)
 
     def load(self, fp):
+        if isinstance(fp, str):
+            fp = open(fp, "rb")
         data = fp.read()
         root = ET.fromstring(data)
         print(root.tag)
@@ -143,6 +145,8 @@ class Writer(object):
     logger = Logger(__name__)
 
     def dump(self, fp, image, **kws):
+        if isinstance(fp, str):
+            fp = open(fp, "wb")
         fp.write(self.dumps(image))
         if hasattr(fp, "close"):
             fp.close()

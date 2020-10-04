@@ -184,6 +184,8 @@ class Reader(BaseType):
                 self.formats.append((format_type, FormatParser(format, self.DATA_SEPARATOR).parse()))
 
     def load(self, fp, **kws):
+        if isinstance(fp, str):
+            fp = open(fp, "rb")
         if PYTHON_VERSION.major == 3:
             data = self.read(fp)#.decode()
             if hasattr(fp, "close"):
@@ -322,6 +324,8 @@ class Writer(BaseType):
         self.logger = Logger("Writer")
 
     def dump(self, fp, image, row_length = 16, **kws):   # TODO: rename to bytesPerRow!
+        if isinstance(fp, str):
+            fp = open(fp, "wb")
         fp.write(self.dumps(image, row_length))
         if hasattr(fp, "close"):
             fp.close()

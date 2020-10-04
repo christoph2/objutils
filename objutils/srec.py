@@ -69,6 +69,8 @@ class Reader(hexfile.Reader):
     )
 
     def load(self, fp, **kws):
+        if isinstance(fp, str):
+            fp = open(fp, "rb")
         data = self.read(fp)
 
 

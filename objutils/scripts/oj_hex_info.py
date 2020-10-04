@@ -47,7 +47,7 @@ def main():
         print("File '{}' does not exist.".format(args.hex_file))
         sys.exit(1)
 
-    img = load(args.file_type.lower(), open(args.hex_file, "rb"))
+    img = load(args.file_type.lower(), args.hex_file)
     #print(img.meta)
     print("\nSections")
     print("--------\n")
