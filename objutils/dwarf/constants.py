@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__version__ = "0.1.0"
-
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -26,6 +24,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import enum
 
 class Base(object):
 
@@ -388,35 +387,7 @@ ATTR_MAP = {
 class AttributeEncoding(Base):
     MAP = ATTR_MAP
 
-##
-## Attribute form encodings.
-##
-DW_FORM_addr                    = 0x01
-DW_FORM_block2                  = 0x03
-DW_FORM_block4                  = 0x04
-DW_FORM_data2                   = 0x05
-DW_FORM_data4                   = 0x06
-DW_FORM_data8                   = 0x07
-DW_FORM_string                  = 0x08
-DW_FORM_block                   = 0x09
-DW_FORM_block1                  = 0x0a
-DW_FORM_data1                   = 0x0b
-DW_FORM_flag                    = 0x0c
-DW_FORM_sdata                   = 0x0d
-DW_FORM_strp                    = 0x0e
-DW_FORM_udata                   = 0x0f
-DW_FORM_ref_addr                = 0x10
-DW_FORM_ref1                    = 0x11
-DW_FORM_ref2                    = 0x12
-DW_FORM_ref4                    = 0x13
-DW_FORM_ref8                    = 0x14
-DW_FORM_ref_udata               = 0x15
-DW_FORM_indirect                = 0x16
-DW_FORM_sec_offset              = 0x17
-DW_FORM_exprloc                 = 0x18
-DW_FORM_flag_present            = 0x19
-DW_FORM_ref_sig8                = 0x20
-
+'''
 FORM_MAP = {
     DW_FORM_addr                : "DW_FORM_addr",
     DW_FORM_block2              : "DW_FORM_block2",
@@ -444,9 +415,38 @@ FORM_MAP = {
     DW_FORM_flag_present        : "DW_FORM_flag_present",
     DW_FORM_ref_sig8            : "DW_FORM_ref_sig8",
 }
+'''
 
-class AttributeForm(Base):
-    MAP = FORM_MAP
+class AttributeForm(enum.IntEnum):
+    #MAP = FORM_MAP
+    ##
+    ## Attribute form encodings.
+    ##
+    DW_FORM_addr                    = 0x01
+    DW_FORM_block2                  = 0x03
+    DW_FORM_block4                  = 0x04
+    DW_FORM_data2                   = 0x05
+    DW_FORM_data4                   = 0x06
+    DW_FORM_data8                   = 0x07
+    DW_FORM_string                  = 0x08
+    DW_FORM_block                   = 0x09
+    DW_FORM_block1                  = 0x0a
+    DW_FORM_data1                   = 0x0b
+    DW_FORM_flag                    = 0x0c
+    DW_FORM_sdata                   = 0x0d
+    DW_FORM_strp                    = 0x0e
+    DW_FORM_udata                   = 0x0f
+    DW_FORM_ref_addr                = 0x10
+    DW_FORM_ref1                    = 0x11
+    DW_FORM_ref2                    = 0x12
+    DW_FORM_ref4                    = 0x13
+    DW_FORM_ref8                    = 0x14
+    DW_FORM_ref_udata               = 0x15
+    DW_FORM_indirect                = 0x16
+    DW_FORM_sec_offset              = 0x17
+    DW_FORM_exprloc                 = 0x18
+    DW_FORM_flag_present            = 0x19
+    DW_FORM_ref_sig8                = 0x20
 
 ##
 ## DWARF operation encodings.
@@ -1139,3 +1139,32 @@ DW_ADDR_huge16                  = 0x03
 DW_ADDR_near32                  = 0x04
 DW_ADDR_far32                   = 0x05
 
+
+class ExceptionHeaderEncoding(enum.IntEnum):
+    """The DWARF Exception Header Encoding is used to describe the type of data
+    used in the .eh_frame and .eh_frame_hdr section.
+
+    Linux specific, s. Linux Base Standard.
+    """
+    DW_EH_PE_absptr     = 0x00
+    DW_EH_PE_uleb128    = 0x01
+    DW_EH_PE_udata2     = 0x02
+    DW_EH_PE_udata4     = 0x03
+    DW_EH_PE_udata8     = 0x04
+    DW_EH_PE_sleb128    = 0x09
+    DW_EH_PE_sdata2     = 0x0A
+    DW_EH_PE_sdata4     = 0x0B
+    DW_EH_PE_sdata8     = 0x0C
+    DW_EH_PE_pcrel      = 0x10
+    DW_EH_PE_textrel    = 0x20
+    DW_EH_PE_datarel    = 0x30
+    DW_EH_PE_funcrel    = 0x40
+    DW_EH_PE_aligned    = 0x50
+
+
+class CFIExtensions(enum.IntEnum):
+    """
+    """
+
+    DW_CFA_GNU_args_size                = 0x2e
+    DW_CFA_GNU_negative_offset_extended = 0x2f
