@@ -39,7 +39,7 @@ from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
 from objutils.dwarf import constants
 from objutils.dwarf import encoding
-from objutils.dwarf.encoding import ULEB, SLEB, Address, StrP, Block1, BlockUleb
+from objutils.dwarf.encoding import ULEB, SLEB, Address, StrP, Block1, BlockUleb, One
 
 Abbreviation = namedtuple('Abbreviation', 'tag children attrs')
 
@@ -56,10 +56,11 @@ class DwarfProcessor:
 
     def __init__(self, sections, b64, endianess):
         self.b64 = b64
-        self.endianess = endianess
+        self.endianess = 1 if endianess == "<" else 0
+        #self.endianess = 0 if endianess == "<" else 1
         self.sections = sections
         if ".debug_str" in sections:
-            self.strings = sections[".debug_str"].image.tobytes()
+            self.strings = sections[".debug_str"].image
         else:
             self.strings = b""
         #print(self.strings.read())
@@ -133,12 +134,11 @@ class DwarfProcessor:
                     break
         self.abbreviations = result
 
-
     def do_mac_info(self):
         if not '.debug_macinfo' in self.sections:
             return
         section = self.sections['.debug_macinfo']
-        image = io.BytesIO(section.image.tobytes())
+        image = io.BytesIO(section.image)
         length = len(section.image)
 
         MacInfo = Struct(
@@ -191,10 +191,10 @@ class DwarfProcessor:
             constants.AttributeForm.DW_FORM_ref8:         self.u64,
             constants.AttributeForm.DW_FORM_ref_udata:    ULEB,
             constants.AttributeForm.DW_FORM_strp:         StrP(self.strings, self.endianess),
-            constants.AttributeForm.DW_FORM_indirect:     '', # TODO: uleb value, that represents its form!
+            constants.AttributeForm.DW_FORM_indirect:     None, # TODO: uleb value, that represents its form!
             constants.AttributeForm.DW_FORM_sec_offset:   self.u32,
             constants.AttributeForm.DW_FORM_exprloc:      BlockUleb,
-            constants.AttributeForm.DW_FORM_flag_present: None,
+            constants.AttributeForm.DW_FORM_flag_present: One,
             constants.AttributeForm.DW_FORM_ref_sig8:     self.u64,
         }
 
@@ -263,7 +263,7 @@ class DwarfProcessor:
         if not '.debug_info' in self.sections:
             return
         section = self.sections['.debug_info']
-        image = io.BytesIO(section.image.tobytes())
+        image = io.BytesIO(section.image)
         imageSize = len(section.image)
         while True:
             start = image.tell()
@@ -278,7 +278,7 @@ class DwarfProcessor:
         if not '.debug_info' in self.sections:
             return
         section = self.sections['.debug_info']
-        image = io.BytesIO(section.image.tobytes())
+        image = io.BytesIO(section.image)
         length = len(section.image)
         DbgInfo = Struct(
             "start" / Tell,
@@ -302,9 +302,18 @@ class DwarfProcessor:
             if pos >= length - 1:
                 break
             dbgInfo = DbgInfo.parse_stream(image) # CU
-            print(dbgInfo)
+            print("   Compilation Unit @ offset 0x{:x}:".format(dbgInfo.start))
+            print("   Start:         {:08x}".format(dbgInfo.start))
+            print("   Stop:          {:08x}".format(dbgInfo.stop))
+            print("   Size:          {:08x}".format(dbgInfo.size))
+            print("   Length:        0x{:x} (32-bit)".format(dbgInfo.unit_length))
+            print("   Version:       2".format(dbgInfo.version))
+            print("   Abbrev Offset: 0x{:x}".format(dbgInfo.debug_abbrev_offset))
+            print("   Pointer Size:  {}".format(dbgInfo.address_size))
+            pos = 0
             offset += dbgInfo.stop - dbgInfo.start
             formReaders = self.get_form_readers(dbgInfo.address_size)
+            print("Pos, Length", pos, dbgInfo.unit_length)
             if pos >= dbgInfo.unit_length:
                 break
             while True:
@@ -317,23 +326,25 @@ class DwarfProcessor:
                     #print("<{:02x}>: Abbrev Number: {} ({})".format(start, enc.name, value))
                     for enc, form in abbr.attrs:
                         reader = formReaders.get(form)
+                        if reader is None:
+                            print("*EF", enc, form, start, attr, abbr)
                         start = image.tell()
                         value = reader.parse_stream(image)
-                        print("    <{:02x}> {}: {}".format(start, enc.name, value))
+                        print("    <{:02x}> {}: {}".format(start, enc, value))
                         stop = image.tell()
-                        # 872b
                     offset += (attr.stop - attr.start)
                     pos = image.tell()
-                    if pos >= 0x8727:
-                        print("chk")
+                    #if pos >= 0x8727:
+                    #    print("chk")
                     if pos >= dbgInfo.unit_length:
+                        image.seek(image.tell() + 1)
                         break
 
     def pubnames(self):
         if not '.debug_pubnames' in self.sections:
             return
         section = self.sections['.debug_pubnames']
-        image = io.BytesIO(section.image.tobytes())
+        image = io.BytesIO(section.image)
         length = len(section.image)
 
         Header = Struct(
@@ -374,7 +385,7 @@ class DwarfProcessor:
         if not '.debug_aranges' in self.sections:
             return
         section = self.sections['.debug_aranges']
-        image = io.BytesIO(section.image.tobytes())
+        image = io.BytesIO(section.image)
         length = len(section.image)
         print("ARANGES")
         Header = Struct(
