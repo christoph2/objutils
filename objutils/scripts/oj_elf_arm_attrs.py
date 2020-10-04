@@ -44,7 +44,7 @@ def main():
     except Exception as e:
         print("\n'{}' is not valid ELF file. Raised exception: '{}'.".format(args.elf_file, repr(e)))
         exit(1)
-    if not ep.e_machine in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64, defs.ELFMachineType.EM_VIDEOCORE3):
+    if not ep.e_machine in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
         print("\n'{}' is not an ARM architecture file.".format(args.elf_file))
         exit(2)
     print("")
