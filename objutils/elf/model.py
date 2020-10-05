@@ -137,7 +137,7 @@ class Elf_Section(Base, RidMixIn):
 
     @hybrid_property
     def allocate(self):
-        self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and self.sh_size > 0
+        return self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and self.sh_size > 0
 
     @hybrid_property
     def section_type(self):
