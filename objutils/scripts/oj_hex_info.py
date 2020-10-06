@@ -55,6 +55,8 @@ def main():
     print("-" * 79)
     for idx, sec in enumerate(img):
         print("{:03d}   0x{:08x} {}".format(idx, sec.start_address, sec.length))
+    print("-" * 79)
+    print("                 {} total bytes".format(len(img)))
     if args.dump:
         img.hexdump()
 
