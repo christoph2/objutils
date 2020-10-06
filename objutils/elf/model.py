@@ -33,11 +33,11 @@ import sqlite3
 
 from sqlalchemy import (MetaData, schema, types, orm, event,
     create_engine, Column, ForeignKey, ForeignKeyConstraint, func,
-    PassiveDefault, UniqueConstraint, CheckConstraint, select
+    PassiveDefault, UniqueConstraint, CheckConstraint, select, and_, or_, not_
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -136,8 +136,24 @@ class Elf_Section(Base, RidMixIn):
     section_image = Column(types.BLOB)
 
     @hybrid_property
-    def allocate(self):
-        return self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and self.sh_size > 0
+    def has_content(self):
+        return self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and (self.sh_size > 0)
+
+    @has_content.expression
+    def has_content(self):
+        return and_(not_(self.sh_type.in_((defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL))), (self.sh_size > 0))
+
+    @hybrid_method
+    def get_flags(self):
+        return self.sh_flags
+
+    @hybrid_method
+    def test_flags(self, mask):
+        return self.get_flags() & mask == mask
+
+    @test_flags.expression
+    def test_flags(cls, mask):
+        return cls.get_flags().op("&")(mask) == mask
 
     @hybrid_property
     def section_type(self):
@@ -145,51 +161,51 @@ class Elf_Section(Base, RidMixIn):
 
     @hybrid_property
     def flag_writeable(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_WRITE) == defs.SectionFlags.SHF_WRITE
+        return self.test_flags(defs.SectionFlags.SHF_WRITE)
 
     @hybrid_property
     def flag_executable(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_EXECINSTR) == defs.SectionFlags.SHF_EXECINSTR
+        return self.test_flags(defs.SectionFlags.SHF_EXECINSTR)
 
     @hybrid_property
     def flag_alloc(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_ALLOC) == defs.SectionFlags.SHF_ALLOC
+        return self.test_flags(defs.SectionFlags.SHF_ALLOC)
 
     @hybrid_property
     def flag_merge(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_MERGE) == defs.SectionFlags.SHF_MERGE
+        return self.test_flags(defs.SectionFlags.SHF_MERGE)
 
     @hybrid_property
     def flag_strings(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_STRINGS) == defs.SectionFlags.SHF_STRINGS
+        return self.test_flags(defs.SectionFlags.SHF_STRINGS)
 
     @hybrid_property
     def flag_info_link(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_INFO_LINK) == defs.SectionFlags.SHF_INFO_LINK
+        return self.test_flags(defs.SectionFlags.SHF_INFO_LINK)
 
     @hybrid_property
     def flag_link_order(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_LINK_ORDER) == defs.SectionFlags.SHF_LINK_ORDER
+        return self.test_flags(defs.SectionFlags.SHF_LINK_ORDER)
 
     @hybrid_property
     def flag_os_nonconforming(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_OS_NONCONFORMING) == defs.SectionFlags.SHF_OS_NONCONFORMING
+        return self.test_flags(defs.SectionFlags.SHF_OS_NONCONFORMING)
 
     @hybrid_property
     def flag_group(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_GROUP) == defs.SectionFlags.SHF_GROUP
+        return self.test_flags(defs.SectionFlags.SHF_GROUP)
 
     @hybrid_property
     def flag_tls(self):
-        return (self.sh_flags & defs.SectionFlags.SHF_TLS) == defs.SectionFlags.SHF_TLS
+        return self.test_flags(defs.SectionFlags.SHF_TLS)
 
     @hybrid_property
     def flag_ordered(self): # Solaris only.
-        return (self.sh_flags & defs.SectionFlags.SHF_ORDERED) == defs.SectionFlags.SHF_ORDERED
+        return self.test_flags(defs.SectionFlags.SHF_ORDERED)
 
     @hybrid_property
     def flag_exclude(self): # Solaris only.
-        return (self.sh_flags & defs.SectionFlags.SHF_EXCLUDE) == defs.SectionFlags.SHF_EXCLUDE
+        return self.test_flags(defs.SectionFlags.SHF_EXCLUDE)
 
 
 class Elf_Symbol(Base, RidMixIn):
@@ -226,6 +242,10 @@ class Elf_Symbol(Base, RidMixIn):
     def hidden(self):
         return self.st_other in (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
 
+    @hidden.expression
+    def hidden(self):
+        return self.st_other.in_((defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL))
+
     @hybrid_property
     def weak(self):
         return self.symbol_bind() == defs.SymbolBinding.STB_WEAK
@@ -246,17 +266,29 @@ class Elf_Symbol(Base, RidMixIn):
     def global_(self):
         return self.symbol_bind() == defs.SymbolBinding.STB_GLOBAL
 
+    @hybrid_method
+    def get_access(self):
+        return self.access
+
+    @hybrid_method
+    def test_access(self, mask):
+        return self.get_access() & mask == mask
+
+    @test_access.expression
+    def test_access(cls, mask):
+        return cls.get_access().op("&")(mask) == mask
+
     @hybrid_property
     def writeable(self):
-        return (self.access & defs.SectionFlags.SHF_WRITE) == defs.SectionFlags.SHF_WRITE
+        return self.test_access(defs.SectionFlags.SHF_WRITE)
 
     @hybrid_property
     def executeable(self):
-        return (self.access & defs.SectionFlags.SHF_EXECINSTR) == defs.SectionFlags.SHF_EXECINSTR
+        return self.test_access(defs.SectionFlags.SHF_EXECINSTR)
 
     @hybrid_property
     def allocate(self):
-        return (self.access & defs.SectionFlags.SHF_ALLOC) == defs.SectionFlags.SHF_ALLOC
+        return self.test_access(defs.SectionFlags.SHF_ALLOC)
 
     @hybrid_property
     def symbol_bind(self):
