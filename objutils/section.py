@@ -178,11 +178,6 @@ class Section(object):
     """
     start_address = attr.ib(type = int, eq = True, order = True, default = 0)
     data = attr.ib(default = bytearray(), converter = _data_converter, eq = True, order = True)
-    #length = attr.ib(init = False, eq = True, order = True)
-
-    #@length.default
-    #def __init_length__(self):
-    #    return len(self.data)
 
     def __attrs_post_init__(self):
         self.repr = reprlib.Repr()

@@ -116,6 +116,7 @@ class MetaData(Base, RidMixIn):
     """
     sha = Column(types.VARCHAR) # hashlib.sha3_512()
 
+
 class Elf_Section(Base, RidMixIn):
     """
 

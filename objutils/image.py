@@ -99,7 +99,7 @@ class Image(object):
     __str__ = __repr__
 
     def __len__(self):
-        return len(self.sections)
+        return sum(len(s) for s in self.sections)
 
     def __iter__(self):
         return iter(self.sections)

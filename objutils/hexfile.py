@@ -333,17 +333,12 @@ class Writer(BaseType):
     def dumps(self, image, row_length = 16, **kws):
         result = []
         self.row_length = row_length
-
-        if hasattr(image, "sections") and  not image.sections:
+        if hasattr(image, "sections") and not image.sections:
             return b''
-
         if self.calculate_address_bits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError('could not encode image.')
-
         params = self.set_parameters(**kws)
-
         self.pre_processing(image)
-
         header = self.compose_header(image.meta if hasattr(image, 'meta') else {})
         if header:
             result.append(header)
