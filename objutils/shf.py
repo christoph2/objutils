@@ -176,4 +176,4 @@ class Writer(object):
                 )
             result.append('    </block>')
         result.append("</dump>")
-        return "\n".join(result)
+        return bytes("\n".join(result), encoding = "ascii")
