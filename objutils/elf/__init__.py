@@ -152,6 +152,51 @@ class DBAPI:
         return self.session.query
 
 
+class SectionAPI(DBAPI):
+    """
+    """
+
+    def get(self, section_name: str):
+        """Get a single section.
+
+        Parameters
+        ----------
+
+        section_name: str
+
+        Returns
+        -------
+        """
+
+        query = self.query(model.Elf_Section)
+        query = query.filter(model.Elf_Section.section_name == section_name)
+        return query.first()
+
+    def fetch(self, sections: str = None, name_pattern: str = None, order_by_address: bool = True):
+        """
+
+        Returns
+        -------
+        """
+
+        query = self.query(model.Elf_Section)
+        if name_pattern:
+            query = query.filter(func.regexp(model.Elf_Section.section_name, name_pattern))
+        if order_by_address:
+            query = query.order_by(model.Elf_Section.sh_addr)
+        else:
+            query = query.order_by(model.Elf_Section.section_name)
+        result = query.all()
+        return result
+
+
+        #query = query.order_by(model.Elf_Symbol.section_name)
+
+        #for key, value in groupby(query.all(), lambda s: s.section_name):
+        #    result[key] = list(value)
+        #return result
+
+
 class SymbolAPI(DBAPI):
     """
     """
@@ -236,7 +281,6 @@ class SymbolAPI(DBAPI):
                 elif item == "tls":
                     flt.append(defs.SymbolType.STT_TLS)
                 query = query.filter(model.Elf_Symbol.st_type.in_(flt))
-
         if name_pattern:
             query = query.filter(func.regexp(model.Elf_Symbol.symbol_name, name_pattern))
         query = query.order_by(model.Elf_Symbol.section_name)
@@ -269,7 +313,10 @@ def calculate_crypto_hash(data):
     sha = hashlib.sha512(data)
     return sha.hexdigest()
 
+
 class ElfParser(object):
+    """
+    """
 
     EI_NIDENT = 16
 
@@ -315,6 +362,7 @@ class ElfParser(object):
         self.db = model.Model()
         self.session = self.db.session
         self.symbols = SymbolAPI(self)
+        self.sections = SectionAPI(self)
         self._images = dict()
         self._sections_by_name = OrderedDict()
         self.asciiCString = CString(encoding = "ascii")
@@ -394,10 +442,11 @@ class ElfParser(object):
                 image = self._images[idx]
                 if section.sh_type == defs.SectionType.SHT_NOTE:
                     note_obj = self._parse_note(image)
-                    note = model.Elf_Note(
-                        section_name = name, type = note_obj.type, name = note_obj.name, desc = note_obj.desc
-                    )
-                    sections.append(note)
+                    if note_obj:
+                        note = model.Elf_Note(
+                            section_name = name, type = note_obj.type, name = note_obj.name, desc = note_obj.desc
+                        )
+                        sections.append(note)
                 elif section.sh_type in (defs.SectionType.SHT_SYMTAB, defs.SectionType.SHT_DYNSYM):
                     self._symbol_sections.append(section)
                 elif name == ".comment":
@@ -504,7 +553,7 @@ class ElfParser(object):
         if data.find(b"\x00") == -1:
             return str(data, "ascii")
         while i < length:
-            print("*** LINE", data[i : ])
+            #print("*** LINE", data[i : ])
             line = Line.parse(data[i : ])
             if line.line:
                 result.append(line.line)
@@ -519,6 +568,8 @@ class ElfParser(object):
             "name" / Bytes(this.namesz),
             "desc" / Bytes(this.descsz)
         )
+        if not data:
+            return None
         result = Note.parse(data)
         result.desc = binascii.b2a_hex(result.desc).decode()
         result.name = self.asciiCString.parse(result.name)
@@ -526,15 +577,15 @@ class ElfParser(object):
 
     def debug_sections(self):
         ds = OrderedDict()
-        for idx, section in enumerate(self.sections):
-            name = section.name
+        for idx, section in enumerate(self.sections.fetch()):
+            name = section.section_name
             if name.startswith('.debug'):
                 if name == '.debug_abbrev':
                     pass
                 ds[name] = section
         result = OrderedDict()
         for name, section in ds.items():
-            result[name]= DebugInfo(section, section.image)
+            result[name]= DebugInfo(section, section.section_image)
         return result
 
     def section_in_segment1(self, section_header, segment, check_vma, strict):
@@ -574,10 +625,12 @@ class ElfParser(object):
         for idx in range(self.e_phnum):
             segment = self.segments[idx]
             mapping[idx] = []
-            for j in range(self.e_shnum):
-                section = self.sections[j]
-                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
-                    mapping[idx].append(j)
+##
+##            for j in range(self.e_shnum):
+##                section = self.sections[j]
+##                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
+##                    mapping[idx].append(j)
+##
         self.sections_to_segments = mapping
         return self.sections_to_segments
 
@@ -675,9 +728,9 @@ class ElfParser(object):
     def endianess(self):
         return self._endianess
 
-    @property
-    def sections(self):
-        return self._section_headers.sections
+#    @property
+#    def sections(self):
+#        return self._section_headers.sections
 
     @property
     def segments(self):
