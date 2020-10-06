@@ -46,6 +46,7 @@ setup(
                 'oj-elf-syms = objutils.scripts.oj_elf_syms:main',
                 'oj-hex-info = objutils.scripts.oj_hex_info:main',
                 'oj-elf-arm-attrs = objutils.scripts.oj_elf_arm_attrs:main',
+                'oj-elf-extract = objutils.scripts.oj_elf_extract:main',
     #            'ticoff-dump = objutils.tools.ticoffdump:main'
         ],
     },
