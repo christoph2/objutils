@@ -80,7 +80,6 @@ class Reader(object):
             fp = open(fp, "rb")
         data = fp.read()
         root = ET.fromstring(data)
-        print(root.tag)
         sections = []
         for idx, child in enumerate(root):
             tag = child.tag
@@ -93,18 +92,21 @@ class Reader(object):
                 continue
             address = attrib.get('address')
             if address:
+                address = remove_ws(address)
                 address = int(address, 16)
             else:
                 self.logger.error("Block #{}: Missing required attribute `address`.".format(idx))
                 continue
             length = attrib.get('length')
             if length:
+                length = remove_ws(length)
                 length = int(length, 16)
             else:
                 self.logger.error("Block #{}: Missing required attribute `length`.".format(idx))
                 continue
             word_size = attrib.get('word_size')
             if word_size:
+                word_size = remove_ws(word_size)
                 word_size = int(word_size, 16)
             else:
                 self.logger.error("Block #{}: Missing required attribute `wordsize`.".format(idx))
@@ -114,6 +116,7 @@ class Reader(object):
                 continue
             checksum = attrib.get('checksum')
             if checksum:
+                checksum = remove_ws(checksum)
                 if SHA1_DIGEST(section_data) != checksum:
                     self.logger.error("Block #{}: Wrong `checksum`.".format(idx))
                     continue
