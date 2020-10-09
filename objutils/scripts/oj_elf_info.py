@@ -66,12 +66,10 @@ def main():
         print("{:25} {:14} {:08x} {:08x} {:06x} {:2}".format(
             sec.section_name, sec.section_type.name[4 : ], sec.sh_addr, sec.sh_offset, sec.sh_size, sec.sh_addralign)
         )
-
     comment = ep.comment
     if comment:
         print_header(".comment")
         print(comment)
-
     for note in ep.notes:
         print_header(note.section_name)
         print("Type Name            Desc")
@@ -81,21 +79,9 @@ def main():
     dbSecs = ep.debug_sections()
     if dbSecs:
         dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-        print(dp)
         dp.do_abbrevs()
         dp.do_mac_info()
         dp.do_dbg_info()
-
-    """
-    sections = sess.query(model.Elf_Section).order_by(model.Elf_Section.index).all()
-    for sec in sections:
-        print("{} {:20} {} {} {}".format(sec.index, sec.section_name, sec.section_type.name, sec.flag_writeable, sec.flag_executable))
-    """
-
-    #doAbbrevs(abbrevs)
-    #macs = dbSecs['.debug_macinfo']
-    #doMacInfo(macs)
-    #print(bytes(macs.image))
 
 def print_header(text):
     print("\n{1:}\n{0:}\n{1:}\n".format(text, "=" * len(text)))

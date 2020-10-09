@@ -35,7 +35,7 @@ from pprint import pprint
 from objutils.elf import defs, ElfParser, model
 
 def main():
-    parser = argparse.ArgumentParser(description = "'Dump '.ARM.attributes' section.")
+    parser = argparse.ArgumentParser(description = "Dump '.ARM.attributes' section.")
     parser.add_argument("elf_file", help = ".elf file")
     #parser.add_argument("-l", help = "loglevel [warn | info | error | debug]", dest = "loglevel", type = str, default = "warn")
     args = parser.parse_args()

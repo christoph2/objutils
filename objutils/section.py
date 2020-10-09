@@ -295,7 +295,7 @@ class Section(object):
     def read_numeric_array(self, addr, length, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("read_numeric_array() access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
@@ -309,7 +309,7 @@ class Section(object):
         length = len(data)
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("write_numeric_array() access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
@@ -319,7 +319,7 @@ class Section(object):
     def read_string(self, addr, encoding = "latin1", length = -1, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("read_string() access out of bounds.")
         if length == -1:
             pos = self.data[offset : ].find(b'\x00')
         else:
@@ -331,7 +331,7 @@ class Section(object):
     def write_string(self, addr, value, encoding = "latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("write_string() access out of bounds.")
         if PYTHON_VERSION.major == 3:
             self.data[offset : offset +  len(value)] = bytes(value, encoding = encoding)
         else:

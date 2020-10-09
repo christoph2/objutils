@@ -39,9 +39,6 @@ def main():
     )
     parser.add_argument("elf_file", help = "ELF file")
     parser.add_argument("output_file_name", help = "Output filename.")
-    parser.add_argument('-d', '--dry-run', help = "Only list sections used, no output is generated.",
-        dest = "dry_run", action = "store_true"
-    )
     parser.add_argument("-j", "--join", help = "Try to make continuous sections.", dest = "join", action = "store_true")
     parser.add_argument("-t", "--file-type", help = "Type of output HEX file.", choices = [
         "ihex", 'shf', "srec" # , 'titxt'
@@ -52,8 +49,6 @@ def main():
     except Exception as e:
         print("\n'{}' is not valid ELF file. Raised exception: '{}'.".format(args.elf_file, repr(e)))
         exit(1)
-    #ep = ElfParser(args.elf_file)
-    #print(args)
     print("\nExtracting from...\n")
     print("Section                   Address    Length")
     print("-" * 45)
