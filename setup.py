@@ -68,7 +68,9 @@ setup(
         'map files',
         'embedded',
         'microcontroller',
-        'ECU'
+        'ECU',
+        'shf',
+        'rfc4194',
     ],
     classifiers=[
         # How mature is this project? Common values are
