@@ -158,7 +158,7 @@ class Writer(object):
         BLOCK_SIZE = 16
         result = []
         result.append('<?xml version="1.0" encoding="UTF-8"?>')
-        result.append('<dump name="SHF dump by objutils" blocks="{:04x}">'.format(len(image)))
+        result.append('<dump name="SHF dump by objutils" blocks="{:04x}">'.format(len(image._sections)))
         if hasattr(image, "sections") and  not image.sections:
             return b''
         sections = sorted(image.sections, key = lambda x: x.start_address)
