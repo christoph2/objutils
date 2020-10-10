@@ -197,6 +197,63 @@ def test_write_int8_be3(filler_0_16):
     with pytest.raises(struct.error):
         filler_0_16.write_numeric(0, INT8_RANGE.upper + 1, "int8_be")
 
+##
+##
+def test_write_byte0(filler_0_16):
+    filler_0_16.write_numeric(0, 0xff, "byte")
+    assert filler_0_16.data == bytearray([0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+def test_write_byte1(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, UINT8_RANGE.lower - 1, "byte")
+
+def test_write_byte2(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, UINT8_RANGE.upper + 1, "byte")
+
+def test_write_byte3(filler_0_16):
+    filler_0_16.write_numeric(0, 0xff, "byte")
+    assert filler_0_16.data == bytearray([0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+def test_write_byte4(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, UINT8_RANGE.lower - 1, "byte")
+
+def test_write_byte5(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, UINT8_RANGE.upper + 1, "byte")
+
+@pytest.mark.skip
+def test_write_byte6(filler_0_16):
+    filler_0_16.write_numeric(0, -100, "byte")
+    assert filler_0_16.data == bytearray([0x9c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+def test_write_byte7(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, INT8_RANGE.lower - 1, "byte")
+
+@pytest.mark.skip
+def test_write_byte8(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, INT8_RANGE.upper + 1, "byte")
+
+@pytest.mark.skip
+def test_write_byte9(filler_0_16):
+    filler_0_16.write_numeric(0, -100, "byte")
+    assert filler_0_16.data == bytearray([0x9c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+def test_write_byte10(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, INT8_RANGE.lower - 1, "byte")
+
+@pytest.mark.skip
+def test_write_byte11(filler_0_16):
+    with pytest.raises(struct.error):
+        filler_0_16.write_numeric(0, INT8_RANGE.upper + 1, "byte")
+
+##
+##
+
 def test_write_uint16_le1(filler_0_16):
     filler_0_16.write_numeric(0, 0x1122, "uint16_le")
     assert filler_0_16.data == bytearray([0x22, 0x11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])

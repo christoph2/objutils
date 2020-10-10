@@ -203,9 +203,12 @@ class Section(object):
     def _verify_dtype(self, dtype):
         """
         """
-        if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
-                raise TypeError("dtype must be suffixed with '_be' or '_le'")
         dtype = dtype.lower().strip()
+        if dtype == "byte":
+            return "uint8", "le"    # Completly arbitrary,
+        if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
+                print("DTYPE:", dtype)
+                raise TypeError("dtype must be suffixed with '_be' or '_le'")
         match = DTYPE.match(dtype)
         if not match:
             raise TypeError("Invalid datatype '{}'".format(dtype))
@@ -348,12 +351,12 @@ class Section(object):
             raise FeatureNotAvailableError("write_ndarray() requires Numpy.")
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("write_ndarray() access out of bounds.")
         if not isinstance(array, np.ndarray):
             raise TypeError("array must be of type numpy.ndarray.")
         data_size = array.nbytes
         if offset + data_size > self.length:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError("write_ndarray() access out of bounds.")
         self.data[offset : offset + data_size] = array.tobytes()
 
     def read_ndarray(self, addr, length, dtype, shape = None, order = None, **kws):
