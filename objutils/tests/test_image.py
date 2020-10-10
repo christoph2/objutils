@@ -479,7 +479,7 @@ class TestImageSlices(BaseTest):
     def testLenWorks(self):
         self.createImage()
         image = self.b0
-        self.assertEqual(len(image), 3)
+        self.assertEqual(len(image), 48)
 
     def testSlicingWorks(self):
         self.createImage()
