@@ -58,32 +58,27 @@ Supported HEX formats
 Current
 ~~~~~~~
 
-=====       ===========
-codec       format name
-------      -------------------------------------------------------------
+- codec / format name
 
-ihex        Intel HEX
-shf         S Hexdump (`rfc4194 <https://tools.ietf.org/html/rfc4194>`_)
-srec        Motorola S-Records
-titxt       Texas Instruments Text
-======      =============================================================
+* ihex (Intel HEX)
+* shf (S Hexdump (`rfc4194 <https://tools.ietf.org/html/rfc4194>`_))
+* srec (Motorola S-Records)
+* titxt (Texas Instruments Text)
 
 Historical
 ~~~~~~~~~~
 
-=====       ===========
-codec       format name
---------    -------------------------------
-ash         ASCII Space Hex
-cosmac      RCA Cosmac
-emon52      Elektor EMON52
-etek        Tektronix Extended Hexadecimal
-fpc         Four Packed Code
-mostec      MOS Technology
-rca         RCA
-sig         Signetics
-tek         Tektronix Hexadecimal
-======     ===============================
+- codec / format name
+
+* ash (ASCII Space Hex)
+* cosmac (RCA Cosmac)
+* emon52 (Elektor EMON52)
+* etek (Tektronix Extended Hexadecimal)
+* fpc (Four Packed Code)
+* mostec (MOS Technology)
+* rca (RCA)
+* sig (Signetics)
+* tek (Tektronix Hexadecimal)
 
 **codec** is the first parameter to dump() / load() functions, e.g.:
 
@@ -365,12 +360,11 @@ Authors
 
 -  `Christoph Schueler <cpu12.gems@googlemail.com>`_ - Initial work and project lead.
 
-See also the list of  `contributors <<https://github.com/christoph2/objutils/blob/master/CONTRIBUTORS>`_ who participated in this project.
 
 License
 -------
 
-This project is licensed under the GNU General Public License v2.0 - see the `LICENSE <<https://github.com/christoph2/objutils/blob/master/LICENSE>`_ file for details.
+This project is licensed under the GNU General Public License v2.0
 
 Contribution
 ------------
