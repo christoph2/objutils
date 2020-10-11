@@ -76,12 +76,12 @@ def main():
         print("-" * 79)
         print("{:4} {:15} {}".format(note.type, note.name, note.desc))
 
-    dbSecs = ep.debug_sections()
-    if dbSecs:
-        dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-        dp.do_abbrevs()
-        dp.do_mac_info()
-        dp.do_dbg_info()
+    #dbSecs = ep.debug_sections()
+    #if dbSecs:
+    #    dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
+    #    dp.do_abbrevs()
+    #    dp.do_mac_info()
+    #    dp.do_dbg_info()
 
 def print_header(text):
     print("\n{1:}\n{0:}\n{1:}\n".format(text, "=" * len(text)))
