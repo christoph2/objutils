@@ -137,7 +137,7 @@ class One(Construct):
         return 1
 
     def _build(self, value, stream, context, path):
-        count = struct.pack(msk, len(1))
+        count = struct.pack("B", 1)
         value = 1
         stream.write(count)
         if six.PY3:
