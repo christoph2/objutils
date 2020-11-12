@@ -32,6 +32,17 @@ import threading
 
 import six
 
+
+def ffs(v: int) -> int:
+    """First first set bit."""
+    if v == 0:
+        return 0
+    res = 0
+    while (not (v & 1)):
+        v >>= 1
+        res += 1
+    return res
+
 def slicer(iterable, sliceLength, converter = None):
     if converter is None:
         converter = type(iterable)
