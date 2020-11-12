@@ -34,7 +34,7 @@ import six
 
 
 def ffs(v: int) -> int:
-    """First first set bit."""
+    """Find first set bit."""
     if v == 0:
         return 0
     res = 0
