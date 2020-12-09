@@ -53,6 +53,7 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 
+from objutils import Image, Section
 from objutils.utils import create_memorymapped_fileview
 from objutils.elf import defs, model
 from objutils.dwarf import DwarfProcessor
@@ -728,10 +729,6 @@ class ElfParser(object):
     def endianess(self):
         return self._endianess
 
-#    @property
-#    def sections(self):
-#        return self._section_headers.sections
-
     @property
     def segments(self):
         return self._program_headers['segments']
@@ -764,3 +761,60 @@ class ElfParser(object):
     def query(self):
         return self.session.query
 
+    def create_image(self, join: bool = True, include_pattern: str = None, exclude_pattern: str = None, callback: callable = None):
+        """
+
+        Parameters
+        ----------
+        join: bool
+            Try to join/merge sections.
+
+        include_pattern: str
+            Include only sections matching a Python RegEx
+
+        exclude_pattern: str
+            Exclude sections matching a Python RegEx
+
+        callback: callable
+            Could be used to generate output for your command-line tools.
+
+            Called with:
+                - state: "start" | "stop" | "section"
+                - section -- current section (only applicable to state "section").
+
+        Returns
+        -------
+        `objutils.Image`
+
+        Note
+        ----
+        `include_pattern` and `exclude_pattern` should be used mutually exclusive, unless you know what you are doing.
+
+        Note
+        ----
+        Look at `scripts/oj_elf_extract.py` to see `create_image()` in action.
+        """
+        query = sections = self.query(model.Elf_Section)
+        query = query.filter(
+            model.Elf_Section.flag_alloc == True,
+            model.Elf_Section.has_content == True,
+        )
+
+        if include_pattern:
+            query = query.filter(func.regexp(model.Elf_Section.section_name, include_pattern))
+
+        if exclude_pattern:
+            query = query.filter(not_(func.regexp(model.Elf_Section.section_name, exclude_pattern)))
+
+        query = query.order_by(model.Elf_Section.sh_addr)
+        result = []
+        if callback:
+            callback("start", None)
+        for section in query.all():
+            if callback:
+                callback("section", section)
+            result.append(Section(section.sh_addr, section.section_image))
+        img = Image(result, join = join)
+        if callback:
+            callback("stop", None)
+        return img

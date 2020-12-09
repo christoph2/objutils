@@ -33,6 +33,16 @@ from sys import stdout
 from objutils import Image, Section, dump
 from objutils.elf import ElfParser, model
 
+def callback(state, section):
+    """
+    """
+    if state == "start":
+        pass
+    elif state == "stop":
+        print("-" * 45)
+    elif state == "section":
+        print("{:25s} 0x{:08x} {}".format(section.section_name, section.sh_addr, section.sh_size))
+
 def main():
     parser = argparse.ArgumentParser(
         description = 'Extract sections contributing to program image, e.g. for flash programming applications.'
@@ -41,8 +51,10 @@ def main():
     parser.add_argument("output_file_name", help = "Output filename.")
     parser.add_argument("-j", "--join", help = "Try to make continuous sections.", dest = "join", action = "store_true")
     parser.add_argument("-t", "--file-type", help = "Type of output HEX file.", choices = [
-        "ihex", 'shf', "srec" # , 'titxt'
+        "ihex", 'shf', "srec", 'titxt'
     ], default = "ihex", dest = "file_type")
+    parser.add_argument("-e", "--exclude_pattern", help = "Exclude sections matching a Python RegEx", dest = "exclude", default = None)
+    parser.add_argument("-i", "--include_pattern", help = "Include only sections matching a Python RegEx", dest = "include", default = None)
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
@@ -52,14 +64,8 @@ def main():
     print("\nExtracting from...\n")
     print("Section                   Address    Length")
     print("-" * 45)
-    bin_sections = []
-    for section in ep.sections.query(model.Elf_Section).filter(model.Elf_Section.has_content == True, model.Elf_Section.flag_alloc == True).all():
-        print("{:25s} 0x{:08x} {}".format(section.section_name, section.sh_addr, section.sh_size))
-        bin_section = Section(start_address = section.sh_addr, data = section.section_image)
-        bin_sections.append(Section(start_address = section.sh_addr, data = section.section_image))
-    print("-" * 45)
-    if bin_sections:
-        img = Image(bin_sections, join = args.join)
+    img = ep.create_image(callback = callback, join = args.join, exclude_pattern = args.exclude, include_pattern = args.include)
+    if img:
         dump(args.file_type, args.output_file_name, img)
         print("HEX image written to: '{}' [{} total bytes]".format(args.output_file_name, len(img)))
 
