@@ -25,7 +25,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import itertools
 import os
 import sys
 import threading
@@ -94,7 +93,7 @@ def get_python_version():
 PYTHON_VERSION = get_python_version()
 
 if PYTHON_VERSION.major == 3:
-    from io import BytesIO as StringIO, TextIOWrapper
+    from io import BytesIO as StringIO
 else:
     try:
         from cStringIO import StringIO

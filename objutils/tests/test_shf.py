@@ -3,7 +3,6 @@
 
 from objutils import loads, dumps
 from objutils.image import Image
-from objutils.section import Section
 
 import pytest
 

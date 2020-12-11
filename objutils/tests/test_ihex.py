@@ -25,11 +25,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from copy import copy
 import io
-import os
 import unittest
-from objutils import dump, dumps, load, loads, probe, probes
+from objutils import dumps, load, loads
 
 
 TEST2 = b''':100000004578616D706C65207769746820616E2039

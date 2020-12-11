@@ -27,11 +27,9 @@ __copyright__ = """
 """
 
 import argparse
-from pprint import pprint
-from sys import stdout
 
-from objutils import Image, Section, dump
-from objutils.elf import ElfParser, model
+from objutils import dump
+from objutils.elf import ElfParser
 
 def callback(state, section):
     """

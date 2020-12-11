@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from objutils import loads, dumps
+from objutils import dumps
 from objutils.section import Section
 from objutils.image import Image
 from objutils.exceptions import InvalidAddressError

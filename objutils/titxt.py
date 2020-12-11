@@ -29,13 +29,7 @@ __copyright__ = """
 ##  ASCII Space Hex format.
 ##
 
-from functools import partial
-import re
-import sys
 import objutils.hexfile as hexfile
-from objutils.section import Section, join_sections
-from objutils.image import Image
-from objutils.utils import PYTHON_VERSION
 
 
 class Reader(hexfile.ASCIIHexReader):

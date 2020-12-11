@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from objutils import loads, dumps, probes
-from objutils.section import Section
-from objutils.image import Image
-from objutils.registry import Registry
 import unittest
 
 import pytest

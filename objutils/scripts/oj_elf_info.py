@@ -29,12 +29,10 @@ __copyright__ = """
 """
 
 import argparse
-import pathlib
 
 from objutils.elf import ElfParser, model
-from objutils.elf.defs import (SectionType, ELFMachineType, ELF_MACHINE_NAMES, ELF_CLASS_NAMES,
-    ELFType, ELF_TYPE_NAMES, ELF_BYTE_ORDER_NAMES, ELFAbiType)
-from objutils.dwarf import DwarfProcessor
+from objutils.elf.defs import (ELFMachineType, ELF_MACHINE_NAMES, ELF_CLASS_NAMES, ELFType,
+    ELF_TYPE_NAMES, ELF_BYTE_ORDER_NAMES, ELFAbiType)
 
 def main():
 

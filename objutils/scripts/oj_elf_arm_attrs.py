@@ -29,10 +29,9 @@ __copyright__ = """
 """
 
 import argparse
-from pprint import pprint
 
 
-from objutils.elf import defs, ElfParser, model
+from objutils.elf import ElfParser, defs
 
 def main():
     parser = argparse.ArgumentParser(description = "Dump '.ARM.attributes' section.")

@@ -32,12 +32,11 @@ __copyright__ = """
 """
 
 from collections import namedtuple
-import bisect
 import enum
 from operator import attrgetter, eq
 import sys
 
-from sortedcontainers import SortedDict, SortedList
+from sortedcontainers import SortedList
 
 from objutils.section import Section, join_sections
 from objutils.exceptions import InvalidAddressError

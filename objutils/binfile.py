@@ -34,8 +34,7 @@ import zipfile
 
 from objutils.section import Section
 from objutils.image import Image
-from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
-from objutils.logger import Logger
+from objutils.utils import PYTHON_VERSION, create_string_buffer
 
 ##
 ## TODO: binzipped format: a separate file for each section + MANIFEST (csv: fname, address, length)

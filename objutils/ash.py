@@ -31,12 +31,8 @@ __copyright__ = """
 
 from functools import partial
 import re
-import sys
 import objutils.hexfile as hexfile
-from objutils.section import Section, join_sections
-from objutils.image import Image
-from objutils.checksums import lrc, COMPLEMENT_NONE
-from objutils.utils import PYTHON_VERSION
+from objutils.checksums import lrc
 
 STX = '\x02'
 ETX = '\x03'

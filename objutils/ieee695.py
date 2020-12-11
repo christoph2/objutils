@@ -27,11 +27,9 @@ __copyright__ = """
 """
 
 
-from collections import namedtuple
 from datetime import datetime
 from functools import reduce
 import os
-import sys
 
 from objutils.logger import Logger
 

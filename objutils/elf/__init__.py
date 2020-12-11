@@ -29,34 +29,24 @@ __copyright__ = """
 
 import binascii
 from collections import namedtuple, OrderedDict
-import datetime
-import enum
 import hashlib
 from itertools import groupby
-import os
 import re
-import struct
 import time
 
 
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil, BitStruct, BitsInteger
-from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell
+from construct import Adapter, Array, CString, Const, Enum, IfThenElse, Padding, Struct
+from construct import BitStruct, BitsInteger, Bytes, Construct, this
+from construct import Computed, Pass, Tell, Union, singleton
 from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
 from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
-from sqlalchemy import (MetaData, schema, types, orm, event,
-    create_engine, Column, ForeignKey, ForeignKeyConstraint, func,
-    PassiveDefault, UniqueConstraint, CheckConstraint, and_, or_, not_
+from sqlalchemy import (func, not_
 )
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship
 
 from objutils import Image, Section
 from objutils.utils import create_memorymapped_fileview
 from objutils.elf import defs, model
-from objutils.dwarf import DwarfProcessor
 from objutils.elf.arm import attributes
 
 

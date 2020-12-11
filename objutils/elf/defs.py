@@ -27,7 +27,6 @@ __copyright__ = """
 
 import enum
 from collections import namedtuple
-import types
 import struct
 
 

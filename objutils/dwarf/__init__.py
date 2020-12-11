@@ -31,14 +31,13 @@ __copyright__ = """
 from collections import namedtuple, OrderedDict
 import io
 
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil
-from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell
-from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
-from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
+from construct import CString, Enum, If, Struct
+from construct import this
+from construct import Computed, Pass, Switch, Tell
+from construct import Int16ul, Int32ul, Int64ul, Int8ul
+from construct import Int16ub, Int32ub, Int64ub
 
 from objutils.dwarf import constants
-from objutils.dwarf import encoding
 from objutils.dwarf.encoding import ULEB, SLEB, Address, StrP, Block1, BlockUleb, One
 
 Abbreviation = namedtuple('Abbreviation', 'tag children attrs')

@@ -27,9 +27,8 @@ __copyright__ = """
 """
 
 import argparse
-from pprint import pprint
 
-from objutils.elf import ElfParser, model
+from objutils.elf import ElfParser
 
 def main():
     parser = argparse.ArgumentParser(description = 'Display ELF symbols.')

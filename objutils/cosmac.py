@@ -26,8 +26,6 @@ __copyright__ = """
 """
 
 import objutils.hexfile as hexfile
-import objutils.utils as utils
-import objutils.checksums as checksums
 
 DATA0    = 1
 DATA1    = 2

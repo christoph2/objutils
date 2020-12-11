@@ -26,13 +26,12 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import io
 import struct
 
 from construct.core import Construct, ConstructError, Bytes, CString
-from construct.core import Adapter, Struct, singleton
-from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
-from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
+from construct.core import singleton
+from construct import Int16ul, Int32ul, Int64ul, Int8ul
+from construct import Int16ub, Int32ub, Int64ub
 
 import six
 

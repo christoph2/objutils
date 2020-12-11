@@ -1,6 +1,5 @@
 
 import unittest
-from objutils.registry import Registry
 
 class DummyReader(object): pass
 class DummyWriter(object): pass

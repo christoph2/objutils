@@ -28,7 +28,6 @@ __copyright__ = """
 
 import re
 import objutils.hexfile as hexfile
-import objutils.utils as utils
 
 DATA    = 1
 EOF     = 2

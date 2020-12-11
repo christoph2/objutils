@@ -26,17 +26,14 @@ __copyright__ = """
 """
 
 from collections import defaultdict, namedtuple
-import logging
 from functools import partial
 import math
 import os
 import re
-import sys
 
 from objutils.section import Section, join_sections
 from objutils.image import Image
 from operator import itemgetter
-from objutils.pickleif import PickleIF
 from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
 from objutils.logger import Logger
 

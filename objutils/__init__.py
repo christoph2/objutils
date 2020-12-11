@@ -39,7 +39,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import namedtuple
 
 from objutils.registry import registry
 import objutils.binfile

@@ -3,14 +3,9 @@
 
 import unittest
 
-from objutils import loads, dumps, probes
-from objutils.section import Section
+from objutils import loads
 from objutils.image import Image
-from objutils.utils import create_string_buffer, PYTHON_VERSION
 from objutils import hexfile
-import os
-import io
-import sys
 
 
 class TestHexfile(unittest.TestCase):

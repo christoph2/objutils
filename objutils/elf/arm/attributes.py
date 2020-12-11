@@ -29,15 +29,15 @@ __copyright__ = """
 
 from collections import namedtuple
 
-from construct import Struct, If, Const, Adapter, FlagsEnum, Enum, Array, Padding, HexDump, Probe, CString, IfThenElse
-from construct import Pointer, Byte, GreedyRange, Bytes, Construct, this, RepeatUntil, BitStruct, BitsInteger
-from construct import singleton, Pass, Computed, Switch, Union, GreedyString, GreedyBytes, Tell
-from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
-from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
+from construct import CString, Struct
+from construct import Byte, Bytes, this
+from construct import Computed, Switch, Tell
+from construct import Int32ul
+from construct import Int32ub
 
 from enum import IntEnum
 
-from objutils.dwarf.encoding import ULEB, SLEB
+from objutils.dwarf.encoding import ULEB
 
 
 AttributeDescription = namedtuple("AttributeDescription", "tag value parameterType conv")

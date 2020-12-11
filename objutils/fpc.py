@@ -27,7 +27,6 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 from functools import partial
-import operator
 import os
 import re
 import objutils.hexfile as hexfile

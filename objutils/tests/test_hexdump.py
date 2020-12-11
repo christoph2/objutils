@@ -3,13 +3,10 @@
 
 import unittest
 
-from objutils import loads, dumps, probes
-from objutils.section import Section
 from objutils.image import Image
 from objutils.utils import create_string_buffer, PYTHON_VERSION
 import os
 import io
-import sys
 
 TEST1 = """
 Section #0000

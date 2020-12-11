@@ -3,9 +3,7 @@
 
 import unittest
 
-from objutils import loads, dumps, probes
-from objutils.section import Section
-from objutils.image import Image
+from objutils import dumps, loads
 
 TEST1 = b''' $A0000,
 7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C

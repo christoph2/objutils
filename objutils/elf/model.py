@@ -26,22 +26,16 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from functools import partial
 import mmap
 import re
 import sqlite3
 
-from sqlalchemy import (MetaData, schema, types, orm, event,
-    create_engine, Column, ForeignKey, ForeignKeyConstraint, func,
-    PassiveDefault, UniqueConstraint, CheckConstraint, select, and_, or_, not_
+from sqlalchemy import (MetaData, types, orm, event, create_engine,
+    Column, and_, not_
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, with_polymorphic, validates
 
 from objutils.elf import defs
 

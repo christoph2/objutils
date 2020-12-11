@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from objutils import loads, dumps
-from objutils.section import Section
 from objutils.image import Image
 from objutils.utils import PYTHON_VERSION
 import unittest
