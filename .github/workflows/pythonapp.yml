@@ -46,14 +46,9 @@ jobs:
            python setup.py bdist_wheel
            python setup.py sdist --formats=zip,gztar
     - name: Publish distibution to PyPI
-      #if: startsWith(github.event.ref, 'refs/tags')
-      #uses: pypa/gh-action-pypi-publish@master
-      #with:
-      #    user: __token__
-      #    password: ${{secrets.PYPI_PASSWORD}}
       uses: casperdcl/deploy-pypi@v1
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-        with:
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      with:
           password: ${{ secrets.PYPI_PASSWORD }}
           user: ${{ secrets.PYPI_USER }}
           build: true
