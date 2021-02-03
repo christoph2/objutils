@@ -44,13 +44,12 @@ jobs:
     - name: Build dists
       run: |
            python setup.py bdist_wheel
-           python setup.py sdist --formats=zip,gztar
-    - name: Publish distibution to PyPI
-      uses: casperdcl/deploy-pypi@v1
-      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-      with:
-          password: ${{ secrets.PYPI_PASSWORD }}
-          user: ${{ secrets.PYPI_USER }}
-          build: true
-          skip_existing: true
-
+           python setup.py sdist --formats=gztar
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USER_NAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      if: env.TWINE_USERNAME != null
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
