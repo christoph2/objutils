@@ -46,6 +46,8 @@ class NoContiniousError(Exception): pass
 class Reader(object):
 
     def load(self, fp, address = 0x0000):
+        if isinstance(fp, str):
+            fp = open(fp, "rb")
         data = fp.read()
         sec = Section(address, data)
         img = Image([sec], valid = True)
@@ -65,6 +67,8 @@ class Reader(object):
 
 class Writer(object):
     def dump(self, fp, image, filler = b'\xff', **kws):
+        if isinstance(fp, str):
+            fp = open(fp, "wb")
         fp.write(self.dumps(image, filler))
         if hasattr(fp, "close"):
             fp.close()
