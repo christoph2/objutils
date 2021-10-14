@@ -40,9 +40,9 @@ jobs:
         pip install pytest
         pytest
     - name: Bump version
-        uses: jaumann/github-bumpversion-action@v0.0.7
-      #  env:
-       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: jaumann/github-bumpversion-action@v0.0.7
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
     - name: Build dists
       run: |
