@@ -44,6 +44,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+      if: matrix.os == 'ubuntu-latest'
     - name: Build dists
       run: |
            python setup.py bdist_wheel
