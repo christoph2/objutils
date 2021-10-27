@@ -131,6 +131,14 @@ class Elf_Section(Base, RidMixIn):
     section_image = Column(types.BLOB)
 
     @hybrid_property
+    def is_debug(self):
+        return self.section_name.starts_with(".debug")
+
+    @hybrid_property
+    def is_dwo(self):
+        return self.section_name.starts_with(".dwo")
+
+    @hybrid_property
     def has_content(self):
         return self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and (self.sh_size > 0)
 
