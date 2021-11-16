@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
+"""DWARF4 Parser.
 """
 
 __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2021 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -62,7 +62,7 @@ class DwarfProcessor:
             self.strings = self.debug_sections[".debug_str"].section_image
         else:
             self.strings = b""
-        
+
         #print(self.strings.read())
         self.installReaders()
 
@@ -236,8 +236,6 @@ class DwarfProcessor:
                     offset += (stop - start)
                     if offset >= size - 1:
                         lastAttr = True
-                        # 872b
-#                offset += (attr.stop - attr.start)
                 pos = image.tell()
             if hasattr(abbr, "children") and abbr.children:
                 level += 1
@@ -261,23 +259,6 @@ class DwarfProcessor:
         print("   Pointer Size:  {}".format(cu.address_size))
         stopPos = image.tell()
         return cu
-
-    """
-    def process_debug_info(self):
-        if not '.debug_info' in self.debug_sections:
-            return
-        section = self.debug_sections['.debug_info']
-        image = io.BytesIO(section.section_image)
-        imageSize = len(section.section_image)
-        while True:
-            start = image.tell()
-            if start >= imageSize - 1:
-                break
-            cu = self.process_compile_unit(image)
-            readers = self.get_form_readers(cu.address_size)
-            stop = image.tell()
-            self.process_attributes(image, readers, cu.unit_length - cu.size, cu.debug_abbrev_offset)
-    """
 
     def do_dbg_info(self):
         if not '.debug_info' in self.debug_sections:
