@@ -35,20 +35,24 @@ from construct import Int16ub, Int32ub, Int64ub
 
 import six
 
-class ULEBError(ConstructError): pass
-class SLEBError(ConstructError): pass
+
+class ULEBError(ConstructError):
+    pass
+
+
+class SLEBError(ConstructError):
+    pass
 
 
 @singleton
 class ULEB(Construct):
-
     def __init__(self, *args):
         if six.PY3:
             super(__class__, self).__init__()
         else:
             super(self.__class__, self).__init__()
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         result = 0
         shift = 0
         while True:
@@ -56,20 +60,19 @@ class ULEB(Construct):
                 bval = ord(stream.read(1))
             except Exception as e:
                 raise ULEBError(str(e))
-            result |= ((bval & 0x7f) << shift)
+            result |= (bval & 0x7F) << shift
             if bval & 0x80 == 0:
                 break
             shift += 7
         return result
 
-
     def _build(self, value, stream, context, path):
         assert value is not None
         if value < 0:
-            raise ULEBError('value must be non-negative.')
+            raise ULEBError("value must be non-negative.")
         result = []
         while True:
-            bval = value & 0x7f
+            bval = value & 0x7F
             value >>= 7
             if value != 0:
                 bval |= 0x80
@@ -81,14 +84,13 @@ class ULEB(Construct):
 
 @singleton
 class SLEB(Construct):
-
     def __init__(self, *args):
         if six.PY3:
             super(__class__, self).__init__()
         else:
             super().__init__()
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         result = 0
         shift = 0
         size = 32
@@ -98,13 +100,13 @@ class SLEB(Construct):
                 bval = ord(stream.read(1))
             except Exception as e:
                 raise SLEBError(str(e))
-            result |= ((bval & 0x7f) << shift)
+            result |= (bval & 0x7F) << shift
             shift += 7
             idx += 1
             if bval & 0x80 == 0:
                 break
         if (shift < 32) or (bval & 0x40) == 0x40:
-            mask = - (1 << (idx * 7))
+            mask = -(1 << (idx * 7))
             result |= mask
         return result
 
@@ -114,25 +116,27 @@ class SLEB(Construct):
         more = 1
         size = 32
         while more:
-            bval = value & 0x7f
+            bval = value & 0x7F
             value >>= 7
-            if ((value == 0 and (bval & 0x40) == 0x00)) or ((value == -1 and (bval & 0x40) == 0x40)):
+            if ((value == 0 and (bval & 0x40) == 0x00)) or (
+                (value == -1 and (bval & 0x40) == 0x40)
+            ):
                 more = 0
             else:
                 bval |= 0x80
             result.append(bval)
         stream.write(bytes(result))
 
+
 @singleton
 class One(Construct):
-
     def __init__(self, *args):
         if six.PY3:
             super(__class__, self).__init__()
         else:
             super().__init__()
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         return 1
 
     def _build(self, value, stream, context, path):
@@ -140,13 +144,14 @@ class One(Construct):
         value = 1
         stream.write(count)
         if six.PY3:
-            stream.write(bytes(value, encoding = "ascii"))
+            stream.write(bytes(value, encoding="ascii"))
         else:
             stream.write(bytes(value))
 
+
 class Block(Construct):
 
-    BYTEORDER = ''
+    BYTEORDER = ""
     SIZE = None
     MASK = None
 
@@ -156,7 +161,7 @@ class Block(Construct):
         else:
             super().__init__()
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         msk = "{}{}".format(self.BYTEORDER, self.MASK)
         count = stream.read(self.SIZE)
         count = struct.unpack(msk, count)[0]
@@ -168,15 +173,14 @@ class Block(Construct):
         count = struct.pack(msk, len(value))
         stream.write(count)
         if six.PY3:
-            stream.write(bytes(value, encoding = "ascii"))
+            stream.write(bytes(value, encoding="ascii"))
         else:
             stream.write(bytes(value))
 
 
 @singleton
 class BlockUleb(Block):
-
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         count = ULEB.parse_stream(stream)
         result = Bytes(count).parse_stream(stream)
         return result
@@ -185,9 +189,10 @@ class BlockUleb(Block):
         count = ULEB.build(len(value))
         stream.write(count)
         if six.PY3:
-            stream.write(bytes(value, encoding = "ascii"))
+            stream.write(bytes(value, encoding="ascii"))
         else:
             stream.write(bytes(value))
+
 
 @singleton
 class Block1(Block):
@@ -252,7 +257,7 @@ class Address(Construct):
             print("**IDX is not int", size, endianess, idx, type(idx))
         self.type = self.TYPES[size][idx]
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         return self.type.parse_stream(stream)
 
     def _build(self, value, stream, context, path):
@@ -261,7 +266,7 @@ class Address(Construct):
 
 class StrP(Construct):
 
-    BYTEORDER = ''
+    BYTEORDER = ""
     SIZE = None
     MASK = None
 
@@ -269,16 +274,16 @@ class StrP(Construct):
         self.image = image
         self.endianess = endianess
         self.ntype = (Int32ul, Int32ub)[0 if endianess == 1 else 1]
-        self.stype = CString(encoding = "utf8")
+        self.stype = CString(encoding="utf8")
         if six.PY3:
             super(__class__, self).__init__()
         else:
             super().__init__()
 
-    def _parse(self, stream, context, path = None):
+    def _parse(self, stream, context, path=None):
         offset = self.ntype.parse_stream(stream)
-        #self.image.seek(offset)
-        data = self.image[offset : ]
+        # self.image.seek(offset)
+        data = self.image[offset:]
         result = self.stype.parse(data)
         return result
 

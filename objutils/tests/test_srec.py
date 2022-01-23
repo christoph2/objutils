@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from objutils import loads, dumps, probes
-from objutils.hexfile import MetaRecord
-from objutils.image import Image
 import unittest
 
 import pytest
+
+from objutils import dumps
+from objutils import loads
+from objutils import probes
+from objutils.hexfile import MetaRecord
+from objutils.image import Image
 
 
 SIG = b""":B00010A5576F77212044696420796F75207265617B
@@ -42,25 +44,33 @@ S315017FC0003B1879210016C07816C04B10EF87C76C95
 S315017FC01080B74618586CEA2102186280EC808C0042
 """
 
+
 def test_meta_data1():
     img = loads("srec", SREC1)
     assert img.meta == {8: [MetaRecord(format_type=8, address=0, chunk=None)]}
 
+
 def test_meta_data2():
     img = loads("srec", SREC4)
-    assert img.meta == {1: [MetaRecord(format_type=1, address=0, chunk=bytearray(b'sample.s19'))]}
+    assert img.meta == {
+        1: [MetaRecord(format_type=1, address=0, chunk=bytearray(b"sample.s19"))]
+    }
+
 
 class TestRoundtrip(unittest.TestCase):
-
     def testLoadsWorks(self):
         image = Image()
-        image.insert_section("Wow! Did you really go through al that trouble to read this?", 0xb000)
+        image.insert_section(
+            "Wow! Did you really go through al that trouble to read this?", 0xB000
+        )
         image.join_sections()
-        self.assertEqual(dumps("srec", image, record_type = 1, s5record = False, start_address = 0x0000), SREC1)
+        self.assertEqual(
+            dumps("srec", image, record_type=1, s5record=False, start_address=0x0000),
+            SREC1,
+        )
 
 
 class Test19Probe(unittest.TestCase):
-
     @pytest.mark.skip
     def testS19ProbeS1(self):
         self.assertEqual(probes(SREC1), "srec")
@@ -75,40 +85,65 @@ class Test19Probe(unittest.TestCase):
 
 
 class TestS19Options(unittest.TestCase):
-
-    def createImage(self, record_type, s5record, start_address = None):
+    def createImage(self, record_type, s5record, start_address=None):
         image = Image()
         image.insert_section(range(10), 0x1000)
         image.join_sections()
-        return dumps("srec", image, record_type = record_type, s5record = s5record, start_address = start_address)
+        return dumps(
+            "srec",
+            image,
+            record_type=record_type,
+            s5record=s5record,
+            start_address=start_address,
+        )
 
     def testS19includeS5RecordS1(self):
-        self.assertEqual(self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB")
+        self.assertEqual(
+            self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB"
+        )
 
     def testS19includeS5RecordS2(self):
-        self.assertEqual(self.createImage(2, True), b"S20E00100000010203040506070809B4\nS504000001FA")
+        self.assertEqual(
+            self.createImage(2, True), b"S20E00100000010203040506070809B4\nS504000001FA"
+        )
 
     def testS19includeS5RecordS3(self):
-        self.assertEqual(self.createImage(3, True), b"S30F0000100000010203040506070809B3\nS50500000001F9")
+        self.assertEqual(
+            self.createImage(3, True),
+            b"S30F0000100000010203040506070809B3\nS50500000001F9",
+        )
 
     def testS19excludeS5RecordS1(self):
         self.assertEqual(self.createImage(1, False), b"S10D100000010203040506070809B5")
 
     def testS19excludeS5RecordS2(self):
-        self.assertEqual(self.createImage(2, False), b"S20E00100000010203040506070809B4")
+        self.assertEqual(
+            self.createImage(2, False), b"S20E00100000010203040506070809B4"
+        )
 
     def testS19excludeS5RecordS3(self):
-        self.assertEqual(self.createImage(3, False), b"S30F0000100000010203040506070809B3")
+        self.assertEqual(
+            self.createImage(3, False), b"S30F0000100000010203040506070809B3"
+        )
 
     def testS19includeStartAddressS1(self):
-        self.assertEqual(self.createImage(1, False, 0x1000), b"S10D100000010203040506070809B5\nS9031000EC")
+        self.assertEqual(
+            self.createImage(1, False, 0x1000),
+            b"S10D100000010203040506070809B5\nS9031000EC",
+        )
 
     def testS19includeStartAddressS2(self):
-        self.assertEqual(self.createImage(2, False, 0x1000), b"S20E00100000010203040506070809B4\nS804001000EB")
+        self.assertEqual(
+            self.createImage(2, False, 0x1000),
+            b"S20E00100000010203040506070809B4\nS804001000EB",
+        )
 
     def testS19includeStartAddressS3(self):
-        self.assertEqual(self.createImage(3, False, 0x1000), b"S30F0000100000010203040506070809B3\nS70500001000EA")
+        self.assertEqual(
+            self.createImage(3, False, 0x1000),
+            b"S30F0000100000010203040506070809B3\nS70500001000EA",
+        )
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     unittest.main()

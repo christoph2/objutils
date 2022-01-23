@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """while the basic option are the same it is currently not intended to be another readelf clone.
 """
 
@@ -31,29 +30,79 @@ __copyright__ = """
 import argparse
 
 from objutils.elf import ElfParser, model
-from objutils.elf.defs import (ELFMachineType, ELF_MACHINE_NAMES, ELF_CLASS_NAMES, ELFType,
-    ELF_TYPE_NAMES, ELF_BYTE_ORDER_NAMES, ELFAbiType)
+from objutils.elf.defs import (
+    ELFMachineType,
+    ELF_MACHINE_NAMES,
+    ELF_CLASS_NAMES,
+    ELFType,
+    ELF_TYPE_NAMES,
+    ELF_BYTE_ORDER_NAMES,
+    ELFAbiType,
+)
+
 
 def main():
 
-    parser = argparse.ArgumentParser(description = 'Display informations about ELF files.')
-    parser.add_argument("elf_file", help = "ELF file") # , nargs = "+"
-    parser.add_argument("-k", dest = 'keepDirectory', action = "store_true", default = False,
-        help = "keep directory; otherwise create db in current directory")
-    parser.add_argument("-l", help = "loglevel [warn | info | error | debug]", dest = "loglevel", type = str, default = "warn")
-    parser.add_argument("-S", "--sections", "--section-headers",  help = "Display the sections' headers.", dest = "sections", action = "store_false")
-    parser.add_argument("-u", help = "Generate UTF-8 encoded output (otherwise Latin-1).", dest = "ucout", action = "store_true")
+    parser = argparse.ArgumentParser(
+        description="Display informations about ELF files."
+    )
+    parser.add_argument("elf_file", help="ELF file")  # , nargs = "+"
+    parser.add_argument(
+        "-k",
+        dest="keepDirectory",
+        action="store_true",
+        default=False,
+        help="keep directory; otherwise create db in current directory",
+    )
+    parser.add_argument(
+        "-l",
+        help="loglevel [warn | info | error | debug]",
+        dest="loglevel",
+        type=str,
+        default="warn",
+    )
+    parser.add_argument(
+        "-S",
+        "--sections",
+        "--section-headers",
+        help="Display the sections' headers.",
+        dest="sections",
+        action="store_false",
+    )
+    parser.add_argument(
+        "-u",
+        help="Generate UTF-8 encoded output (otherwise Latin-1).",
+        dest="ucout",
+        action="store_true",
+    )
 
     args = parser.parse_args()
-    #print("ARGS", args)
+    # print("ARGS", args)
     print("")
 
     ep = ElfParser(args.elf_file)
     print("Class:       {}".format(ELF_CLASS_NAMES.get(ep.ei_class, "*** INVALID ***")))
-    print("Type:        {} [{}]".format(ELFType(ep.e_type).name[3 :], ELF_TYPE_NAMES.get(ep.e_type, "")))
-    print("Machine:     {} [{}]".format(ELFMachineType(ep.e_machine).name[3 : ], ELF_MACHINE_NAMES.get(ep.e_machine, "")))
-    print("Data:        {}".format(ELF_BYTE_ORDER_NAMES.get(ep.ei_data, "*** INVALID ***")))
-    print("OS/ABI       {} / v{}".format(ELFAbiType(ep.ei_osabi).name[9 : ], ep.ei_abiversion))
+    print(
+        "Type:        {} [{}]".format(
+            ELFType(ep.e_type).name[3:], ELF_TYPE_NAMES.get(ep.e_type, "")
+        )
+    )
+    print(
+        "Machine:     {} [{}]".format(
+            ELFMachineType(ep.e_machine).name[3:],
+            ELF_MACHINE_NAMES.get(ep.e_machine, ""),
+        )
+    )
+    print(
+        "Data:        {}".format(
+            ELF_BYTE_ORDER_NAMES.get(ep.ei_data, "*** INVALID ***")
+        )
+    )
+    print(
+        "OS/ABI       {} / v{}".format(
+            ELFAbiType(ep.ei_osabi).name[9:], ep.ei_abiversion
+        )
+    )
 
     sections = ep.query(model.Elf_Section).order_by(model.Elf_Section.index).all()
     print_header("Sections")
@@ -61,8 +110,15 @@ def main():
     print("-" * 79)
     for sec in sections:
         flags = []
-        print("{:25} {:14} {:08x} {:08x} {:06x} {:2}".format(
-            sec.section_name, sec.section_type.name[4 : ], sec.sh_addr, sec.sh_offset, sec.sh_size, sec.sh_addralign)
+        print(
+            "{:25} {:14} {:08x} {:08x} {:06x} {:2}".format(
+                sec.section_name,
+                sec.section_type.name[4:],
+                sec.sh_addr,
+                sec.sh_offset,
+                sec.sh_size,
+                sec.sh_addralign,
+            )
         )
     comment = ep.comment
     if comment:
@@ -74,16 +130,17 @@ def main():
         print("-" * 79)
         print("{:4} {:15} {}".format(note.type, note.name, note.desc))
 
-    #dbSecs = ep.debug_sections()
-    #if dbSecs:
+    # dbSecs = ep.debug_sections()
+    # if dbSecs:
     #    dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
     #    dp.do_abbrevs()
     #    dp.do_mac_info()
     #    dp.do_dbg_info()
 
+
 def print_header(text):
     print("\n{1:}\n{0:}\n{1:}\n".format(text, "=" * len(text)))
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

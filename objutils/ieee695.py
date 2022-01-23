@@ -53,9 +53,9 @@ $FC-$FF     Unused.
 Table 2-1. Initial Bytes of IEEE Elements
 """
 
-SMALL_NUMBER    = 0x7f
-SHORT_STRING    = 0x7f
-COMMAND_CODE    = 0xe0
+SMALL_NUMBER = 0x7F
+SHORT_STRING = 0x7F
+COMMAND_CODE = 0xE0
 
 """
 ASP     = 0xD0    # Current Section PC.
@@ -72,23 +72,23 @@ ASM     = 0xCD    # M-Value.
 ASN     = 0xCE
 """
 
-F1      = 0xF1
-E2      = 0xE2
+F1 = 0xF1
+E2 = 0xE2
 
 ##
 ## Header Part.
 ##
-MB      = 0xE0      # Module Beginning.
-AD      = 0xEC      # Address Descriptor.
+MB = 0xE0  # Module Beginning.
+AD = 0xEC  # Address Descriptor.
 
-ASW0    = 0x00    # Assign Pointer to AD Extension Part.
-ASW1    = 0x01    # Assign Pointer to Environment Part.
-ASW2    = 0x02    # Assign Pointer to Section Part.
-ASW3    = 0x03    # Assign Pointer to External Part.
-ASW4    = 0x04    # Assign Pointer to Debug Part.
-ASW5    = 0x05    # Assign Pointer to Data Part.
-ASW6    = 0x06    # Assign Pointer to Trailer Part.
-ASW7    = 0x07    # Assign Pointer to Module End.
+ASW0 = 0x00  # Assign Pointer to AD Extension Part.
+ASW1 = 0x01  # Assign Pointer to Environment Part.
+ASW2 = 0x02  # Assign Pointer to Section Part.
+ASW3 = 0x03  # Assign Pointer to External Part.
+ASW4 = 0x04  # Assign Pointer to Debug Part.
+ASW5 = 0x05  # Assign Pointer to Data Part.
+ASW6 = 0x06  # Assign Pointer to Trailer Part.
+ASW7 = 0x07  # Assign Pointer to Module End.
 
 
 ASWAssignment = {
@@ -105,9 +105,9 @@ ASWAssignment = {
 ##
 ## AD Extension Part (ASW0).
 ##
-NN      = 0xF0       # Variable Attributes
-ATN     = 0xCE     # Variable Attributes    - F1
-ASN     = 0xCE     # Variable Values    - E2
+NN = 0xF0  # Variable Attributes
+ATN = 0xCE  # Variable Attributes    - F1
+ASN = 0xCE  # Variable Values    - E2
 
 
 ##
@@ -124,80 +124,80 @@ ASN     = 0xE2CE    # Variable Values
 ##
 ## Section Definition Part (ASW2).
 ##
-ST      = 0xE6    # Section Type.
-SA      = 0xE7    # Section Alignment.
-ASS     = 0xD3    # Section Size.   - E2
-ASL     = 0xCC    # Section Base Address.   - E2
-ASR     = 0xD2    # Variable Values.  - E2
-NC      = 0xFB    # Define Context.
-ASA     = 0xC1    # Physical Region Size. - E2
-ASB     = 0xC2    # Physical Region Base Address. - E2
-ASP     = 0xC6    # Mau Size. - E2
-ASF     = 0xC6    # Mau Size. - E2
-ASM     = 0xCD    # M-Value.  - E2
+ST = 0xE6  # Section Type.
+SA = 0xE7  # Section Alignment.
+ASS = 0xD3  # Section Size.   - E2
+ASL = 0xCC  # Section Base Address.   - E2
+ASR = 0xD2  # Variable Values.  - E2
+NC = 0xFB  # Define Context.
+ASA = 0xC1  # Physical Region Size. - E2
+ASB = 0xC2  # Physical Region Base Address. - E2
+ASP = 0xC6  # Mau Size. - E2
+ASF = 0xC6  # Mau Size. - E2
+ASM = 0xCD  # M-Value.  - E2
 
 
 ##
 ## External Part (ASW3).
 ##
-NI      = 0xE8    # Public (External) Symbol.
-ATI     = 0xC9    # Variable Attribute. - F1
-ASI     = 0xC9    # Variable Values.  - E2
-NX      = 0xE9    # External Reference Name.
-ATX     = 0xD8    # External Reference Relocation Information.  - F1
-WX      = 0xF4    # Weak External Reference.
+NI = 0xE8  # Public (External) Symbol.
+ATI = 0xC9  # Variable Attribute. - F1
+ASI = 0xC9  # Variable Values.  - E2
+NX = 0xE9  # External Reference Name.
+ATX = 0xD8  # External Reference Relocation Information.  - F1
+WX = 0xF4  # Weak External Reference.
 
 
 ##
 ## Debug Information Definition Part (ASW4).
 ##
-BB      = 0xF8    # Declare Block Beginning.
-NN      = 0xF0    # Declare Type Name, file name, line numbers, function name, variable names, etc.
-TY      = 0xF2    # Define Type Characteristics.
-ASN     = 0xCE    # Variable Values.  - E2
-ASR     = 0xD2    # Variable Values. - E2
-BE      = 0xF9    # Declare Block End.
+BB = 0xF8  # Declare Block Beginning.
+NN = 0xF0  # Declare Type Name, file name, line numbers, function name, variable names, etc.
+TY = 0xF2  # Define Type Characteristics.
+ASN = 0xCE  # Variable Values.  - E2
+ASR = 0xD2  # Variable Values. - E2
+BE = 0xF9  # Declare Block End.
 
 
 ##
 ## Data Part (ASW5).
 ##
-SB      = 0xE5    # Current Section.
-ASP     = 0xD0    # Current Section PC.   - E2
-LD      = 0xED    # Load Constant MAUs.
-IR      = 0xE3    # Initialize Relocation Base.
-RE      = 0xF7    # Repeat Data.
-ASW     = 0xD7    # Variable Values.  - E2
-LR      = 0xE4    # Load With Relocation.
-LT      = 0xFA    # Load With Translation.
+SB = 0xE5  # Current Section.
+ASP = 0xD0  # Current Section PC.   - E2
+LD = 0xED  # Load Constant MAUs.
+IR = 0xE3  # Initialize Relocation Base.
+RE = 0xF7  # Repeat Data.
+ASW = 0xD7  # Variable Values.  - E2
+LR = 0xE4  # Load With Relocation.
+LT = 0xFA  # Load With Translation.
 
 
 ##
 ## Trailer Part (ASW6).
 ##
-ASG     = 0xC7    # Execution Starting Address.   - E2
+ASG = 0xC7  # Execution Starting Address.   - E2
 
 
 ##
 ## Module End (ASW7).
 ##
-ME      = 0xE1      # Module End.
+ME = 0xE1  # Module End.
 ##Checksum Records - 0xEE, 0xEF
 
 
 ##
 ##  Blocktypes.
 ##
-BB1 = 1     # Type definitions local to a module.
-BB2 = 2     # Type definitions global to all modules.
-BB3 = 3     # A module. A non-separable unit of code, usually the result
-            # of a single compilation, i.e. a Modula-2 module or an Ada package.
-BB4 = 4     # A global subprogram.
-BB5 = 5     # A source file line number block.
-BB6 = 6     # A local (static) subprogram.
-BB10 = 10   # An assembler debugging information block.
-BB11 = 11   # The module portion of a section.
-BB20 = 20   # Library - contains a list of global symbols used in a module.
+BB1 = 1  # Type definitions local to a module.
+BB2 = 2  # Type definitions global to all modules.
+BB3 = 3  # A module. A non-separable unit of code, usually the result
+# of a single compilation, i.e. a Modula-2 module or an Ada package.
+BB4 = 4  # A global subprogram.
+BB5 = 5  # A source file line number block.
+BB6 = 6  # A local (static) subprogram.
+BB10 = 10  # An assembler debugging information block.
+BB11 = 11  # The module portion of a section.
+BB20 = 20  # Library - contains a list of global symbols used in a module.
 
 
 ##
@@ -207,24 +207,21 @@ ObjectFormatTypes = {
     1: "Absolute (not relinkable)",
     2: "Relocatable",
     3: "Loadable",
-    4: "Library"
+    4: "Library",
 }
 
-CaseSensitivity = {
-    1: "case insensitiv",
-    2: "case sensitiv"
-}
+CaseSensitivity = {1: "case insensitiv", 2: "case sensitiv"}
 
 MemoryModel = {
-    0: "tiny",      #Code and data are in the same single 64K segment/page.
-    1: "small",     # Code and data each have a single 64K segment/page.
-    2: "medium",    # Data has a single 64K segment/page, while code has multiple 64K segments/pages.
-    3: "compact",   # Data has multiple 64K segments/pages, while code has a single 64K segment/page.
-    4: "large",     # Both data and code have multiple 64K segments/pages.
-    5: "big",       # Code has multiple 64K segments/pages, while there is a common "near" data area with
-                    # far data areas available; normaly data and stack are together
-    6: "huge",      # All large arrays and structures are in their own section so that
-                    # addressing involves computations (you can have arrays and structures bigger than 64K)
+    0: "tiny",  # Code and data are in the same single 64K segment/page.
+    1: "small",  # Code and data each have a single 64K segment/page.
+    2: "medium",  # Data has a single 64K segment/page, while code has multiple 64K segments/pages.
+    3: "compact",  # Data has multiple 64K segments/pages, while code has a single 64K segment/page.
+    4: "large",  # Both data and code have multiple 64K segments/pages.
+    5: "big",  # Code has multiple 64K segments/pages, while there is a common "near" data area with
+    # far data areas available; normaly data and stack are together
+    6: "huge",  # All large arrays and structures are in their own section so that
+    # addressing involves computations (you can have arrays and structures bigger than 64K)
 }
 
 FunctionsAndOperators = {
@@ -264,19 +261,21 @@ FunctionsAndOperators = {
 
 
 ESCAPEFunctionEncodings = {
-    0 : "reserved",
-    1 : "@ISDEF",
-    2 : "@TRANS",
-    3 : "@SPLIT",
-    4 : "@INBLOCK",
-    5 : "@CALL_OPT",
+    0: "reserved",
+    1: "@ISDEF",
+    2: "@TRANS",
+    3: "@SPLIT",
+    4: "@INBLOCK",
+    5: "@CALL_OPT",
 }
 
 
-class InvalidFormatError(Exception): pass
+class InvalidFormatError(Exception):
+    pass
 
 
-class Info(object): pass
+class Info(object):
+    pass
 
 
 class DebugInformation(object):
@@ -290,7 +289,7 @@ class DebugInformation(object):
 class Section(object):
     def __init__(self, sectionType, sectionName, parentSectionIndex):
         self.sectionType = sectionType
-        self.sectionName =  sectionName
+        self.sectionName = sectionName
         self.parentSectionIndex = parentSectionIndex
         self.regionSize = []
         self.physicalAddress = []
@@ -301,14 +300,13 @@ class Section(object):
 
 
 class Reader(object):
-
     def __init__(self, inFile):
-        if not hasattr(inFile, 'read'):
+        if not hasattr(inFile, "read"):
             raise TypeError("Need a file-like object.")
         self.logger = Logger("IEEE695")
         self.inFile = inFile
         self.info = Info()
-        self.info.ASWs={}
+        self.info.ASWs = {}
         self.fpos = 0
         self.blockType = []
         self.finished = False
@@ -324,7 +322,7 @@ class Reader(object):
         self.diParents = [diRoot]
         self.currentSection = None
         self.currentSectionIndex = None
-    ####
+        ####
         self._nb = 0
         self.dbCollection = bytearray()
 
@@ -367,17 +365,15 @@ class Reader(object):
             else:
                 raise NotImplementedError("0x{0:02X}".format(cc))
 
-
     def setCurrentSectionIndex(self, index):
         self.currentSectionIndex = index
 
     def checkSectionIndex(self, index):
-        if  self.currentSectionIndex is None:
+        if self.currentSectionIndex is None:
             print("No current Section Index.")
         elif self.currentSectionIndex != index:
             print
             print("Invalid Section Index.")
-
 
     def readByte(self, offset):
         "Read 8bit quantity"
@@ -415,10 +411,10 @@ class Reader(object):
         if typecode <= SHORT_STRING:
             # length: [0..127]
             length = typecode
-        elif typecode == 0xde:
+        elif typecode == 0xDE:
             # length: [0..255]
             length = self.readByte(offset + 1)
-        elif typecode == 0xdf:
+        elif typecode == 0xDF:
             # length: [0..65535]
             length = self.readWord(offset + 1)
         else:
@@ -429,25 +425,25 @@ class Reader(object):
 
     def readCharacter(self, offset):
         result = chr(self.readByte(offset) - 0x80)
-        if ord(result) > ord('Z'):
+        if ord(result) > ord("Z"):
             result = None
         return result
 
-    def checkOptional(self, offset, isString = False):
+    def checkOptional(self, offset, isString=False):
         "Read and maybe putback"
         cc = self.readByte(offset)
         if cc >= COMMAND_CODE:
-            self.inFile.seek(offset, os.SEEK_SET)   # Put back.
+            self.inFile.seek(offset, os.SEEK_SET)  # Put back.
             self.fpos = offset
             return None
         if isString == True:
-            self.inFile.seek(offset, os.SEEK_SET)   # Put back.
+            self.inFile.seek(offset, os.SEEK_SET)  # Put back.
             self.fpos = offset
             return self.readString(offset)
         else:
             if 0xC0 <= cc <= 0xDA:
                 result = chr(cc - 0x80)
-                if ord(result) > ord('Z'):
+                if ord(result) > ord("Z"):
                     result = None
             else:
                 return self.readNumber(offset)
@@ -458,15 +454,19 @@ class Reader(object):
     def symbolByIndex(self, index):
         pass
 
-################################
-################################
-################################
+    ################################
+    ################################
+    ################################
     def onModuleBegin(self):
         "{$E0}{Id1}{Id2}"
         self.info.processor = self.readString(self.fpos)
         self.info.module = self.readString(self.fpos)
 
-        self.logger.debug("PROCESSOR: '{0!s}' MODULE: '{1!s}'.".format(self.info.processor, self.info.module))
+        self.logger.debug(
+            "PROCESSOR: '{0!s}' MODULE: '{1!s}'.".format(
+                self.info.processor, self.info.module
+            )
+        )
 
     def onAD(self):
         "$EC}{n1}{n2}[a]"
@@ -489,7 +489,11 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionSize = self.readNumber(self.fpos)
-            self.logger.debug("Section-Size: 0x{0:04x}".format(self.sections[sectionIndex].sectionSize))
+            self.logger.debug(
+                "Section-Size: 0x{0:04x}".format(
+                    self.sections[sectionIndex].sectionSize
+                )
+            )
         elif discr == ASA:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -497,7 +501,9 @@ class Reader(object):
         elif discr == ASB:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
-            self.sections[sectionIndex].physicalAddress.append(self.readNumber(self.fpos))
+            self.sections[sectionIndex].physicalAddress.append(
+                self.readNumber(self.fpos)
+            )
         elif discr == ASR:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -506,12 +512,18 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].mauSize = self.readNumber(self.fpos)
-            self.logger.debug("MAU-Size: 0x{0:04x}".format(self.sections[sectionIndex].mauSize))
+            self.logger.debug(
+                "MAU-Size: 0x{0:04x}".format(self.sections[sectionIndex].mauSize)
+            )
         elif discr == ASL:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionBaseAddr = self.readNumber(self.fpos)
-            self.logger.debug("Section-BaseAddr: 0x{0:04x}".format(self.sections[sectionIndex].sectionBaseAddr))
+            self.logger.debug(
+                "Section-BaseAddr: 0x{0:04x}".format(
+                    self.sections[sectionIndex].sectionBaseAddr
+                )
+            )
         elif discr == ASM:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -526,17 +538,19 @@ class Reader(object):
             symbolNameIndex = self.readNumber(self.fpos)
             symbolTypeIndex = self.readNumber(self.fpos)
         elif discr == ASP:
-            sectionIndex = self.readNumber(self.fpos)   #? check sec-Index!!?
+            sectionIndex = self.readNumber(self.fpos)  # ? check sec-Index!!?
             newValue = self.readNumber(self.fpos)
         elif discr == ASG:
             delim = self.readByte(self.fpos)
             if delim != 0xBE:
-                pass    # todo: FormatError!!!
+                pass  # todo: FormatError!!!
             executionStartingAddr = self.readNumber(self.fpos)
-            self.logger.debug("STARTING-ADDRESS: 0x{0:04X}".format(executionStartingAddr))
+            self.logger.debug(
+                "STARTING-ADDRESS: 0x{0:04X}".format(executionStartingAddr)
+            )
             delim = self.readByte(self.fpos)
             if delim != 0xBF:
-                pass    # todo: FormatError!!!
+                pass  # todo: FormatError!!!
             self.info.executionStartingAddr = executionStartingAddr
         else:
             raise NotImplementedError(hex(discr))
@@ -550,7 +564,7 @@ class Reader(object):
         self.nnRecords[symbolType].name = symbolName
         self.nnRecords[symbolType].atn = {}
 
-        #self.logger.debug("Symbol-Type: 0x%02x Name: '%s'" % (symbolType, symbolName))
+        # self.logger.debug("Symbol-Type: 0x%02x Name: '%s'" % (symbolType, symbolName))
 
     def onNX(self):
         "{$E9}{n1}{Id}"
@@ -569,33 +583,35 @@ class Reader(object):
 
     def onF1(self):
         """
-            ATI     = 0xF1C9    # Variable Attribute.
-            ATX     = 0xF1D8    # External Reference Relocation Information.
-            ATN     = 0xF1CE    # Variable Attributes.
+        ATI     = 0xF1C9    # Variable Attribute.
+        ATX     = 0xF1D8    # External Reference Relocation Information.
+        ATN     = 0xF1CE    # Variable Attributes.
         """
         discr = self.readByte(self.fpos)
         if discr == ATI:
             numberOfElements = 0
             symbolNameIndex = self.readNumber(self.fpos)
-            symbolTypeIndex =self.readNumber(self.fpos)
-            attrDef =self.readNumber(self.fpos)
+            symbolTypeIndex = self.readNumber(self.fpos)
+            attrDef = self.readNumber(self.fpos)
             if attrDef == 8:
                 pass
             elif attrDef == 16:
                 symbolClass = self.readNumber(self.fpos)
-                publicLocalIndicator =  self.checkOptional(self.fpos)
+                publicLocalIndicator = self.checkOptional(self.fpos)
                 numericValue = self.checkOptional(self.fpos)
                 stringValue = self.checkOptional(self.fpos)
 
                 self.symbols[symbolNameIndex].symbolClass = symbolClass
-                self.symbols[symbolNameIndex].publicLocalIndicator = publicLocalIndicator
+                self.symbols[
+                    symbolNameIndex
+                ].publicLocalIndicator = publicLocalIndicator
                 self.symbols[symbolNameIndex].numericValue = numericValue
                 self.symbols[symbolNameIndex].stringValue = stringValue
             elif attrDef == 19:
                 pass
             else:
-                pass    # todo: FormatError!!!
-##            n4 =self.readNumber(self.fpos) # If n2 is non-zero, number of elements in the symbol type specified in n2
+                pass  # todo: FormatError!!!
+            ##            n4 =self.readNumber(self.fpos) # If n2 is non-zero, number of elements in the symbol type specified in n2
             if symbolTypeIndex != 0:
                 numberOfElements = self.readNumber(self.fpos)
             self.symbols[symbolNameIndex].symbolTypeIndex = symbolTypeIndex
@@ -608,19 +624,21 @@ class Reader(object):
             shortExternalFlag = self.readNumber(self.fpos)
             self.externalSymbols[externalReferenceIndex].typeIndex = typeIndex
             self.externalSymbols[externalReferenceIndex].sectionIndex = sectionIndex
-            self.externalSymbols[externalReferenceIndex].shortExternalFlag = shortExternalFlag
+            self.externalSymbols[
+                externalReferenceIndex
+            ].shortExternalFlag = shortExternalFlag
         elif discr == ATN:  # todo: onATN
             symbolNameIndex = self.readNumber(self.fpos)
-            symbolTypeIndex =self.readNumber(self.fpos)
-            attrDef =self.readNumber(self.fpos)
+            symbolTypeIndex = self.readNumber(self.fpos)
+            attrDef = self.readNumber(self.fpos)
             if attrDef == 1:
                 stackOffset = self.readNumber(self.fpos)
             elif attrDef == 2:
                 registerIndex = self.readNumber(self.fpos)
             elif attrDef == 3:
                 pass
-#            elif attrDef == 4:
-#                pass
+            #            elif attrDef == 4:
+            #                pass
             elif attrDef == 7:
                 lineNumber = self.readNumber(self.fpos)
                 columnNumber = self.readNumber(self.fpos)
@@ -635,18 +653,22 @@ class Reader(object):
             elif attrDef == 10:
                 registerIndex = self.readNumber(self.fpos)
                 frameOffset = self.readNumber(self.fpos)
-#            elif attrDef == 11:
-#                pass
+            #            elif attrDef == 11:
+            #                pass
             elif attrDef == 19:
                 numberOfElements = self.readNumber(self.fpos)
                 localGlobal = self.checkOptional(self.fpos)
             elif attrDef == 37:
                 self.info.objectFormatVersionNumber = self.readNumber(self.fpos)
-                self.info.objectFormatRevisionLevel  = self.readNumber(self.fpos)
+                self.info.objectFormatRevisionLevel = self.readNumber(self.fpos)
             elif attrDef == 38:
-                self.info.objectFormatType=ObjectFormatTypes[self.readNumber(self.fpos)]
+                self.info.objectFormatType = ObjectFormatTypes[
+                    self.readNumber(self.fpos)
+                ]
             elif attrDef == 39:
-                self.info.symbolCaseSensitivity = CaseSensitivity[self.readNumber(self.fpos)]
+                self.info.symbolCaseSensitivity = CaseSensitivity[
+                    self.readNumber(self.fpos)
+                ]
             elif attrDef == 40:
                 self.info.memoryModel = MemoryModel[self.readNumber(self.fpos)]
             elif attrDef == 50:
@@ -656,7 +678,9 @@ class Reader(object):
                 hour = self.readNumber(self.fpos)
                 minute = self.readNumber(self.fpos)
                 second = self.readNumber(self.fpos)
-                self.info.creationDate = datetime(year, month, day, hour, minute, second)
+                self.info.creationDate = datetime(
+                    year, month, day, hour, minute, second
+                )
             elif attrDef == 51:
                 self.info.commandLine = self.readString(self.fpos)
             elif attrDef == 52:
@@ -667,7 +691,9 @@ class Reader(object):
                 tool = self.readNumber(self.fpos)
                 version = self.readNumber(self.fpos)
                 revision = self.readNumber(self.fpos)
-                revisionLevel = self.checkOptional(self.fpos)   # single IEEE-695 letter in the range $C1-$DA
+                revisionLevel = self.checkOptional(
+                    self.fpos
+                )  # single IEEE-695 letter in the range $C1-$DA
             elif attrDef == 55:
                 self.info.comments = self.readString(self.fpos)
             elif attrDef == 64:
@@ -687,36 +713,38 @@ class Reader(object):
         sectionIndex = self.readByte(self.fpos)
         self.setCurrentSectionIndex(sectionIndex)
         f = self.readCharacter(self.fpos)
-        if f == 'A':
+        if f == "A":
             s, t = self.readCharacter(self.fpos), self.readCharacter(self.fpos)
             sectionType = f + s + t
-        elif f == 'B':
+        elif f == "B":
             pass
-        elif f == 'C':
+        elif f == "C":
             pass
-        elif f == 'E':
-            pass # todo: 'EA' / 'EZ' !!!
-        elif f == 'M':
+        elif f == "E":
+            pass  # todo: 'EA' / 'EZ' !!!
+        elif f == "M":
             pass
-        elif f == 'T':
+        elif f == "T":
             pass
-        #todo: 'ZC' / 'ZM'.
+        # todo: 'ZC' / 'ZM'.
         else:
             raise NotImplementedError("SEG-TYPE: {0!s}".format(f))
 
         sectionName = self.readString(self.fpos)
         parentSectionIndex = self.checkOptional(self.fpos)
 
-        if f == 'T':
+        if f == "T":
             brotherSectionIndex = self.readNumber(self.fpos)
 
-        if f in ('B', 'T'):
+        if f in ("B", "T"):
             contextIndex = self.readNumber(self.fpos)
 
-        self.sections[sectionIndex] = Section(sectionType, sectionName, parentSectionIndex)
+        self.sections[sectionIndex] = Section(
+            sectionType, sectionName, parentSectionIndex
+        )
         self.logger.debug("SECTION [{0!s}:{1!s}]".format(sectionType, sectionName))
         # SA, ASA, ASB, ASF, ASL, ASM, ASR, and ASS records must appear after the ST record they refer to.
-        '''
+        """
         ASP absolute code
         ASR absolute ROM data
         ASD absolute data
@@ -732,7 +760,7 @@ class Reader(object):
         ZCP  short code
         ZCR  short ROM data
         ZCD  short data
-        '''
+        """
 
     def onNC(self):
         "{$FB}{n1}{Id}"
@@ -746,7 +774,7 @@ class Reader(object):
         self.checkSectionIndex(sectionIndex)
         boundaryAlignmentDivisor = self.checkOptional(self.fpos)
         self.sections[sectionIndex].boundaryAlignment = 2 ** boundaryAlignmentDivisor
-        self.sections[sectionIndex].pageSize  = self.checkOptional(self.fpos)
+        self.sections[sectionIndex].pageSize = self.checkOptional(self.fpos)
 
     def onNI(self):
         "{$E8}{n}{Id}"
@@ -756,7 +784,7 @@ class Reader(object):
         info.nameIndex = nameIndex
         info.symbolName = symbolName
         self.symbols[nameIndex] = info
-        self.logger.debug("SYMBOL: {0!s}".format(symbolName)) # followed by ASI.
+        self.logger.debug("SYMBOL: {0!s}".format(symbolName))  # followed by ASI.
 
     def onBB(self):
         blockType = self.readByte(self.fpos)
@@ -794,10 +822,10 @@ class Reader(object):
             info.typeIndexOfReturnValue = typeIndexOfReturnValue
             info.offsetExpr = offsetExpr
             info.name = "BB4"
-        elif blockType ==  BB5:
+        elif blockType == BB5:
             self.blockType.append(5)
             sourceFilename = self.readString(self.fpos)
-            year = self.checkOptional(self.fpos)    # todo: factor-out (namedtuple)!!!
+            year = self.checkOptional(self.fpos)  # todo: factor-out (namedtuple)!!!
             month = self.checkOptional(self.fpos)
             day = self.checkOptional(self.fpos)
             hour = self.checkOptional(self.fpos)
@@ -811,7 +839,7 @@ class Reader(object):
             info.minute = minute
             info.second = second
             info.name = "BB5"
-        elif blockType ==  BB6:
+        elif blockType == BB6:
             self.blockType.append(6)
             functionName = self.readString(self.fpos)
             stackRequired = self.readNumber(self.fpos)
@@ -827,7 +855,7 @@ class Reader(object):
             module_name = self.readString(self.fpos)
             objFileName = self.readString(self.fpos)
             toolType = self.readNumber(self.fpos)
-            versionRevision = self.checkOptional(self.fpos, isString = True)
+            versionRevision = self.checkOptional(self.fpos, isString=True)
             year = self.checkOptional(self.fpos)
             month = self.checkOptional(self.fpos)
             day = self.checkOptional(self.fpos)
@@ -845,13 +873,13 @@ class Reader(object):
             info.minute = minute
             info.second = second
             info.name = "BB10"
-        elif blockType ==  BB11:
+        elif blockType == BB11:
             self.blockType.append(11)
             zeroLengthName = self.readString(self.fpos)
             sectionType = self.readNumber(self.fpos)
             sectionIndex = self.readNumber(self.fpos)
             offsetExpr = self.readNumber(self.fpos)
-            dummy = self.readByte(self.fpos)   # $90 - Comma operator!!!
+            dummy = self.readByte(self.fpos)  # $90 - Comma operator!!!
             sectionMapping = self.readNumber(self.fpos)
             info.zeroLengthName = zeroLengthName
             info.sectionType = sectionType
@@ -860,27 +888,27 @@ class Reader(object):
             info.dummy = dummy
             info.sectionMapping = sectionMapping
             info.name = "BB11"
-        elif blockType ==  BB20:
+        elif blockType == BB20:
             self.blockType.append(20)
-            raise NotImplementedError('BB20')
+            raise NotImplementedError("BB20")
         parent = self.diParents[-1]
         parent.add(info)
         self.diParents.append(info)
-        #self.logger.debug(" " * len(self.diParents), "BB{0:d}".format(blockType))
+        # self.logger.debug(" " * len(self.diParents), "BB{0:d}".format(blockType))
 
     def onBE(self):
         blockType = self.blockType.pop()
         self.diParents.pop()
-        if  blockType in (4, 6):
+        if blockType in (4, 6):
             functionEndAddr = self.readNumber(self.fpos)
         elif blockType == 11:
             moduleSectionSize = self.checkOptional(self.fpos)
 
     def onTY(self):
-        ""
+        """"""
         typeIndex = self.readNumber(self.fpos)
         if self.readByte(self.fpos) != 0xCE:
-            pass    # todo: raise FormatError!!
+            pass  # todo: raise FormatError!!
         localNameIndex = self.readNumber(self.fpos)
         values = []
         while True:
@@ -894,9 +922,11 @@ class Reader(object):
         "{$E5}{n1}"
         sectionIndex = self.readNumber(self.fpos)
         sec = self.sections[sectionIndex]
-        self.logger.debug("Data for section: '{0!s}'. {1:d} bytes of data to follow.".format(
-            sec.sectionName, sec.sectionSize
-        ))
+        self.logger.debug(
+            "Data for section: '{0!s}'. {1:d} bytes of data to follow.".format(
+                sec.sectionName, sec.sectionSize
+            )
+        )
 
     def onLD(self):
         "{$ED}{n1}{...}"
@@ -904,13 +934,11 @@ class Reader(object):
         data = self.inFile.read((numberOfMAUs * self.info.numberOfBits) / 8)
         self.logger.debug("reading {0:d} bytes".format(len(data)))
 
-
         # SB ASP LD
         self._nb += len(data)
         self.dbCollection.extend(data)
 
         self.fpos = self.inFile.tell()
-
 
     def onME(self):
         "Module End Record Type"
@@ -944,4 +972,3 @@ Negative numbers have these characteristics:
       representable number (e.g., {$84}{$FF}{$FF}{$FF}{$FF} is -1 for 32-bit and smaller processors).
 
 """
-

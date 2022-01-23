@@ -30,38 +30,41 @@ import unittest
 from objutils import dumps, load, loads
 
 
-TEST2 = b''':100000004578616D706C65207769746820616E2039
+TEST2 = b""":100000004578616D706C65207769746820616E2039
 :0B0010006164647265737320676170A7
 :101000004865726520697320612067617020696E90
 :1010100020746865206D656D6F727920616C6C6FEE
 :06102000636174696F6E4C
 :00000001FF
-'''
+"""
 
-TEST3 = b''':020000022BC011
+TEST3 = b""":020000022BC011
 :1012340054686973207061727420697320696E2028
 :0D12440061206C6F77207365676D656E74B7
 :020000027F007D
 :1080000054686973207061727420697320696E20EE
 :108010007468652068696768207365676D656E744C
 :00000001FF
-'''
+"""
 
 TEST4 = b""":0D00000048656C6C6F2C20576F726C640AA1
 :00000001FF"""
 
 
 class TestIHex(unittest.TestCase):
-
     def testAddressGapFromString(self):
         data = loads("ihex", TEST2)
-        self.assertEqual(data.sections[0].data, b'Example with an address gap')
-        self.assertEqual(data.sections[1].data, b'Here is a gap in the memory allocation')
+        self.assertEqual(data.sections[0].data, b"Example with an address gap")
+        self.assertEqual(
+            data.sections[1].data, b"Here is a gap in the memory allocation"
+        )
 
     def testAddressGapFromFileLike(self):
         data = load("ihex", io.BytesIO(TEST2))
-        self.assertEqual(data.sections[0].data, b'Example with an address gap')
-        self.assertEqual(data.sections[1].data, b'Here is a gap in the memory allocation')
+        self.assertEqual(data.sections[0].data, b"Example with an address gap")
+        self.assertEqual(
+            data.sections[1].data, b"Here is a gap in the memory allocation"
+        )
 
     def testRoundtripFromString(self):
         dataIn = loads("ihex", TEST2)
@@ -69,10 +72,11 @@ class TestIHex(unittest.TestCase):
         self.assertEqual(dataOut, TEST2)
 
     def testRoundtripFromFileLike(self):
-        #pass
+        # pass
         dataIn = load("ihex", io.BytesIO(TEST2))
         dataOut = dumps("ihex", dataIn)
         self.assertEqual(dataOut, TEST2)
+
 
 S19_16 = """S1130100000102030405060708090A0B0C0D0E0F73
 S1130110101112131415161718191A1B1C1D1E1F63
@@ -102,7 +106,7 @@ S31500200020202122232425262728292A2B2C2D2E2F32
 S31500200030303132333435363738393A3B3C3D3E3F22
 """
 
-IHEX_16 =  b""":10010000000102030405060708090A0B0C0D0E0F77
+IHEX_16 = b""":10010000000102030405060708090A0B0C0D0E0F77
 :10011000101112131415161718191A1B1C1D1E1F67
 :10012000202122232425262728292A2B2C2D2E2F57
 :10013000303132333435363738393A3B3C3D3E3F47
@@ -139,8 +143,8 @@ IHEX_32 = b""":020000040010EA
 :00000001FF
 """
 
-class TestIHexrecord_types(unittest.TestCase):
 
+class TestIHexrecord_types(unittest.TestCase):
     def test16Bit(self):
         dataIn = loads("srec", S19_16)
         dataOut = dumps("ihex", dataIn)
@@ -160,6 +164,6 @@ class TestIHexrecord_types(unittest.TestCase):
 def main():
     unittest.main()
 
-if __name__=='__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

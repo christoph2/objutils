@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Package entry-point.
 
 Registers CODECS and implements an interface to them.
@@ -59,21 +58,58 @@ import objutils.shf
 from objutils.image import Image
 from objutils.section import Section
 
-registry.register('bin', objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
-registry.register('binzip', objutils.binfile.BinZipReader, objutils.binfile.BinZipWriter, "Zipped binary format.")
-registry.register('sig', objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
-registry.register('srec', objutils.srec.Reader, objutils.srec.Writer, "Motorola S-Records (a.k.a. S19).")
-registry.register('titxt', objutils.titxt.Reader, objutils.titxt.Writer, "Texas Instruments MSP430 text format.")
-registry.register('emon52', objutils.emon52.Reader, objutils.emon52.Writer, "Elektor Monitor (EMON52) file format.")
-registry.register('etek', objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
-registry.register('fpc', objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
-registry.register('ihex', objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
-registry.register('mostec', objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
-registry.register('rca', objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
-registry.register('tek', objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
-registry.register('cosmac', objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
-registry.register('ash', objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
-registry.register('shf', objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
+registry.register(
+    "bin", objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format."
+)
+registry.register(
+    "binzip",
+    objutils.binfile.BinZipReader,
+    objutils.binfile.BinZipWriter,
+    "Zipped binary format.",
+)
+registry.register("sig", objutils.sig.Reader, objutils.sig.Writer, "Signetics format.")
+registry.register(
+    "srec",
+    objutils.srec.Reader,
+    objutils.srec.Writer,
+    "Motorola S-Records (a.k.a. S19).",
+)
+registry.register(
+    "titxt",
+    objutils.titxt.Reader,
+    objutils.titxt.Writer,
+    "Texas Instruments MSP430 text format.",
+)
+registry.register(
+    "emon52",
+    objutils.emon52.Reader,
+    objutils.emon52.Writer,
+    "Elektor Monitor (EMON52) file format.",
+)
+registry.register(
+    "etek", objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format."
+)
+registry.register(
+    "fpc", objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format."
+)
+registry.register(
+    "ihex", objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format."
+)
+registry.register(
+    "mostec", objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format."
+)
+registry.register("rca", objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
+registry.register("tek", objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
+registry.register(
+    "cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format."
+)
+registry.register(
+    "ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats."
+)
+registry.register(
+    "shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149)."
+)
+
 
 def load(codec_name, *args, **kws):
     """Load hex data from file.
@@ -89,6 +125,7 @@ def load(codec_name, *args, **kws):
     """
     return registry.get(codec_name).Reader().load(*args, **kws)
 
+
 def loads(codec_name, *args, **kws):
     """Load hex data from bytes.
 
@@ -103,6 +140,7 @@ def loads(codec_name, *args, **kws):
     """
 
     return registry.get(codec_name).Reader().loads(*args, **kws)
+
 
 def probe(*args, **kws):
     """Try to guess codec from file.
@@ -125,6 +163,7 @@ def probe(*args, **kws):
             break
     return reader.codec_name if found else None
 
+
 def probes(*args, **kws):
     """Try to guess codec from bytes.
 
@@ -146,6 +185,7 @@ def probes(*args, **kws):
             break
     return reader.codec_name if found else None
 
+
 def dump(codec_name, *args, **kws):
     """Save hex data to file.
 
@@ -160,6 +200,7 @@ def dump(codec_name, *args, **kws):
     """
 
     registry.get(codec_name).Writer().dump(*args, **kws)
+
 
 def dumps(codec_name, *args, **kws):
     """Save hex data to bytes.

@@ -37,22 +37,26 @@ def ffs(v: int) -> int:
     if v == 0:
         return 0
     res = 0
-    while (not (v & 1)):
+    while not (v & 1):
         v >>= 1
         res += 1
     return res
 
-def slicer(iterable, sliceLength, converter = None):
+
+def slicer(iterable, sliceLength, converter=None):
     if converter is None:
         converter = type(iterable)
     length = len(iterable)
-    return [converter((iterable[item : item + sliceLength])) for item in range(0, length, sliceLength)]
+    return [
+        converter((iterable[item : item + sliceLength]))
+        for item in range(0, length, sliceLength)
+    ]
 
 
 def make_list(*args):
     result = []
     for arg in args:
-        if hasattr(arg, '__iter__'):
+        if hasattr(arg, "__iter__"):
             result.extend(list(arg))
         else:
             result.append(arg)
@@ -62,7 +66,7 @@ def make_list(*args):
 def int_to_array(value):
     result = []
     while value:
-        result.append(value & 0xff)
+        result.append(value & 0xFF)
         value >>= 8
     if result:
         return list(reversed(result))
@@ -85,10 +89,12 @@ class Curry:
         return self.fun(*(self.pending + args), **kw)
 
 
-identity = lambda self,x: x
+identity = lambda self, x: x
+
 
 def get_python_version():
     return sys.version_info
+
 
 PYTHON_VERSION = get_python_version()
 
@@ -99,44 +105,47 @@ else:
         from cStringIO import StringIO
     except ImportError:
         from StringIO import StringIO
-        #from io import TextIOWrapper as StringIO
-        #io.TextIOWrapper(create_string_buffer())
+
+        # from io import TextIOWrapper as StringIO
+        # io.TextIOWrapper(create_string_buffer())
 
 
 def create_string_buffer(*args):
-    """Create a string with file-like behaviour (StringIO on Python 2.x).
-    """
+    """Create a string with file-like behaviour (StringIO on Python 2.x)."""
     buf = StringIO(*args)
     return buf
 
+
 def bin_extractor(fname, offset, length):
-    """Extract a junk of data from a file.
-    """
+    """Extract a junk of data from a file."""
     fp = open(fname)
     fp.seek(offset)
     data = fp.read(length)
     return data
 
+
 CYG_PREFIX = "/cygdrive/"
+
 
 def cygpath_to_win(path):
     if path.startswith(CYG_PREFIX):
-        path = path[len(CYG_PREFIX) : ]
+        path = path[len(CYG_PREFIX) :]
         drive_letter = "{0}:\\".format(path[0])
-        path = path[2 : ].replace("/", "\\")
+        path = path[2:].replace("/", "\\")
         path = "{0}{1}".format(drive_letter, path)
     return path
 
 
 import ctypes
 
+
 class StructureWithEnums(ctypes.Structure):
-    """Add missing enum feature to ctypes Structures.
-    """
+    """Add missing enum feature to ctypes Structures."""
+
     _map = {}
 
     def __getattribute__(self, name):
-        _map = ctypes.Structure.__getattribute__(self, '_map')
+        _map = ctypes.Structure.__getattribute__(self, "_map")
         value = ctypes.Structure.__getattribute__(self, name)
         if name in _map:
             EnumClass = _map[name]
@@ -155,20 +164,26 @@ class StructureWithEnums(ctypes.Structure):
             if attr in self._map:
                 attrType = self._map[attr]
             value = getattr(self, attr)
-            result.append("    {0} [{1}] = {2!r};".format(attr, attrType.__name__, value))
+            result.append(
+                "    {0} [{1}] = {2!r};".format(attr, attrType.__name__, value)
+            )
         result.append("};")
-        return '\n'.join(result)
+        return "\n".join(result)
 
     __repr__ = __str__
 
 
 import subprocess
 
+
 class CommandError(Exception):
     pass
 
+
 def runCommand(cmd):
-    proc = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    proc = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     result = proc.communicate()
     proc.wait()
     if proc.returncode:
@@ -181,10 +196,10 @@ class SingletonBase(object):
 
     def __new__(cls, *args, **kws):
         # Double-Checked Locking
-        if not hasattr(cls, '_instance'):
+        if not hasattr(cls, "_instance"):
             try:
                 cls._lock.acquire()
-                if not hasattr(cls, '_instance'):
+                if not hasattr(cls, "_instance"):
                     cls._instance = super(SingletonBase, cls).__new__(cls)
             finally:
                 cls._lock.release()
@@ -215,11 +230,17 @@ class RepresentationMixIn(object):
 
 import mmap
 
-def create_memorymapped_fileview(filename, writeable = False):
+
+def create_memorymapped_fileview(filename, writeable=False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
     if six.PY3:
-        return memoryview(mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
+        return memoryview(
+            mmap.mmap(
+                fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ
+            )
+        )
     else:
-        return mmap.mmap(fd, size, access = mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ)
-
+        return mmap.mmap(
+            fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ
+        )

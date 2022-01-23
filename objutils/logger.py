@@ -31,10 +31,10 @@ import logging
 
 class Logger(object):
 
-    LOGGER_BASE_NAME = 'objutils'
+    LOGGER_BASE_NAME = "objutils"
     FORMAT = "[%(levelname)s (%(name)s)]: %(message)s"
 
-    def __init__(self, name, level = logging.WARN):
+    def __init__(self, name, level=logging.WARN):
         self.logger = logging.getLogger("{0}.{1}".format(self.LOGGER_BASE_NAME, name))
         self.logger.setLevel(level)
         handler = logging.StreamHandler()
@@ -87,4 +87,3 @@ class Logger(object):
         if isinstance(level, str):
             level = LEVEL_MAP.get(level.upper(), logging.WARN)
         self.logger.setLevel(level)
-

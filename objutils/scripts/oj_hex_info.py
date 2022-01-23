@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Displays informations about HEX files.
 """
 
@@ -34,15 +33,40 @@ import sys
 
 from objutils import load
 
+
 def main():
 
-    parser = argparse.ArgumentParser(description = 'Displays informations about HEX files.')
-    parser.add_argument("file_type", help = "file type", choices = [
-        'ash', 'cosmac', 'emon52', 'etek', 'fpc', "ihex", 'mostec', 'rca', 'shf', 'sig', "srec", 'tek', 'titxt'
-    ])
-    parser.add_argument("hex_file", help = "HEX file")
-    parser.add_argument("-d", '--dump', dest = 'dump', action = "store_true", default = False,
-        help = "hexdump contents")
+    parser = argparse.ArgumentParser(
+        description="Displays informations about HEX files."
+    )
+    parser.add_argument(
+        "file_type",
+        help="file type",
+        choices=[
+            "ash",
+            "cosmac",
+            "emon52",
+            "etek",
+            "fpc",
+            "ihex",
+            "mostec",
+            "rca",
+            "shf",
+            "sig",
+            "srec",
+            "tek",
+            "titxt",
+        ],
+    )
+    parser.add_argument("hex_file", help="HEX file")
+    parser.add_argument(
+        "-d",
+        "--dump",
+        dest="dump",
+        action="store_true",
+        default=False,
+        help="hexdump contents",
+    )
 
     args = parser.parse_args()
 
@@ -51,7 +75,7 @@ def main():
         sys.exit(1)
 
     img = load(args.file_type.lower(), args.hex_file)
-    #print(img.meta)
+    # print(img.meta)
     print("\nSections")
     print("--------\n")
     print("Num   Address    Length")
@@ -63,6 +87,6 @@ def main():
     if args.dump:
         img.hexdump()
 
+
 if __name__ == "__main__":
     main()
-

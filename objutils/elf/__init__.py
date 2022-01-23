@@ -39,10 +39,9 @@ from construct import Adapter, Array, CString, Const, Enum, IfThenElse, Padding,
 from construct import BitStruct, BitsInteger, Bytes, Construct, this
 from construct import Computed, Pass, Tell, Union, singleton
 from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
-from construct import         Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
+from construct import Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
 
-from sqlalchemy import (func, not_
-)
+from sqlalchemy import func, not_
 
 from objutils import Image, Section
 from objutils.utils import create_memorymapped_fileview
@@ -50,7 +49,7 @@ from objutils.elf import defs, model
 from objutils.elf.arm import attributes
 
 
-MAGIC = b'\x7fELF'
+MAGIC = b"\x7fELF"
 
 
 @singleton
@@ -64,26 +63,33 @@ class Pass2(Construct):
         >>> Pass.sizeof()
         0
     """
+
     def __init__(self):
         super().__init__()
         self.flagbuildnone = True
+
     def _parse(self, stream, context, path):
         return None
+
     def _build(self, obj, stream, context, path):
         pass
+
     def _sizeof(self, context, path):
         return 0
 
+
 Test = Struct(
-    "ei_version"  / Enum(Int8ul, default = Pass,
-        EV_NONE = 0,
-        EV_CURRENT = 1,
+    "ei_version"
+    / Enum(
+        Int8ul,
+        default=Pass,
+        EV_NONE=0,
+        EV_CURRENT=1,
     )
 )
 
 
 class UTCTimeStampAdapter(Adapter):
-
     def _decode(self, obj, context):
         return time.ctime(obj)
 
@@ -96,7 +102,6 @@ def UTCTimeStamp(name):
 
 
 class ListToBytesAdapter(Adapter):
-
     def _decode(self, obj, context):
         return bytes(obj)
 
@@ -105,14 +110,12 @@ class ListToBytesAdapter(Adapter):
 
 
 class PrintContext(Construct):
-
     def _parse(self, stream, context, *args, **kws):
         print("CTX: {} {} {}".format(context, args, kws))
         print("CTX_END")
 
 
 class ElfFileStruct(Struct):
-
     def __init__(self, *args, **kws):
         super(ElfFileStruct, self).__init__(*args, **kws)
 
@@ -123,13 +126,11 @@ class ElfFileStruct(Struct):
         print("*** {}".format(self))
 
 
-DebugInfo = namedtuple('DebugInfo', 'section image')
+DebugInfo = namedtuple("DebugInfo", "section image")
 
 
 class DBAPI:
-    """
-
-    """
+    """ """
 
     def __init__(self, parent):
         self._session = parent.session
@@ -144,8 +145,7 @@ class DBAPI:
 
 
 class SectionAPI(DBAPI):
-    """
-    """
+    """ """
 
     def get(self, section_name: str):
         """Get a single section.
@@ -163,7 +163,12 @@ class SectionAPI(DBAPI):
         query = query.filter(model.Elf_Section.section_name == section_name)
         return query.first()
 
-    def fetch(self, sections: str = None, name_pattern: str = None, order_by_address: bool = True):
+    def fetch(
+        self,
+        sections: str = None,
+        name_pattern: str = None,
+        order_by_address: bool = True,
+    ):
         """
 
         Returns
@@ -172,7 +177,9 @@ class SectionAPI(DBAPI):
 
         query = self.query(model.Elf_Section)
         if name_pattern:
-            query = query.filter(func.regexp(model.Elf_Section.section_name, name_pattern))
+            query = query.filter(
+                func.regexp(model.Elf_Section.section_name, name_pattern)
+            )
         if order_by_address:
             query = query.order_by(model.Elf_Section.sh_addr)
         else:
@@ -180,17 +187,15 @@ class SectionAPI(DBAPI):
         result = query.all()
         return result
 
+        # query = query.order_by(model.Elf_Symbol.section_name)
 
-        #query = query.order_by(model.Elf_Symbol.section_name)
-
-        #for key, value in groupby(query.all(), lambda s: s.section_name):
+        # for key, value in groupby(query.all(), lambda s: s.section_name):
         #    result[key] = list(value)
-        #return result
+        # return result
 
 
 class SymbolAPI(DBAPI):
-    """
-    """
+    """ """
 
     def get(self, symbol_name: str, section_name: str = None):
         """Get a single symbol.
@@ -216,8 +221,15 @@ class SymbolAPI(DBAPI):
         query = query.filter(model.Elf_Symbol.symbol_name == symbol_name)
         return query.first()
 
-    def fetch(self, sections: str = None, name_pattern: str = None,
-        bindings : str = None, access: str = None, types_str: str = None, order_by_value: bool = True):
+    def fetch(
+        self,
+        sections: str = None,
+        name_pattern: str = None,
+        bindings: str = None,
+        access: str = None,
+        types_str: str = None,
+        order_by_value: bool = True,
+    ):
         """
 
         Returns
@@ -239,7 +251,7 @@ class SymbolAPI(DBAPI):
                     value |= defs.SectionFlags.SHF_WRITE
                 elif item == "x":
                     value |= defs.SectionFlags.SHF_EXECINSTR
-            query = query.filter(model.Elf_Symbol.access.op('&')(value))
+            query = query.filter(model.Elf_Symbol.access.op("&")(value))
         if bindings:
             bindings = [b for b in re.split(r"[ ,]", bindings) if b]
             flt = []
@@ -273,7 +285,9 @@ class SymbolAPI(DBAPI):
                     flt.append(defs.SymbolType.STT_TLS)
                 query = query.filter(model.Elf_Symbol.st_type.in_(flt))
         if name_pattern:
-            query = query.filter(func.regexp(model.Elf_Symbol.symbol_name, name_pattern))
+            query = query.filter(
+                func.regexp(model.Elf_Symbol.symbol_name, name_pattern)
+            )
         query = query.order_by(model.Elf_Symbol.section_name)
         if order_by_value:
             query = query.order_by(model.Elf_Symbol.st_value)
@@ -293,7 +307,9 @@ class SymbolAPI(DBAPI):
         ----
         This is a GCC specific feature and will not work with other compilers.
         """
-        syms = self.query(model.Elf_Symbol).filter(model.Elf_Symbol.st_shndx == defs.SectionName.SHN_ABS)
+        syms = self.query(model.Elf_Symbol).filter(
+            model.Elf_Symbol.st_shndx == defs.SectionName.SHN_ABS
+        )
         syms = syms.filter(model.Elf_Symbol.symbol_name != "")
         syms = syms.filter(func.regexp(model.Elf_Symbol.symbol_name, "_.*"))
         syms = syms.filter(model.Elf_Symbol.st_type == defs.SymbolType.STT_NOTYPE)
@@ -306,43 +322,45 @@ def calculate_crypto_hash(data):
 
 
 class ElfParser(object):
-    """
-    """
+    """ """
 
     EI_NIDENT = 16
 
     DATATYPES32 = {
-        "Addr":   (Int32ul, Int32ub),   # 4 - Unsigned program address
-        "Half":   (Int16ul, Int16ub),   # 2 - Unsigned medium integer
-        "Off":    (Int32ul, Int32ub),   # 4 - Unsigned file offset
-        "Sword":  (Int32sl, Int32sb),   # 4 - Signed large integer
-        "Word":   (Int32ul, Int32ub),   # 4 - Unsigned large integer
-        "Xword":  (Int32ul, Int32ub),   # 8 - Unsigned long integer
-        "Sxword": (None, None),         # 8 - Signed long integer
+        "Addr": (Int32ul, Int32ub),  # 4 - Unsigned program address
+        "Half": (Int16ul, Int16ub),  # 2 - Unsigned medium integer
+        "Off": (Int32ul, Int32ub),  # 4 - Unsigned file offset
+        "Sword": (Int32sl, Int32sb),  # 4 - Signed large integer
+        "Word": (Int32ul, Int32ub),  # 4 - Unsigned large integer
+        "Xword": (Int32ul, Int32ub),  # 8 - Unsigned long integer
+        "Sxword": (None, None),  # 8 - Signed long integer
     }
 
     DATATYPES64 = {
-        "Addr":   (Int64ul, Int64ub),   # 8 - Unsigned program address
-        "Off":    (Int64ul, Int64ub),   # 8 - Unsigned file offset
-        "Half":   (Int16ul, Int16ub),   # 2 - Unsigned medium integer
-        "Word":   (Int32ul, Int32ub),   # 4 - Unsigned integer
-        "Sword":  (Int32sl, Int32sb),   # 4 - Signed integer
-        "Xword":  (Int64ul, Int64ub),   # 8 - Unsigned long integer
-        "Sxword": (Int64sl, Int64sb),   # 8 - Signed long integer
+        "Addr": (Int64ul, Int64ub),  # 8 - Unsigned program address
+        "Off": (Int64ul, Int64ub),  # 8 - Unsigned file offset
+        "Half": (Int16ul, Int16ub),  # 2 - Unsigned medium integer
+        "Word": (Int32ul, Int32ub),  # 4 - Unsigned integer
+        "Sword": (Int32sl, Int32sb),  # 4 - Signed integer
+        "Xword": (Int64ul, Int64ub),  # 8 - Unsigned long integer
+        "Sxword": (Int64sl, Int64sb),  # 8 - Signed long integer
     }
 
     BasicHeader = Struct(
-        "header" / Union(None,
-            "fields"/ Struct(
+        "header"
+        / Union(
+            None,
+            "fields"
+            / Struct(
                 Const(MAGIC),
-                "ei_class"  / Int8ul,
-                "ei_data"  / Int8ul,
-                "ei_version"  / Int8ul,
+                "ei_class" / Int8ul,
+                "ei_data" / Int8ul,
+                "ei_version" / Int8ul,
                 "ei_osabi" / Int8ul,
                 "ei_abiversion" / Int8ul,
                 Padding(7),
             ),
-            "bytes" / Bytes(EI_NIDENT)
+            "bytes" / Bytes(EI_NIDENT),
         ),
     )
 
@@ -354,19 +372,23 @@ class ElfParser(object):
         self.session = self.db.session
         self.symbols = SymbolAPI(self)
         self.sections = SectionAPI(self)
-        self._images = dict()
+        self._images = {}
         self._sections_by_name = OrderedDict()
-        self.asciiCString = CString(encoding = "ascii")
+        self.asciiCString = CString(encoding="ascii")
         self._basic_header = ElfParser.BasicHeader.parse(self.fp)
-        self.b64 = (self.ei_class == 2)
-        if self.ei_data == 1:   # Little-Endian
+        self.b64 = self.ei_class == 2
+        if self.ei_data == 1:  # Little-Endian
             offset = 0
-        elif self.ei_data == 2: # Big-Endian
+        elif self.ei_data == 2:  # Big-Endian
             offset = 1
         else:
-            raise ValueError("EI_DATA has an invalid value. Got: {}".format(self.ei_data))
+            raise ValueError(
+                "EI_DATA has an invalid value. Got: {}".format(self.ei_data)
+            )
         self._endianess = "<" if self.ei_data == 1 else ">"
-        datatypes = ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
+        datatypes = (
+            ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
+        )
         for key, value in datatypes:
             setattr(self, key, value[offset])
         self._parser_extended_header()
@@ -379,26 +401,29 @@ class ElfParser(object):
 
     def _parser_extended_header(self):
         ExtendedHeader = Struct(
-            "e_type" / self.Half,        # Object file type
-            "e_machine" / self.Half,     # Machine type
-            "e_version" / self.Word,     # Object file version
-            "e_entry" / self.Addr,       # Entry point address
-            "e_phoff" / self.Off,        # Program header offset
-            "e_shoff" / self.Off,        # Section header offset
-            "e_flags" / self.Word,       # Processor-specific flags
-            "e_ehsize" / self.Half,      # ELF header size
-            "e_phentsize" / self.Half,   # Size of program header entry
-            "e_phnum" / self.Half,       # Number of program header entries
-            "e_shentsize" / self.Half,   # Size of section header entry
-            "e_shnum" / self.Half,       # Number of section header entries
-            "e_shstrndx" / self.Half,    # Section name string table index
+            "e_type" / self.Half,  # Object file type
+            "e_machine" / self.Half,  # Machine type
+            "e_version" / self.Word,  # Object file version
+            "e_entry" / self.Addr,  # Entry point address
+            "e_phoff" / self.Off,  # Program header offset
+            "e_shoff" / self.Off,  # Section header offset
+            "e_flags" / self.Word,  # Processor-specific flags
+            "e_ehsize" / self.Half,  # ELF header size
+            "e_phentsize" / self.Half,  # Size of program header entry
+            "e_phnum" / self.Half,  # Number of program header entries
+            "e_shentsize" / self.Half,  # Size of section header entry
+            "e_shnum" / self.Half,  # Number of section header entries
+            "e_shstrndx" / self.Half,  # Section name string table index
         )
-        self._extended_header = ExtendedHeader.parse(self.fp[self.EI_NIDENT : ])
+        self._extended_header = ExtendedHeader.parse(self.fp[self.EI_NIDENT :])
 
     def _parse_section_headers(self):
         SectionHeaders = Struct(
-            "sections" / Array(lambda ctx: self.e_shnum,
-                "section" / Struct(
+            "sections"
+            / Array(
+                lambda ctx: self.e_shnum,
+                "section"
+                / Struct(
                     "sh_name" / self.Word,
                     "sh_type" / self.Word,
                     "sh_flags" / self.Xword,
@@ -408,18 +433,23 @@ class ElfParser(object):
                     "sh_link" / self.Word,
                     "sh_info" / self.Word,
                     "sh_addralign" / self.Xword,
-                    "sh_entsize" /self.Xword,
-                    "allocate" / Computed(lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)),
-                )
+                    "sh_entsize" / self.Xword,
+                    "allocate"
+                    / Computed(
+                        lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)
+                    ),
+                ),
             )
         )
         sections = []
         self._symbol_sections = []
-        if hasattr(self, 'e_shnum'):
-            self._section_headers = SectionHeaders.parse(self.fp[self.e_shoff : ])
+        if hasattr(self, "e_shnum"):
+            self._section_headers = SectionHeaders.parse(self.fp[self.e_shoff :])
             for idx, section in enumerate(self._section_headers.sections):
                 if section.allocate:
-                    image = self.fp[section.sh_offset : section.sh_offset + section.sh_size]
+                    image = self.fp[
+                        section.sh_offset : section.sh_offset + section.sh_size
+                    ]
                 else:
                     image = None
                 if image is not None:
@@ -435,21 +465,36 @@ class ElfParser(object):
                     note_obj = self._parse_note(image)
                     if note_obj:
                         note = model.Elf_Note(
-                            section_name = name, type = note_obj.type, name = note_obj.name, desc = note_obj.desc
+                            section_name=name,
+                            type=note_obj.type,
+                            name=note_obj.name,
+                            desc=note_obj.desc,
                         )
                         sections.append(note)
-                elif section.sh_type in (defs.SectionType.SHT_SYMTAB, defs.SectionType.SHT_DYNSYM):
+                elif section.sh_type in (
+                    defs.SectionType.SHT_SYMTAB,
+                    defs.SectionType.SHT_DYNSYM,
+                ):
                     self._symbol_sections.append(section)
                 elif name == ".comment":
                     cmt_text = self._parse_comment(image)
                     if cmt_text:
-                        comment = model.Elf_Comment(text = cmt_text)
+                        comment = model.Elf_Comment(text=cmt_text)
                         sections.append(comment)
-                db_sec = model.Elf_Section(index = idx, section_name = name, sh_name = section.sh_name,
-                    sh_type = section.sh_type, sh_flags = section.sh_flags, sh_addr = section.sh_addr,
-                    sh_offset = section.sh_offset, sh_size = section.sh_size, sh_link = section.sh_link,
-                    sh_info = section.sh_info, sh_addralign = section.sh_addralign, sh_entsize = section.sh_entsize,
-                    section_image = image
+                db_sec = model.Elf_Section(
+                    index=idx,
+                    section_name=name,
+                    sh_name=section.sh_name,
+                    sh_type=section.sh_type,
+                    sh_flags=section.sh_flags,
+                    sh_addr=section.sh_addr,
+                    sh_offset=section.sh_offset,
+                    sh_size=section.sh_size,
+                    sh_link=section.sh_link,
+                    sh_info=section.sh_info,
+                    sh_addralign=section.sh_addralign,
+                    sh_entsize=section.sh_entsize,
+                    section_image=image,
                 )
                 sections.append(db_sec)
             self.session.bulk_save_objects(sections)
@@ -457,13 +502,17 @@ class ElfParser(object):
     def get_string(self, table_index, entry):
         if entry > len(self._images[table_index]):
             return ""
-        name = self.asciiCString.parse(self._images[table_index][entry : ])
+        name = self.asciiCString.parse(self._images[table_index][entry:])
         return name
 
     def _parse_program_headers(self):
         ProgramHeaders = Struct(
-            "segments" / Array(lambda ctx: self.e_phnum,
-                "segment" / IfThenElse(lambda ctx: self.b64,
+            "segments"
+            / Array(
+                lambda ctx: self.e_phnum,
+                "segment"
+                / IfThenElse(
+                    lambda ctx: self.b64,
                     Struct(
                         "p_type" / self.Word,
                         "p_flags" / self.Word,
@@ -483,14 +532,14 @@ class ElfParser(object):
                         "p_memsz" / self.Word,
                         "p_flags" / self.Word,
                         "p_align" / self.Word,
-                    )
+                    ),
                 ),
             )
         )
-        if hasattr(self, 'e_shnum'):
-            #if self.e_shnum:
+        if hasattr(self, "e_shnum"):
+            # if self.e_shnum:
             #    print("PG_size: {}".format(ProgramHeaders.sizeof() / self.e_phnum))
-            self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff : ])
+            self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff :])
 
     def _parse_symbol_section(self, section):
         sh_link = section.sh_link
@@ -499,7 +548,8 @@ class ElfParser(object):
             "st_name" / self.Word,
             "st_value" / self.Addr,
             "st_size" / self.Word,
-            "st_info" / BitStruct(
+            "st_info"
+            / BitStruct(
                 "st_bind" / BitsInteger(4),
                 "st_type" / BitsInteger(4),
             ),
@@ -516,26 +566,33 @@ class ElfParser(object):
                 section_name = defs.special_section_name(sym.st_shndx)
             else:
                 if not sym.st_shndx in symbol_cache:
-                    section_header = self.session.query(model.Elf_Section).\
-                        filter(model.Elf_Section.index == sym.st_shndx).first()
+                    section_header = (
+                        self.session.query(model.Elf_Section)
+                        .filter(model.Elf_Section.index == sym.st_shndx)
+                        .first()
+                    )
                     if section_header:
                         section_name = section_header.section_name
                     else:
                         section_name = str(sym.st_shndx)
-            db_sym = model.Elf_Symbol(st_name = sym.st_name, st_value = sym.st_value, st_size = sym.st_size,
-                st_bind = sym.st_info.st_bind, st_type = sym.st_info.st_type, st_other = sym.st_other,
-                st_shndx = sym.st_shndx, symbol_name = sym.symbol_name, section_name = section_name,
-                access = section_header.sh_flags if section_header else 0
+            db_sym = model.Elf_Symbol(
+                st_name=sym.st_name,
+                st_value=sym.st_value,
+                st_size=sym.st_size,
+                st_bind=sym.st_info.st_bind,
+                st_type=sym.st_info.st_type,
+                st_other=sym.st_other,
+                st_shndx=sym.st_shndx,
+                symbol_name=sym.symbol_name,
+                section_name=section_name,
+                access=section_header.sh_flags if section_header else 0,
             )
             symbols.append(db_sym)
         self.session.bulk_save_objects(symbols)
         self.session.commit()
 
     def _parse_comment(self, data):
-        Line = Struct(
-            "line" / CString("ascii"),
-            "pos" / Tell
-        )
+        Line = Struct("line" / CString("ascii"), "pos" / Tell)
         if not data:
             return ""
         length = len(data)
@@ -544,12 +601,12 @@ class ElfParser(object):
         if data.find(b"\x00") == -1:
             return str(data, "ascii")
         while i < length:
-            #print("*** LINE", data[i : ])
-            line = Line.parse(data[i : ])
+            # print("*** LINE", data[i : ])
+            line = Line.parse(data[i:])
             if line.line:
                 result.append(line.line)
             i += line.pos
-        return '\n'.join(result)
+        return "\n".join(result)
 
     def _parse_note(self, data):
         Note = Struct(
@@ -557,7 +614,7 @@ class ElfParser(object):
             "descsz" / self.Word,
             "type" / self.Word,
             "name" / Bytes(this.namesz),
-            "desc" / Bytes(this.descsz)
+            "desc" / Bytes(this.descsz),
         )
         if not data:
             return None
@@ -570,13 +627,13 @@ class ElfParser(object):
         ds = OrderedDict()
         for idx, section in enumerate(self.sections.fetch()):
             name = section.section_name
-            if name.startswith('.debug'):
-                if name == '.debug_abbrev':
+            if name.startswith(".debug"):
+                if name == ".debug_abbrev":
                     pass
                 ds[name] = section
         result = OrderedDict()
         for name, section in ds.items():
-            result[name]= DebugInfo(section, section.section_image)
+            result[name] = DebugInfo(section, section.section_image)
         return result
 
     def section_in_segment1(self, section_header, segment, check_vma, strict):
@@ -584,26 +641,78 @@ class ElfParser(object):
         valid_segment = False
         has_VMA = False
         has_dynamic_size = False
-        valid_segment = ((section_header.sh_flags & defs.SectionFlags.SHF_TLS) != 0) and (segment.p_type == defs.PT_TLS or \
-            segment.p_type == defs.PT_GNU_RELRO or segment.p_type == defs.PT_LOAD) or \
-            ((section_header.sh_flags & defs.SectionFlags.SHF_TLS) == 0 and segment.p_type != defs.PT_TLS and \
-            segment.p_type != defs.PT_PHDR)
-        has_offset = section_header.sh_type == defs.SectionType.SHT_NOBITS or (section_header.sh_offset >= segment.p_offset \
-            and (not strict or (section_header.sh_offset - segment.p_offset <= segment.p_filesz - 1)) \
-            and ((section_header.sh_offset - segment.p_offset + self.section_size(section_header, segment)) <= \
-            (segment.p_filesz)))
-        has_VMA = (not check_vma or (section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0 or (section_header.sh_addr >= \
-            segment.p_vaddr and (not strict or (section_header.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)) \
-            and ((section_header.sh_addr - segment.p_vaddr + self.section_size(section_header, segment)) <= segment.p_memsz))
+        valid_segment = (
+            ((section_header.sh_flags & defs.SectionFlags.SHF_TLS) != 0)
+            and (
+                segment.p_type == defs.PT_TLS
+                or segment.p_type == defs.PT_GNU_RELRO
+                or segment.p_type == defs.PT_LOAD
+            )
+            or (
+                (section_header.sh_flags & defs.SectionFlags.SHF_TLS) == 0
+                and segment.p_type != defs.PT_TLS
+                and segment.p_type != defs.PT_PHDR
+            )
         )
-        has_dynamic_size = (segment.p_type != defs.PT_DYNAMIC or section_header.sh_size != 0 or segment.p_memsz == 0 \
-            or ((section_header.sh_type == defs.SectionType.SHT_NOBITS or (section_header.sh_offset > segment.p_offset \
-            and (section_header.sh_offset - segment.p_offset < segment.p_filesz))) \
-            and ((section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0 \
-            or (section_header.sh_addr > segment.p_vaddr \
-            and (section_header.sh_addr - segment.p_vaddr < segment.p_memsz)))) \
+        has_offset = section_header.sh_type == defs.SectionType.SHT_NOBITS or (
+            section_header.sh_offset >= segment.p_offset
+            and (
+                not strict
+                or (section_header.sh_offset - segment.p_offset <= segment.p_filesz - 1)
+            )
+            and (
+                (
+                    section_header.sh_offset
+                    - segment.p_offset
+                    + self.section_size(section_header, segment)
+                )
+                <= (segment.p_filesz)
+            )
         )
-        return (valid_segment and has_offset and has_VMA and has_dynamic_size)
+        has_VMA = (
+            not check_vma
+            or (section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0
+            or (
+                section_header.sh_addr >= segment.p_vaddr
+                and (
+                    not strict
+                    or (section_header.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)
+                )
+                and (
+                    (
+                        section_header.sh_addr
+                        - segment.p_vaddr
+                        + self.section_size(section_header, segment)
+                    )
+                    <= segment.p_memsz
+                )
+            )
+        )
+        has_dynamic_size = (
+            segment.p_type != defs.PT_DYNAMIC
+            or section_header.sh_size != 0
+            or segment.p_memsz == 0
+            or (
+                (
+                    section_header.sh_type == defs.SectionType.SHT_NOBITS
+                    or (
+                        section_header.sh_offset > segment.p_offset
+                        and (
+                            section_header.sh_offset - segment.p_offset
+                            < segment.p_filesz
+                        )
+                    )
+                )
+                and (
+                    (section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0
+                    or (
+                        section_header.sh_addr > segment.p_vaddr
+                        and (section_header.sh_addr - segment.p_vaddr < segment.p_memsz)
+                    )
+                )
+            )
+        )
+        return valid_segment and has_offset and has_VMA and has_dynamic_size
 
     def section_in_segment(self, section_header, segment):
         return self.section_in_segment1(section_header, segment, 1, 0)
@@ -616,22 +725,26 @@ class ElfParser(object):
         for idx in range(self.e_phnum):
             segment = self.segments[idx]
             mapping[idx] = []
-##
-##            for j in range(self.e_shnum):
-##                section = self.sections[j]
-##                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
-##                    mapping[idx].append(j)
-##
+        ##
+        ##            for j in range(self.e_shnum):
+        ##                section = self.sections[j]
+        ##                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
+        ##                    mapping[idx].append(j)
+        ##
         self.sections_to_segments = mapping
         return self.sections_to_segments
 
     def tbss_special(self, section_header, segment):
-       return ((section_header.sh_flags & defs.SectionFlags.SHF_TLS) != 0 and
-           section_header.sh_type == defs.SectionType.SHT_NOBITS and segment.p_type != defs.PT_TLS
+        return (
+            (section_header.sh_flags & defs.SectionFlags.SHF_TLS) != 0
+            and section_header.sh_type == defs.SectionType.SHT_NOBITS
+            and segment.p_type != defs.PT_TLS
         )
 
     def section_size(self, section_header, segment):
-        return 0 if self.tbss_special(section_header, segment) else section_header.sh_size
+        return (
+            0 if self.tbss_special(section_header, segment) else section_header.sh_size
+        )
 
     def get_basic_header_field(self, name):
         return getattr(self._basic_header.header.fields, name)
@@ -641,23 +754,23 @@ class ElfParser(object):
 
     @property
     def ei_class(self):
-        return self.get_basic_header_field('ei_class')
+        return self.get_basic_header_field("ei_class")
 
     @property
     def ei_data(self):
-        return self.get_basic_header_field('ei_data')
+        return self.get_basic_header_field("ei_data")
 
     @property
     def ei_version(self):
-        return self.get_basic_header_field('ei_version')
+        return self.get_basic_header_field("ei_version")
 
     @property
     def ei_osabi(self):
-        return self.get_basic_header_field('ei_osabi')
+        return self.get_basic_header_field("ei_osabi")
 
     @property
     def ei_abiversion(self):
-        return self.get_basic_header_field('ei_abiversion')
+        return self.get_basic_header_field("ei_abiversion")
 
     @property
     def header_bytes(self):
@@ -665,55 +778,55 @@ class ElfParser(object):
 
     @property
     def e_type(self):
-        return self.get_extended_header_field('e_type')
+        return self.get_extended_header_field("e_type")
 
     @property
     def e_machine(self):
-        return self.get_extended_header_field('e_machine')
+        return self.get_extended_header_field("e_machine")
 
     @property
     def e_version(self):
-        return self.get_extended_header_field('e_version')
+        return self.get_extended_header_field("e_version")
 
     @property
     def e_entry(self):
-        return self.get_extended_header_field('e_entry')
+        return self.get_extended_header_field("e_entry")
 
     @property
     def e_phoff(self):
-        return self.get_extended_header_field('e_phoff')
+        return self.get_extended_header_field("e_phoff")
 
     @property
     def e_shoff(self):
-        return self.get_extended_header_field('e_shoff')
+        return self.get_extended_header_field("e_shoff")
 
     @property
     def e_flags(self):
-        return self.get_extended_header_field('e_flags')
+        return self.get_extended_header_field("e_flags")
 
     @property
     def e_ehsize(self):
-        return self.get_extended_header_field('e_ehsize')
+        return self.get_extended_header_field("e_ehsize")
 
     @property
     def e_phentsize(self):
-        return self.get_extended_header_field('e_phentsize')
+        return self.get_extended_header_field("e_phentsize")
 
     @property
     def e_phnum(self):
-        return self.get_extended_header_field('e_phnum')
+        return self.get_extended_header_field("e_phnum")
 
     @property
     def e_shentsize(self):
-        return self.get_extended_header_field('e_shentsize')
+        return self.get_extended_header_field("e_shentsize")
 
     @property
     def e_shnum(self):
-        return self.get_extended_header_field('e_shnum')
+        return self.get_extended_header_field("e_shnum")
 
     @property
     def e_shstrndx(self):
-        return self.get_extended_header_field('e_shstrndx')
+        return self.get_extended_header_field("e_shstrndx")
 
     @property
     def endianess(self):
@@ -721,13 +834,17 @@ class ElfParser(object):
 
     @property
     def segments(self):
-        return self._program_headers['segments']
+        return self._program_headers["segments"]
 
     @property
     def arm_attributes(self):
-        res = self.query(model.Elf_Section).filter(model.Elf_Section.section_name == ".ARM.attributes").first()
+        res = (
+            self.query(model.Elf_Section)
+            .filter(model.Elf_Section.section_name == ".ARM.attributes")
+            .first()
+        )
         if res:
-            return attributes.parse(res.section_image, byteorder = self.endianess)
+            return attributes.parse(res.section_image, byteorder=self.endianess)
         else:
             return {}
 
@@ -751,7 +868,13 @@ class ElfParser(object):
     def query(self):
         return self.session.query
 
-    def create_image(self, join: bool = True, include_pattern: str = None, exclude_pattern: str = None, callback: callable = None):
+    def create_image(
+        self,
+        join: bool = True,
+        include_pattern: str = None,
+        exclude_pattern: str = None,
+        callback: callable = None,
+    ):
         """
 
         Parameters
@@ -791,10 +914,14 @@ class ElfParser(object):
         )
 
         if include_pattern:
-            query = query.filter(func.regexp(model.Elf_Section.section_name, include_pattern))
+            query = query.filter(
+                func.regexp(model.Elf_Section.section_name, include_pattern)
+            )
 
         if exclude_pattern:
-            query = query.filter(not_(func.regexp(model.Elf_Section.section_name, exclude_pattern)))
+            query = query.filter(
+                not_(func.regexp(model.Elf_Section.section_name, exclude_pattern))
+            )
 
         query = query.order_by(model.Elf_Section.sh_addr)
         result = []
@@ -804,7 +931,7 @@ class ElfParser(object):
             if callback:
                 callback("section", section)
             result.append(Section(section.sh_addr, section.section_image))
-        img = Image(result, join = join)
+        img = Image(result, join=join)
         if callback:
             callback("stop", None)
         return img

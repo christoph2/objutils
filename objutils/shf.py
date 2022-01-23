@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Reader/Writer S Hexdump Format (rfc4149).
 """
 
@@ -69,9 +68,9 @@ WHITESPACE = re.compile("\s*")
 
 remove_ws = lambda text: WHITESPACE.sub("", text)
 
+
 class Reader(object):
-    """
-    """
+    """ """
 
     logger = Logger(__name__)
 
@@ -86,45 +85,59 @@ class Reader(object):
             attrib = child.attrib
             text = remove_ws(child.text)
             section_data = bytearray.fromhex(text)
-            name = attrib.get('name')
+            name = attrib.get("name")
             if name is None:
-                self.logger.error("Block #{}: Missing required attribute `name`.".format(idx))
+                self.logger.error(
+                    "Block #{}: Missing required attribute `name`.".format(idx)
+                )
                 continue
-            address = attrib.get('address')
+            address = attrib.get("address")
             if address:
                 address = remove_ws(address)
                 address = int(address, 16)
             else:
-                self.logger.error("Block #{}: Missing required attribute `address`.".format(idx))
+                self.logger.error(
+                    "Block #{}: Missing required attribute `address`.".format(idx)
+                )
                 continue
-            length = attrib.get('length')
+            length = attrib.get("length")
             if length:
                 length = remove_ws(length)
                 length = int(length, 16)
             else:
-                self.logger.error("Block #{}: Missing required attribute `length`.".format(idx))
+                self.logger.error(
+                    "Block #{}: Missing required attribute `length`.".format(idx)
+                )
                 continue
-            word_size = attrib.get('word_size')
+            word_size = attrib.get("word_size")
             if word_size:
                 word_size = remove_ws(word_size)
                 word_size = int(word_size, 16)
             else:
-                self.logger.error("Block #{}: Missing required attribute `wordsize`.".format(idx))
+                self.logger.error(
+                    "Block #{}: Missing required attribute `wordsize`.".format(idx)
+                )
                 continue
             if len(section_data) != (length * word_size):
-                self.logger.error("Block #{}: Mismatch between (`length` * `word_size`) and actual block length.".format(idx))
+                self.logger.error(
+                    "Block #{}: Mismatch between (`length` * `word_size`) and actual block length.".format(
+                        idx
+                    )
+                )
                 continue
-            checksum = attrib.get('checksum')
+            checksum = attrib.get("checksum")
             if checksum:
                 checksum = remove_ws(checksum)
                 if SHA1_DIGEST(section_data) != checksum:
                     self.logger.error("Block #{}: Wrong `checksum`.".format(idx))
                     continue
             else:
-                self.logger.error("Block #{}: Missing required attribute `checksum`.".format(idx))
+                self.logger.error(
+                    "Block #{}: Missing required attribute `checksum`.".format(idx)
+                )
                 continue
-            #print(tag, attrib)
-            #print(section_data, SHA1_DIGEST(section_data))
+            # print(tag, attrib)
+            # print(section_data, SHA1_DIGEST(section_data))
             sections.append(Section(address, section_data))
         img = Image(sections)
         if hasattr(fp, "close"):
@@ -142,8 +155,7 @@ class Reader(object):
 
 
 class Writer(object):
-    """
-    """
+    """ """
 
     logger = Logger(__name__)
 
@@ -158,25 +170,49 @@ class Writer(object):
         BLOCK_SIZE = 16
         result = []
         result.append('<?xml version="1.0" encoding="UTF-8"?>')
-        result.append('<dump name="SHF dump by objutils" blocks="{:04x}">'.format(len(image._sections)))
-        if hasattr(image, "sections") and  not image.sections:
-            return b''
-        sections = sorted(image.sections, key = lambda x: x.start_address)
+        result.append(
+            '<dump name="SHF dump by objutils" blocks="{:04x}">'.format(
+                len(image._sections)
+            )
+        )
+        if hasattr(image, "sections") and not image.sections:
+            return b""
+        sections = sorted(image.sections, key=lambda x: x.start_address)
         for idx, section in enumerate(sections):
-            result.append('    <block name="Section #{:04x}" address="{:08x}" word_size="01" length="{:08x}" checksum="{}">'.\
-                format(idx, section.start_address, section.length, SHA1_DIGEST(section.data)))
+            result.append(
+                '    <block name="Section #{:04x}" address="{:08x}" word_size="01" length="{:08x}" checksum="{}">'.format(
+                    idx,
+                    section.start_address,
+                    section.length,
+                    SHA1_DIGEST(section.data),
+                )
+            )
             nblocks = len(section.data) // BLOCK_SIZE
             remaining = len(section.data) % BLOCK_SIZE
             offset = 0
             for _ in range(nblocks):
-                result.append("        {}".format(" ".join(
-                    ["{:02x}".format(x) for x in section.data[offset : offset + BLOCK_SIZE]]))
+                result.append(
+                    "        {}".format(
+                        " ".join(
+                            [
+                                "{:02x}".format(x)
+                                for x in section.data[offset : offset + BLOCK_SIZE]
+                            ]
+                        )
+                    )
                 )
                 offset += BLOCK_SIZE
             if remaining:
-                result.append("        {}".format(" ".join(
-                    ["{:02x}".format(x) for x in section.data[offset : offset + remaining]]))
+                result.append(
+                    "        {}".format(
+                        " ".join(
+                            [
+                                "{:02x}".format(x)
+                                for x in section.data[offset : offset + remaining]
+                            ]
+                        )
+                    )
                 )
-            result.append('    </block>')
+            result.append("    </block>")
         result.append("</dump>")
-        return bytes("\n".join(result), encoding = "ascii")
+        return bytes("\n".join(result), encoding="ascii")

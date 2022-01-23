@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from objutils import loads, dumps
 import unittest
+
+from objutils import dumps
+from objutils import loads
 
 
 TEK = b"""/B000100C576F77212044696420796F7520726561A5
@@ -19,18 +20,16 @@ S5030004F8"""
 
 
 class TestRoundtrip(unittest.TestCase):
-
     def testLoadsWorks(self):
         data = loads("tek", TEK)
-        #data.hexdump()
-        #print(dumps("srec", data))
-        self.assertEqual(dumps("srec", data, s5record = True), S19)
+        # data.hexdump()
+        # print(dumps("srec", data))
+        self.assertEqual(dumps("srec", data, s5record=True), S19)
 
     def testDumpsWorks(self):
         data = loads("srec", S19)
         self.assertEqual(dumps("tek", data), TEK)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-
 import unittest
-from objutils.utils import create_string_buffer
+
 from objutils.readers import PlainBinaryReader
+from objutils.utils import create_string_buffer
 
 
 class TestReader(unittest.TestCase):
-
     @staticmethod
     def _createReader():
-        return PlainBinaryReader(create_string_buffer(bytearray("hello world!", "ascii")), PlainBinaryReader.LITTLE_ENDIAN)
+        return PlainBinaryReader(
+            create_string_buffer(bytearray("hello world!", "ascii")),
+            PlainBinaryReader.LITTLE_ENDIAN,
+        )
 
     def testSize(self):
         reader = self._createReader()
@@ -38,9 +39,10 @@ class TestReader(unittest.TestCase):
 
 
 class Decoder(unittest.TestCase):
-
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(create_string_buffer(value), PlainBinaryReader.LITTLE_ENDIAN)
+        dr = PlainBinaryReader(
+            create_string_buffer(value), PlainBinaryReader.LITTLE_ENDIAN
+        )
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):
@@ -72,7 +74,6 @@ class Decoder(unittest.TestCase):
 
 
 class TestDecoding(Decoder):
-
     def testSlb01(self):
         self.sleb(b"\x9b\xf1\x59", -624485)
 
@@ -158,6 +159,6 @@ class TestDecoding(Decoder):
 def main():
     unittest.main()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

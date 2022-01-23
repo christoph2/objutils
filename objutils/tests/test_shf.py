@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import pytest
 
-from objutils import loads, dumps
+from objutils import dumps
+from objutils import loads
 from objutils.image import Image
 
-import pytest
 
 def test_load_shf1():
     DUMP = """<?xml version="1.0" encoding="UTF-8"?>
@@ -18,9 +19,10 @@ def test_load_shf1():
     img = loads("shf", DUMP)
     assert len(img) == 31
     sec = img[0]
-    assert sec.start_address == 0X00000400
+    assert sec.start_address == 0x00000400
     assert sec.length == 31
-    assert sec.data == b'All your base are belong to us\n'
+    assert sec.data == b"All your base are belong to us\n"
+
 
 def test_load_shf2():
     DUMP = """<?xml version="1.0" encoding="UTF-8"?>
@@ -38,12 +40,16 @@ def test_load_shf2():
     img = loads("shf", DUMP)
     assert len(img) == 56
     sec0, sec1 = img
-    assert sec0.start_address == 0X00001000
+    assert sec0.start_address == 0x00001000
     assert sec0.length == 42
-    assert sec0.data == b'\xa9\x01\x85 \x85! \x1e\x10 \x1e\x10\x18\xa5!\xaae \x86 \x85! \x1e\x10\xc9\xc8\x90\xef`\xae\x00\x11\xa5!\x9d\x00\x11\xee\x00\x11`'
-    assert sec1.start_address == 0X00001100
+    assert (
+        sec0.data
+        == b"\xa9\x01\x85 \x85! \x1e\x10 \x1e\x10\x18\xa5!\xaae \x86 \x85! \x1e\x10\xc9\xc8\x90\xef`\xae\x00\x11\xa5!\x9d\x00\x11\xee\x00\x11`"
+    )
+    assert sec1.start_address == 0x00001100
     assert sec1.length == 14
-    assert sec1.data == b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    assert sec1.data == b"\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+
 
 def test_load_shf3():
     DUMP = """<?xml version="1.0" encoding="UTF-8"?>
@@ -62,11 +68,15 @@ def test_load_shf3():
     img = loads("shf", DUMP)
     assert len(img) == 130
     sec = img[0]
-    assert sec.start_address == 0X00000000
+    assert sec.start_address == 0x00000000
     assert sec.length == 130
-    assert sec.data == b'\x00\x10\x00\x02\x00\x00\x00\x00\x00\x90\x00\x00\x00\x006\x000\x00\x04\x00\x00\x85 \x02P\x00#\x00\x08X\x00P\x00\x06\x00\x01M\xc0\x00X\x00*\x80\x00\xb8\x00p\x00\x08\x00\x00\x0b\x00\x01\x92\x00\x10\x00\x00\x00\x00\x90\x00\n\x00\x00\x00\x00\x00\n@\x00\x00\x00\x00\x00\xb0\x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\xd0\x00\x0e\x00\x00\x00\x00\x01\x00\x0c\xcc\xcc\xcc\xcd\x00\xf0\x00\x10\x00\x00\x00\x00\x00\x10\x80\x00\x00\x00\x00\x00\x10\x00\x07\x90\x00\x00\x00\x024'
+    assert (
+        sec.data
+        == b"\x00\x10\x00\x02\x00\x00\x00\x00\x00\x90\x00\x00\x00\x006\x000\x00\x04\x00\x00\x85 \x02P\x00#\x00\x08X\x00P\x00\x06\x00\x01M\xc0\x00X\x00*\x80\x00\xb8\x00p\x00\x08\x00\x00\x0b\x00\x01\x92\x00\x10\x00\x00\x00\x00\x90\x00\n\x00\x00\x00\x00\x00\n@\x00\x00\x00\x00\x00\xb0\x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\xd0\x00\x0e\x00\x00\x00\x00\x01\x00\x0c\xcc\xcc\xcc\xcd\x00\xf0\x00\x10\x00\x00\x00\x00\x00\x10\x80\x00\x00\x00\x00\x00\x10\x00\x07\x90\x00\x00\x00\x024"
+    )
 
-@pytest.mark.skip   # Content identical, whitespace issue.
+
+@pytest.mark.skip  # Content identical, whitespace issue.
 def test_dump_shf1():
     SREC1 = b"""S113B000576F77212044696420796F7520726561D8
 S113B0106C6C7920676F207468726F756768206143
@@ -76,7 +86,9 @@ S9030000FC"""
     sr = loads("srec", SREC1)
     img = Image([sr[0]])
     shf = dumps("shf", img)
-    assert shf == """<?xml version="1.0" encoding="UTF-8"?>
+    assert (
+        shf
+        == """<?xml version="1.0" encoding="UTF-8"?>
 <dump name="SHF dump by objutils" blocks="0001">
     <block name="Section #0000" address="0000b000" word_size="01" length="0000003c" checksum="9a8e02926903975688683136d71ff38ca9fc9847">
         57 6f 77 21 20 44 69 64 20 79 6f 75 20 72 65 61
@@ -85,3 +97,4 @@ S9030000FC"""
         6f 20 72 65 61 64 20 74 68 69 73 3f
     </block>
 </dump>"""
+    )

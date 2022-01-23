@@ -76,7 +76,7 @@ def diff_bin(a, b):
     length = min(la, lb)
     tmp = []
     start_offset = 0
-    diff_bytes_a, diff_bytes_b= bytearray(), bytearray()
+    diff_bytes_a, diff_bytes_b = bytearray(), bytearray()
     for offset in range(length):
         ai = a[offset]
         bi = b[offset]
@@ -89,10 +89,10 @@ def diff_bin(a, b):
         else:
             if diff_bytes_a:
                 tmp.append(BinDiff("M", start_offset, diff_bytes_a, diff_bytes_b))
-                diff_bytes_a, diff_bytes_b= bytearray(), bytearray()
+                diff_bytes_a, diff_bytes_b = bytearray(), bytearray()
     if lb > la:
-        tmp.append(BinDiff("A", len(a), None, b[-(lb-la) : ]))
+        tmp.append(BinDiff("A", len(a), None, b[-(lb - la) :]))
     elif lb < la:
-        tmp.append(BinDiff("D", len(b), a[-(la-lb) : ], None))
+        tmp.append(BinDiff("D", len(b), a[-(la - lb) :], None))
     result = tmp
     return result

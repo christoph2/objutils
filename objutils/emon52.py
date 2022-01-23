@@ -27,18 +27,16 @@ __copyright__ = """
 
 import objutils.hexfile as hexfile
 
-DATA                        = 0
-EOF                         = 1
-EXTENDED_SEGMENT_ADDRESS    = 2
-START_SEGMENT_ADDRESS       = 3
-EXTENDED_LINEAR_ADDRESS     = 4
-START_LINEAR_ADDRESS        = 5
+DATA = 0
+EOF = 1
+EXTENDED_SEGMENT_ADDRESS = 2
+START_SEGMENT_ADDRESS = 3
+EXTENDED_LINEAR_ADDRESS = 4
+START_LINEAR_ADDRESS = 5
 
 
 class Codec(object):
-    """
-
-    """
+    """ """
 
     def __init__(self, file_like):
         self.file_like = file_like
@@ -53,20 +51,18 @@ class Codec(object):
 
 
 class Reader(hexfile.Reader):
-    """
+    """ """
 
-    """
-
-    FORMAT_SPEC = (
-        (hexfile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),
-    )
-    DATA_SEPARATOR =  " "
+    FORMAT_SPEC = ((hexfile.TYPE_FROM_RECORD, "LL AAAA:DD CCCC"),)
+    DATA_SEPARATOR = " "
 
     def check_line(self, line, format_type):
         if line.length != len(line.chunk):
-            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
+            raise hexfile.InvalidRecordLengthError(
+                "Byte count doesn't match length of actual data."
+            )
         # todo: factor out checksum calculation from line!!!
-        checksum = (sum(line.chunk) & 0xffff)
+        checksum = sum(line.chunk) & 0xFFFF
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
 
@@ -75,12 +71,12 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    """
-
-    """
+    """ """
 
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):
         checksum = sum(row) % 65536
-        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(length, address, Writer.hex_bytes(row, spaced = True), checksum)
+        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(
+            length, address, Writer.hex_bytes(row, spaced=True), checksum
+        )

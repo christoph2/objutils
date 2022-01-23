@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from objutils import loads, dumps
 import unittest
+
+from objutils import dumps
+from objutils import loads
 
 TITEXT = b"""@DEAD
 99 F2 B9 CB 79 D3 EE F8 8F C6 A9 40 AB CD 71 A6
@@ -36,14 +37,13 @@ S123DF8D3B4528750401B3F5379BEA733D425CB24F1FA7C3FA32060ED76668756708CCA3DA
 S123DFAD4DF41852F5CB472D6631A0A374FD56C31CFD8616308D2407F38C7C5A9448FDE260
 S5030009F3"""
 
-fromSrec =  loads('srec', SREC)
-dataFromSRec = dumps('titxt', fromSrec)
-fromTiTxt =  loads('titxt', TITEXT)
-dataFromTiTxt = dumps('srec', fromTiTxt, row_length = 32, s5record = True)
+fromSrec = loads("srec", SREC)
+dataFromSRec = dumps("titxt", fromSrec)
+fromTiTxt = loads("titxt", TITEXT)
+dataFromTiTxt = dumps("srec", fromTiTxt, row_length=32, s5record=True)
 
 
 class TestRoundTrip(unittest.TestCase):
-
     def testFromSrec(self):
         self.assertEqual(dataFromSRec, TITEXT)
 
@@ -51,6 +51,5 @@ class TestRoundTrip(unittest.TestCase):
         self.assertEqual(dataFromTiTxt, SREC)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-
