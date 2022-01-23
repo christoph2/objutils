@@ -30,22 +30,20 @@ import mmap
 import re
 import sqlite3
 
-from sqlalchemy import (MetaData, types, orm, event, create_engine,
-    Column, and_, not_
-)
+from sqlalchemy import MetaData, types, orm, event, create_engine, Column, and_, not_
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 
 from objutils.elf import defs
 
-CACHE_SIZE      = 4 # MB
-PAGE_SIZE       = mmap.PAGESIZE
+CACHE_SIZE = 4  # MB
+PAGE_SIZE = mmap.PAGESIZE
 
 Base = declarative_base()
 
-class MixInBase(object):
 
+class MixInBase(object):
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
@@ -62,7 +60,7 @@ class MixInBase(object):
 
 
 class RidMixIn(MixInBase):
-    rid = Column("rid", types.Integer, primary_key = True)
+    rid = Column("rid", types.Integer, primary_key=True)
 
 
 """
@@ -84,38 +82,63 @@ table = Table(
 )
 """
 
-def StdInteger(default = 0, primary_key = False, unique = False, nullable = False, index = False):
-    return Column(types.INTEGER, default = default, nullable = nullable,    # PassiveDefault(str(default))
-        primary_key = primary_key, unique = unique, index = index)
-    #types.INTEGER
 
-def StdNumeric(default = 0, primary_key = False, unique = False, nullable = False, index = False):
-    return Column(types.NUMERIC(20, 0), default = default, nullable = nullable,
-        primary_key = primary_key, unique = unique, index = index)
+def StdInteger(default=0, primary_key=False, unique=False, nullable=False, index=False):
+    return Column(
+        types.INTEGER,
+        default=default,
+        nullable=nullable,  # PassiveDefault(str(default))
+        primary_key=primary_key,
+        unique=unique,
+        index=index,
+    )
+    # types.INTEGER
 
-def StdBigInt(default = 0, primary_key = False, unique = False, nullable = False, index = False):
-    return Column(types.INTEGER, default = default, nullable = nullable,
-        primary_key = primary_key, unique = unique, index = index)
+
+def StdNumeric(default=0, primary_key=False, unique=False, nullable=False, index=False):
+    return Column(
+        types.NUMERIC(20, 0),
+        default=default,
+        nullable=nullable,
+        primary_key=primary_key,
+        unique=unique,
+        index=index,
+    )
+
+
+def StdBigInt(default=0, primary_key=False, unique=False, nullable=False, index=False):
+    return Column(
+        types.INTEGER,
+        default=default,
+        nullable=nullable,
+        primary_key=primary_key,
+        unique=unique,
+        index=index,
+    )
 
     #  Column("id", types.BigInteger().with_variant(types.BigInteger, "sqlite"), primary_key=True)
 
-def StdFloat(default = 0.0, primary_key = False, unique = False, nullable = False):
-    return Column(types.Integer, default = default, nullable = nullable,
-        primary_key = primary_key, unique = unique)
+
+def StdFloat(default=0.0, primary_key=False, unique=False, nullable=False):
+    return Column(
+        types.Integer,
+        default=default,
+        nullable=nullable,
+        primary_key=primary_key,
+        unique=unique,
+    )
 
 
 class MetaData(Base, RidMixIn):
-    """
+    """ """
 
-    """
-    sha = Column(types.VARCHAR) # hashlib.sha3_512()
+    sha = Column(types.VARCHAR)  # hashlib.sha3_512()
 
 
 class Elf_Section(Base, RidMixIn):
-    """
+    """ """
 
-    """
-    index = Column(types.Integer, unique = True)
+    index = Column(types.Integer, unique=True)
     sh_name = StdBigInt()
     sh_type = StdBigInt()
     sh_flags = StdBigInt()
@@ -127,7 +150,7 @@ class Elf_Section(Base, RidMixIn):
     sh_addralign = StdBigInt()
     sh_entsize = StdBigInt()
 
-    section_name = Column(types.VARCHAR, index = True)
+    section_name = Column(types.VARCHAR, index=True)
     section_image = Column(types.BLOB)
 
     @hybrid_property
@@ -140,11 +163,21 @@ class Elf_Section(Base, RidMixIn):
 
     @hybrid_property
     def has_content(self):
-        return self.sh_type not in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL) and (self.sh_size > 0)
+        return self.sh_type not in (
+            defs.SectionType.SHT_NOBITS,
+            defs.SectionType.SHT_NULL,
+        ) and (self.sh_size > 0)
 
     @has_content.expression
     def has_content(self):
-        return and_(not_(self.sh_type.in_((defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL))), (self.sh_size > 0))
+        return and_(
+            not_(
+                self.sh_type.in_(
+                    (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL)
+                )
+            ),
+            (self.sh_size > 0),
+        )
 
     @hybrid_method
     def get_flags(self):
@@ -203,11 +236,11 @@ class Elf_Section(Base, RidMixIn):
         return self.test_flags(defs.SectionFlags.SHF_TLS)
 
     @hybrid_property
-    def flag_ordered(self): # Solaris only.
+    def flag_ordered(self):  # Solaris only.
         return self.test_flags(defs.SectionFlags.SHF_ORDERED)
 
     @hybrid_property
-    def flag_exclude(self): # Solaris only.
+    def flag_exclude(self):  # Solaris only.
         return self.test_flags(defs.SectionFlags.SHF_EXCLUDE)
 
 
@@ -229,25 +262,31 @@ class Elf_Symbol(Base, RidMixIn):
 
     undefined: bool
     """
+
     st_name = StdInteger()
-    st_value = StdInteger(index = True)
+    st_value = StdInteger(index=True)
     st_size = StdInteger()
-    st_bind = StdInteger(index = True)
-    st_type = StdInteger(index = True)
+    st_bind = StdInteger(index=True)
+    st_type = StdInteger(index=True)
     st_other = StdInteger()
     st_shndx = StdInteger()
 
-    section_name = Column(types.VARCHAR, index = True)
-    symbol_name = Column(types.VARCHAR, index = True)
-    access = StdInteger(index = True)
+    section_name = Column(types.VARCHAR, index=True)
+    symbol_name = Column(types.VARCHAR, index=True)
+    access = StdInteger(index=True)
 
     @hybrid_property
     def hidden(self):
-        return self.st_other in (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
+        return self.st_other in (
+            defs.SymbolVisibility.STV_HIDDEN,
+            defs.SymbolVisibility.STV_INTERNAL,
+        )
 
     @hidden.expression
     def hidden(self):
-        return self.st_other.in_((defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL))
+        return self.st_other.in_(
+            (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
+        )
 
     @hybrid_property
     def weak(self):
@@ -303,17 +342,15 @@ class Elf_Symbol(Base, RidMixIn):
 
 
 class Elf_Comment(Base, RidMixIn):
-    """
-    """
+    """ """
 
     text = Column(types.VARCHAR)
 
 
 class Elf_Note(Base, RidMixIn):
-    """
-    """
+    """ """
 
-    section_name = Column(types.VARCHAR, unique = True)
+    section_name = Column(types.VARCHAR, unique=True)
     type = StdInteger()
     name = Column(types.VARCHAR)
     desc = Column(types.VARCHAR)
@@ -322,7 +359,9 @@ class Elf_Note(Base, RidMixIn):
 def calculateCacheSize(value):
     return -(value // PAGE_SIZE)
 
+
 REGEXER_CACHE = {}
+
 
 def regexer(value, expr):
     if not REGEXER_CACHE.get(expr):
@@ -335,24 +374,30 @@ def regexer(value, expr):
 def set_sqlite3_pragmas(dbapi_connection, connection_record):
     dbapi_connection.create_function("REGEXP", 2, regexer)
     cursor = dbapi_connection.cursor()
-    #cursor.execute("PRAGMA jornal_mode=WAL")
+    # cursor.execute("PRAGMA jornal_mode=WAL")
     cursor.execute("PRAGMA FOREIGN_KEYS=ON")
     cursor.execute("PRAGMA PAGE_SIZE={}".format(PAGE_SIZE))
-    cursor.execute("PRAGMA CACHE_SIZE={}".format(calculateCacheSize(CACHE_SIZE * 1024 * 1024)))
-    cursor.execute("PRAGMA SYNCHRONOUS=OFF") # FULL
-    cursor.execute("PRAGMA LOCKING_MODE=EXCLUSIVE") # NORMAL
+    cursor.execute(
+        "PRAGMA CACHE_SIZE={}".format(calculateCacheSize(CACHE_SIZE * 1024 * 1024))
+    )
+    cursor.execute("PRAGMA SYNCHRONOUS=OFF")  # FULL
+    cursor.execute("PRAGMA LOCKING_MODE=EXCLUSIVE")  # NORMAL
     cursor.execute("PRAGMA TEMP_STORE=MEMORY")  # FILE
     cursor.close()
 
 
 class Model(object):
+    def __init__(self, debug=False):
+        self._engine = create_engine(
+            "sqlite:///:memory:",
+            echo=debug,
+            connect_args={
+                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+            },
+            native_datetime=True,
+        )
 
-    def __init__(self, debug = False):
-        self._engine = create_engine("sqlite:///:memory:", echo = debug,
-        connect_args={'detect_types': sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
-        native_datetime = True)
-
-        self._session = orm.Session(self._engine, autoflush = True, autocommit = False)
+        self._session = orm.Session(self._engine, autoflush=True, autocommit=False)
 
         self._metadata = Base.metadata
         Base.metadata.create_all(self.engine)

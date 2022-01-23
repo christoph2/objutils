@@ -29,13 +29,19 @@ from collections import namedtuple, OrderedDict
 
 from objutils.utils import SingletonBase
 
-class CodecDoesNotExistError(Exception): pass
-class CodecAlreadyExistError(Exception): pass
+
+class CodecDoesNotExistError(Exception):
+    pass
+
+
+class CodecAlreadyExistError(Exception):
+    pass
+
 
 Codec = namedtuple("Codec", "Reader Writer description")
 
-class Registry(SingletonBase):
 
+class Registry(SingletonBase):
     def __init__(self):
         self._codecs = OrderedDict()
 
@@ -54,7 +60,7 @@ class Registry(SingletonBase):
             raise CodecDoesNotExistError(name)
         return codec
 
-    def register(self, name, readerClass, writerClass, description = ''):
+    def register(self, name, readerClass, writerClass, description=""):
         if name in self.codecs:
             raise CodecAlreadyExistError(name)
         self._codecs[name] = Codec(readerClass, writerClass, description)
@@ -63,5 +69,6 @@ class Registry(SingletonBase):
 
     codecs = property(_get_codecs)
     formats = property(_get_formats)
+
 
 registry = Registry()

@@ -25,15 +25,18 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-class FileCorruptedError(Exception): pass
 
-class PrematureEndOfFileError(Exception): pass
+class FileCorruptedError(Exception):
+    pass
+
+
+class PrematureEndOfFileError(Exception):
+    pass
+
 
 class InvalidAddressError(Exception):
-    """Raised if address information is out of range.
-    """
+    """Raised if address information is out of range."""
+
 
 class FeatureNotAvailableError(Exception):
-    """Raised if something is missing, e.g. Numpy for certain operations.
-    """
-
+    """Raised if something is missing, e.g. Numpy for certain operations."""

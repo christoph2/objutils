@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import io
+import os
 import unittest
 
 from objutils.image import Image
-from objutils.utils import create_string_buffer, PYTHON_VERSION
-import os
-import io
+from objutils.utils import create_string_buffer
+from objutils.utils import PYTHON_VERSION
 
 TEST1 = """
 Section #0000
@@ -83,18 +83,17 @@ Section #0000
 
 
 class BaseTest(unittest.TestCase):
-
     def setUp(self):
         if PYTHON_VERSION.major == 3:
             self.buf = io.TextIOWrapper(create_string_buffer())
         else:
             self.buf = create_string_buffer()
-        #self.stdout = sys.stdout
-        #sys.stdout = self.buf
+        # self.stdout = sys.stdout
+        # sys.stdout = self.buf
         self.image = Image()
 
     def tearDown(self):
-        #sys.stdout = self.stdout
+        # sys.stdout = self.stdout
         del self.buf
         del self.image
 
@@ -104,7 +103,6 @@ class BaseTest(unittest.TestCase):
 
 
 class TestHexdumper(BaseTest):
-
     def testDumpContinuousRange(self):
         self.image.insert_section(range(64), 0x1000)
         self.image.join_sections()
@@ -142,6 +140,6 @@ class TestHexdumper(BaseTest):
 def main():
     unittest.main()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

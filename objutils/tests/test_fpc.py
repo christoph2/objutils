@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from objutils import loads, dumps, probes
 import unittest
 
 import pytest
 
-#for key, value in sorted(registry.registry().items()):
+from objutils import dumps
+from objutils import loads
+from objutils import probes
+
+# for key, value in sorted(registry.registry().items()):
 #    print("{0:10} {1}".format(key, value.description))
 
 
@@ -21,25 +23,23 @@ $B[6\;%%,:\KIn?GFWY/qKI1G5:;-_e
 $%%%%%"""
 
 
-fromSrec =  loads('srec', SREC)
-dataFromSRec = dumps('fpc', fromSrec)   # Fixme: Does _NOT_ return 'bytes'!
+fromSrec = loads("srec", SREC)
+dataFromSRec = dumps("fpc", fromSrec)  # Fixme: Does _NOT_ return 'bytes'!
 
-fromFPC =  loads('fpc', FPC)
-dataFromFPC = dumps('srec', fromFPC, row_length = 32, s5record = True)
+fromFPC = loads("fpc", FPC)
+dataFromFPC = dumps("srec", fromFPC, row_length=32, s5record=True)
 
 
 class TestRoundTrip(unittest.TestCase):
-
     def testFromSrec(self):
         self.assertEqual(dataFromSRec, FPC)
-        #pass
+        # pass
 
     def testFromFPC(self):
         self.assertEqual(dataFromFPC, SREC)
 
 
 class TestProbe(unittest.TestCase):
-
     @pytest.mark.skip
     def testProbeSrec(self):
         self.assertEqual(probes(SREC), "srec")
@@ -49,6 +49,5 @@ class TestProbe(unittest.TestCase):
         self.assertEqual(probes(FPC), "fpc")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

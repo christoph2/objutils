@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
 """
 
@@ -68,16 +67,16 @@ FORMATS = {
 }
 
 TYPE_SIZES = {
-    "uint8":    1,
-    "int8":     1,
-    "uint16":   2,
-    "int16":    2,
-    "uint32":   4,
-    "int32":    4,
-    "uint64":   8,
-    "int64":    8,
-    "float32":  4,
-    "float64":  8,
+    "uint8": 1,
+    "int8": 1,
+    "uint16": 2,
+    "int16": 2,
+    "uint32": 4,
+    "int32": 4,
+    "uint64": 8,
+    "int64": 8,
+    "float32": 4,
+    "float64": 8,
 }
 
 
@@ -88,21 +87,24 @@ BYTEORDER = {
 
 TypeInformation = namedtuple("TypeInformation", "type byte_order size")
 
-DTYPE = re.compile(r"""
+DTYPE = re.compile(
+    r"""
       (?:(?P<uns>u)?int(?P<len>8 | 16 | 32 | 64)(?P<sep>[-/_:])(?P<end> be | le))
     | (?P<byte>byte)
-    | (?P<flt>float)(?P<flen>32 | 64)""", re.IGNORECASE | re.VERBOSE)
+    | (?P<flt>float)(?P<flen>32 | 64)""",
+    re.IGNORECASE | re.VERBOSE,
+)
 
 NumberRange = namedtuple("NumberRange", "lower upper")
 
-signed_range = lambda x: NumberRange( *(int(-(2 ** x / 2)), int((2 ** x / 2) - 1)))
-unsigned_range = lambda x: NumberRange( *(0, int((2 ** x) - 1)))
+signed_range = lambda x: NumberRange(*(int(-(2 ** x / 2)), int((2 ** x / 2) - 1)))
+unsigned_range = lambda x: NumberRange(*(0, int((2 ** x) - 1)))
 
-INT8_RANGE  = signed_range(8)
+INT8_RANGE = signed_range(8)
 INT16_RANGE = signed_range(16)
 INT32_RANGE = signed_range(32)
 INT64_RANGE = signed_range(64)
-UINT8_RANGE  = unsigned_range(8)
+UINT8_RANGE = unsigned_range(8)
 UINT16_RANGE = unsigned_range(16)
 UINT32_RANGE = unsigned_range(32)
 UINT64_RANGE = unsigned_range(64)
@@ -118,6 +120,7 @@ RANGES = {
     "uint64": UINT64_RANGE,
     "int64": INT64_RANGE,
 }
+
 
 def filler(ch, n):
     """Create an bytearray consisting of `n` `ch`s.
@@ -146,21 +149,21 @@ def filler(ch, n):
 
 def _data_converter(data):
     if isinstance(data, bytearray):
-        pass    # no conversion needed.
+        pass  # no conversion needed.
     elif isinstance(data, int):
         raise ValueError("single int not permitted")
     elif isinstance(data, str):
-        if PYTHON_VERSION.major == 3 :
-            data = bytearray(data, encoding = "ascii")
+        if PYTHON_VERSION.major == 3:
+            data = bytearray(data, encoding="ascii")
         else:
             data = bytearray(data)
-    elif isinstance(data, array) and data.typecode != 'B':
+    elif isinstance(data, array) and data.typecode != "B":
         if PYTHON_VERSION.major == 3:
             data = bytearray(data.tobytes())
         else:
             data = bytearray(data.tostring())
     elif isinstance(data, Section):
-        data = copy(data.data)    # just copy data from other section.
+        data = copy(data.data)  # just copy data from other section.
     else:
         try:
             data = bytearray(data)
@@ -169,15 +172,16 @@ def _data_converter(data):
     return data
 
 
-@attr.s(repr = False, eq = True, order = True)
+@attr.s(repr=False, eq=True, order=True)
 class Section(object):
     """Manage sections.
 
     A section is a continuous block of bytes, with a start-address and known length.
 
     """
-    start_address = attr.ib(type = int, eq = True, order = True, default = 0)
-    data = attr.ib(default = bytearray(), converter = _data_converter, eq = True, order = True)
+
+    start_address = attr.ib(type=int, eq=True, order=True, default=0)
+    data = attr.ib(default=bytearray(), converter=_data_converter, eq=True, order=True)
 
     def __attrs_post_init__(self):
         self.repr = reprlib.Repr()
@@ -187,36 +191,34 @@ class Section(object):
     def __iter__(self):
         yield self
 
-    def hexdump(self, fp = sys.stdout):
+    def hexdump(self, fp=sys.stdout):
         dumper = hexdump.CanonicalDumper(fp)
         dumper.dump_data(self)
 
     def tobytes(self):
         if PYTHON_VERSION.major == 3:
-            return  array('B', self.data).tobytes()
+            return array("B", self.data).tobytes()
         else:
-            return  array('B', self.data).tostring()
+            return array("B", self.data).tostring()
 
     def tolist(self):
-        return  array('B', self.data).tolist()
+        return array("B", self.data).tolist()
 
     def _verify_dtype(self, dtype):
-        """
-        """
+        """ """
         dtype = dtype.lower().strip()
         if dtype == "byte":
-            return "uint8", "le"    # Completly arbitrary,
+            return "uint8", "le"  # Completly arbitrary,
         if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
-                print("DTYPE:", dtype)
-                raise TypeError("dtype must be suffixed with '_be' or '_le'")
+            print("DTYPE:", dtype)
+            raise TypeError("dtype must be suffixed with '_be' or '_le'")
         match = DTYPE.match(dtype)
         if not match:
             raise TypeError("Invalid datatype '{}'".format(dtype))
         return dtype.split("_")
 
-    def _getformat(self, dtype, length = 1):
-        """
-        """
+    def _getformat(self, dtype, length=1):
+        """ """
         fmt, bo = self._verify_dtype(dtype)
 
         if length > 1:
@@ -267,21 +269,20 @@ class Section(object):
         if offset + data_size > self.length:
             raise InvalidAddressError("read_numeric() access out of bounds.")
         data = self.data[offset : offset + data_size]
-        if 'bit_mask' in kws:
+        if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
             data = self.apply_bitmask(data, dtype, bit_mask)
         return struct.unpack(fmt, data)[0]
 
     def apply_bitmask(self, data, dtype, bit_mask):
-        """
-        """
+        """ """
         dtype, byteorder = dtype.lower().strip().split("_")
         byteorder = "little" if byteorder == "le" else "big"
         type_size = TYPE_SIZES.get(dtype)
         data_size = len(data)
-        tmp = int.from_bytes(data, byteorder, signed = False)
+        tmp = int.from_bytes(data, byteorder, signed=False)
         tmp &= bit_mask
-        return tmp.to_bytes(data_size, byteorder, signed = False)
+        return tmp.to_bytes(data_size, byteorder, signed=False)
 
     def write_numeric(self, addr, value, dtype, **kws):
         offset = addr - self.start_address
@@ -291,7 +292,7 @@ class Section(object):
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
             raise InvalidAddressError("write_numeric() access out of bounds.")
-        if 'bit_mask' in kws:
+        if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
@@ -307,7 +308,7 @@ class Section(object):
         return struct.unpack(fmt, data)
 
     def write_numeric_array(self, addr, data, dtype, **kws):
-        if not hasattr(data, '__iter__'):
+        if not hasattr(data, "__iter__"):
             raise TypeError("data must be iterable")
         length = len(data)
         offset = addr - self.start_address
@@ -319,32 +320,30 @@ class Section(object):
             raise InvalidAddressError("write_numeric_array() access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
-    def read_string(self, addr, encoding = "latin1", length = -1, **kws):
+    def read_string(self, addr, encoding="latin1", length=-1, **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("read_string() access out of bounds.")
         if length == -1:
-            pos = self.data[offset : ].find(b'\x00')
+            pos = self.data[offset:].find(b"\x00")
         else:
             pos = length
         if pos == -1:
-            raise TypeError("Unterminated String!!!")   # TODO: Testcase.
-        return self.data[offset : offset + pos].decode(encoding = encoding)
+            raise TypeError("Unterminated String!!!")  # TODO: Testcase.
+        return self.data[offset : offset + pos].decode(encoding=encoding)
 
-    def write_string(self, addr, value, encoding = "latin1", **kws):
+    def write_string(self, addr, value, encoding="latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError("write_string() access out of bounds.")
         if PYTHON_VERSION.major == 3:
-            self.data[offset : offset +  len(value)] = bytes(value, encoding = encoding)
+            self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
         else:
-            self.data[offset : offset +  len(value)] = bytes(value)
-        self.data[offset +  len(value)] = 0
+            self.data[offset : offset + len(value)] = bytes(value)
+        self.data[offset + len(value)] = 0
 
-    def write_ndarray(self, addr, array, order = None, **kws):
-        """
-
-        """
+    def write_ndarray(self, addr, array, order=None, **kws):
+        """ """
         try:
             import numpy as np
         except ImportError:
@@ -359,10 +358,8 @@ class Section(object):
             raise InvalidAddressError("write_ndarray() access out of bounds.")
         self.data[offset : offset + data_size] = array.tobytes()
 
-    def read_ndarray(self, addr, length, dtype, shape = None, order = None, **kws):
-        """
-
-        """
+    def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
+        """ """
         try:
             import numpy as np
         except ImportError:
@@ -384,12 +381,13 @@ class Section(object):
         type_, byte_order = self._verify_dtype(dtype)
         dt = np.dtype(type_)
         dt = dt.newbyteorder(BYTEORDER.get(byte_order))
-        arr = np.frombuffer(self.data[offset : offset + length], dtype = dt).reshape(shape)
+        arr = np.frombuffer(self.data[offset : offset + length], dtype=dt).reshape(
+            shape
+        )
         if order == "F":
-            return arr.T    # Fortran deposit, i.e. col-maj means transposition.
+            return arr.T  # Fortran deposit, i.e. col-maj means transposition.
         else:
             return arr
-
 
     """
     def write_timestamp():
@@ -399,15 +397,15 @@ class Section(object):
         pass
     """
 
-    def find(self, expr, addr = -1):
+    def find(self, expr, addr=-1):
         for item in re.finditer(bytes(expr), self.data):
-            yield (self.start_address + item.start(), item.end()- item.start())
+            yield (self.start_address + item.start(), item.end() - item.start())
 
     def __repr__(self):
         return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
             self.start_address,
             self.length,
-            self.repr.repr(memoryview(self.data).tobytes())
+            self.repr.repr(memoryview(self.data).tobytes()),
         )
 
     def __len__(self):
@@ -427,7 +425,7 @@ class Section(object):
 
 def join_sections(sections):
     if isinstance(sections, SortedList):
-        result_sections = SortedList(key = attrgetter("start_address"))
+        result_sections = SortedList(key=attrgetter("start_address"))
     else:
         result_sections = []
     prev_section = Section()
@@ -435,7 +433,10 @@ def join_sections(sections):
         section = sections.pop(0)
         if not isinstance(section, Section):
             raise TypeError("'{}' is not a 'Section' instance", section)
-        if section.start_address == prev_section.start_address + prev_section.length and result_sections:
+        if (
+            section.start_address == prev_section.start_address + prev_section.length
+            and result_sections
+        ):
             last_segment = result_sections[-1]
             last_segment.data.extend(section.data)
         else:
@@ -449,6 +450,6 @@ def join_sections(sections):
         return result_sections
     else:
         if isinstance(sections, SortedList):
-            return SortedList(key = attrgetter("start_address"))
+            return SortedList(key=attrgetter("start_address"))
         else:
             return []

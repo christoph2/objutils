@@ -14,6 +14,13 @@ objutils
 .. image:: https://ci.appveyor.com/api/projects/status/owpi324b6wbwocq9?svg=true
     :target: https://ci.appveyor.com/project/christoph2/objutils
 
+.. image:: https://results.pre-commit.ci/badge/github/christoph2/objutils/master.svg
+   :target: https://results.pre-commit.ci/latest/github/christoph2/objutils/master
+   :alt: pre-commit.ci status
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 .. image:: http://img.shields.io/badge/license-GPL-blue.svg
    :target: http://opensource.org/licenses/GPL-2.0
 

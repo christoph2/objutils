@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import unittest
 
-from objutils import dumps, loads
+from objutils import dumps
+from objutils import loads
 
-TEST1 = b''' $A0000,
+TEST1 = b""" $A0000,
 7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C
 3B E0 00 01 93 FE 00 00 7F FA 02 A6 93 FE 00 04
 7F FB 02 A6 93 FE 00 08 7F D2 42 A6 7F F3 42 A6
@@ -15,9 +15,9 @@ TEST1 = b''' $A0000,
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 $ACF00,
 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-$$0FF0,'''
+$$0FF0,"""
 
-TEST2 = b'''
+TEST2 = b"""
 7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C
 3B E0 00 01 93 FE 00 00 7F FA 02 A6 93 FE 00 04
 7F FB 02 A6 93 FE 00 08 7F D2 42 A6 7F F3 42 A6
@@ -27,7 +27,7 @@ TEST2 = b'''
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 $ACF00,
 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-$$0FF0,'''
+$$0FF0,"""
 
 """$A000000,
 377 377 377 377 377 377 377 377 377 377 377 377 377 377 377 377
@@ -58,19 +58,18 @@ TEST_HEX_COMMA = b""" $A0000,
 FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,
 $S0FF0,"""
 
-#TEST_HEX_ = """B $A0000,
-#FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'
-#$S0FF0,"""
+# TEST_HEX_ = """B $A0000,
+# FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'FF'
+# $S0FF0,"""
 
 SREC = b"""S1130000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC
 S5030001FB"""
 
 
 class TestAcceptance(unittest.TestCase):
-
     def _runTest(self, format):
         data = loads("ash", format)
-        self.assertTrue(dumps("srec", data, s5record = True) == SREC)
+        self.assertTrue(dumps("srec", data, s5record=True) == SREC)
 
     def testAcceptSpace(self):
         self._runTest(TEST_HEX_SPACE)
@@ -86,16 +85,15 @@ class TestAcceptance(unittest.TestCase):
 
 
 class TestGenerateVariants(unittest.TestCase):
-
     def testWriteHexSpace(self):
         data = loads("srec", SREC)
-        #print(dumps("ash", data, separator = "%"))
-        #print()
+        # print(dumps("ash", data, separator = "%"))
+        # print()
 
 
 def main():
     unittest.main()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

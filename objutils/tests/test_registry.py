@@ -1,11 +1,16 @@
-
 import unittest
 
-class DummyReader(object): pass
-class DummyWriter(object): pass
+
+class DummyReader(object):
+    pass
+
+
+class DummyWriter(object):
+    pass
+
 
 class TestRegistry(unittest.TestCase):
-    CODECS = ('A', 'B', 'C', 'X', 'Y', 'Z')
+    CODECS = ("A", "B", "C", "X", "Y", "Z")
 
     """
     def tearDown(self):
@@ -40,6 +45,6 @@ class TestRegistry(unittest.TestCase):
             objutils.registry.register('X', DummyReader, DummyWriter)
     """
 
-if __name__ == '__main__':
-    unittest.main()
 
+if __name__ == "__main__":
+    unittest.main()

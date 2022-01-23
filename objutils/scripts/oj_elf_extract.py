@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Extract sections contributing to program image, e.g. for flash programming applications.
 """
 
@@ -31,41 +30,83 @@ import argparse
 from objutils import dump
 from objutils.elf import ElfParser
 
+
 def callback(state, section):
-    """
-    """
+    """ """
     if state == "start":
         pass
     elif state == "stop":
         print("-" * 45)
     elif state == "section":
-        print("{:25s} 0x{:08x} {}".format(section.section_name, section.sh_addr, section.sh_size))
+        print(
+            "{:25s} 0x{:08x} {}".format(
+                section.section_name, section.sh_addr, section.sh_size
+            )
+        )
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description = 'Extract sections contributing to program image, e.g. for flash programming applications.'
+        description="Extract sections contributing to program image, e.g. for flash programming applications."
     )
-    parser.add_argument("elf_file", help = "ELF file")
-    parser.add_argument("output_file_name", help = "Output filename.")
-    parser.add_argument("-j", "--join", help = "Try to make continuous sections.", dest = "join", action = "store_true")
-    parser.add_argument("-t", "--file-type", help = "Type of output HEX file.", choices = [
-        "ihex", 'shf', "srec", 'titxt'
-    ], default = "ihex", dest = "file_type")
-    parser.add_argument("-e", "--exclude_pattern", help = "Exclude sections matching a Python RegEx", dest = "exclude", default = None)
-    parser.add_argument("-i", "--include_pattern", help = "Include only sections matching a Python RegEx", dest = "include", default = None)
+    parser.add_argument("elf_file", help="ELF file")
+    parser.add_argument("output_file_name", help="Output filename.")
+    parser.add_argument(
+        "-j",
+        "--join",
+        help="Try to make continuous sections.",
+        dest="join",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-t",
+        "--file-type",
+        help="Type of output HEX file.",
+        choices=["ihex", "shf", "srec", "titxt"],
+        default="ihex",
+        dest="file_type",
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude_pattern",
+        help="Exclude sections matching a Python RegEx",
+        dest="exclude",
+        default=None,
+    )
+    parser.add_argument(
+        "-i",
+        "--include_pattern",
+        help="Include only sections matching a Python RegEx",
+        dest="include",
+        default=None,
+    )
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print("\n'{}' is not valid ELF file. Raised exception: '{}'.".format(args.elf_file, repr(e)))
+        print(
+            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
+                args.elf_file, repr(e)
+            )
+        )
         exit(1)
     print("\nExtracting from...\n")
     print("Section                   Address    Length")
     print("-" * 45)
-    img = ep.create_image(callback = callback, join = args.join, exclude_pattern = args.exclude, include_pattern = args.include)
+    img = ep.create_image(
+        callback=callback,
+        join=args.join,
+        exclude_pattern=args.exclude,
+        include_pattern=args.include,
+    )
     if img:
         dump(args.file_type, args.output_file_name, img)
-        print("HEX image written to: '{}' [{} total bytes]".format(args.output_file_name, len(img)))
+        print(
+            "HEX image written to: '{}' [{} total bytes]".format(
+                args.output_file_name, len(img)
+            )
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

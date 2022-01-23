@@ -38,11 +38,11 @@ from objutils.utils import slicer, create_string_buffer, PYTHON_VERSION
 from objutils.logger import Logger
 
 
-'''
+"""
 MemoryBlocks
 ------------
 Segment-Types: generic,code,const,bss,... (s. ELF!?)
-'''
+"""
 
 """
 TODO:   Create a base class for Reader/Writer common functionality.
@@ -50,95 +50,108 @@ TODO:   Create a base class for Reader/Writer common functionality.
         Parameter ['exceptionsOnErrors'].
 """
 
-SIXTEEN_BITS    = 0
-TWENTY_BITS     = 1
+SIXTEEN_BITS = 0
+TWENTY_BITS = 1
 TWENTYFOUR_BITS = 2
-THIRTYTWO_BITS  = 3
+THIRTYTWO_BITS = 3
 
-START           = 0
-LENGTH          = 1
-TYPE            = 2
-ADDRESS         = 3
-DATA            = 4
-UNPARSED        = 5
-CHECKSUM        = 6
-ADDR_CHECKSUM   = 7
+START = 0
+LENGTH = 1
+TYPE = 2
+ADDRESS = 3
+DATA = 4
+UNPARSED = 5
+CHECKSUM = 6
+ADDR_CHECKSUM = 7
 
 MAP_GROUP_TO_REGEX = {
-    LENGTH          : "(?P<length>[0-9a-zA-Z]{%d})",
-    TYPE            : "(?P<type>\d{%d})",
-    ADDRESS         : "(?P<address>[0-9a-zA-Z]{%d})",
-    DATA            : "(?P<chunk>[0-9a-zA-Z]+)",
-    UNPARSED        : "(?P<chunk>.*)",
-    CHECKSUM        : "(?P<checksum>[0-9a-zA-Z]{%d})",
-    ADDR_CHECKSUM   : "(?P<addrChecksum>[0-9a-zA-Z]{%d})",
+    LENGTH: "(?P<length>[0-9a-zA-Z]{%d})",
+    TYPE: "(?P<type>\d{%d})",
+    ADDRESS: "(?P<address>[0-9a-zA-Z]{%d})",
+    DATA: "(?P<chunk>[0-9a-zA-Z]+)",
+    UNPARSED: "(?P<chunk>.*)",
+    CHECKSUM: "(?P<checksum>[0-9a-zA-Z]{%d})",
+    ADDR_CHECKSUM: "(?P<addrChecksum>[0-9a-zA-Z]{%d})",
 }
 
 MAP_CHAR_TO_GROUP = {
-    'L': LENGTH,
-    'T': TYPE,
-    'A': ADDRESS,
-    'D': DATA,
-    'U': UNPARSED,
-    'C': CHECKSUM,
-    'B': ADDR_CHECKSUM,
+    "L": LENGTH,
+    "T": TYPE,
+    "A": ADDRESS,
+    "D": DATA,
+    "U": UNPARSED,
+    "C": CHECKSUM,
+    "B": ADDR_CHECKSUM,
 }
 
 TYPE_FROM_RECORD = 0
 
-atoi = partial(int, base = 16)
+atoi = partial(int, base=16)
 
-class Invalidrecord_typeError(Exception): pass
-class InvalidRecordLengthError(Exception): pass
-class InvalidRecordChecksumError(Exception): pass
-class AddressRangeToLargeError(Exception): pass
 
-MetaRecord = namedtuple('MetaRecord', 'format_type address chunk')
+class Invalidrecord_typeError(Exception):
+    pass
+
+
+class InvalidRecordLengthError(Exception):
+    pass
+
+
+class InvalidRecordChecksumError(Exception):
+    pass
+
+
+class AddressRangeToLargeError(Exception):
+    pass
+
+
+MetaRecord = namedtuple("MetaRecord", "format_type address chunk")
+
 
 class FormatParser(object):
-    def __init__(self, fmt, data_separator = None):
+    def __init__(self, fmt, data_separator=None):
         self.fmt = fmt
         self.translated_format = []
         self.data_separator = data_separator
 
     def parse(self):
-        group = ''
-        prevCh = ''
+        group = ""
+        prevCh = ""
         for ch in self.fmt:
             if ch != prevCh:
-                if group != '':
+                if group != "":
                     self.translateFormat(group)
-                    group = ''
+                    group = ""
             group += ch
             prevCh = ch
         self.translateFormat(group)
-        self.translated_format.append((0, 0, r"(?P<junk>(.*?))$"))  #??
-        ft = "^{0}".format(''.join(map(itemgetter(2), self.translated_format)))
+        self.translated_format.append((0, 0, r"(?P<junk>(.*?))$"))  # ??
+        ft = "^{0}".format("".join(map(itemgetter(2), self.translated_format)))
         return re.compile(ft, re.DOTALL | re.MULTILINE)
 
     def translateFormat(self, group):
         group_number = MAP_CHAR_TO_GROUP.get(group[0])
         length = len(group)
-        if group_number is None:    # Handle invariants (i.e. fixed chars).
-            if group[0] == ' ':
-                expr = '\s{{{0!s}}}'.format(length )
+        if group_number is None:  # Handle invariants (i.e. fixed chars).
+            if group[0] == " ":
+                expr = "\s{{{0!s}}}".format(length)
             else:
                 expr = group[0] * length
         else:
             expr = MAP_GROUP_TO_REGEX.get(group_number)
             if group_number == START:
-                expr = expr % (self.startSign, )
+                expr = expr % (self.startSign,)
             elif group_number == DATA:
                 "(?P<chunk>[0-9a-zA-Z]*)"
                 if self.data_separator is not None:
-                    expr = "(?P<chunk>[0-9a-zA-Z{0!s}]*)".format(self.data_separator )
+                    expr = "(?P<chunk>[0-9a-zA-Z{0!s}]*)".format(self.data_separator)
                 else:
                     pass
             elif group_number == UNPARSED:
-                #print expr
+                # print expr
                 pass
             else:
-                expr = expr % (length, )
+                expr = expr % (length,)
         self.translated_format.append((group_number, length, expr))
 
 
@@ -151,7 +164,6 @@ class Container(object):
 
 
 class BaseType(object):
-
     def error(self, msg):
         self.logger.error(msg)
         self.valid = False
@@ -169,7 +181,9 @@ class BaseType(object):
 class Reader(BaseType):
     ALIGMENT = 0  # 2**n
     DATA_SEPARATOR = None
-    VALID_CHARS = re.compile(r"^[a-fA-F0-9 :/;,%\n\r!?S]*$") # General case, fits most formats.
+    VALID_CHARS = re.compile(
+        r"^[a-fA-F0-9 :/;,%\n\r!?S]*$"
+    )  # General case, fits most formats.
 
     def __init__(self):
         self.logger = Logger("Reader")
@@ -178,13 +192,15 @@ class Reader(BaseType):
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
             for format_type, format in self.FORMAT_SPEC:
-                self.formats.append((format_type, FormatParser(format, self.DATA_SEPARATOR).parse()))
+                self.formats.append(
+                    (format_type, FormatParser(format, self.DATA_SEPARATOR).parse())
+                )
 
     def load(self, fp, **kws):
         if isinstance(fp, str):
             fp = open(fp, "rb")
         if PYTHON_VERSION.major == 3:
-            data = self.read(fp)#.decode()
+            data = self.read(fp)  # .decode()
             if hasattr(fp, "close"):
                 fp.close()
             return data
@@ -193,7 +209,6 @@ class Reader(BaseType):
             if hasattr(fp, "close"):
                 fp.close()
             return data
-
 
     def loads(self, image, **kws):
         if PYTHON_VERSION.major == 3:
@@ -223,44 +238,52 @@ class Reader(BaseType):
                     if dict_ != {}:
                         # Handle scalar values.
                         for key, value in dict_.items():
-                            if key not in ('chunk', 'junk'):
+                            if key not in ("chunk", "junk"):
                                 setattr(container, key, atoi(value))
-                            elif key == 'junk':
+                            elif key == "junk":
                                 setattr(container, key, value)
-                        if 'chunk' in dict_:
+                        if "chunk" in dict_:
                             if self.parseData(container, format_type):
-                                chunk = bytearray.fromhex(dict_['chunk'])
+                                chunk = bytearray.fromhex(dict_["chunk"])
                             else:
                                 # don't convert/parse stuff like symbols.
-                                chunk = dict_['chunk']
-                            dict_.pop('chunk')
-                            setattr(container, 'chunk', chunk)
+                                chunk = dict_["chunk"]
+                            dict_.pop("chunk")
+                            setattr(container, "chunk", chunk)
                         self.check_line(container, format_type)
                         # this is to handle esoteric stuff like Intel seg:offs addressing and symbols.
                         self.special_processing(container, format_type)
                         if self.is_data_line(container, format_type):
                             sections.append(Section(container.address, container.chunk))
                         else:
-                            chunk = container.chunk if hasattr(container, 'chunk') else None
-                            address = container.address if hasattr(container, 'address') else None
-                            meta_data[format_type].append(MetaRecord(format_type, address, chunk))
+                            chunk = (
+                                container.chunk if hasattr(container, "chunk") else None
+                            )
+                            address = (
+                                container.address
+                                if hasattr(container, "address")
+                                else None
+                            )
+                            meta_data[format_type].append(
+                                MetaRecord(format_type, address, chunk)
+                            )
                     break
             if not matched:
                 self.warn("Ignoring garbage line #{0:d}".format(line_number))
         if sections:
-            return Image(sections = join_sections(sections), meta = meta_data)
+            return Image(sections=join_sections(sections), meta=meta_data)
         else:
             self.error("File seems to be invalid.")
-            return Image([], valid = False)
+            return Image([], valid=False)
 
     def _address_space(self, value):
-        if value < 2**16:
+        if value < 2 ** 16:
             return SIXTEEN_BITS
-        elif value < 2**20:
+        elif value < 2 ** 20:
             return TWENTY_BITS
-        elif value < 2**24:
+        elif value < 2 ** 24:
             return TWENTYFOUR_BITS
-        elif value < 2**32:
+        elif value < 2 ** 32:
             return THIRTYTWO_BITS
         else:
             raise ValueError("Unsupported Addressspace size.")
@@ -278,7 +301,7 @@ class Reader(BaseType):
             return False
         matched = False
         for (line_number, line) in enumerate(fp.readlines(), 1):
-            for format_type, format in self.formats: # NOTE: Same as in 'read()'!
+            for format_type, format in self.formats:  # NOTE: Same as in 'read()'!
                 if isinstance(line, bytes):
                     match = format.match(line.decode())
                 else:
@@ -316,47 +339,46 @@ class Reader(BaseType):
 
 
 class Writer(BaseType):
-
     def __init__(self):
         self.logger = Logger("Writer")
 
-    def dump(self, fp, image, row_length = 16, **kws):   # TODO: rename to bytesPerRow!
+    def dump(self, fp, image, row_length=16, **kws):  # TODO: rename to bytesPerRow!
         if isinstance(fp, str):
             fp = open(fp, "wb")
         fp.write(self.dumps(image, row_length))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, row_length = 16, **kws):
+    def dumps(self, image, row_length=16, **kws):
         result = []
         self.row_length = row_length
         if hasattr(image, "sections") and not image.sections:
-            return b''
+            return b""
         if self.calculate_address_bits(image) > self.MAX_ADDRESS_BITS:
-            raise AddressRangeToLargeError('could not encode image.')
+            raise AddressRangeToLargeError("could not encode image.")
         params = self.set_parameters(**kws)
         self.pre_processing(image)
-        header = self.compose_header(image.meta if hasattr(image, 'meta') else {})
+        header = self.compose_header(image.meta if hasattr(image, "meta") else {})
         if header:
             result.append(header)
         for section in image:
             address = section.start_address
-            rows = slicer(section.data, row_length, lambda x:  [int(y) for y in x])
+            rows = slicer(section.data, row_length, lambda x: [int(y) for y in x])
             for row in rows:
                 length = len(row)
                 result.append(self.compose_row(address, length, row))
                 address += row_length
-        footer = self.compose_footer(image.meta if hasattr(image, 'meta') else {})
+        footer = self.compose_footer(image.meta if hasattr(image, "meta") else {})
         if footer:
             result.append(footer)
         if PYTHON_VERSION.major == 3:
-            return self.post_processing(bytes('\n'.join(result), "ascii"))
+            return self.post_processing(bytes("\n".join(result), "ascii"))
         else:
-            return self.post_processing(bytes('\n'.join(result)))
+            return self.post_processing(bytes("\n".join(result)))
 
     def calculate_address_bits(self, image):
         if hasattr(image, "sections"):
-            last_segment = sorted(image.sections, key = lambda s: s.start_address)[-1]
+            last_segment = sorted(image.sections, key=lambda s: s.start_address)[-1]
         else:
             last_segment = image
         highest_address = last_segment.start_address + last_segment.length
@@ -390,13 +412,13 @@ class Writer(BaseType):
 
     def word_to_bytes(self, word):
         word = int(word)
-        h = (word & 0xff00) >> 8
-        l = word & 0x00ff
+        h = (word & 0xFF00) >> 8
+        l = word & 0x00FF
         return h, l
 
     @staticmethod
-    def hex_bytes(row, spaced = False):
-        spacer = ' ' if spaced else ''
+    def hex_bytes(row, spaced=False):
+        spacer = " " if spaced else ""
         return spacer.join(["{0:02X}".format(x) for x in row])
 
 
@@ -404,18 +426,28 @@ class ASCIIHexReader(Reader):
 
     FORMAT_SPEC = None
 
-    def __init__(self, address_pattern, data_pattern, etx_pattern, separators = ', '):
+    def __init__(self, address_pattern, data_pattern, etx_pattern, separators=", "):
         self.separators = separators
-        self.DATA_PATTERN = re.compile(data_pattern.format(separators), re.DOTALL | re.MULTILINE)
+        self.DATA_PATTERN = re.compile(
+            data_pattern.format(separators), re.DOTALL | re.MULTILINE
+        )
         self.ADDRESS_PATTERN = re.compile(address_pattern, re.DOTALL | re.MULTILINE)
         self.ETX_PATTERN = re.compile(etx_pattern, re.DOTALL | re.MULTILINE)
-        self.SPLITTER = re.compile('[{0}]'.format(separators))
-        self.patterns = ((self.ADDRESS_PATTERN, self.getAddress), (self.DATA_PATTERN, self.parse_line), (self.ETX_PATTERN, self.nop))
-        self.formats = [(0, self.ADDRESS_PATTERN), (1, self.DATA_PATTERN), (2, self.ETX_PATTERN)]
+        self.SPLITTER = re.compile("[{0}]".format(separators))
+        self.patterns = (
+            (self.ADDRESS_PATTERN, self.getAddress),
+            (self.DATA_PATTERN, self.parse_line),
+            (self.ETX_PATTERN, self.nop),
+        )
+        self.formats = [
+            (0, self.ADDRESS_PATTERN),
+            (1, self.DATA_PATTERN),
+            (2, self.ETX_PATTERN),
+        ]
         super(ASCIIHexReader, self).__init__()
 
     def getAddress(self, line, match):
-        self.address = int(match.group('address'), 16)
+        self.address = int(match.group("address"), 16)
         self.previous_address = self.address
         return True
 
@@ -423,7 +455,12 @@ class ASCIIHexReader(Reader):
         return False
 
     def parse_line(self, line, match):
-        section = Section(self.address, bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]))
+        section = Section(
+            self.address,
+            bytearray(
+                [int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]
+            ),
+        )
         self.sections.append(section)
         self.address += len(section)
         return True
@@ -454,16 +491,17 @@ class ASCIIHexWriter(Writer):
     previous_address = None
 
     def __init__(self, address_designator):
-        self.separator = ' '
+        self.separator = " "
         self.address_designator = address_designator
         super(ASCIIHexWriter, self).__init__()
 
     def compose_row(self, address, length, row):
-        prepend_address =  True if address != self.previous_address else False
-        self.previous_address = (address + length)
+        prepend_address = True if address != self.previous_address else False
+        self.previous_address = address + length
         if prepend_address:
-            line = "{0}\n{1}".format("{0}{1:04X}".format(
-                self.address_designator, address), "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row])
+            line = "{0}\n{1}".format(
+                "{0}{1:04X}".format(self.address_designator, address),
+                "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row]),
             )
         else:
             line = " ".join(["{0:02X}".format(x) for x in row])

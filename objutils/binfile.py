@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Reader/Writer for plain binfiles.
 """
 
@@ -40,22 +39,23 @@ from objutils.utils import PYTHON_VERSION, create_string_buffer
 ## TODO: binzipped format: a separate file for each section + MANIFEST (csv: fname, address, length)
 ##
 
-class NoContiniousError(Exception): pass
+
+class NoContiniousError(Exception):
+    pass
 
 
 class Reader(object):
-
-    def load(self, fp, address = 0x0000):
+    def load(self, fp, address=0x0000):
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = fp.read()
         sec = Section(address, data)
-        img = Image([sec], valid = True)
+        img = Image([sec], valid=True)
         if hasattr(fp, "close"):
             fp.close()
         return img
 
-    def loads(self, image, address = 0x0000):
+    def loads(self, image, address=0x0000):
         if PYTHON_VERSION.major == 3:
             if isinstance(image, str):
                 return self.load(create_string_buffer(bytes(image, "ascii")), address)
@@ -66,14 +66,14 @@ class Reader(object):
 
 
 class Writer(object):
-    def dump(self, fp, image, filler = b'\xff', **kws):
+    def dump(self, fp, image, filler=b"\xff", **kws):
         if isinstance(fp, str):
             fp = open(fp, "wb")
         fp.write(self.dumps(image, filler))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, filler = b'\xff', **kws):
+    def dumps(self, image, filler=b"\xff", **kws):
         if not isinstance(filler, (bytes, int)):
             raise TypeError("filler must be of type 'bytes' or 'int'")
         if isinstance(filler, bytes) and len(filler) > 1:
@@ -84,9 +84,9 @@ class Writer(object):
         previous_address = None
         previous_length = None
 
-        if hasattr(image, "sections") and  not image.sections:
-            return b''
-        sections = sorted(image.sections, key = lambda x: x.start_address)
+        if hasattr(image, "sections") and not image.sections:
+            return b""
+        sections = sorted(image.sections, key=lambda x: x.start_address)
         for section in sections:
             if not previous_address is None:
                 gap = section.start_address - (previous_address + previous_length)
@@ -97,7 +97,9 @@ class Writer(object):
             previous_length = section.length
         return result
 
+
 #
+
 
 class BinZipReader(object):
     pass
@@ -115,18 +117,18 @@ class BinZipWriter(object):
 
     def dumps(self, image, **kws):
 
-        if hasattr(image, "sections") and  not image.sections:
-            return b''
-        sections = sorted(image.sections, key = lambda x: x.start_address)
+        if hasattr(image, "sections") and not image.sections:
+            return b""
+        sections = sorted(image.sections, key=lambda x: x.start_address)
         manifest_buffer = io.StringIO()
         out_buffer = io.BytesIO()
-        #out_buffer = io.StringIO()
+        # out_buffer = io.StringIO()
         print("BUF", out_buffer)
-        with closing(zipfile.ZipFile(out_buffer, mode = "w")) as outFile:
+        with closing(zipfile.ZipFile(out_buffer, mode="w")) as outFile:
             print(outFile)
             for idx, section in enumerate(sections):
                 print(section.start_address, section.length)
-                #print("FN", BinZipWriter.SECTION_FILE_NAME.format(idx))
+                # print("FN", BinZipWriter.SECTION_FILE_NAME.format(idx))
                 manifest_buffer.write(BinZipWriter.SECTION_FILE_NAME.format(idx))
                 manifest_buffer.write("\t")
                 manifest_buffer.write(str(section.start_address))
@@ -135,4 +137,4 @@ class BinZipWriter(object):
                 manifest_buffer.write("\n")
         manifest_buffer.seek(0)
         print(manifest_buffer.read())
-        return ''
+        return ""

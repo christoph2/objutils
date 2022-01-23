@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """List symbols contained in an ELF file (but not DWARF symbols!).
 """
 
@@ -30,30 +29,74 @@ import argparse
 
 from objutils.elf import ElfParser
 
+
 def main():
-    parser = argparse.ArgumentParser(description = 'Display ELF symbols.')
-    parser.add_argument("elf_file", help = "ELF file")
-    parser.add_argument("-s", "--sections", help = "Use only symbols from listed sections", dest = "sections",
-        type = str, default = None)
-    parser.add_argument("-p", "--pattern", help = "Only display symbols matching a (Python) regex", dest = "pattern",
-        type = str, default = None)
-    parser.add_argument("-t", "--types", help = "Use only symbols with listed types", dest = "types",
-        type = str, default = None)
-    parser.add_argument('-a', '--access', type = str, default = None,
-        help = "Use only symbols with listed access specifiers:  A (allocate), W (write), X (execute)")
-    parser.add_argument("-b", "--bindings", help = "Use only symbols with listed bindings", dest = "bindings",
-        type = str, default = None)
-    parser.add_argument('-o', '--order-by', choices = ["N", "V"], default = "V",
-        help = "Order symbols by name or value")
+    parser = argparse.ArgumentParser(description="Display ELF symbols.")
+    parser.add_argument("elf_file", help="ELF file")
+    parser.add_argument(
+        "-s",
+        "--sections",
+        help="Use only symbols from listed sections",
+        dest="sections",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-p",
+        "--pattern",
+        help="Only display symbols matching a (Python) regex",
+        dest="pattern",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-t",
+        "--types",
+        help="Use only symbols with listed types",
+        dest="types",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-a",
+        "--access",
+        type=str,
+        default=None,
+        help="Use only symbols with listed access specifiers:  A (allocate), W (write), X (execute)",
+    )
+    parser.add_argument(
+        "-b",
+        "--bindings",
+        help="Use only symbols with listed bindings",
+        dest="bindings",
+        type=str,
+        default=None,
+    )
+    parser.add_argument(
+        "-o",
+        "--order-by",
+        choices=["N", "V"],
+        default="V",
+        help="Order symbols by name or value",
+    )
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print("\n'{}' is not valid ELF file. Raised exception: '{}'.".format(args.elf_file, repr(e)))
+        print(
+            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
+                args.elf_file, repr(e)
+            )
+        )
         exit(1)
-    for section, syms in ep.symbols.fetch(sections = args.sections, name_pattern = args.pattern,
-        order_by_value = True if args.order_by == "V" else False, bindings = args.bindings,
-        types_str = args.types, access = args.access).items():
+    for section, syms in ep.symbols.fetch(
+        sections=args.sections,
+        name_pattern=args.pattern,
+        order_by_value=True if args.order_by == "V" else False,
+        bindings=args.bindings,
+        types_str=args.types,
+        access=args.access,
+    ).items():
         separator = "=" * len(section)
         print("\n{1:}\n{0:}\n{1:}\n".format(section, separator))
         print("Name")
@@ -65,8 +108,17 @@ def main():
                 "W" if sym.writeable else " ",
                 "X" if sym.executeable else " ",
             )
-            print("{:30}\n{:08x} {:5d} {:10} {:9} {}\n".format(sym.symbol_name, sym.st_value, sym.st_size,
-                sym.symbol_bind.name[4 : ], sym.symbol_type.name[4 : ], access_str))
+            print(
+                "{:30}\n{:08x} {:5d} {:10} {:9} {}\n".format(
+                    sym.symbol_name,
+                    sym.st_value,
+                    sym.st_size,
+                    sym.symbol_bind.name[4:],
+                    sym.symbol_type.name[4:],
+                    access_str,
+                )
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

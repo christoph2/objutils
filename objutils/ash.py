@@ -34,37 +34,47 @@ import re
 import objutils.hexfile as hexfile
 from objutils.checksums import lrc
 
-STX = '\x02'
-ETX = '\x03'
+STX = "\x02"
+ETX = "\x03"
 
-DATA = re.compile(r'(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4})[,.])?', re.DOTALL | re.MULTILINE)
-ADDRESS = re.compile(r'\$A(?P<value>[0-9a-zA-Z]{2,8})[,.]\s*')
+DATA = re.compile(
+    r"(?:.*?\02)(?P<chunks>.*)(?:\03)\s*(?:\$\$(?P<checksum>[0-9a-zA-Z]{2,4})[,.])?",
+    re.DOTALL | re.MULTILINE,
+)
+ADDRESS = re.compile(r"\$A(?P<value>[0-9a-zA-Z]{2,8})[,.]\s*")
 LINE_SPLIITER = re.compile(r"[ %,']")
 
-checksum = partial(lrc, width = 16)
+checksum = partial(lrc, width=16)
+
 
 class Reader(hexfile.ASCIIHexReader):
-    """
-    """
+    """ """
+
     VALID_CHARS = re.compile(r"^[a-fA-F0-9 %,\'\$\x02\x03\n\r]*$")
 
-    def __init__(self, address_pattern = r'^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$',
-                 data_pattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etx_pattern = r'^q.*$'):
-        super(Reader, self).__init__(address_pattern, data_pattern, etx_pattern, separators = ", %'")
+    def __init__(
+        self,
+        address_pattern=r"^(?:(?P<stx>[\x02])\s+)?\$A(?P<address>[0-9a-zA-Z]{2,8})[,.]\s*$",
+        data_pattern=r"^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$",
+        etx_pattern=r"^q.*$",
+    ):
+        super(Reader, self).__init__(
+            address_pattern, data_pattern, etx_pattern, separators=", %'"
+        )
 
 
 class Writer(hexfile.ASCIIHexWriter):
 
     MAX_ADDRESS_BITS = 16
-    ADDRESS_DESIGNATOR = '$A'
+    ADDRESS_DESIGNATOR = "$A"
 
-    def __init__(self, address_designator = '$A'):
+    def __init__(self, address_designator="$A"):
         super(Writer, self).__init__(address_designator)
 
     def compose_header(self, meta):
         self.checksum = 0
         self.previous_address = None
-        line ="{0} ".format(STX)
+        line = "{0} ".format(STX)
         return line
 
     def compose_footer(self, meta):

@@ -31,22 +31,27 @@ import objutils.hexfile as hexfile
 import objutils.utils as utils
 import objutils.checksums as checksums
 
-DATA    = 1
-EOF     = 2
+DATA = 1
+EOF = 2
 
 
 class Reader(hexfile.Reader):
 
-    FORMAT_SPEC = (
-        (DATA,  ";LLAAAADDCCCC"),
-        (EOF,   ";00")
-    )
+    FORMAT_SPEC = ((DATA, ";LLAAAADDCCCC"), (EOF, ";00"))
 
     def check_line(self, line, format_type):
         if format_type == DATA:
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
-            checksum = checksums.lrc(utils.make_list(utils.int_to_array(line.address), line.length, line.chunk), 16, checksums.COMPLEMENT_NONE)
+                raise hexfile.InvalidRecordLengthError(
+                    "Byte count doesn't match length of actual data."
+                )
+            checksum = checksums.lrc(
+                utils.make_list(
+                    utils.int_to_array(line.address), line.length, line.chunk
+                ),
+                16,
+                checksums.COMPLEMENT_NONE,
+            )
             if line.checksum != checksum:
                 raise hexfile.InvalidRecordChecksumError()
 
@@ -59,8 +64,14 @@ class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):
-        checksum = checksums.lrc(utils.make_list(utils.int_to_array(address), length, row), 16, checksums.COMPLEMENT_NONE)
-        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(length, address, Writer.hex_bytes(row), checksum)
+        checksum = checksums.lrc(
+            utils.make_list(utils.int_to_array(address), length, row),
+            16,
+            checksums.COMPLEMENT_NONE,
+        )
+        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(
+            length, address, Writer.hex_bytes(row), checksum
+        )
         return line
 
     def compose_footer(self, meta):

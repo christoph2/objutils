@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from objutils import loads, dumps
 import unittest
+
+from objutils import dumps
+from objutils import loads
 
 
 EMON52 = b"""10 0000:57 6F 77 21 20 44 69 64 20 79 6F 75 20 72 65 61 0564
@@ -20,16 +21,14 @@ S5030005F7"""
 
 
 class TestRoundtrip(unittest.TestCase):
-
     def testLoadsWorks(self):
         data = loads("emon52", EMON52)
-        self.assertEqual(dumps("srec", data, s5record = True), S19)
+        self.assertEqual(dumps("srec", data, s5record=True), S19)
 
     def testDumpsWorks(self):
         data = loads("srec", S19)
         self.assertEqual(dumps("emon52", data), EMON52)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

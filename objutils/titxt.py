@@ -33,17 +33,19 @@ import objutils.hexfile as hexfile
 
 
 class Reader(hexfile.ASCIIHexReader):
-    """
-    """
+    """ """
 
-    def __init__(self, address_pattern = r'^@(?P<address>[0-9a-zA-Z]{2,8})\s*$',
-                 data_pattern = r'^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$', etx_pattern = r'^q.*$'):
+    def __init__(
+        self,
+        address_pattern=r"^@(?P<address>[0-9a-zA-Z]{2,8})\s*$",
+        data_pattern=r"^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$",
+        etx_pattern=r"^q.*$",
+    ):
         super(Reader, self).__init__(address_pattern, data_pattern, etx_pattern)
 
 
 class Writer(hexfile.ASCIIHexWriter):
-
-    def __init__(self, address_designator = '@'):
+    def __init__(self, address_designator="@"):
         super(Writer, self).__init__(address_designator)
 
     def compose_footer(self, meta):

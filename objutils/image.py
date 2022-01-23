@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
 
 """
-
 from __future__ import print_function
 
 __version__ = "0.1.0"
@@ -48,13 +46,14 @@ SearchType = namedtuple("SearchType", "start_address")
 # TODO: Use crypto hashes (comparison, optimized storage, ...)
 #
 
+
 class AddressSpace(enum.IntEnum):
-    """Adress-space constants.
-    """
-    AS_16   = 0
-    AS_24   = 1
-    AS_32   = 2
-    AS_64   = 3
+    """Adress-space constants."""
+
+    AS_16 = 0
+    AS_24 = 1
+    AS_32 = 2
+    AS_64 = 3
 
 
 class Image(object):
@@ -70,7 +69,7 @@ class Image(object):
         Arbitrary meta-data.
     """
 
-    def __init__(self, sections = None, join = True, meta = None):
+    def __init__(self, sections=None, join=True, meta=None):
         if meta is None:
             meta = {}
         if not sections:
@@ -79,13 +78,13 @@ class Image(object):
             sections = list(sections)
         else:
             raise TypeError("Argument section is of wrong type '{}'".format(sections))
-        self._sections = SortedList(sections, key = attrgetter("start_address"))
+        self._sections = SortedList(sections, key=attrgetter("start_address"))
         self._join = join
         if join:
             self.join_sections()
         _validate_sections(self._sections)
         self.address = 0
-        #if meta and not isinstance(meta, MetaRecord):
+        # if meta and not isinstance(meta, MetaRecord):
         #    raise TypeError("meta-data must be of instance 'MetaRecord'")
         self.meta = meta
 
@@ -93,7 +92,7 @@ class Image(object):
         result = []
         for segment in self.sections:
             result.append(repr(segment))
-        return '\n'.join(result)
+        return "\n".join(result)
 
     __str__ = __repr__
 
@@ -118,13 +117,11 @@ class Image(object):
     def __contains__(self, addr):
         return any(addr in sec for sec in self.sections)
 
-    def hexdump(self, fp = sys.stdout):
-        """
-
-        """
+    def hexdump(self, fp=sys.stdout):
+        """ """
         for idx, section in enumerate(self.sections):
-            print("\nSection #{0:04d}".format(idx ), file = fp)
-            print("-" * 13, file = fp)
+            print("\nSection #{0:04d}".format(idx), file=fp)
+            print("-" * 13, file=fp)
             section.hexdump(fp)
 
     def _call_address_function(self, func_name, addr, *args, **kws):
@@ -178,50 +175,40 @@ class Image(object):
         self._call_address_function("write", addr, data, **kws)
 
     def read_numeric(self, addr, dtype, **kws):
-        """
-
-        """
+        """ """
         return self._call_address_function("read_numeric", addr, dtype, **kws)
 
     def write_numeric(self, addr, value, dtype, **kws):
-        """
-        """
+        """ """
         self._call_address_function("write_numeric", addr, value, dtype, **kws)
 
     def read_numeric_array(self, addr, length, dtype, **kws):
-        """
+        """ """
+        return self._call_address_function(
+            "read_numeric_array", addr, length, dtype, **kws
+        )
 
-        """
-        return self._call_address_function("read_numeric_array", addr, length, dtype, **kws)
-
-    def write_numeric_array(self, addr, data, dtype, **kws):# TODO: bounds-checking.
-        """
-        """
+    def write_numeric_array(self, addr, data, dtype, **kws):  # TODO: bounds-checking.
+        """ """
         self._call_address_function("write_numeric_array", addr, data, dtype)
 
-    def write_ndarray(self, addr, array, order = None, **kws):
-        """
-        """
-        self._call_address_function("write_ndarray", addr, array, order = None, **kws)
+    def write_ndarray(self, addr, array, order=None, **kws):
+        """ """
+        self._call_address_function("write_ndarray", addr, array, order=None, **kws)
 
-    def read_ndarray(self, addr, length, dtype, shape = None, order = None, **kws):
-        """
-        """
-        return self._call_address_function("read_ndarray", addr, length, dtype, shape, order, **kws)
+    def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
+        """ """
+        return self._call_address_function(
+            "read_ndarray", addr, length, dtype, shape, order, **kws
+        )
 
-
-    def read_string(self, addr, encoding = "latin1", length = -1, **kws):
-        """
-
-        """
+    def read_string(self, addr, encoding="latin1", length=-1, **kws):
+        """ """
         return self._call_address_function("read_string", addr, encoding, length, **kws)
 
-    def write_string(self, addr, value, encoding = "latin1", **kws):
-        """
-
-        """
+    def write_string(self, addr, value, encoding="latin1", **kws):
+        """ """
         self._call_address_function("write_string", addr, value, encoding, **kws)
-
 
     def _address_contained(self, address, length):
         """Check if address space exists.
@@ -237,7 +224,7 @@ class Image(object):
         """
         return address in self or (address + length - 1) in self
 
-    def insert_section(self, data, start_address = None, join = True):
+    def insert_section(self, data, start_address=None, join=True):
         """Insert/add a new section to image.
 
         Parameters
@@ -257,11 +244,13 @@ class Image(object):
         Overlapping sections are not supported.
         To update/replace a section use :meth:`update_section`.
         """
-        start_address = start_address if start_address is not None else self.address  # If Address omitted, create continuous address space.
+        start_address = (
+            start_address if start_address is not None else self.address
+        )  # If Address omitted, create continuous address space.
         if self._address_contained(start_address, len(data)):
             raise InvalidAddressError("Overlapping address-space")
         if isinstance(data, str):
-            data = [ord(x) for x in data] # array.array('B',data)
+            data = [ord(x) for x in data]  # array.array('B',data)
         self._sections.add(Section(start_address, data))
         if join:
             self.join_sections()
@@ -290,34 +279,29 @@ class Image(object):
         result = self._sections.bisect_right(SearchType(address))
         return self._sections[result - 1]
 
-
-    def update_section(self, data, address = None):
-        """
-
-        """
+    def update_section(self, data, address=None):
+        """ """
         if not self._address_contained(address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 
-    def delete_section(self, address = None):
-        """
-
-        """
+    def delete_section(self, address=None):
+        """ """
 
     def join_sections(self):
-        """
-
-        """
+        """ """
         self._sections = join_sections(self._sections)
 
-    def split(self, at = None, equal_parts = None, remap = None):
+    def split(self, at=None, equal_parts=None, remap=None):
         print("SPLIT-IMAGE", at, equal_parts, remap)
 
+
 def _validate_sections(sections):
-    """Test for required protocol
-    """
-    ATTRIBUTES = ('start_address', 'length', 'data')
-    if not '__iter__' in dir(sections):
+    """Test for required protocol"""
+    ATTRIBUTES = ("start_address", "length", "data")
+    if not "__iter__" in dir(sections):
         raise TypeError("Sections must be iteratable.")
     for section in sections:
-        if not all( hasattr(section, attr) for attr in ATTRIBUTES):
-            raise TypeError("Section '{0}' doesn't fulfills required protocol (missing attributes).")
+        if not all(hasattr(section, attr) for attr in ATTRIBUTES):
+            raise TypeError(
+                "Section '{0}' doesn't fulfills required protocol (missing attributes)."
+            )

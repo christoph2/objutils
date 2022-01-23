@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """ Dumps '.ARM.attributes' section in an ELF file.
 """
 
@@ -33,15 +32,20 @@ import argparse
 
 from objutils.elf import ElfParser, defs
 
+
 def main():
-    parser = argparse.ArgumentParser(description = "Dump '.ARM.attributes' section.")
-    parser.add_argument("elf_file", help = ".elf file")
-    #parser.add_argument("-l", help = "loglevel [warn | info | error | debug]", dest = "loglevel", type = str, default = "warn")
+    parser = argparse.ArgumentParser(description="Dump '.ARM.attributes' section.")
+    parser.add_argument("elf_file", help=".elf file")
+    # parser.add_argument("-l", help = "loglevel [warn | info | error | debug]", dest = "loglevel", type = str, default = "warn")
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print("\n'{}' is not valid ELF file. Raised exception: '{}'.".format(args.elf_file, repr(e)))
+        print(
+            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
+                args.elf_file, repr(e)
+            )
+        )
         exit(1)
     if not ep.e_machine in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
         print("\n'{}' is not an ARM architecture file.".format(args.elf_file))
@@ -54,9 +58,12 @@ def main():
             print("Name                           Value\nDescription")
             print("-" * 79)
             for attr in entries:
-                print("{:30} {}\n{}\n".format(attr.tag_name, attr.value, attr.description))
+                print(
+                    "{:30} {}\n{}\n".format(attr.tag_name, attr.value, attr.description)
+                )
     else:
         print("*** No .ARM.attributes section ***")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

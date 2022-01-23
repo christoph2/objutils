@@ -29,19 +29,16 @@ __copyright__ = """
 import re
 import objutils.hexfile as hexfile
 
-DATA    = 1
-EOF     = 2
+DATA = 1
+EOF = 2
 
-NULLS = re.compile(r'\0*\s*!M\s*(.*)', re.DOTALL | re.M)
+NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.M)
 
 
 class Reader(hexfile.Reader):
 
-    #data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)  # FIXME!!!
-    FORMAT_SPEC = (
-        (DATA, "AAAA DD;"),
-        (EOF, ":0000")
-    )
+    # data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)  # FIXME!!!
+    FORMAT_SPEC = ((DATA, "AAAA DD;"), (EOF, ":0000"))
 
     def check_line(self, line, format_type):
         if format_type == DATA:
@@ -52,7 +49,7 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    SEPARATOR = "{0!s}\x0d\x0a".format(('\x00' * 48))
+    SEPARATOR = "{0!s}\x0d\x0a".format(("\x00" * 48))
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):

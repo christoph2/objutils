@@ -29,20 +29,24 @@ __copyright__ = """
 
 import abc
 
-DUMMY_PROTOCOL  = None
+DUMMY_PROTOCOL = None
+
 
 class PickleIF(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def dump(self, obj, file_, protocol = DUMMY_PROTOCOL): pass
+    def dump(self, obj, file_, protocol=DUMMY_PROTOCOL):
+        pass
 
     @abc.abstractmethod
-    def dumps(self, obj, protocol = DUMMY_PROTOCOL): pass
+    def dumps(self, obj, protocol=DUMMY_PROTOCOL):
+        pass
 
     @abc.abstractmethod
-    def load(self, file_): pass
+    def load(self, file_):
+        pass
 
     @abc.abstractmethod
-    def loads(self, string_): pass
-
+    def loads(self, string_):
+        pass

@@ -27,19 +27,19 @@ __copyright__ = """
 
 import objutils.hexfile as hexfile
 
-DATA0    = 1
-DATA1    = 2
-DATA2    = 3
-DATA3    = 4
+DATA0 = 1
+DATA1 = 2
+DATA2 = 3
+DATA3 = 4
 
 
 class Reader(hexfile.Reader):
 
     FORMAT_SPEC = (
-        (DATA0,  "!MAAAA DD"),
-        (DATA1,  "\?MAAAA DD"),
-        (DATA2,  "AAAA DD"),
-        (DATA3,  "DD"),
+        (DATA0, "!MAAAA DD"),
+        (DATA1, "\?MAAAA DD"),
+        (DATA2, "AAAA DD"),
+        (DATA3, "DD"),
     )
     previous_address = 0
     previous_length = 0
@@ -49,13 +49,13 @@ class Reader(hexfile.Reader):
 
     def is_data_line(self, line, format_type):
         if format_type == DATA3:
-            if line.junk in ("!M", "?M"):   # Startsymbol, address ommited.
+            if line.junk in ("!M", "?M"):  # Startsymbol, address ommited.
                 return False
             line.address = self.previous_address + self.previous_length
             self.previous_address = line.address
             self.previous_length = len(line.chunk)
         else:
-            if hasattr(line, 'chunk'):
+            if hasattr(line, "chunk"):
                 length = len(line.chunk)
             else:
                 length = 0

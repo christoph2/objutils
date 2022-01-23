@@ -32,10 +32,10 @@ import struct
 
 
 class PlainBinaryReader(object):
-    LITTLE_ENDIAN   = '<'
-    BIG_ENDIAN      = '>'
+    LITTLE_ENDIAN = "<"
+    BIG_ENDIAN = ">"
 
-    def __init__(self, image, byte_order_prefix = "@"):
+    def __init__(self, image, byte_order_prefix="@"):
         self.image = image
         self.image.seek(0, os.SEEK_END)
         self._size = self.image.tell()
@@ -59,39 +59,46 @@ class PlainBinaryReader(object):
         return self.u8()
 
     def value(self, conversion_code, size):
-        res, = struct.unpack('%c%c' % (self.byte_order_prefix, conversion_code, ), self.image.read(size))
+        (res,) = struct.unpack(
+            "%c%c"
+            % (
+                self.byte_order_prefix,
+                conversion_code,
+            ),
+            self.image.read(size),
+        )
         return res
 
     def u8(self):
-        return self.value('B', 1)
+        return self.value("B", 1)
 
     def u16(self):
-        return self.value('H', 2)
+        return self.value("H", 2)
 
     def u32(self):
-        return self.value('L', 4)
+        return self.value("L", 4)
 
     def u64(self):
-        return self.value('Q', 8)
+        return self.value("Q", 8)
 
     def s8(self):
-        return self.value('b', 1)
+        return self.value("b", 1)
 
     def s16(self):
-        return self.value('h', 2)
+        return self.value("h", 2)
 
     def s32(self):
-        return self.value('l', 4)
+        return self.value("l", 4)
 
     def s64(self):
-        return self.value('q', 8)
+        return self.value("q", 8)
 
     def uleb(self):
         result = 0
         shift = 0
         while True:
             bval = self.next_byte()
-            result |= ((bval & 0x7f) << shift)
+            result |= (bval & 0x7F) << shift
             if bval & 0x80 == 0:
                 break
             shift += 7
@@ -100,16 +107,16 @@ class PlainBinaryReader(object):
     def sleb(self):
         result = 0
         shift = 0
-        idx =0
+        idx = 0
         while True:
             bval = self.next_byte()
-            result |= ((bval & 0x7f) << shift)
+            result |= (bval & 0x7F) << shift
             shift += 7
             idx += 1
             if bval & 0x80 == 0:
                 break
         if (shift < 32) or (bval & 0x40) == 0x40:
-            mask = - (1 << (idx * 7))
+            mask = -(1 << (idx * 7))
             result |= mask
         return result
 
@@ -121,7 +128,7 @@ class PlainBinaryReader(object):
                 break
             else:
                 result.append(ch)
-        return ''.join(chr(c) for c in result)
+        return "".join(chr(c) for c in result)
 
     pos = property(_get_pos, _set_pos)
     size = property(_get_size)
