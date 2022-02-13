@@ -44,22 +44,20 @@ SYM = 9
 
 BIAS = {S0: 3, S1: 3, S2: 4, S3: 5, S5: 2, S7: 5, S8: 4, S9: 3}
 
-SYMBOLTABLE = re.compile(
-    r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)", re.MULTILINE | re.DOTALL
-)
+SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)", re.MULTILINE | re.DOTALL)
 SYMBOL = re.compile(r"\s+(?P<symbol>.*?)\s+\$(?P<value>.+)", re.MULTILINE | re.DOTALL)
 
 
 class Reader(hexfile.Reader):
     FORMAT_SPEC = (
-        (S0, "S0LLAAAADDCC"),
-        (S1, "S1LLAAAADDCC"),
-        (S2, "S2LLAAAAAADDCC"),
-        (S3, "S3LLAAAAAAAADDCC"),
-        (S5, "S5LLAAAACC"),
-        (S7, "S7LLAAAAAAAACC"),
-        (S8, "S8LLAAAAAACC"),
-        (S9, "S9LLAAAACC"),
+        (S0, r"S0LLAAAADDCC"),
+        (S1, r"S1LLAAAADDCC"),
+        (S2, r"S2LLAAAAAADDCC"),
+        (S3, r"S3LLAAAAAAAADDCC"),
+        (S5, r"S5LLAAAACC"),
+        (S7, r"S7LLAAAAAAAACC"),
+        (S8, r"S8LLAAAAAACC"),
+        (S9, r"S9LLAAAACC"),
     )
 
     def load(self, fp, **kws):
@@ -82,11 +80,7 @@ class Reader(hexfile.Reader):
         if format_type in (S0, S1, S5, S9):
             checksum_of_address = ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
         elif format_type in (S2, S8):
-            checksum_of_address = (
-                ((line.address & 0xFF0000) >> 16)
-                + ((line.address & 0xFF00) >> 8)
-                + (line.address & 0xFF)
-            )
+            checksum_of_address = ((line.address & 0xFF0000) >> 16) + ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
         elif format_type in (S3, S7):
             checksum_of_address = (
                 ((line.address & 0xFF000000) >> 24)
@@ -97,18 +91,14 @@ class Reader(hexfile.Reader):
         else:
             raise TypeError("Invalid format type '{0!s}'.".format(format_type))
         if hasattr(line, "chunk"):
-            checksum = (
-                ~(sum([line.length, checksum_of_address]) + sum(line.chunk))
-            ) & 0xFF
+            checksum = (~(sum([line.length, checksum_of_address]) + sum(line.chunk))) & 0xFF
         else:
             checksum = (~(sum([line.length, checksum_of_address]))) & 0xFF
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
         line.length -= BIAS[format_type]  # calculate actual data length.
         if hasattr(line, "chunk") and line.length and (line.length != len(line.chunk)):
-            raise hexfile.InvalidRecordLengthError(
-                "Byte count doesn't match length of actual data."
-            )
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def is_data_line(self, line, format_type):
         return format_type in (S1, S2, S3)
@@ -118,20 +108,17 @@ class Reader(hexfile.Reader):
             # print("S0: [{}]".format(line.chunk))
             pass
         elif format_type == S5:
-            # print "S5: [%s]" % line.chunk
-            start_address = line.address
+            # print("S5: [%s]" , line.chunk)
+            start_address = line.address  # noqa: F841
         elif format_type == S7:
-            start_address = line.address
-            # print "Startaddress[S7]: %u" % start_address
-            # print "32-Bit Start-Address: ", hex(start_address)
+            start_address = line.address  # noqa: F841
+            # print("Startaddress[S7]: {:08x}".format(start_address))
         elif format_type == S8:
-            start_address = line.address
-            # print "Startaddress[S8]: %u" % start_address
-            # print "24-Bit Start-Address: ", hex(start_address)
+            start_address = line.address  # noqa: F841
+            # print("Startaddress[S8]: {:08x}".format(start_address))
         elif format_type == S9:
-            start_address = line.address
-            # print "Startaddress[S9]: %u" % start_address
-            # print "16-Bit Start-Address: ", hex(start_address)
+            start_address = line.address  # noqa: F841
+            # print("Startaddress[S9]: {:08x}".format(start_address))
 
     def _strip_symbols(self, symbol_tables):
         self.symbols = []
@@ -169,7 +156,7 @@ class Writer(hexfile.Writer):
                 self.record_type = 2
             elif highest_address <= 0xFFFFFFFF:
                 self.record_type = 3
-        self.address_mask = "%0{0:d}X".format((self.record_type + 1) * 2)
+        self.address_mask = "{{:0{0:d}X}}".format((self.record_type + 1) * 2)
         self.offset = self.record_type + 2
 
     def srecord(self, record_type, length, address, data=None):
@@ -178,8 +165,12 @@ class Writer(hexfile.Writer):
         length += self.offset
         address_bytes = utils.int_to_array(address)
         checksum = self.checksum(make_list(address_bytes, length, data))
-        mask = "S%u%02X{0!s}%s%02X".format(self.address_mask)
-        return mask % (record_type, length, address, Writer.hex_bytes(data), checksum)
+
+        # mask = "S%u%02X{0!s}%s%02X".format(self.address_mask)
+        header = bytes("S{{:1X}}{{:02X}}{}".format(self.address_mask).format(record_type, length, address), "ascii")
+        trailer = bytes("{:02X}".format(checksum), "ascii")
+        return header + Writer.hex_bytes(data) + trailer
+        # return bytes(mask % (record_type, length, address, Writer.hex_bytes(data), checksum), "ascii")
 
     def compose_row(self, address, length, row):
         self.record_count += 1
@@ -190,10 +181,8 @@ class Writer(hexfile.Writer):
         result = []
         if S0 in meta:  # Usually only one S0 record, but be tolerant.
             for meta in meta[S0]:
-                result.append(
-                    self.srecord(0, len(meta.chunk), meta.address, meta.chunk)
-                )
-        return "\n".join(result)
+                result.append(self.srecord(0, len(meta.chunk), meta.address, meta.chunk))
+        return b"\n".join(result)
 
     def compose_footer(self, meta):
         result = []
@@ -218,4 +207,4 @@ class Writer(hexfile.Writer):
                     result.append(self.srecord(7, 0, s7.address))
                 else:
                     result.append(self.srecord(7, 0, self.start_address))
-        return "\n".join(result)
+        return b"\n".join(result)

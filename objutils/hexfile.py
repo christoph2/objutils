@@ -349,7 +349,7 @@ class Writer(BaseType):
         footer = self.compose_footer(image.meta if hasattr(image, "meta") else {})
         if footer:
             result.append(footer)
-        return self.post_processing(bytes("\n".join(result), "ascii"))
+        return self.post_processing(b"\n".join(result))
 
     def calculate_address_bits(self, image):
         if hasattr(image, "sections"):
@@ -393,7 +393,7 @@ class Writer(BaseType):
 
     @staticmethod
     def hex_bytes(row: List[int], spaced: bool = False) -> bytes:
-        hex_bytes = binascii.hexlify(bytes(row))
+        hex_bytes = binascii.hexlify(bytes(row)).upper()
         if not spaced:
             return hex_bytes
         else:
@@ -470,12 +470,12 @@ class ASCIIHexWriter(Writer):
         prepend_address = True if address != self.previous_address else False
         self.previous_address = address + length
         if prepend_address:
-            line = "{0}\n{1}".format(
-                "{0}{1:04X}".format(self.address_designator, address),
-                "{0}".format(self.separator).join(["{0:02X}".format(x) for x in row]),
+            line = b"{0}\n{1}".format(
+                b"{0}{1:04X}".format(self.address_designator, address),
+                b"{0}".format(self.separator).join([b"{0:02X}".format(x) for x in row]),
             )
         else:
-            line = " ".join(["{0:02X}".format(x) for x in row])
+            line = b" ".join([b"{0:02X}".format(x) for x in row])
         self.row_callout(address, length, row)
         return line
 
