@@ -1,0 +1,96 @@
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[tool.pdm]
+includes = []
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest<7.0.0,>=6.2.5",
+    "pytest-runner<6.0.0,>=5.3.1",
+]
+[project]
+authors = [
+    {name = "Christoph Schueler"},
+]
+requires-python = ">=3.5,<4.0"
+dependencies = [
+    "sortedcontainers<3.0.0,>=2.4.0",
+    "attrs<22.0.0,>=21.4.0",
+    "Mako<2.0.0,>=1.1.6",
+    "construct<3.0.0,>=2.10.67",
+]
+name = "objutils"
+version = "0.4.12"
+readme = "docs/README.rst"
+description = "Objectfile library for Python"
+keywords = ["hex files", "intel hex", "s19", "srec", "srecords", "object files", "map files", "embedded", "microcontroller", "ECU", "shf", "rfc4194"]
+classifiers = ["Development Status :: 4 - Beta", "Intended Audience :: Developers", "Topic :: Software Development", "Topic :: Scientific/Engineering", "License :: OSI Approved :: GNU General Public License v2 (GPLv2)", "Programming Language :: Python :: 3.5", "Programming Language :: Python :: 3.6", "Programming Language :: Python :: 3.7", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10"]
+[project.urls]
+homepage = "https://github.com/christoph2/objutils"
+
+[project.optional-dependencies]
+doc = [
+    "sphinx",
+    "sphinxcontrib-napoleon"
+]
+
+[project.scripts]
+oj-elf-info = "objutils.scripts.oj_elf_info:main"
+oj-elf-syms = "objutils.scripts.oj_elf_syms:main"
+oj-hex-info = "objutils.scripts.oj_hex_info:main"
+oj-elf-arm-attrs = "objutils.scripts.oj_elf_arm_attrs:main"
+oj-elf-extract = "objutils.scripts.oj_elf_extract:main"
+[tool.poetry.scripts]
+oj-elf-info = "objutils.scripts.oj_elf_info:main"
+oj-elf-syms = "objutils.scripts.oj_elf_syms:main"
+oj-hex-info = "objutils.scripts.oj_hex_info:main"
+oj-elf-arm-attrs = "objutils.scripts.oj_elf_arm_attrs:main"
+oj-elf-extract = "objutils.scripts.oj_elf_extract:main"
+
+[tool.pytest]
+addopts = "--verbose --tb=short --junitxml=result.xml -o junit_family=xunit2"
+testpaths = "objutils/tests"
+
+[tool.flake8]
+ignore = ["D203", "E203", "E266", "E501", "W503", "F403", "F401", "BLK100"]
+exclude = '''
+/(
+    \.git
+    | __pycache__
+    | __pypackages__
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | \.eggs
+    | _build
+    | build
+    | docs
+    | dist
+    | experimental
+)/
+'''
+max-complexity = 10
+count = true
+statistics = true
+show-source = true
+max-line-length = 132
+select = ["B","C","E","F","W","T4","B9"]
+
+[tool.black]
+line-length=132
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | build
+    | docs
+    | __pycache__
+    | __pypackages__
+    | dist
+)/
+'''
