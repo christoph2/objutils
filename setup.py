@@ -22,9 +22,7 @@ install_reqs = [
     "SQLAlchemy",
 ]
 
-if sys.version_info.major == 2 or (
-    sys.version_info.major == 3 and sys.version_info.minor < 4
-):
+if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(["enum34", "mock"])
 
 with open("docs/README.rst", "r") as fh:
@@ -90,10 +88,12 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     # package_data = {'tests': ['ELFFiles/*.*']},
 )

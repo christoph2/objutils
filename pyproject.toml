@@ -1,5 +1,5 @@
 [build-system]
-requires = ["pdm-pep517"]
+requires = ["pdm-pep517", "pybind11<3.0.0,>=2.9.0", "wheel", "build", "twine"]
 build-backend = "pdm.pep517.api"
 
 [tool.pdm]
@@ -13,7 +13,7 @@ dev = [
 authors = [
     {name = "Christoph Schueler"},
 ]
-requires-python = ">=3.5,<4.0"
+requires-python = ">=3.5"
 dependencies = [
     "sortedcontainers<3.0.0,>=2.4.0",
     "attrs<22.0.0,>=21.4.0",
@@ -94,3 +94,10 @@ exclude = '''
     | dist
 )/
 '''
+[tool.cibuildwheel]
+build-verbosity = 3
+#test-command = "pytest {package}/tests"
+build = "cp3{6,7,8,9,10}-*"
+build-frontend = "build"
+#build-frontend = "pip"
+
