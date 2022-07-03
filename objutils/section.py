@@ -294,6 +294,9 @@ class Section(object):
             raise InvalidAddressError("write_numeric() access out of bounds.")
         if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
+
+
+
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
     def read_numeric_array(self, addr, length, dtype, **kws):
