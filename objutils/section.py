@@ -236,9 +236,9 @@ class Section(object):
         """
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("read() access out of bounds.")
+            raise InvalidAddressError(f"read(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
-            raise InvalidAddressError("read() access out of bounds.")
+            raise InvalidAddressError(f"read(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + length]
         return data
 
@@ -255,19 +255,19 @@ class Section(object):
         length = len(data)
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write() access out of bounds.")
+            raise InvalidAddressError(f"write(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
-            raise InvalidAddressError("write() access out of bounds.")
+            raise InvalidAddressError(f"write(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + length] = data
 
     def read_numeric(self, addr, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("read_numeric() access out of bounds.")
+            raise InvalidAddressError(f"read_numeric(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError("read_numeric() access out of bounds.")
+            raise InvalidAddressError(f"read_numeric(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + data_size]
         if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
@@ -287,11 +287,11 @@ class Section(object):
     def write_numeric(self, addr, value, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError(f"write_numeric(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError("write_numeric() access out of bounds.")
+            raise InvalidAddressError(f"write_numeric(0x{addr:08x}) access out of bounds.")
         if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
 
@@ -302,11 +302,11 @@ class Section(object):
     def read_numeric_array(self, addr, length, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("read_numeric_array() access out of bounds.")
+            raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError("read_numeric_array() access out of bounds.")
+            raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
@@ -316,17 +316,17 @@ class Section(object):
         length = len(data)
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_numeric_array() access out of bounds.")
+            raise InvalidAddressError(f"write_numeric_array(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError("write_numeric_array() access out of bounds.")
+            raise InvalidAddressError(f"write_numeric_array(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
     def read_string(self, addr, encoding="latin1", length=-1, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("read_string() access out of bounds.")
+            raise InvalidAddressError(f"read_string(0x{addr:08x}) access out of bounds.")
         if length == -1:
             pos = self.data[offset:].find(b"\x00")
         else:
@@ -338,7 +338,7 @@ class Section(object):
     def write_string(self, addr, value, encoding="latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_string() access out of bounds.")
+            raise InvalidAddressError(f"write_string(0x{addr:08x}) access out of bounds.")
         if PYTHON_VERSION.major == 3:
             self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
         else:
@@ -353,12 +353,12 @@ class Section(object):
             raise FeatureNotAvailableError("write_ndarray() requires Numpy.")
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("write_ndarray() access out of bounds.")
+            raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
         if not isinstance(array, np.ndarray):
             raise TypeError("array must be of type numpy.ndarray.")
         data_size = array.nbytes
         if offset + data_size > self.length:
-            raise InvalidAddressError("write_ndarray() access out of bounds.")
+            raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + data_size] = array.tobytes()
 
     def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
@@ -369,9 +369,9 @@ class Section(object):
             raise FeatureNotAvailableError("read_ndarray() requires Numpy.")
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError("read_ndarray() access out of bounds.")
+            raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
-            raise InvalidAddressError("read_ndarray() access out of bounds.")
+            raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
 
         """
         If the buffer has data that is not in machine byte-order, this should
