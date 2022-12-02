@@ -14,7 +14,7 @@ from objutils import probes
 
 SREC = b"""S123B000576F77212044696420796F75207265616C6C7920676F207468726F7567682061DF
 S120B0206C6C20746861742074726F75626C6520746F207265616420746869733F73
-S5030002FA"""
+S5030002FA\n"""
 
 FPC = b"""$kL&@h%%,:,B.\?00EPuX0K3rO0JI))
 $;UPR'%%,:<Hn&FCG:at<GVF(;G9wIw
@@ -33,7 +33,6 @@ dataFromFPC = dumps("srec", fromFPC, row_length=32, s5record=True)
 class TestRoundTrip(unittest.TestCase):
     def testFromSrec(self):
         self.assertEqual(dataFromSRec, FPC)
-        # pass
 
     def testFromFPC(self):
         self.assertEqual(dataFromFPC, SREC)
