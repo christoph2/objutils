@@ -385,6 +385,8 @@ class Writer(BaseType):
         return int(math.ceil(math.log(highest_address + 1) / math.log(2)))
 
     def post_processing(self, data):
+        if not data.endswith(b"\n"):
+            data += b"\n"
         return data
 
     def pre_processing(self, image):

@@ -425,7 +425,7 @@ class Equality(BaseTest):
 
 class TestCreateSections(BaseTest):
 
-    SREC = b"S1131000000102030405060708090A0B0C0D0E0F64"
+    SREC = b"S1131000000102030405060708090A0B0C0D0E0F64\n"
 
     def runSectionTestPass(self, data):
         self.b0.insert_section(data, 0x1000)
@@ -497,7 +497,7 @@ class TestCreateSections(BaseTest):
     def testEmptySectionProducesEmptiness(self):
         self.b0.insert_section([], 0x1000)
         result = dumps("srec", self.b0)
-        self.assertEqual(result, b"")
+        self.assertEqual(result, b"\n")
 
     def testCreateSectionFromBytesWorks(self):
         if PYTHON_VERSION.major == 3:
