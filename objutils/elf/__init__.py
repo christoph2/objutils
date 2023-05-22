@@ -8,7 +8,7 @@ from __future__ import division
 __copyright__ = """
    objutils - Object file library for Python.
 
-  (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2010-2023 by Christoph Schueler <cpu12.gems@googlemail.com>
 
   All Rights Reserved
 
@@ -40,6 +40,7 @@ from construct import BitStruct, BitsInteger, Bytes, Construct, this
 from construct import Computed, Pass, Tell, Union, singleton
 from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
 from construct import Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
+from construct import StreamError
 
 from sqlalchemy import func, not_
 
@@ -560,7 +561,11 @@ class ElfParser(object):
         symbol_cache = {}
         num_symbols = len(section.image) // Symbol.sizeof()
         for offset in range(0, len(section.image), Symbol.sizeof()):
-            sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
+            try:
+                sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
+            except StreamError as e:
+                print(f"parse symbol section: {e}")
+                continue
             section_header = None
             if sym.st_shndx in defs.SpecialSections:
                 section_name = defs.special_section_name(sym.st_shndx)
@@ -588,8 +593,12 @@ class ElfParser(object):
                 access=section_header.sh_flags if section_header else 0,
             )
             symbols.append(db_sym)
-        self.session.bulk_save_objects(symbols)
-        self.session.commit()
+        try:
+            self.session.bulk_save_objects(symbols)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            print(f"{e}")
 
     def _parse_comment(self, data):
         Line = Struct("line" / CString("ascii"), "pos" / Tell)
