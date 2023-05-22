@@ -545,19 +545,36 @@ class ElfParser(object):
     def _parse_symbol_section(self, section):
         sh_link = section.sh_link
         symbols = []
-        Symbol = Struct(
-            "st_name" / self.Word,
-            "st_value" / self.Addr,
-            "st_size" / self.Word,
-            "st_info"
-            / BitStruct(
-                "st_bind" / BitsInteger(4),
-                "st_type" / BitsInteger(4),
-            ),
-            "st_other" / Int8ul,
-            "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
-            "st_shndx" / self.Half,
-        )
+        if self.b64:
+            Symbol = Struct(
+                "st_name" / self.Word,
+                "st_info"
+                / BitStruct(
+                    "st_bind" / BitsInteger(4),
+                    "st_type" / BitsInteger(4),
+                ),
+                "st_other" / Int8ul,
+                "st_shndx" / self.Half,
+                "st_value" / self.Addr,
+                "st_size" / self.Xword,
+                "symbol_name"
+                / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
+            )
+        else:
+            Symbol = Struct(
+                "st_name" / self.Word,
+                "st_value" / self.Addr,
+                "st_size" / self.Word,
+                "st_info"
+                / BitStruct(
+                    "st_bind" / BitsInteger(4),
+                    "st_type" / BitsInteger(4),
+                ),
+                "st_other" / Int8ul,
+                "symbol_name"
+                / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
+                "st_shndx" / self.Half,
+            )
         symbol_cache = {}
         num_symbols = len(section.image) // Symbol.sizeof()
         for offset in range(0, len(section.image), Symbol.sizeof()):
