@@ -56,12 +56,13 @@ class DwarfProcessor:
     def __init__(self, sections, b64, endianess):
         self.b64 = b64
         self.endianess = 1 if endianess == "<" else 0
-        debug_sections = sections.fetch(name_pattern=".debug*")
-        self.debug_sections = {
-            section.section_name: section for section in debug_sections
-        }
+        # debug_sections = sections.fetch(name_pattern=".debug*")
+        self.debug_sections = sections
+        # self.debug_sections = {
+        #    section.section_name: section for section in debug_sections
+        # }
         if ".debug_str" in self.debug_sections:
-            self.strings = self.debug_sections[".debug_str"].section_image
+            self.strings = self.debug_sections[".debug_str"].image
         else:
             self.strings = b""
 
@@ -87,8 +88,8 @@ class DwarfProcessor:
 
     def do_abbrevs(self):
         section = self.debug_sections[".debug_abbrev"]
-        image = section.section_image
-        length = len(section.section_image)
+        image = section.image
+        length = len(section.image)
         Abbrevation = Struct(
             "start" / Tell,
             "code" / ULEB,
@@ -112,6 +113,8 @@ class DwarfProcessor:
         offset = 0
         result = OrderedDict()
         kOffs = offset
+        # [no children]     [has children]
+
         while True:
             print("Offset: {}".format(offset))
             abbrev = Abbrevation.parse(image[offset:])
@@ -119,7 +122,7 @@ class DwarfProcessor:
                 print(
                     "{} {} {}".format(
                         abbrev.code,
-                        constants.Tag(abbrev.details.tag),
+                        constants.Tag(abbrev.details.tag).name,
                         abbrev.details.children == 1,
                     )
                 )
@@ -135,22 +138,23 @@ class DwarfProcessor:
                 result[key] = Abbreviation(0, False, [])
                 continue
             result[key] = Abbreviation(
-                constants.Tag(abbrev.details.tag), (abbrev.details.children == 1), []
+                constants.Tag(abbrev.details.tag).name,
+                (abbrev.details.children == 1),
+                [],
             )
             while True:
                 attr = Attribute.parse(image[offset:])
-
                 if attr.attrValue != 0 and attr.formValue != 0:
                     result[key].attrs.append(
                         (
-                            constants.AttributeEncoding(attr.attrValue),
+                            constants.AttributeEncoding(attr.attrValue).name,
                             constants.AttributeForm(attr.formValue),
                         )
                     )
                     print(
                         "   {} {}".format(
-                            constants.AttributeEncoding(attr.attrValue),
-                            constants.AttributeForm(attr.formValue),
+                            constants.AttributeEncoding(attr.attrValue).name,
+                            constants.AttributeForm(attr.formValue).name,
                         )
                     )
                 offset += attr.stop - attr.start
@@ -162,8 +166,8 @@ class DwarfProcessor:
         if not ".debug_macinfo" in self.debug_sections:
             return
         section = self.debug_sections[".debug_macinfo"]
-        image = io.BytesIO(section.section_image)
-        length = len(section.section_image)
+        image = io.BytesIO(section.image)
+        length = len(section.image)
 
         MacInfo = Struct(
             "start" / Tell,
@@ -308,8 +312,8 @@ class DwarfProcessor:
         if not ".debug_info" in self.debug_sections:
             return
         section = self.debug_sections[".debug_info"]
-        image = io.BytesIO(section.section_image)
-        length = len(section.section_image)
+        image = io.BytesIO(section.image)
+        section_length = len(section.image)
         DbgInfo = Struct(
             "start" / Tell,
             "unit_length" / self.u32,
@@ -326,20 +330,19 @@ class DwarfProcessor:
             "size" / Computed(this.stop - this.start),
         )
         offset = 0
-        finished = False
+        # finished = False
         while True:
-            pos = image.tell()
-            if pos >= length - 1:
+            section_pos = image.tell()
+            if section_pos >= section_length - 1:
                 break
             dbgInfo = DbgInfo.parse_stream(image)  # CU
+            print("*" * 80)
             print("   Compilation Unit @ offset 0x{:x}:".format(dbgInfo.start))
-            print("   Start:         {:08x}".format(dbgInfo.start))
-            print("   Stop:          {:08x}".format(dbgInfo.stop))
-            print("   Size:          {:08x}".format(dbgInfo.size))
             print("   Length:        0x{:x} (32-bit)".format(dbgInfo.unit_length))
-            print("   Version:       2".format(dbgInfo.version))
+            print("   Version:       {}".format(dbgInfo.version))
             print("   Abbrev Offset: 0x{:x}".format(dbgInfo.debug_abbrev_offset))
             print("   Pointer Size:  {}".format(dbgInfo.address_size))
+            level = 0
             pos = 0
             offset += dbgInfo.stop - dbgInfo.start
             formReaders = self.get_form_readers(dbgInfo.address_size)
@@ -348,34 +351,48 @@ class DwarfProcessor:
                 break
             while True:
                 start = image.tell()
+                if start >= section_length - 1:
+                    break
                 attr = Attribute.parse_stream(image)
                 abbr = self.abbreviations.get((dbgInfo.debug_abbrev_offset, attr.attr))
                 if not abbr:
-                    print("<{:02x}>: {}".format(start, "Abbrev Number: 0"))
+                    print("<{:2x}>: {}".format(start, "Abbrev Number: 0 ---"))
+                    level -= 1
                 else:
-                    # print("<{:02x}>: Abbrev Number: {} ({})".format(start, enc.name, value))
+                    print(
+                        "{}<{}><{:02x}>: Abbrev Number: {} ({})".format(
+                            ("   " * (level + 1)), level, start, attr.attr, abbr.tag
+                        )
+                    )
+                    if abbr.children:
+                        level += 1
+                    elif attr.attr == 0:
+                        level -= 1
                     for enc, form in abbr.attrs:
                         reader = formReaders.get(form)
                         if reader is None:
                             print("*EF", enc, form, start, attr, abbr)
                         start = image.tell()
                         value = reader.parse_stream(image)
-                        print("    <{:02x}> {}: {}".format(start, enc, value))
-                        stop = image.tell()
+                        if enc == "language":
+                            value = constants.Languages(value).name
+                        print(
+                            "{}<{:02x}> {}: {}".format(
+                                ("   " * (level + 1)), start, enc, value
+                            )
+                        )
+                        # stop = image.tell()
                     offset += attr.stop - attr.start
                     pos = image.tell()
-                    # if pos >= 0x8727:
-                    #    print("chk")
-                    if pos >= dbgInfo.unit_length:
-                        image.seek(image.tell() + 1)
+                    if pos >= dbgInfo.start + dbgInfo.unit_length + 4:
                         break
 
     def pubnames(self):
         if not ".debug_pubnames" in self.debug_sections:
             return
         section = self.debug_sections[".debug_pubnames"]
-        image = io.BytesIO(section.section_image)
-        length = len(section.section_image)
+        image = io.BytesIO(section.image)
+        length = len(section.image)
 
         Header = Struct(
             "start" / Tell,
@@ -415,8 +432,8 @@ class DwarfProcessor:
         if not ".debug_aranges" in self.debug_sections:
             return
         section = self.debug_sections[".debug_aranges"]
-        image = io.BytesIO(section.section_image)
-        length = len(section.section_image)
+        image = io.BytesIO(section.image)
+        length = len(section.image)
         print("ARANGES")
         Header = Struct(
             "start" / Tell,
