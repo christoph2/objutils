@@ -40,6 +40,8 @@ from objutils.elf.defs import (
     ELFAbiType,
 )
 
+from objutils.dwarf import DwarfProcessor
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -129,12 +131,14 @@ def main():
         print("-" * 79)
         print("{:4} {:15} {}".format(note.type, note.name, note.desc))
 
-    # dbSecs = ep.debug_sections()
-    # if dbSecs:
-    #    dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-    #    dp.do_abbrevs()
-    #    dp.do_mac_info()
-    #    dp.do_dbg_info()
+    dbSecs = ep.debug_sections()
+    # dbSecs = ep.sections.fetch(name_pattern=".debug*")
+    # dbSecs = ep.sections.fetch(name_pattern="*")
+    if dbSecs:
+        dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
+        dp.do_abbrevs()
+        dp.do_mac_info()
+        dp.do_dbg_info()
 
 
 def print_header(text):
