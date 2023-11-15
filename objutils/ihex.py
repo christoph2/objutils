@@ -42,7 +42,6 @@ START_LINEAR_ADDRESS = 5
 
 
 class Reader(hexfile.Reader):
-
     FORMAT_SPEC = ((hexfile.TYPE_FROM_RECORD, ":LLAAAATTDDCC"),)
 
     def __init__(self):
@@ -130,7 +129,6 @@ def divmod(a, b):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 32
     checksum = partial(lrc, width=8, comp=COMPLEMENT_TWOS)
 

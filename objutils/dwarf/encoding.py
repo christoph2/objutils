@@ -150,7 +150,6 @@ class One(Construct):
 
 
 class Block(Construct):
-
     BYTEORDER = ""
     SIZE = None
     MASK = None
@@ -196,7 +195,6 @@ class BlockUleb(Block):
 
 @singleton
 class Block1(Block):
-
     SIZE = 1
     MASK = "B"
     BYTEORDER = "<"
@@ -204,7 +202,6 @@ class Block1(Block):
 
 @singleton
 class Block2l(Block):
-
     SIZE = 2
     MASK = "H"
     BYTEORDER = "<"
@@ -212,7 +209,6 @@ class Block2l(Block):
 
 @singleton
 class Block2b(Block):
-
     SIZE = 2
     MASK = "H"
     BYTEORDER = ">"
@@ -220,7 +216,6 @@ class Block2b(Block):
 
 @singleton
 class Block4l(Block):
-
     SIZE = 4
     MASK = "L"
     BYTEORDER = "<"
@@ -228,14 +223,12 @@ class Block4l(Block):
 
 @singleton
 class Block4b(Block):
-
     SIZE = 4
     MASK = "L"
     BYTEORDER = ">"
 
 
 class Address(Construct):
-
     TYPES = {
         1: (Int8ul, Int8ul),
         2: (Int16ul, Int16ub),
@@ -265,7 +258,6 @@ class Address(Construct):
 
 
 class StrP(Construct):
-
     BYTEORDER = ""
     SIZE = None
     MASK = None

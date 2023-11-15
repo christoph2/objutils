@@ -35,7 +35,6 @@ from objutils import load
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="Displays informations about HEX files."
     )

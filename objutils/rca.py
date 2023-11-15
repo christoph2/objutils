@@ -36,7 +36,6 @@ NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.M)
 
 
 class Reader(hexfile.Reader):
-
     # data = re.sub('\0*$', ';\n:0000', NULLS.match(inFile.read()).group(1), 1)  # FIXME!!!
     FORMAT_SPEC = ((DATA, "AAAA DD;"), (EOF, ":0000"))
 

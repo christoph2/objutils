@@ -34,7 +34,6 @@ DATA3 = 4
 
 
 class Reader(hexfile.Reader):
-
     FORMAT_SPEC = (
         (DATA0, "!MAAAA DD"),
         (DATA1, "\?MAAAA DD"),
@@ -65,7 +64,6 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):

@@ -64,7 +64,6 @@ class Reader(hexfile.ASCIIHexReader):
 
 
 class Writer(hexfile.ASCIIHexWriter):
-
     MAX_ADDRESS_BITS = 16
     ADDRESS_DESIGNATOR = "$A"
 
