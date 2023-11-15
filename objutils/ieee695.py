@@ -773,7 +773,7 @@ class Reader(object):
         sectionIndex = self.readByte(self.fpos)
         self.checkSectionIndex(sectionIndex)
         boundaryAlignmentDivisor = self.checkOptional(self.fpos)
-        self.sections[sectionIndex].boundaryAlignment = 2 ** boundaryAlignmentDivisor
+        self.sections[sectionIndex].boundaryAlignment = 2**boundaryAlignmentDivisor
         self.sections[sectionIndex].pageSize = self.checkOptional(self.fpos)
 
     def onNI(self):

@@ -38,7 +38,6 @@ EOF = 3
 
 
 class Reader(hexfile.Reader):
-
     VALID_CHARS = re.compile(
         r"^[a-zA-Z0-9_ %\n\r]*$"
     )  # We need to consider symbol information.
@@ -86,7 +85,6 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 24
 
     def compose_row(self, address, length, row):

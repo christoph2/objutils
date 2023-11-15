@@ -30,7 +30,6 @@ import logging
 
 
 class Logger(object):
-
     LOGGER_BASE_NAME = "objutils"
     FORMAT = "[%(levelname)s (%(name)s)]: %(message)s"
 

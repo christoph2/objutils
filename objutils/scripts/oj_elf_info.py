@@ -42,7 +42,6 @@ from objutils.elf.defs import (
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="Display informations about ELF files."
     )

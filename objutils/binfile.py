@@ -106,7 +106,6 @@ class BinZipReader(object):
 
 
 class BinZipWriter(object):
-
     SECTION_FILE_NAME = "image{0:d}.bin"
     MANIFEST_FILE_NAME = "IMAGES.mf"
 
@@ -116,7 +115,6 @@ class BinZipWriter(object):
             fp.close()
 
     def dumps(self, image, **kws):
-
         if hasattr(image, "sections") and not image.sections:
             return b""
         sections = sorted(image.sections, key=lambda x: x.start_address)

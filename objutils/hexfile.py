@@ -224,7 +224,7 @@ class Reader(BaseType):
         matched = False
         self.valid = True
         meta_data = defaultdict(list)
-        for (line_number, line) in enumerate(fp.readlines(), 1):
+        for line_number, line in enumerate(fp.readlines(), 1):
             for format_type, format in self.formats:
                 if isinstance(line, bytes):
                     match = format.match(line.decode())
@@ -277,13 +277,13 @@ class Reader(BaseType):
             return Image([], valid=False)
 
     def _address_space(self, value):
-        if value < 2 ** 16:
+        if value < 2**16:
             return SIXTEEN_BITS
-        elif value < 2 ** 20:
+        elif value < 2**20:
             return TWENTY_BITS
-        elif value < 2 ** 24:
+        elif value < 2**24:
             return TWENTYFOUR_BITS
-        elif value < 2 ** 32:
+        elif value < 2**32:
             return THIRTYTWO_BITS
         else:
             raise ValueError("Unsupported Addressspace size.")
@@ -300,7 +300,7 @@ class Reader(BaseType):
         if self.maybe_binary_file(fp):
             return False
         matched = False
-        for (line_number, line) in enumerate(fp.readlines(), 1):
+        for line_number, line in enumerate(fp.readlines(), 1):
             for format_type, format in self.formats:  # NOTE: Same as in 'read()'!
                 if isinstance(line, bytes):
                     match = format.match(line.decode())
@@ -425,7 +425,6 @@ class Writer(BaseType):
 
 
 class ASCIIHexReader(Reader):
-
     FORMAT_SPEC = None
 
     def __init__(self, address_pattern, data_pattern, etx_pattern, separators=", "):
@@ -488,7 +487,6 @@ class ASCIIHexReader(Reader):
 
 
 class ASCIIHexWriter(Writer):
-
     MAX_ADDRESS_BITS = 16
     previous_address = None
 

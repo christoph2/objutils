@@ -34,7 +34,6 @@ EOF = 2
 
 
 class Reader(hexfile.Reader):
-
     FORMAT_SPEC = (
         (DATA, "/AAAALLBBDDCC"),
         (EOF, "/AAAA00BB"),
@@ -61,7 +60,6 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 16
 
     def compose_footer(self, meta):

@@ -34,7 +34,6 @@ EOF = 2
 
 
 class Reader(hexfile.Reader):
-
     FORMAT_SPEC = ((DATA, ":AAAALLBBDDCC"), (EOF, ":00"))
 
     def check_line(self, line, format_type):
@@ -59,7 +58,6 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):

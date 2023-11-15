@@ -103,7 +103,8 @@ class TestS19Options(unittest.TestCase):
 
     def testS19includeS5RecordS2(self):
         self.assertEqual(
-            self.createImage(2, True), b"S20E00100000010203040506070809B4\nS504000001FA\n"
+            self.createImage(2, True),
+            b"S20E00100000010203040506070809B4\nS504000001FA\n",
         )
 
     def testS19includeS5RecordS3(self):
@@ -113,7 +114,9 @@ class TestS19Options(unittest.TestCase):
         )
 
     def testS19excludeS5RecordS1(self):
-        self.assertEqual(self.createImage(1, False), b"S10D100000010203040506070809B5\n")
+        self.assertEqual(
+            self.createImage(1, False), b"S10D100000010203040506070809B5\n"
+        )
 
     def testS19excludeS5RecordS2(self):
         self.assertEqual(
