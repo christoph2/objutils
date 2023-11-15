@@ -1,7 +1,6 @@
 enum34
 six
 mock
-future
 mako
 construct >= 2.8
 pytest

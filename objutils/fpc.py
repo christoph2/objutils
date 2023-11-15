@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import division
 
 __version__ = "0.1.0"
 
@@ -52,7 +51,6 @@ atoi16 = partial(int, base=16)
 
 
 class Reader(hexfile.Reader):
-
     FORMAT_SPEC = (
         (DATA_ABS, "CCLL0000AAAAAAAADD"),
         (DATA_INC, "CCLL0001DD"),
@@ -143,7 +141,6 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):

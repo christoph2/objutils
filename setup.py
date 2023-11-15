@@ -13,7 +13,6 @@ with open(os.path.join("objutils", "version.py"), "r") as f:
             break
 
 install_reqs = [
-    "future",
     "mako",
     "six",
     "construct",

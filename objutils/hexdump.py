@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 
 __version__ = "0.1.1"
 
@@ -40,7 +39,7 @@ def unpack(*args):
 class Dumper(object):
     def __init__(self, fp=sys.stdout, num_address_bits=32):
         self._fp = fp
-        self._rolloverMask = 2 ** num_address_bits
+        self._rolloverMask = 2**num_address_bits
         self._nibbles = num_address_bits >> 2
         self._addressMask = "%0{0:d}x ".format(self._nibbles)
         self.previous_row = bytes()  # bytearray()
