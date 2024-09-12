@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import hexfile
-from objutils import loads
+from objutils import hexfile, loads
 from objutils.image import Image
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """List symbols contained in an ELF file (but not DWARF symbols!).
 """
 
@@ -83,11 +82,7 @@ def main():
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print(
-            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
-                args.elf_file, repr(e)
-            )
-        )
+        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
         exit(1)
     for section, syms in ep.symbols.fetch(
         sections=args.sections,

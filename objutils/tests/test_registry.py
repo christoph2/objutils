@@ -1,11 +1,11 @@
 import unittest
 
 
-class DummyReader(object):
+class DummyReader:
     pass
 
 
-class DummyWriter(object):
+class DummyWriter:
     pass
 
 

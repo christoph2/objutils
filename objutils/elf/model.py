@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -30,12 +29,13 @@ import mmap
 import re
 import sqlite3
 
-from sqlalchemy import MetaData, types, orm, event, create_engine, Column, and_, not_
+from sqlalchemy import Column, and_, create_engine, event, not_, orm, types
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 
 from objutils.elf import defs
+
 
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
@@ -43,19 +43,19 @@ PAGE_SIZE = mmap.PAGESIZE
 Base = declarative_base()
 
 
-class MixInBase(object):
+class MixInBase:
     @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+    def __tablename__(self):
+        return self.__name__.lower()
 
     def __repr__(self):
         columns = [c.name for c in self.__class__.__table__.c]
         result = []
         for name, value in [(n, getattr(self, n)) for n in columns]:
             if isinstance(value, str):
-                result.append("{} = '{}'".format(name, value))
+                result.append(f"{name} = '{value}'")
             else:
-                result.append("{} = {}".format(name, value))
+                result.append(f"{name} = {value}")
         return "{}({})".format(self.__class__.__name__, ", ".join(result))
 
 
@@ -129,12 +129,6 @@ def StdFloat(default=0.0, primary_key=False, unique=False, nullable=False):
     )
 
 
-class MetaData(Base, RidMixIn):
-    """ """
-
-    sha = Column(types.VARCHAR)  # hashlib.sha3_512()
-
-
 class Elf_Section(Base, RidMixIn):
     """ """
 
@@ -171,11 +165,7 @@ class Elf_Section(Base, RidMixIn):
     @has_content.expression
     def has_content(self):
         return and_(
-            not_(
-                self.sh_type.in_(
-                    (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL)
-                )
-            ),
+            not_(self.sh_type.in_((defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL))),
             (self.sh_size > 0),
         )
 
@@ -188,8 +178,8 @@ class Elf_Section(Base, RidMixIn):
         return self.get_flags() & mask == mask
 
     @test_flags.expression
-    def test_flags(cls, mask):
-        return cls.get_flags().op("&")(mask) == mask
+    def test_flags(self, mask):
+        return self.get_flags().op("&")(mask) == mask
 
     @hybrid_property
     def section_type(self):
@@ -284,9 +274,7 @@ class Elf_Symbol(Base, RidMixIn):
 
     @hidden.expression
     def hidden(self):
-        return self.st_other.in_(
-            (defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL)
-        )
+        return self.st_other.in_((defs.SymbolVisibility.STV_HIDDEN, defs.SymbolVisibility.STV_INTERNAL))
 
     @hybrid_property
     def weak(self):
@@ -317,8 +305,8 @@ class Elf_Symbol(Base, RidMixIn):
         return self.get_access() & mask == mask
 
     @test_access.expression
-    def test_access(cls, mask):
-        return cls.get_access().op("&")(mask) == mask
+    def test_access(self, mask):
+        return self.get_access().op("&")(mask) == mask
 
     @hybrid_property
     def writeable(self):
@@ -376,24 +364,20 @@ def set_sqlite3_pragmas(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
     # cursor.execute("PRAGMA jornal_mode=WAL")
     cursor.execute("PRAGMA FOREIGN_KEYS=ON")
-    cursor.execute("PRAGMA PAGE_SIZE={}".format(PAGE_SIZE))
-    cursor.execute(
-        "PRAGMA CACHE_SIZE={}".format(calculateCacheSize(CACHE_SIZE * 1024 * 1024))
-    )
+    cursor.execute(f"PRAGMA PAGE_SIZE={PAGE_SIZE}")
+    cursor.execute(f"PRAGMA CACHE_SIZE={calculateCacheSize(CACHE_SIZE * 1024 * 1024)}")
     cursor.execute("PRAGMA SYNCHRONOUS=OFF")  # FULL
     cursor.execute("PRAGMA LOCKING_MODE=EXCLUSIVE")  # NORMAL
     cursor.execute("PRAGMA TEMP_STORE=MEMORY")  # FILE
     cursor.close()
 
 
-class Model(object):
+class Model:
     def __init__(self, debug=False):
         self._engine = create_engine(
             "sqlite:///:memory:",
             echo=debug,
-            connect_args={
-                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
-            },
+            connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
             native_datetime=True,
         )
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import pytest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
 from objutils.image import Image
 
 

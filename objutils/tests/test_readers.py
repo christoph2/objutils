@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
 from objutils.readers import PlainBinaryReader
@@ -40,9 +39,7 @@ class TestReader(unittest.TestCase):
 
 class Decoder(unittest.TestCase):
     def _runTest(self, method, value, expected):
-        dr = PlainBinaryReader(
-            create_string_buffer(value), PlainBinaryReader.LITTLE_ENDIAN
-        )
+        dr = PlainBinaryReader(create_string_buffer(value), PlainBinaryReader.LITTLE_ENDIAN)
         self.assertEqual(getattr(dr, method)(), expected)
 
     def sleb(self, value, expected):

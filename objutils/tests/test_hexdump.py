@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import io
 import os
 import unittest
 
 from objutils.image import Image
-from objutils.utils import create_string_buffer
-from objutils.utils import PYTHON_VERSION
+from objutils.utils import PYTHON_VERSION, create_string_buffer
+
 
 TEST1 = """
 Section #0000

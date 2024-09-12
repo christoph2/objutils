@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Package entry-point.
 
 Registers CODECS and implements an interface to them.
@@ -39,28 +38,26 @@ __copyright__ = """
 """
 
 
-from objutils.registry import registry
+import objutils.ash
 import objutils.binfile
-import objutils.sig
-import objutils.srec
-import objutils.titxt
+import objutils.cosmac
 import objutils.emon52
 import objutils.etek
 import objutils.fpc
 import objutils.ihex
 import objutils.mostec
 import objutils.rca
-import objutils.tek
-import objutils.cosmac
-import objutils.ash
 import objutils.shf
+import objutils.sig
+import objutils.srec
+import objutils.tek
+import objutils.titxt
+from objutils.image import Image  # noqa: F401
+from objutils.registry import registry
+from objutils.section import Section  # noqa: F401
 
-from objutils.image import Image
-from objutils.section import Section
 
-registry.register(
-    "bin", objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format."
-)
+registry.register("bin", objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
 registry.register(
     "binzip",
     objutils.binfile.BinZipReader,
@@ -86,29 +83,15 @@ registry.register(
     objutils.emon52.Writer,
     "Elektor Monitor (EMON52) file format.",
 )
-registry.register(
-    "etek", objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format."
-)
-registry.register(
-    "fpc", objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format."
-)
-registry.register(
-    "ihex", objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format."
-)
-registry.register(
-    "mostec", objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format."
-)
+registry.register("etek", objutils.etek.Reader, objutils.etek.Writer, "Extended Tektonix format.")
+registry.register("fpc", objutils.fpc.Reader, objutils.fpc.Writer, "Four packed code file format.")
+registry.register("ihex", objutils.ihex.Reader, objutils.ihex.Writer, "Intel IHex format.")
+registry.register("mostec", objutils.mostec.Reader, objutils.mostec.Writer, "MOSTech format.")
 registry.register("rca", objutils.rca.Reader, objutils.rca.Writer, "RCA format.")
 registry.register("tek", objutils.tek.Reader, objutils.tek.Writer, "Tektonix format.")
-registry.register(
-    "cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format."
-)
-registry.register(
-    "ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats."
-)
-registry.register(
-    "shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149)."
-)
+registry.register("cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
+registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
+registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 
 def load(codec_name, *args, **kws):

@@ -1,16 +1,14 @@
 environment:
-
   PYPI_PASSWORD:
-    secure: zBC2GOUADRTMx3wJG8UE5w==    # zBC2G0UADRTMx3wJG8UE5w
+    secure: zBC2GOUADRTMx3wJG8UE5w== # zBC2G0UADRTMx3wJG8UE5w
 
   matrix:
-
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
     # The list here is complete (excluding Python 2.6, which
     # isn't covered by this document) at the time of writing.
 
-      #- PYTHON: "C:\\Python34"
+    #- PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
     - PYTHON: "C:\\Python37"
@@ -27,7 +25,6 @@ install:
   - "%PYTHON%\\python.exe -m pip install wheel twine"
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - "%PYTHON%\\python.exe -m pip install -r test_requirements.txt"
-
 
 build: off
 
@@ -64,16 +61,16 @@ on_finish:
       $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\result.xml))
 
 deploy:
-- provider: GitHub
-  artifact: '*.*' #"dist\\*"
-  on:
+  - provider: GitHub
+    artifact: "*.*" #"dist\\*"
+    on:
       APPVEYOR_REPO_TAG: true
-  auth_token:
-    secure: Wiweaot1JAHzV9mMZ3Zhn/5XUuLe5XYAyfpRZmWNpLW7fMW1FhAdoRliiAhz3Sv6
-  description: Test release -- do not use
-  tag: $(APPVEYOR_REPO_TAG_NAME)
-  draft: false
-  prerelease: true
+    auth_token:
+      secure: Wiweaot1JAHzV9mMZ3Zhn/5XUuLe5XYAyfpRZmWNpLW7fMW1FhAdoRliiAhz3Sv6
+    description: Test release -- do not use
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    draft: false
+    prerelease: true
 
 deploy_script:
   - echo "Starting Artifact Deployment"
@@ -93,4 +90,4 @@ deploy_script:
   - echo "Finished Artifact Deployment"
 
 cache:
-    - "%APPDATA%\\pip\\Cache -> appveyor.yml" 
+  - "%APPDATA%\\pip\\Cache -> appveyor.yml"

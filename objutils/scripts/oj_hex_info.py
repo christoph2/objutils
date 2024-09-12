@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Displays informations about HEX files.
 """
 
@@ -28,16 +27,14 @@ __copyright__ = """
 """
 
 import argparse
-from os import path
 import sys
+from os import path
 
 from objutils import load
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Displays informations about HEX files."
-    )
+    parser = argparse.ArgumentParser(description="Displays informations about HEX files.")
     parser.add_argument(
         "file_type",
         help="file type",
@@ -70,7 +67,7 @@ def main():
     args = parser.parse_args()
 
     if not path.exists(args.hex_file):
-        print("File '{}' does not exist.".format(args.hex_file))
+        print(f"File '{args.hex_file}' does not exist.")
         sys.exit(1)
 
     img = load(args.file_type.lower(), args.hex_file)
@@ -80,9 +77,9 @@ def main():
     print("Num   Address    Length")
     print("-" * 79)
     for idx, sec in enumerate(img):
-        print("{:03d}   0x{:08x} {}".format(idx, sec.start_address, sec.length))
+        print(f"{idx:03d}   0x{sec.start_address:08x} {sec.length}")
     print("-" * 79)
-    print("                 {} total bytes".format(len(img)))
+    print(f"                 {len(img)} total bytes")
     if args.dump:
         img.hexdump()
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,8 +26,8 @@ __copyright__ = """
 
 import re
 
-import objutils.hexfile as hexfile
 import objutils.checksums as checksums
+import objutils.hexfile as hexfile
 import objutils.utils as utils
 
 
@@ -38,9 +37,7 @@ EOF = 3
 
 
 class Reader(hexfile.Reader):
-    VALID_CHARS = re.compile(
-        r"^[a-zA-Z0-9_ %\n\r]*$"
-    )  # We need to consider symbol information.
+    VALID_CHARS = re.compile(r"^[a-zA-Z0-9_ %\n\r]*$")  # We need to consider symbol information.
 
     FORMAT_SPEC = (
         (DATA, "%LL6CCAAAAADD"),
@@ -60,17 +57,11 @@ class Reader(hexfile.Reader):
                 )
             )
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             if line.checksum != checksum:
                 raise hexfile.InvalidRecordChecksumError()
         elif format_type == SYMBOL:
-            checksum = checksums.nibble_sum(
-                utils.make_list(
-                    3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]
-                )
-            )
+            checksum = checksums.nibble_sum(utils.make_list(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
             chunk = line.chunk.strip()
             address = int(chunk[-4:], 16)
             line.address = address
@@ -88,11 +79,7 @@ class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 24
 
     def compose_row(self, address, length, row):
-        checksum = checksums.nibble_sum(
-            utils.make_list(utils.int_to_array(address), 6, ((length + 5) * 2), row)
-        )
+        checksum = checksums.nibble_sum(utils.make_list(utils.int_to_array(address), 6, ((length + 5) * 2), row))
 
-        line = "%{0:02X}6{1:02X}{2:04X}{3!s}".format(
-            (length + 5) * 2, checksum, address, Writer.hex_bytes(row)
-        )
+        line = f"%{(length + 5) * 2:02X}6{checksum:02X}{address:04X}{Writer.hex_bytes(row)!s}"
         return line

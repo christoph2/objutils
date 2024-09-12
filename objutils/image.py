@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 
 """
@@ -9,7 +8,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -28,15 +27,16 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import namedtuple
 import enum
-from operator import attrgetter, eq
 import sys
+from collections import namedtuple
+from operator import attrgetter, eq
 
 from sortedcontainers import SortedList
 
-from objutils.section import Section, join_sections
 from objutils.exceptions import InvalidAddressError
+from objutils.section import Section, join_sections
+
 
 SearchType = namedtuple("SearchType", "start_address")
 
@@ -55,7 +55,7 @@ class AddressSpace(enum.IntEnum):
     AS_64 = 3
 
 
-class Image(object):
+class Image:
     """Manage images.
 
     An image is a collection of :class:`Section`s and meta-data.
@@ -76,7 +76,7 @@ class Image(object):
         elif isinstance(sections, Section) or hasattr(sections, "__iter__"):
             sections = list(sections)
         else:
-            raise TypeError("Argument section is of wrong type '{}'".format(sections))
+            raise TypeError(f"Argument section is of wrong type '{sections}'")
         self._sections = SortedList(sections, key=attrgetter("start_address"))
         self._join = join
         if join:
@@ -106,7 +106,7 @@ class Image(object):
 
     def __eq__(self, other):
         if len(self.sections) == len(other.sections):
-            return all(eq(l, r) for l, r in zip(self.sections, other.sections))
+            return all(eq(left, right) for left, right in zip(self.sections, other.sections, strict=True))
         else:
             return False
 
@@ -119,7 +119,7 @@ class Image(object):
     def hexdump(self, fp=sys.stdout):
         """ """
         for idx, section in enumerate(self.sections):
-            print("\nSection #{0:04d}".format(idx), file=fp)
+            print(f"\nSection #{idx:04d}", file=fp)
             print("-" * 13, file=fp)
             section.hexdump(fp)
 
@@ -128,7 +128,7 @@ class Image(object):
             if addr in section:
                 func = getattr(section, func_name)
                 return func(addr, *args, **kws)
-        raise InvalidAddressError("Address 0x{:08x} not in range.".format(addr))
+        raise InvalidAddressError(f"Address 0x{addr:08x} not in range.")
 
     def read(self, addr, length, **kws):
         """Read bytes from image.
@@ -183,9 +183,7 @@ class Image(object):
 
     def read_numeric_array(self, addr, length, dtype, **kws):
         """ """
-        return self._call_address_function(
-            "read_numeric_array", addr, length, dtype, **kws
-        )
+        return self._call_address_function("read_numeric_array", addr, length, dtype, **kws)
 
     def write_numeric_array(self, addr, data, dtype, **kws):  # TODO: bounds-checking.
         """ """
@@ -197,9 +195,7 @@ class Image(object):
 
     def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
         """ """
-        return self._call_address_function(
-            "read_ndarray", addr, length, dtype, shape, order, **kws
-        )
+        return self._call_address_function("read_ndarray", addr, length, dtype, shape, order, **kws)
 
     def read_string(self, addr, encoding="latin1", length=-1, **kws):
         """ """
@@ -273,7 +269,7 @@ class Image(object):
         ------
         :class:`InvalidAddressError`
         """
-        if not address in self:
+        if address not in self:
             raise InvalidAddressError("Address not in range")
         result = self._sections.bisect_right(SearchType(address))
         return self._sections[result - 1]
@@ -297,10 +293,8 @@ class Image(object):
 def _validate_sections(sections):
     """Test for required protocol"""
     ATTRIBUTES = ("start_address", "length", "data")
-    if not "__iter__" in dir(sections):
+    if "__iter__" not in dir(sections):
         raise TypeError("Sections must be iteratable.")
     for section in sections:
         if not all(hasattr(section, attr) for attr in ATTRIBUTES):
-            raise TypeError(
-                "Section '{0}' doesn't fulfills required protocol (missing attributes)."
-            )
+            raise TypeError("Section '{0}' doesn't fulfills required protocol (missing attributes).")

@@ -1,12 +1,10 @@
-#!/bin/env python
 import os
 import sys
-from glob import glob
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
-with open(os.path.join("objutils", "version.py"), "r") as f:
+
+with open(os.path.join("objutils", "version.py")) as f:
     for line in f:
         if line.startswith("__version__"):
             version = line.split("=")[-1].strip().strip('"')
@@ -21,12 +19,10 @@ install_reqs = [
     "SQLAlchemy",
 ]
 
-if sys.version_info.major == 2 or (
-    sys.version_info.major == 3 and sys.version_info.minor < 4
-):
+if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
     install_reqs.extend(["enum34", "mock"])
 
-with open("docs/README.rst", "r") as fh:
+with open("docs/README.rst") as fh:
     long_description = fh.read()
 
 setup(
@@ -93,6 +89,12 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
     # package_data = {'tests': ['ELFFiles/*.*']},
 )

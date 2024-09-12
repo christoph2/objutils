@@ -1,22 +1,20 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
 import pytest
 
-from objutils import dumps
-from objutils import loads
-from objutils import probes
+from objutils import dumps, loads, probes
+
 
 # for key, value in sorted(registry.registry().items()):
 #    print("{0:10} {1}".format(key, value.description))
 
 
-SREC = b"""S123B000576F77212044696420796F75207265616C6C7920676F207468726F7567682061DF
+SREC = rb"""S123B000576F77212044696420796F75207265616C6C7920676F207468726F7567682061DF
 S120B0206C6C20746861742074726F75626C6520746F207265616420746869733F73
 S5030002FA\n"""
 
-FPC = b"""$kL&@h%%,:,B.\?00EPuX0K3rO0JI))
+FPC = rb"""$kL&@h%%,:,B.\?00EPuX0K3rO0JI))
 $;UPR'%%,:<Hn&FCG:at<GVF(;G9wIw
 $7FD1p%%,:LHmy:>GTV%/KJ7@GE[kYz
 $B[6\;%%,:\KIn?GFWY/qKI1G5:;-_e

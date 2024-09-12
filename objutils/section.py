@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 """
 
@@ -8,7 +7,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2024 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -28,20 +27,20 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from array import array
-from collections import namedtuple
-from copy import copy
-from operator import attrgetter
 import re
 import reprlib
 import struct
 import sys
+from array import array
+from collections import namedtuple
+from copy import copy
+from operator import attrgetter
 
 import attr
 from sortedcontainers import SortedList
 
-from objutils.exceptions import InvalidAddressError, FeatureNotAvailableError
 import objutils.hexdump as hexdump
+from objutils.exceptions import FeatureNotAvailableError, InvalidAddressError
 from objutils.utils import PYTHON_VERSION
 
 
@@ -97,8 +96,14 @@ DTYPE = re.compile(
 
 NumberRange = namedtuple("NumberRange", "lower upper")
 
-signed_range = lambda x: NumberRange(*(int(-(2**x / 2)), int((2**x / 2) - 1)))
-unsigned_range = lambda x: NumberRange(*(0, int((2**x) - 1)))
+
+def signed_range(x: int) -> NumberRange:
+    return NumberRange(*(int(-(2**x / 2)), int((2**x / 2) - 1)))
+
+
+def unsigned_range(x: int) -> NumberRange:
+    return NumberRange(*(0, int((2**x) - 1)))
+
 
 INT8_RANGE = signed_range(8)
 INT16_RANGE = signed_range(16)
@@ -167,13 +172,13 @@ def _data_converter(data):
     else:
         try:
             data = bytearray(data)
-        except Exception:
-            raise ValueError("cannot convert '{}' to bytearray()".format(data))
+        except Exception as e:
+            raise ValueError(f"cannot convert {data!r} to bytearray()") from e
     return data
 
 
 @attr.s(repr=False, eq=True, order=True)
-class Section(object):
+class Section:
     """Manage sections.
 
     A section is a continuous block of bytes, with a start-address and known length.
@@ -209,12 +214,12 @@ class Section(object):
         dtype = dtype.lower().strip()
         if dtype == "byte":
             return "uint8", "le"  # Completly arbitrary,
-        if not "_" in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
+        if "_" not in dtype or not (dtype.endswith("_le") or dtype.endswith("_be")):
             print("DTYPE:", dtype)
             raise TypeError("dtype must be suffixed with '_be' or '_le'")
         match = DTYPE.match(dtype)
         if not match:
-            raise TypeError("Invalid datatype '{}'".format(dtype))
+            raise TypeError(f"Invalid datatype '{dtype}'")
         return dtype.split("_")
 
     def _getformat(self, dtype, length=1):
@@ -222,9 +227,9 @@ class Section(object):
         fmt, bo = self._verify_dtype(dtype)
 
         if length > 1:
-            return "{}{}{}".format(BYTEORDER.get(bo), length, FORMATS.get(fmt))
+            return f"{BYTEORDER.get(bo)}{length}{FORMATS.get(fmt)}"
         else:
-            return "{}{}".format(BYTEORDER.get(bo), FORMATS.get(fmt))
+            return f"{BYTEORDER.get(bo)}{FORMATS.get(fmt)}"
 
     def read(self, addr, length, **kws):
         """
@@ -263,15 +268,11 @@ class Section(object):
     def read_numeric(self, addr, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"read_numeric(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_numeric(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError(
-                f"read_numeric(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_numeric(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + data_size]
         if "bit_mask" in kws:
             bit_mask = kws.pop("bit_mask")
@@ -282,7 +283,7 @@ class Section(object):
         """ """
         dtype, byteorder = dtype.lower().strip().split("_")
         byteorder = "little" if byteorder == "le" else "big"
-        type_size = TYPE_SIZES.get(dtype)
+        # type_size = TYPE_SIZES.get(dtype)
         data_size = len(data)
         tmp = int.from_bytes(data, byteorder, signed=False)
         tmp &= bit_mask
@@ -291,32 +292,24 @@ class Section(object):
     def write_numeric(self, addr, value, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"write_numeric(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_numeric(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError(
-                f"write_numeric(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_numeric(0x{addr:08x}) access out of bounds.")
         if "bit_mask" in kws:
-            bit_mask = kws.pop("bit_mask")
+            bit_mask = kws.pop("bit_mask")  # noqa: F841
 
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
     def read_numeric_array(self, addr, length, dtype, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"read_numeric_array(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError(
-                f"read_numeric_array(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
@@ -326,23 +319,17 @@ class Section(object):
         length = len(data)
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"write_numeric_array(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_numeric_array(0x{addr:08x}) access out of bounds.")
         fmt = self._getformat(dtype, length)
         data_size = struct.calcsize(fmt)
         if offset + data_size > self.length:
-            raise InvalidAddressError(
-                f"write_numeric_array(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_numeric_array(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
     def read_string(self, addr, encoding="latin1", length=-1, **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"read_string(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_string(0x{addr:08x}) access out of bounds.")
         if length == -1:
             pos = self.data[offset:].find(b"\x00")
         else:
@@ -354,9 +341,7 @@ class Section(object):
     def write_string(self, addr, value, encoding="latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"write_string(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_string(0x{addr:08x}) access out of bounds.")
         if PYTHON_VERSION.major == 3:
             self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
         else:
@@ -367,37 +352,29 @@ class Section(object):
         """ """
         try:
             import numpy as np
-        except ImportError:
-            raise FeatureNotAvailableError("write_ndarray() requires Numpy.")
+        except ImportError as e:
+            raise FeatureNotAvailableError("write_ndarray() requires Numpy.") from e
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"write_ndarray(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
         if not isinstance(array, np.ndarray):
             raise TypeError("array must be of type numpy.ndarray.")
         data_size = array.nbytes
         if offset + data_size > self.length:
-            raise InvalidAddressError(
-                f"write_ndarray(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + data_size] = array.tobytes()
 
     def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
         """ """
         try:
             import numpy as np
-        except ImportError:
-            raise FeatureNotAvailableError("read_ndarray() requires Numpy.")
+        except ImportError as e:
+            raise FeatureNotAvailableError("read_ndarray() requires Numpy.") from e
         offset = addr - self.start_address
         if offset < 0:
-            raise InvalidAddressError(
-                f"read_ndarray(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
-            raise InvalidAddressError(
-                f"read_ndarray(0x{addr:08x}) access out of bounds."
-            )
+            raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
 
         """
         If the buffer has data that is not in machine byte-order, this should
@@ -410,9 +387,7 @@ class Section(object):
         type_, byte_order = self._verify_dtype(dtype)
         dt = np.dtype(type_)
         dt = dt.newbyteorder(BYTEORDER.get(byte_order))
-        arr = np.frombuffer(self.data[offset : offset + length], dtype=dt).reshape(
-            shape
-        )
+        arr = np.frombuffer(self.data[offset : offset + length], dtype=dt).reshape(shape)
         if order == "F":
             return arr.T  # Fortran deposit, i.e. col-maj means transposition.
         else:
@@ -431,7 +406,7 @@ class Section(object):
             yield (self.start_address + item.start(), item.end() - item.start())
 
     def __repr__(self):
-        return "Section(address = 0X{0:08X}, length = {1:d}, data = {2})".format(
+        return "Section(address = 0X{:08X}, length = {:d}, data = {})".format(
             self.start_address,
             self.length,
             self.repr.repr(memoryview(self.data).tobytes()),
@@ -462,10 +437,7 @@ def join_sections(sections):
         section = sections.pop(0)
         if not isinstance(section, Section):
             raise TypeError("'{}' is not a 'Section' instance", section)
-        if (
-            section.start_address == prev_section.start_address + prev_section.length
-            and result_sections
-        ):
+        if section.start_address == prev_section.start_address + prev_section.length and result_sections:
             last_segment = result_sections[-1]
             last_segment.data.extend(section.data)
         else:

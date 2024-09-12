@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
 
 
 TEK = b"""/B000100C576F77212044696420796F7520726561A5

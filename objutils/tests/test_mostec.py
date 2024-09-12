@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
 
 
 MOSTEC = b""";10B000576F77212044696420796F75207265610624

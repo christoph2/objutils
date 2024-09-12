@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """while the basic option are the same it is currently not intended to be another readelf clone.
 """
 
@@ -8,7 +7,7 @@ __version__ = "0.1.0"
 __copyright__ = """
    objutils - Object file library for Python.
 
-  (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
   All Rights Reserved
 
@@ -29,24 +28,21 @@ __copyright__ = """
 
 import argparse
 
+from objutils.dwarf import DwarfProcessor
 from objutils.elf import ElfParser, model
 from objutils.elf.defs import (
-    ELFMachineType,
-    ELF_MACHINE_NAMES,
-    ELF_CLASS_NAMES,
-    ELFType,
-    ELF_TYPE_NAMES,
     ELF_BYTE_ORDER_NAMES,
+    ELF_CLASS_NAMES,
+    ELF_MACHINE_NAMES,
+    ELF_TYPE_NAMES,
     ELFAbiType,
+    ELFMachineType,
+    ELFType,
 )
-
-from objutils.dwarf import DwarfProcessor
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Display informations about ELF files."
-    )
+    parser = argparse.ArgumentParser(description="Display informations about ELF files.")
     parser.add_argument("elf_file", help="ELF file")  # , nargs = "+"
     parser.add_argument(
         "-k",
@@ -78,48 +74,21 @@ def main():
     )
 
     args = parser.parse_args()
-    # print("ARGS", args)
-    print("")
-
     ep = ElfParser(args.elf_file)
-    print("Class:       {}".format(ELF_CLASS_NAMES.get(ep.ei_class, "*** INVALID ***")))
-    print(
-        "Type:        {} [{}]".format(
-            ELFType(ep.e_type).name[3:], ELF_TYPE_NAMES.get(ep.e_type, "")
-        )
-    )
-    print(
-        "Machine:     {} [{}]".format(
-            ELFMachineType(ep.e_machine).name[3:],
-            ELF_MACHINE_NAMES.get(ep.e_machine, ""),
-        )
-    )
-    print(
-        "Data:        {}".format(
-            ELF_BYTE_ORDER_NAMES.get(ep.ei_data, "*** INVALID ***")
-        )
-    )
-    print(
-        "OS/ABI       {} / v{}".format(
-            ELFAbiType(ep.ei_osabi).name[9:], ep.ei_abiversion
-        )
-    )
+    print(f"Class:       {ELF_CLASS_NAMES.get(ep.ei_class, '*** INVALID ***')}")
+    print(f"Type:        {ELFType(ep.e_type).name[3:]} [{ELF_TYPE_NAMES.get(ep.e_type, '')}]")
+    print(f"Machine:     {ELFMachineType(ep.e_machine).name[3:]} [{ELF_MACHINE_NAMES.get(ep.e_machine, '')}]")
+    print(f"Data:        {ELF_BYTE_ORDER_NAMES.get(ep.ei_data, '*** INVALID ***')}")
+    print(f"OS/ABI       {ELFAbiType(ep.ei_osabi).name[9:]} / v{ep.ei_abiversion}")
 
     sections = ep.query(model.Elf_Section).order_by(model.Elf_Section.index).all()
     print_header("Sections")
     print("Name                      Type           Addr     Offs     Size   Al")
     print("-" * 79)
     for sec in sections:
-        flags = []
         print(
-            "{:25} {:14} {:08x} {:08x} {:06x} {:2}".format(
-                sec.section_name,
-                sec.section_type.name[4:],
-                sec.sh_addr,
-                sec.sh_offset,
-                sec.sh_size,
-                sec.sh_addralign,
-            )
+            f"{sec.section_name:25} {sec.section_type.name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
+            " {sec.sh_size:06x} {sec.sh_addralign:2}"
         )
     comment = ep.comment
     if comment:
@@ -129,7 +98,7 @@ def main():
         print_header(note.section_name)
         print("Type Name            Desc")
         print("-" * 79)
-        print("{:4} {:15} {}".format(note.type, note.name, note.desc))
+        print(f"{note.type:4} {note.name:15} {note.desc}")
 
     dbSecs = ep.debug_sections()
     # dbSecs = ep.sections.fetch(name_pattern=".debug*")

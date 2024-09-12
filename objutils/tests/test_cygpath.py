@@ -11,9 +11,7 @@ class TestCygpath(unittest.TestCase):
         )
 
     def test02(self):
-        self.assertEqual(
-            cygpath_to_win(r"c:\projects\foobar\flonz"), r"c:\projects\foobar\flonz"
-        )
+        self.assertEqual(cygpath_to_win(r"c:\projects\foobar\flonz"), r"c:\projects\foobar\flonz")
 
 
 def main():

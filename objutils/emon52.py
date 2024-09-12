@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,6 +26,7 @@ __copyright__ = """
 
 import objutils.hexfile as hexfile
 
+
 DATA = 0
 EOF = 1
 EXTENDED_SEGMENT_ADDRESS = 2
@@ -35,15 +35,14 @@ EXTENDED_LINEAR_ADDRESS = 4
 START_LINEAR_ADDRESS = 5
 
 
-class Codec(object):
+class Codec:
     """ """
 
     def __init__(self, file_like):
         self.file_like = file_like
 
     def readlines(self):
-        for line in self.file_like.readlines():
-            yield line
+        yield from self.file_like.readlines()
 
     def writelines(self, lines):
         for line in lines:
@@ -58,9 +57,7 @@ class Reader(hexfile.Reader):
 
     def check_line(self, line, format_type):
         if line.length != len(line.chunk):
-            raise hexfile.InvalidRecordLengthError(
-                "Byte count doesn't match length of actual data."
-            )
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
         # todo: factor out checksum calculation from line!!!
         checksum = sum(line.chunk) & 0xFFFF
         if line.checksum != checksum:
@@ -77,6 +74,4 @@ class Writer(hexfile.Writer):
 
     def compose_row(self, address, length, row):
         checksum = sum(row) % 65536
-        return "{0:02X} {1:04X}:{2!s} {3:04X}".format(
-            length, address, Writer.hex_bytes(row, spaced=True), checksum
-        )
+        return f"{length:02X} {address:04X}:{Writer.hex_bytes(row, spaced=True)!s} {checksum:04X}"

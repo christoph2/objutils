@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Reader/Writer for plain binfiles.
 """
 
@@ -27,13 +26,14 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from contextlib import closing
 import io
 import zipfile
+from contextlib import closing
 
-from objutils.section import Section
 from objutils.image import Image
+from objutils.section import Section
 from objutils.utils import PYTHON_VERSION, create_string_buffer
+
 
 ##
 ## TODO: binzipped format: a separate file for each section + MANIFEST (csv: fname, address, length)
@@ -44,7 +44,7 @@ class NoContiniousError(Exception):
     pass
 
 
-class Reader(object):
+class Reader:
     def load(self, fp, address=0x0000):
         if isinstance(fp, str):
             fp = open(fp, "rb")
@@ -65,7 +65,7 @@ class Reader(object):
             return self.load(create_string_buffer(image), address)
 
 
-class Writer(object):
+class Writer:
     def dump(self, fp, image, filler=b"\xff", **kws):
         if isinstance(fp, str):
             fp = open(fp, "wb")
@@ -88,7 +88,7 @@ class Writer(object):
             return b""
         sections = sorted(image.sections, key=lambda x: x.start_address)
         for section in sections:
-            if not previous_address is None:
+            if previous_address is not None:
                 gap = section.start_address - (previous_address + previous_length)
                 if gap > 0:
                     result.extend(filler * gap)
@@ -101,11 +101,11 @@ class Writer(object):
 #
 
 
-class BinZipReader(object):
+class BinZipReader:
     pass
 
 
-class BinZipWriter(object):
+class BinZipWriter:
     SECTION_FILE_NAME = "image{0:d}.bin"
     MANIFEST_FILE_NAME = "IMAGES.mf"
 
