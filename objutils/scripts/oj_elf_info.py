@@ -28,7 +28,7 @@ __copyright__ = """
 
 import argparse
 
-from objutils.dwarf import DwarfProcessor
+# from objutils.dwarf import DwarfProcessor
 from objutils.elf import ElfParser, model
 from objutils.elf.defs import (
     ELF_BYTE_ORDER_NAMES,
@@ -88,7 +88,7 @@ def main():
     for sec in sections:
         print(
             f"{sec.section_name:25} {sec.section_type.name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
-            " {sec.sh_size:06x} {sec.sh_addralign:2}"
+            f" {sec.sh_size:06x} {sec.sh_addralign:2}"
         )
     comment = ep.comment
     if comment:
@@ -100,14 +100,15 @@ def main():
         print("-" * 79)
         print(f"{note.type:4} {note.name:15} {note.desc}")
 
-    dbSecs = ep.debug_sections()
+    # dbSecs = ep.debug_sections()
     # dbSecs = ep.sections.fetch(name_pattern=".debug*")
     # dbSecs = ep.sections.fetch(name_pattern="*")
-    if dbSecs:
-        dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-        dp.do_abbrevs()
-        dp.do_mac_info()
-        dp.do_dbg_info()
+
+    # if dbSecs:
+    #     dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
+    #     dp.do_abbrevs()
+    #     dp.do_mac_info()
+    #     dp.do_dbg_info()
 
 
 def print_header(text):

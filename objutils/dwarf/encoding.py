@@ -28,16 +28,20 @@ __copyright__ = """
 import struct
 import time
 from dataclasses import dataclass
+from enum import IntEnum
 
 from construct import Int8ul, Int16ub, Int16ul, Int32ub, Int32ul, Int64ub, Int64ul
 from construct.core import Bytes, Construct, ConstructError, CString, singleton
-
-from objutils.elf.defs import Endianess
 
 
 # from objutils.dwarf.lineprog import Line
 
 NULL_CHAR: bytes = b"\x00"
+
+
+class Endianess(IntEnum):
+    Little = 0
+    Big = 1
 
 
 class ULEBError(ConstructError):
