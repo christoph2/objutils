@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.4.15"
+version = "0.5.0"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
