@@ -1,15 +1,17 @@
 import pytest
 
-from objutils.checksums import check
-from objutils.checksums import COMPLEMENT_NONE
-from objutils.checksums import COMPLEMENT_ONES
-from objutils.checksums import COMPLEMENT_TWOS
-from objutils.checksums import lrc
-from objutils.checksums import nibble_sum
-from objutils.checksums import ROTATE_LEFT
-from objutils.checksums import ROTATE_RIGHT
-from objutils.checksums import rotatedXOR
-from objutils.checksums import xor
+from objutils.checksums import (
+    COMPLEMENT_NONE,
+    COMPLEMENT_ONES,
+    COMPLEMENT_TWOS,
+    ROTATE_LEFT,
+    ROTATE_RIGHT,
+    check,
+    lrc,
+    nibble_sum,
+    rotatedXOR,
+    xor,
+)
 
 
 def testNibbleSumCase1():

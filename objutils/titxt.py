@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -41,12 +40,12 @@ class Reader(hexfile.ASCIIHexReader):
         data_pattern=r"^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$",
         etx_pattern=r"^q.*$",
     ):
-        super(Reader, self).__init__(address_pattern, data_pattern, etx_pattern)
+        super().__init__(address_pattern, data_pattern, etx_pattern)
 
 
 class Writer(hexfile.ASCIIHexWriter):
     def __init__(self, address_designator="@"):
-        super(Writer, self).__init__(address_designator)
+        super().__init__(address_designator)
 
     def compose_footer(self, meta):
         return "q"

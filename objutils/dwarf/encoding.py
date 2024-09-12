@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2024 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -27,13 +26,18 @@ __copyright__ = """
 """
 
 import struct
+import time
+from dataclasses import dataclass
 
-from construct.core import Construct, ConstructError, Bytes, CString
-from construct.core import singleton
-from construct import Int16ul, Int32ul, Int64ul, Int8ul
-from construct import Int16ub, Int32ub, Int64ub
+from construct import Int8ul, Int16ub, Int16ul, Int32ub, Int32ul, Int64ub, Int64ul
+from construct.core import Bytes, Construct, ConstructError, CString, singleton
 
-import six
+from objutils.elf.defs import Endianess
+
+
+# from objutils.dwarf.lineprog import Line
+
+NULL_CHAR: bytes = b"\x00"
 
 
 class ULEBError(ConstructError):
@@ -47,10 +51,7 @@ class SLEBError(ConstructError):
 @singleton
 class ULEB(Construct):
     def __init__(self, *args):
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super(self.__class__, self).__init__()
+        super(__class__, self).__init__()
 
     def _parse(self, stream, context, path=None):
         result = 0
@@ -59,7 +60,7 @@ class ULEB(Construct):
             try:
                 bval = ord(stream.read(1))
             except Exception as e:
-                raise ULEBError(str(e))
+                raise ULEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             if bval & 0x80 == 0:
                 break
@@ -67,7 +68,6 @@ class ULEB(Construct):
         return result
 
     def _build(self, value, stream, context, path):
-        assert value is not None
         if value < 0:
             raise ULEBError("value must be non-negative.")
         result = []
@@ -85,21 +85,17 @@ class ULEB(Construct):
 @singleton
 class SLEB(Construct):
     def __init__(self, *args):
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super().__init__()
+        super(__class__, self).__init__()
 
     def _parse(self, stream, context, path=None):
         result = 0
         shift = 0
-        size = 32
         idx = 0
         while True:
             try:
                 bval = ord(stream.read(1))
             except Exception as e:
-                raise SLEBError(str(e))
+                raise SLEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             shift += 7
             idx += 1
@@ -111,16 +107,12 @@ class SLEB(Construct):
         return result
 
     def _build(self, value, stream, context, path):
-        assert value is not None
         result = []
         more = 1
-        size = 32
         while more:
             bval = value & 0x7F
             value >>= 7
-            if ((value == 0 and (bval & 0x40) == 0x00)) or (
-                (value == -1 and (bval & 0x40) == 0x40)
-            ):
+            if (value == 0 and (bval & 0x40) == 0x00) or (value == -1 and (bval & 0x40) == 0x40):
                 more = 0
             else:
                 bval |= 0x80
@@ -131,10 +123,7 @@ class SLEB(Construct):
 @singleton
 class One(Construct):
     def __init__(self, *args):
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super().__init__()
+        super(__class__, self).__init__()
 
     def _parse(self, stream, context, path=None):
         return 1
@@ -143,10 +132,7 @@ class One(Construct):
         count = struct.pack("B", 1)
         value = 1
         stream.write(count)
-        if six.PY3:
-            stream.write(bytes(value, encoding="ascii"))
-        else:
-            stream.write(bytes(value))
+        stream.write(bytes(value, encoding="ascii"))
 
 
 class Block(Construct):
@@ -155,26 +141,20 @@ class Block(Construct):
     MASK = None
 
     def __init__(self, *args):
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super().__init__()
+        super(__class__, self).__init__()
 
     def _parse(self, stream, context, path=None):
-        msk = "{}{}".format(self.BYTEORDER, self.MASK)
+        msk = f"{self.BYTEORDER}{self.MASK}"
         count = stream.read(self.SIZE)
         count = struct.unpack(msk, count)[0]
         result = Bytes(count).parse_stream(stream)
         return result
 
     def _build(self, value, stream, context, path):
-        msk = "{}{}".format(self.BYTEORDER, self.MASK)
+        msk = f"{self.BYTEORDER}{self.MASK}"
         count = struct.pack(msk, len(value))
         stream.write(count)
-        if six.PY3:
-            stream.write(bytes(value, encoding="ascii"))
-        else:
-            stream.write(bytes(value))
+        stream.write(bytes(value, encoding="ascii"))
 
 
 @singleton
@@ -187,10 +167,7 @@ class BlockUleb(Block):
     def _build(self, value, stream, context, path):
         count = ULEB.build(len(value))
         stream.write(count)
-        if six.PY3:
-            stream.write(bytes(value, encoding="ascii"))
-        else:
-            stream.write(bytes(value))
+        stream.write(bytes(value, encoding="ascii"))
 
 
 @singleton
@@ -236,14 +213,11 @@ class Address(Construct):
         8: (Int64ul, Int64ub),
     }
 
-    def __init__(self, size, endianess):
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super().__init__()
-        idx = endianess
+    def __init__(self, size, endianess: Endianess):
+        super(__class__, self).__init__()
+        idx = 0 if endianess == Endianess.Little else 1
         if size not in (1, 2, 4, 8):
-            raise ValueError("Address size '{}' not supported.".format(size))
+            raise ValueError(f"Address size '{size}' not supported.")
         if not isinstance(size, int):
             print("**SIZE is not int", size, endianess, idx, type(str))
         if not isinstance(idx, int):
@@ -262,15 +236,12 @@ class StrP(Construct):
     SIZE = None
     MASK = None
 
-    def __init__(self, image, endianess):
+    def __init__(self, image, endianess: Endianess):
         self.image = image
         self.endianess = endianess
-        self.ntype = (Int32ul, Int32ub)[0 if endianess == 1 else 1]
+        self.ntype = (Int32ul, Int32ub)[0 if endianess == Endianess.Little else 1]
         self.stype = CString(encoding="utf8")
-        if six.PY3:
-            super(__class__, self).__init__()
-        else:
-            super().__init__()
+        super(__class__, self).__init__()
 
     def _parse(self, stream, context, path=None):
         offset = self.ntype.parse_stream(stream)
@@ -281,3 +252,71 @@ class StrP(Construct):
 
     def _build(self, value, stream, context, path):
         stream.write(self.type.build(value))
+
+
+class ArrayOfCStrings(Construct):
+
+    def __init__(self, encoding: str = "ascii") -> None:
+        self.str_type = CString(encoding=encoding)
+        super().__init__()
+
+    def _parse(self, stream, context, path=None):
+        result = []
+
+        while True:
+            value = CString(encoding="utf8").parse_stream(stream)
+            if not value:
+                break
+            result.append(value)
+        # term = stream.read(1)
+        return result
+
+    def _build(self, values, stream, context, path):
+        if values:
+            for value in values:
+                stream.write(self.str_type.build(value))
+        else:
+            stream.write(NULL_CHAR)
+        # stream.write(NULL_CHAR)
+
+
+@dataclass
+class Filename:
+    name: str
+    dir_index: int
+    last_modified: int
+    length: int
+
+
+class FilenameSequence(Construct):
+
+    def __init__(self, encoding: str = "ascii") -> None:
+        self.str_type = CString(encoding=encoding)
+        super().__init__()
+
+    def _parse(self, stream, context, path=None):
+        result = {}
+        idx = 1
+        while True:
+            current = stream.tell()
+            ch = stream.read(1)
+            if ch == NULL_CHAR:
+                break
+            stream.seek(current)
+            name = self.str_type.parse_stream(stream)
+            if not name:
+                break
+            dir_index = ULEB.parse_stream(stream)
+            last_mod = ULEB.parse_stream(stream)
+            file_length = ULEB.parse_stream(stream)
+            result[idx] = Filename(name, dir_index, time.ctime(last_mod), file_length)
+            idx += 1
+        return result
+
+    def _build(self, values, stream, context, path):
+        if values:
+            for value in values:
+                stream.write(self.str_type.build(value))
+        else:
+            stream.write(NULL_CHAR)
+        stream.write(NULL_CHAR)

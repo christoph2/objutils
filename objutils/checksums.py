@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -26,10 +25,11 @@ __copyright__ = """
 """
 
 import enum
-import operator
 import functools
+import operator
 import struct
 import zlib
+
 
 COMPLEMENT_NONE = 0
 COMPLEMENT_ONES = 1
@@ -679,9 +679,7 @@ class Crc16:
 
     WIDTH = 16
 
-    def __init__(
-        self, table, initalRemainder, finalXorValue, reflectData, reflectRemainder
-    ):
+    def __init__(self, table, initalRemainder, finalXorValue, reflectData, reflectRemainder):
         self.table = table
         self.initalRemainder = initalRemainder
         self.finalXorValue = finalXorValue
@@ -758,10 +756,7 @@ def wordSum(modulus, step):
             mask = "<I"
         else:
             raise NotImplementedError("Only WORDs or DWORDs are supported.")
-        x = [
-            struct.unpack(mask, frame[x : x + step])[0]
-            for x in range(0, len(frame), step)
-        ]
+        x = [struct.unpack(mask, frame[x : x + step])[0] for x in range(0, len(frame), step)]
         return sum(x) % modulus
 
     return add
@@ -816,4 +811,4 @@ def check(frame, algo):
     if fun:
         return fun(frame)
     else:
-        raise NotImplementedError("Invalid algorithm '{}'.".format(algo))
+        raise NotImplementedError(f"Invalid algorithm '{algo}'.")

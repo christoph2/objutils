@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """ Dumps '.ARM.attributes' section in an ELF file.
 """
 
@@ -8,7 +7,7 @@ __version__ = "0.1.0"
 __copyright__ = """
    objutils - Object file library for Python.
 
-  (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
   All Rights Reserved
 
@@ -29,7 +28,6 @@ __copyright__ = """
 
 import argparse
 
-
 from objutils.elf import ElfParser, defs
 
 
@@ -41,14 +39,10 @@ def main():
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print(
-            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
-                args.elf_file, repr(e)
-            )
-        )
+        print(f"\n{args.elf_file!r} is not valid ELF file. Raised exception: {e!r}.")
         exit(1)
-    if not ep.e_machine in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
-        print("\n'{}' is not an ARM architecture file.".format(args.elf_file))
+    if ep.e_machine not in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
+        print(f"\n'{args.elf_file}' is not an ARM architecture file.")
         exit(2)
     print("")
     arm_attrs = ep.arm_attributes
@@ -58,9 +52,7 @@ def main():
             print("Name                           Value\nDescription")
             print("-" * 79)
             for attr in entries:
-                print(
-                    "{:30} {}\n{}\n".format(attr.tag_name, attr.value, attr.description)
-                )
+                print(f"{attr.tag_name:30} {attr.value}\n{attr.description}\n")
     else:
         print("*** No .ARM.attributes section ***")
 

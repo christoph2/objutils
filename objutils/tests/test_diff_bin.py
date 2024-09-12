@@ -1,8 +1,7 @@
 import copy
 import string
 
-from objutils.utils.diff import BinDiff
-from objutils.utils.diff import diff_bin
+from objutils.utils.diff import BinDiff, diff_bin
 
 
 def test_modify1():
@@ -14,9 +13,7 @@ def test_modify1():
     b1[136] = 14
     res = diff_bin(b0, b1)
     assert res == [
-        BinDiff(
-            type="M", offset=126, a=bytearray(b"~\x7f\x80"), b=bytearray(b"\x0b\x0c\r")
-        ),
+        BinDiff(type="M", offset=126, a=bytearray(b"~\x7f\x80"), b=bytearray(b"\x0b\x0c\r")),
         BinDiff(type="M", offset=136, a=bytearray(b"\x88"), b=bytearray(b"\x0e")),
     ]
 

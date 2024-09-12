@@ -3,10 +3,10 @@ dist: xenial
 language: python
 sudo: required
 python:
-    - 3.4
-    #- 3.5
-    - 3.6
-    - 3.7
+  - 3.4
+  #- 3.5
+  - 3.6
+  - 3.7
 
 os:
   - linux
@@ -20,8 +20,7 @@ install:
   - travis_retry pip install pylint codeclimate-test-reporter
   - travis_retry pip install pytest-cov coverage coveralls codacy-coverage
 
-script:
-   coverage run --source=objutils setup.py test
+script: coverage run --source=objutils setup.py test
 
 after_success:
   - pylint objutils

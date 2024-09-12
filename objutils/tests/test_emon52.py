@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
 
 
 EMON52 = b"""10 0000:57 6F 77 21 20 44 69 64 20 79 6F 75 20 72 65 61 0564

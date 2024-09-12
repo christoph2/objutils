@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
+
 
 TEST1 = b""" $A0000,
 7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C
@@ -86,7 +85,7 @@ class TestAcceptance(unittest.TestCase):
 
 class TestGenerateVariants(unittest.TestCase):
     def testWriteHexSpace(self):
-        data = loads("srec", SREC)
+        loads("srec", SREC)
         # print(dumps("ash", data, separator = "%"))
         # print()
 

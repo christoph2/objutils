@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,9 +26,10 @@ __copyright__ = """
 """
 
 
+import objutils.checksums as checksums
 import objutils.hexfile as hexfile
 import objutils.utils as utils
-import objutils.checksums as checksums
+
 
 DATA = 1
 EOF = 2
@@ -41,13 +41,9 @@ class Reader(hexfile.Reader):
     def check_line(self, line, format_type):
         if format_type == DATA:
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             checksum = checksums.lrc(
-                utils.make_list(
-                    utils.int_to_array(line.address), line.length, line.chunk
-                ),
+                utils.make_list(utils.int_to_array(line.address), line.length, line.chunk),
                 16,
                 checksums.COMPLEMENT_NONE,
             )
@@ -67,9 +63,7 @@ class Writer(hexfile.Writer):
             16,
             checksums.COMPLEMENT_NONE,
         )
-        line = ";{0:02X}{1:04X}{2!s}{3:04X}".format(
-            length, address, Writer.hex_bytes(row), checksum
-        )
+        line = f";{length:02X}{address:04X}{Writer.hex_bytes(row)!s}{checksum:04X}"
         return line
 
     def compose_footer(self, meta):

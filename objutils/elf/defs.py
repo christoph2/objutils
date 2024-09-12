@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -26,8 +25,8 @@ __copyright__ = """
 """
 
 import enum
-from collections import namedtuple
 import struct
+from collections import namedtuple
 
 
 ELF_MAGIC = b"\x7fELF"
@@ -35,6 +34,11 @@ ELF_MAGIC = b"\x7fELF"
 EI_NIDENT = 16  # Size of e_ident[].
 HDR_FMT32 = "HHIIIIIHHHHHH"
 HDR_FMT64 = "HHIQQQIHHHHHH"
+
+
+class Endianess(enum.IntEnum):
+    Little = 0
+    Big = 1
 
 
 Elf32_Ehdr = namedtuple(
@@ -185,9 +189,7 @@ class ELFMachineType(enum.IntEnum):
     EM_SE_C33 = 107  # S1C33 Family of Seiko Epson processors.
     EM_SEP = 108  # Sharp embedded microprocessor.
     EM_ARCA = 109  # Arca RISC Microprocessor.
-    EM_UNICORE = (
-        110  # Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University.
-    )
+    EM_UNICORE = 110  # Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University.
     EM_EXCESS = 111  # eXcess: 16/32/64-bit configurable embedded CPU.
     EM_DXP = 112  # Icera Semiconductor Inc. Deep Execution Processor.
     EM_ALTERA_NIOS2 = 113  # Altera Nios II soft-core processor.
@@ -241,41 +243,23 @@ class ELFMachineType(enum.IntEnum):
     EM_CUDA = 190  # NVIDIA CUDA architecture.
     EM_TILEGX = 191  # Tilera TILE-Gx
     EM_AVR_OLD = 0x1057  # AVR magic number.  Written in the absense of an ABI.
-    EM_MSP430_OLD = (
-        0x1059  # MSP430 magic number.  Written in the absense of everything.
-    )
+    EM_MSP430_OLD = 0x1059  # MSP430 magic number.  Written in the absense of everything.
     EM_MT = 0x2530  # Morpho MT.   Written in the absense of an ABI.
     EM_CYGNUS_FR30 = 0x3330  # FR30 magic number - no EABI available.
-    EM_OPENRISC_OLD = (
-        0x3426  # OpenRISC magic number.  Written in the absense of an ABI.
-    )
+    EM_OPENRISC_OLD = 0x3426  # OpenRISC magic number.  Written in the absense of an ABI.
     EM_DLX = 0x5AA5  # DLX magic number.  Written in the absense of an ABI.
     EM_CYGNUS_FRV = 0x5441  # FRV magic number - no EABI available??.
     EM_XC16X = 0x4688  # Infineon Technologies 16-bit microcontroller with C166-V2 core.
     EM_NEC_V850 = 0x723E  # V850ES/FJ3 /w NEC compiler.
-    EM_CYGNUS_D10V = (
-        0x7650  # D10V backend magic number.  Written in the absence of an ABI.
-    )
-    EM_CYGNUS_D30V = (
-        0x7676  # D30V backend magic number.  Written in the absence of an ABI.
-    )
+    EM_CYGNUS_D10V = 0x7650  # D10V backend magic number.  Written in the absence of an ABI.
+    EM_CYGNUS_D30V = 0x7676  # D30V backend magic number.  Written in the absence of an ABI.
     EM_IP2K_OLD = 0x8217  # Ubicom IP2xxx;   Written in the absense of an ABI.
     EM_OR32 = 0x8472  # (Deprecated) Temporary number for the OpenRISC processor.
-    EM_CYGNUS_POWERPC = (
-        0x9025  # Cygnus PowerPC ELF backend.  Written in the absence of an ABI.
-    )
-    EM_ALPHA_NO_ABI = (
-        0x9026  # Alpha backend magic number.  Written in the absence of an ABI.
-    )
-    EM_CYGNUS_M32R = (
-        0x9041  # Cygnus M32R ELF backend.  Written in the absence of an ABI.
-    )
-    EM_CYGNUS_V850 = (
-        0x9080  # V850 backend magic number.  Written in the absense of an ABI.
-    )
-    EM_S390_OLD = (
-        0xA390  # old S/390 backend magic number. Written in the absence of an ABI.
-    )
+    EM_CYGNUS_POWERPC = 0x9025  # Cygnus PowerPC ELF backend.  Written in the absence of an ABI.
+    EM_ALPHA_NO_ABI = 0x9026  # Alpha backend magic number.  Written in the absence of an ABI.
+    EM_CYGNUS_M32R = 0x9041  # Cygnus M32R ELF backend.  Written in the absence of an ABI.
+    EM_CYGNUS_V850 = 0x9080  # V850 backend magic number.  Written in the absense of an ABI.
+    EM_S390_OLD = 0xA390  # old S/390 backend magic number. Written in the absence of an ABI.
     EM_XTENSA_OLD = 0xABC7  # Old, unofficial value for Xtensa.
     EM_XSTORMY16 = 0xAD45
     EM_CYGNUS_MN10300 = 0xBEEF  # mn10200 and mn10300 backend magic numbers. Written in the absense of an ABI.
@@ -651,9 +635,7 @@ class SectionType(enum.IntEnum):
     SHT_ARM_PREEMPTMAP = 0x70000002  # Section pre-emption details.
     SHT_ARM_ATTRIBUTES = 0x70000003  # Section holds attributes.
     SHT_ARM_DEBUGOVERLAY = 0x70000004  # Section holds overlay debug info.
-    SHT_ARM_OVERLAYSECTION = (
-        0x70000005  # Section holds GDB and overlay integration info.
-    )
+    SHT_ARM_OVERLAYSECTION = 0x70000005  # Section holds GDB and overlay integration info.
 
     SHT_HIPROC = 0x7FFFFFFF  # End of processor-specific.
     SHT_LOUSER = 0x80000000  # Start of application-specific.
@@ -678,9 +660,7 @@ class SectionFlags(enum.IntEnum):
     SHF_MASKPROC = 0xF0000000  # Processor-specific.
 
     SHF_ORDERED = 1073741824  # Special ordering requirement (Solaris).
-    SHF_EXCLUDE = (
-        2147483648  # Section is excluded unless referenced or allocated (Solaris).
-    )
+    SHF_EXCLUDE = 2147483648  # Section is excluded unless referenced or allocated (Solaris).
 
 
 ##
@@ -774,7 +754,6 @@ PN_XNUM = 0xFFFF  # Extended numbering.
 
 
 class NoteSegmentDescriptorCore(enum.IntEnum):
-
     """
     Legal values for note segment descriptor types for core files.
     """
@@ -805,7 +784,6 @@ class NoteSegmentDescriptorCore(enum.IntEnum):
 
 
 class NoteSegmentDescriptorObject(enum.IntEnum):
-
     """
     Legal values for the note segment descriptor types for object files.
     """

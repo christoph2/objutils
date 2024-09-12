@@ -1,4 +1,3 @@
-
 First import some stuff we need in this tutorial:
 
 .. code-block:: python

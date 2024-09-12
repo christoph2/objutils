@@ -195,11 +195,12 @@ never-returning-functions=sys.exit
 
 # Naming style matching correct argument names.
 #argument-naming-style=snake_case
-argument-naming-style=snake_case
+argument-naming-style=camelCase
 
 # Regular expression matching correct argument names. Overrides argument-
 # naming-style.
 #argument-rgx=
+argument-rgx=[a-z][a-zA-Z0-9]*$
 
 # Naming style matching correct attribute names.
 attr-naming-style=snake_case
@@ -207,6 +208,7 @@ attr-naming-style=snake_case
 # Regular expression matching correct attribute names. Overrides attr-naming-
 # style.
 #attr-rgx=
+attr-rgx=[a-z][a-zA-Z0-9]*$
 
 # Bad variable names which should always be refused, separated by a comma.
 bad-names=foo,
@@ -229,6 +231,7 @@ class-naming-style=PascalCase
 # Regular expression matching correct class names. Overrides class-naming-
 # style.
 #class-rgx=
+class-rgx=[A-Z][a-zA-Z0-9]+$
 
 # Naming style matching correct constant names.
 const-naming-style=UPPER_CASE
@@ -247,6 +250,7 @@ function-naming-style=snake_case
 # Regular expression matching correct function names. Overrides function-
 # naming-style.
 #function-rgx=
+function-rgx=[a-z_][a-zA-Z0-9]*$
 
 
 # Good variable names which should always be accepted, separated by a comma.
@@ -273,6 +277,7 @@ method-naming-style=snake_case
 # Regular expression matching correct method names. Overrides method-naming-
 # style.
 #method-rgx=
+method-rgx=[a-z_][a-zA-Z0-9]*$
 
 
 # Naming style matching correct module names.
@@ -281,6 +286,7 @@ module-naming-style=snake_case
 # Regular expression matching correct module names. Overrides module-naming-
 # style.
 #module-rgx=
+module-rgx=(([a-z][a-z0-9]*)|([A-Z][a-zA-Z0-9]+))$
 
 
 # Colon-delimited sets of names that determine each other's naming style when
@@ -302,6 +308,7 @@ variable-naming-style=snake_case
 # Regular expression matching correct variable names. Overrides variable-
 # naming-style.
 #variable-rgx=
+variable-rgx=[a-z][a-zA-Z0-9]*$
 
 [FORMAT]
 

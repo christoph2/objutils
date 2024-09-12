@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -29,10 +28,12 @@ __copyright__ = """
 ##  ASCII Space Hex format.
 ##
 
-from functools import partial
 import re
+from functools import partial
+
 import objutils.hexfile as hexfile
 from objutils.checksums import lrc
+
 
 STX = "\x02"
 ETX = "\x03"
@@ -58,9 +59,7 @@ class Reader(hexfile.ASCIIHexReader):
         data_pattern=r"^(?:[0-9a-zA-Z]{{2,4}}[{0}]?)*\s*$",
         etx_pattern=r"^q.*$",
     ):
-        super(Reader, self).__init__(
-            address_pattern, data_pattern, etx_pattern, separators=", %'"
-        )
+        super().__init__(address_pattern, data_pattern, etx_pattern, separators=", %'")
 
 
 class Writer(hexfile.ASCIIHexWriter):
@@ -68,16 +67,16 @@ class Writer(hexfile.ASCIIHexWriter):
     ADDRESS_DESIGNATOR = "$A"
 
     def __init__(self, address_designator="$A"):
-        super(Writer, self).__init__(address_designator)
+        super().__init__(address_designator)
 
     def compose_header(self, meta):
         self.checksum = 0
         self.previous_address = None
-        line = "{0} ".format(STX)
+        line = f"{STX} "
         return line
 
     def compose_footer(self, meta):
-        line = "{0}$${1:04X},".format(ETX, self.checksum % 65536)
+        line = f"{ETX}$${self.checksum % 65536:04X},"
         return line
 
     def row_callout(self, address, length, row):

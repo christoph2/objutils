@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,7 +26,9 @@ __copyright__ = """
 """
 
 import re
+
 import objutils.hexfile as hexfile
+
 
 DATA = 1
 EOF = 2
@@ -48,14 +49,14 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    SEPARATOR = "{0!s}\x0d\x0a".format(("\x00" * 48))
+    SEPARATOR = "{!s}\x0d\x0a".format("\x00" * 48)
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):
-        return "{0:04X} {1!s};".format(address, Writer.hex_bytes(row))
+        return f"{address:04X} {Writer.hex_bytes(row)!s};"
 
     def compose_header(self, meta):
-        return "{0!s}!M".format(Writer.SEPARATOR)
+        return f"{Writer.SEPARATOR!s}!M"
 
     def compose_footer(self, meta):
-        return "{0!s}".format(Writer.SEPARATOR)
+        return f"{Writer.SEPARATOR!s}"

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Parser for ELF files.
 """
 
@@ -26,26 +25,50 @@ __copyright__ = """
 """
 
 import binascii
-from collections import namedtuple, OrderedDict
 import hashlib
-from itertools import groupby
 import re
 import time
+from collections import OrderedDict, namedtuple
+from itertools import groupby
 
-
-from construct import Adapter, Array, CString, Const, Enum, IfThenElse, Padding, Struct
-from construct import BitStruct, BitsInteger, Bytes, Construct, this
-from construct import Computed, Pass, Tell, Union, singleton
-from construct import Int8ul, Int16ul, Int32ul, Int32sl, Int64ul, Int64sl
-from construct import Int16ub, Int32ub, Int32sb, Int64ub, Int64sb
-from construct import StreamError
-
+from construct import (
+    Adapter,
+    Array,
+    BitsInteger,
+    BitStruct,
+    Bytes,
+    Computed,
+    Const,
+    Construct,
+    CString,
+    Enum,
+    IfThenElse,
+    Int8ul,
+    Int16ub,
+    Int16ul,
+    Int32sb,
+    Int32sl,
+    Int32ub,
+    Int32ul,
+    Int64sb,
+    Int64sl,
+    Int64ub,
+    Int64ul,
+    Padding,
+    Pass,
+    StreamError,
+    Struct,
+    Tell,
+    Union,
+    singleton,
+    this,
+)
 from sqlalchemy import func, not_
 
 from objutils import Image, Section
-from objutils.utils import create_memorymapped_fileview
 from objutils.elf import defs, model
 from objutils.elf.arm import attributes
+from objutils.utils import create_memorymapped_fileview
 
 
 MAGIC = b"\x7fELF"
@@ -110,19 +133,19 @@ class ListToBytesAdapter(Adapter):
 
 class PrintContext(Construct):
     def _parse(self, stream, context, *args, **kws):
-        print("CTX: {} {} {}".format(context, args, kws))
+        print(f"CTX: {context} {args} {kws}")
         print("CTX_END")
 
 
 class ElfFileStruct(Struct):
     def __init__(self, *args, **kws):
-        super(ElfFileStruct, self).__init__(*args, **kws)
+        super().__init__(*args, **kws)
 
     def elf32Addr(self):
         pass
 
     def setByteOrder(self):
-        print("*** {}".format(self))
+        print(f"*** {self}")
 
 
 DebugInfo = namedtuple("DebugInfo", "section image")
@@ -176,9 +199,7 @@ class SectionAPI(DBAPI):
 
         query = self.query(model.Elf_Section)
         if name_pattern:
-            query = query.filter(
-                func.regexp(model.Elf_Section.section_name, name_pattern)
-            )
+            query = query.filter(func.regexp(model.Elf_Section.section_name, name_pattern))
         if order_by_address:
             query = query.order_by(model.Elf_Section.sh_addr)
         else:
@@ -211,9 +232,6 @@ class SymbolAPI(DBAPI):
         Returns
         -------
         """
-        if isinstance(symbol_name, str):
-            names = [symbol_name]
-
         query = self.query(model.Elf_Symbol)
         if section_name:
             query = query.filter(model.Elf_Symbol.section_name == section_name)
@@ -284,9 +302,7 @@ class SymbolAPI(DBAPI):
                     flt.append(defs.SymbolType.STT_TLS)
                 query = query.filter(model.Elf_Symbol.st_type.in_(flt))
         if name_pattern:
-            query = query.filter(
-                func.regexp(model.Elf_Symbol.symbol_name, name_pattern)
-            )
+            query = query.filter(func.regexp(model.Elf_Symbol.symbol_name, name_pattern))
         query = query.order_by(model.Elf_Symbol.section_name)
         if order_by_value:
             query = query.order_by(model.Elf_Symbol.st_value)
@@ -306,9 +322,7 @@ class SymbolAPI(DBAPI):
         ----
         This is a GCC specific feature and will not work with other compilers.
         """
-        syms = self.query(model.Elf_Symbol).filter(
-            model.Elf_Symbol.st_shndx == defs.SectionName.SHN_ABS
-        )
+        syms = self.query(model.Elf_Symbol).filter(model.Elf_Symbol.st_shndx == defs.SectionName.SHN_ABS)
         syms = syms.filter(model.Elf_Symbol.symbol_name != "")
         syms = syms.filter(func.regexp(model.Elf_Symbol.symbol_name, "_.*"))
         syms = syms.filter(model.Elf_Symbol.st_type == defs.SymbolType.STT_NOTYPE)
@@ -320,7 +334,7 @@ def calculate_crypto_hash(data):
     return sha.hexdigest()
 
 
-class ElfParser(object):
+class ElfParser:
     """ """
 
     EI_NIDENT = 16
@@ -365,7 +379,7 @@ class ElfParser(object):
 
     def __init__(self, filename):
         self.fp = create_memorymapped_fileview(filename)
-        sha = calculate_crypto_hash(self.fp.tobytes())
+        # sha = calculate_crypto_hash(self.fp.tobytes())
 
         self.db = model.Model()
         self.session = self.db.session
@@ -381,13 +395,9 @@ class ElfParser(object):
         elif self.ei_data == 2:  # Big-Endian
             offset = 1
         else:
-            raise ValueError(
-                "EI_DATA has an invalid value. Got: {}".format(self.ei_data)
-            )
+            raise ValueError(f"EI_DATA has an invalid value. Got: {self.ei_data}")
         self._endianess = "<" if self.ei_data == 1 else ">"
-        datatypes = (
-            ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
-        )
+        datatypes = ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
         for key, value in datatypes:
             setattr(self, key, value[offset])
         self._parser_extended_header()
@@ -433,10 +443,7 @@ class ElfParser(object):
                     "sh_info" / self.Word,
                     "sh_addralign" / self.Xword,
                     "sh_entsize" / self.Xword,
-                    "allocate"
-                    / Computed(
-                        lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)
-                    ),
+                    "allocate" / Computed(lambda ctx: (ctx.sh_type not in (0, 8) and ctx.sh_size > 0)),
                 ),
             )
         )
@@ -446,9 +453,7 @@ class ElfParser(object):
             self._section_headers = SectionHeaders.parse(self.fp[self.e_shoff :])
             for idx, section in enumerate(self._section_headers.sections):
                 if section.allocate:
-                    image = self.fp[
-                        section.sh_offset : section.sh_offset + section.sh_size
-                    ]
+                    image = self.fp[section.sh_offset : section.sh_offset + section.sh_size]
                 else:
                     image = None
                 if image is not None:
@@ -555,8 +560,7 @@ class ElfParser(object):
                 "st_shndx" / self.Half,
                 "st_value" / self.Addr,
                 "st_size" / self.Xword,
-                "symbol_name"
-                / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
+                "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
             )
         else:
             Symbol = Struct(
@@ -569,12 +573,11 @@ class ElfParser(object):
                     "st_type" / BitsInteger(4),
                 ),
                 "st_other" / Int8ul,
-                "symbol_name"
-                / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
+                "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
                 "st_shndx" / self.Half,
             )
         symbol_cache = {}
-        num_symbols = len(section.image) // Symbol.sizeof()
+        # num_symbols = len(section.image) // Symbol.sizeof()
         for offset in range(0, len(section.image), Symbol.sizeof()):
             try:
                 sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
@@ -585,12 +588,8 @@ class ElfParser(object):
             if sym.st_shndx in defs.SpecialSections:
                 section_name = defs.special_section_name(sym.st_shndx)
             else:
-                if not sym.st_shndx in symbol_cache:
-                    section_header = (
-                        self.session.query(model.Elf_Section)
-                        .filter(model.Elf_Section.index == sym.st_shndx)
-                        .first()
-                    )
+                if sym.st_shndx not in symbol_cache:
+                    section_header = self.session.query(model.Elf_Section).filter(model.Elf_Section.index == sym.st_shndx).first()
                     if section_header:
                         section_name = section_header.section_name
                     else:
@@ -649,7 +648,7 @@ class ElfParser(object):
 
     def debug_sections(self):
         ds = OrderedDict()
-        for idx, section in enumerate(self.sections.fetch()):
+        for section in self.sections.fetch():
             name = section.section_name
             if name.startswith(".debug"):
                 if name == ".debug_abbrev":
@@ -667,11 +666,7 @@ class ElfParser(object):
         has_dynamic_size = False
         valid_segment = (
             ((section_header.sh_flags & defs.SectionFlags.SHF_TLS) != 0)
-            and (
-                segment.p_type == defs.PT_TLS
-                or segment.p_type == defs.PT_GNU_RELRO
-                or segment.p_type == defs.PT_LOAD
-            )
+            and (segment.p_type == defs.PT_TLS or segment.p_type == defs.PT_GNU_RELRO or segment.p_type == defs.PT_LOAD)
             or (
                 (section_header.sh_flags & defs.SectionFlags.SHF_TLS) == 0
                 and segment.p_type != defs.PT_TLS
@@ -680,36 +675,16 @@ class ElfParser(object):
         )
         has_offset = section_header.sh_type == defs.SectionType.SHT_NOBITS or (
             section_header.sh_offset >= segment.p_offset
-            and (
-                not strict
-                or (section_header.sh_offset - segment.p_offset <= segment.p_filesz - 1)
-            )
-            and (
-                (
-                    section_header.sh_offset
-                    - segment.p_offset
-                    + self.section_size(section_header, segment)
-                )
-                <= (segment.p_filesz)
-            )
+            and (not strict or (section_header.sh_offset - segment.p_offset <= segment.p_filesz - 1))
+            and ((section_header.sh_offset - segment.p_offset + self.section_size(section_header, segment)) <= (segment.p_filesz))
         )
         has_VMA = (
             not check_vma
             or (section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0
             or (
                 section_header.sh_addr >= segment.p_vaddr
-                and (
-                    not strict
-                    or (section_header.sh_addr - segment.p_vaddr <= segment.p_memsz - 1)
-                )
-                and (
-                    (
-                        section_header.sh_addr
-                        - segment.p_vaddr
-                        + self.section_size(section_header, segment)
-                    )
-                    <= segment.p_memsz
-                )
+                and (not strict or (section_header.sh_addr - segment.p_vaddr <= segment.p_memsz - 1))
+                and ((section_header.sh_addr - segment.p_vaddr + self.section_size(section_header, segment)) <= segment.p_memsz)
             )
         )
         has_dynamic_size = (
@@ -721,18 +696,12 @@ class ElfParser(object):
                     section_header.sh_type == defs.SectionType.SHT_NOBITS
                     or (
                         section_header.sh_offset > segment.p_offset
-                        and (
-                            section_header.sh_offset - segment.p_offset
-                            < segment.p_filesz
-                        )
+                        and (section_header.sh_offset - segment.p_offset < segment.p_filesz)
                     )
                 )
                 and (
                     (section_header.sh_flags & defs.SectionFlags.SHF_ALLOC) == 0
-                    or (
-                        section_header.sh_addr > segment.p_vaddr
-                        and (section_header.sh_addr - segment.p_vaddr < segment.p_memsz)
-                    )
+                    or (section_header.sh_addr > segment.p_vaddr and (section_header.sh_addr - segment.p_vaddr < segment.p_memsz))
                 )
             )
         )
@@ -747,7 +716,6 @@ class ElfParser(object):
     def create_section_to_segment_mapping(self):
         mapping = OrderedDict()
         for idx in range(self.e_phnum):
-            segment = self.segments[idx]
             mapping[idx] = []
         ##
         ##            for j in range(self.e_shnum):
@@ -766,9 +734,7 @@ class ElfParser(object):
         )
 
     def section_size(self, section_header, segment):
-        return (
-            0 if self.tbss_special(section_header, segment) else section_header.sh_size
-        )
+        return 0 if self.tbss_special(section_header, segment) else section_header.sh_size
 
     def get_basic_header_field(self, name):
         return getattr(self._basic_header.header.fields, name)
@@ -862,11 +828,7 @@ class ElfParser(object):
 
     @property
     def arm_attributes(self):
-        res = (
-            self.query(model.Elf_Section)
-            .filter(model.Elf_Section.section_name == ".ARM.attributes")
-            .first()
-        )
+        res = self.query(model.Elf_Section).filter(model.Elf_Section.section_name == ".ARM.attributes").first()
         if res:
             return attributes.parse(res.section_image, byteorder=self.endianess)
         else:
@@ -931,21 +893,17 @@ class ElfParser(object):
         ----
         Look at `scripts/oj_elf_extract.py` to see `create_image()` in action.
         """
-        query = sections = self.query(model.Elf_Section)
+        query = self.query(model.Elf_Section)
         query = query.filter(
-            model.Elf_Section.flag_alloc == True,
-            model.Elf_Section.has_content == True,
+            model.Elf_Section.flag_alloc is True,
+            model.Elf_Section.has_content is True,
         )
 
         if include_pattern:
-            query = query.filter(
-                func.regexp(model.Elf_Section.section_name, include_pattern)
-            )
+            query = query.filter(func.regexp(model.Elf_Section.section_name, include_pattern))
 
         if exclude_pattern:
-            query = query.filter(
-                not_(func.regexp(model.Elf_Section.section_name, exclude_pattern))
-            )
+            query = query.filter(not_(func.regexp(model.Elf_Section.section_name, exclude_pattern)))
 
         query = query.order_by(model.Elf_Section.sh_addr)
         result = []

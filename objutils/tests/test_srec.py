@@ -1,12 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
 import pytest
 
-from objutils import dumps
-from objutils import loads
-from objutils import probes
+from objutils import dumps, loads, probes
 from objutils.hexfile import MetaRecord
 from objutils.image import Image
 
@@ -51,17 +48,13 @@ def test_meta_data1():
 
 def test_meta_data2():
     img = loads("srec", SREC4)
-    assert img.meta == {
-        1: [MetaRecord(format_type=1, address=0, chunk=bytearray(b"sample.s19"))]
-    }
+    assert img.meta == {1: [MetaRecord(format_type=1, address=0, chunk=bytearray(b"sample.s19"))]}
 
 
 class TestRoundtrip(unittest.TestCase):
     def testLoadsWorks(self):
         image = Image()
-        image.insert_section(
-            "Wow! Did you really go through al that trouble to read this?", 0xB000
-        )
+        image.insert_section("Wow! Did you really go through al that trouble to read this?", 0xB000)
         image.join_sections()
         self.assertEqual(
             dumps("srec", image, record_type=1, s5record=False, start_address=0x0000),
@@ -97,9 +90,7 @@ class TestS19Options(unittest.TestCase):
         )
 
     def testS19includeS5RecordS1(self):
-        self.assertEqual(
-            self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB\n"
-        )
+        self.assertEqual(self.createImage(1, True), b"S10D100000010203040506070809B5\nS5030001FB\n")
 
     def testS19includeS5RecordS2(self):
         self.assertEqual(
@@ -114,19 +105,13 @@ class TestS19Options(unittest.TestCase):
         )
 
     def testS19excludeS5RecordS1(self):
-        self.assertEqual(
-            self.createImage(1, False), b"S10D100000010203040506070809B5\n"
-        )
+        self.assertEqual(self.createImage(1, False), b"S10D100000010203040506070809B5\n")
 
     def testS19excludeS5RecordS2(self):
-        self.assertEqual(
-            self.createImage(2, False), b"S20E00100000010203040506070809B4\n"
-        )
+        self.assertEqual(self.createImage(2, False), b"S20E00100000010203040506070809B4\n")
 
     def testS19excludeS5RecordS3(self):
-        self.assertEqual(
-            self.createImage(3, False), b"S30F0000100000010203040506070809B3\n"
-        )
+        self.assertEqual(self.createImage(3, False), b"S30F0000100000010203040506070809B3\n")
 
     def testS19includeStartAddressS1(self):
         self.assertEqual(

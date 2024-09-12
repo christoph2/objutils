@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2023 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2024 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -28,7 +27,6 @@ from enum import IntEnum
 
 
 class EnumBase(IntEnum):
-
     """
     def __init__(self, value):
         self._value = value
@@ -120,13 +118,13 @@ class Tag(EnumBase):
     format_label = 0x4101
     function_template = 0x4102
     class_template = 0x4103
-    NU_BINCL = 0x4104
-    NU_EINCL = 0x4105
-    NU_template_template_param = 0x4106
-    NU_template_parameter_pack = 0x4107
-    NU_formal_parameter_pack = 0x4108
-    NU_call_site = 0x4109
-    NU_call_site_parameter = 0x410A
+    GNU_BINCL = 0x4104
+    GNU_EINCL = 0x4105
+    GNU_template_template_param = 0x4106
+    GNU_template_parameter_pack = 0x4107
+    GNU_formal_parameter_pack = 0x4108
+    GNU_call_site = 0x4109
+    GNU_call_site_parameter = 0x410A
     upc_shared_type = 0x8765
     upc_strict_type = 0x8766
     upc_relaxed_type = 0x8767
@@ -196,7 +194,7 @@ class AttributeEncoding(EnumBase):
     friend = 0x41
     identifier_case = 0x42
     macro_info = 0x43
-    namelist_items = 0x44
+    namelist_item = 0x44
     priority = 0x45
     segment = 0x46
     specification = 0x47
@@ -239,7 +237,36 @@ class AttributeEncoding(EnumBase):
     const_expr = 0x6C
     enum_class = 0x6D
     linkage_name = 0x6E
+    string_length_bit_size = 0x6F
+    string_length_byte_size = 0x70
+    rank = 0x71
+    str_offsets_base = 0x72
+    addr_base = 0x73
+    rnglists_base = 0x74
+    dwo_name = 0x76
+    reference = 0x77
+    rvalue_reference = 0x78
+    macros = 0x79
+    call_all_calls = 0x7A
+    call_all_source_calls = 0x7B
+    call_all_tail_calls = 0x7C
+    call_return_pc = 0x7D
+    call_value = 0x7E
+    call_origin = 0x7F
+    call_parameter = 0x80
+    call_pc = 0x81
+    call_tail_call = 0x82
+    call_target = 0x83
+    call_target_clobbered = 0x84
+    call_data_location = 0x85
+    call_data_value = 0x86
     noreturn = 0x87
+    alignment = 0x88
+    export_symbols = 0x89
+    deleted = 0x8A
+    defaulted = 0x8B
+    loclists_base = 0x8C
+
     lo_user = 0x2000
     hi_user = 0x3FFF
     MIPS_fde = 0x2001
@@ -336,38 +363,21 @@ class AttributeEncoding(EnumBase):
 
     @classmethod
     def _missing_(cls, value):
-        return cls.UNKOWN
+        return f"Unknown AT value (0x{value:04x})"
 
 
-"""
-FORM_MAP = {
-    DW_FORM_addr                : "DW_FORM_addr",
-    DW_FORM_block2              : "DW_FORM_block2",
-    DW_FORM_block4              : "DW_FORM_block4",
-    DW_FORM_data2               : "DW_FORM_data2",
-    DW_FORM_data4               : "DW_FORM_data4",
-    DW_FORM_data8               : "DW_FORM_data8",
-    DW_FORM_string              : "DW_FORM_string",
-    DW_FORM_block               : "DW_FORM_block",
-    DW_FORM_block1              : "DW_FORM_block1",
-    DW_FORM_data1               : "DW_FORM_data1",
-    DW_FORM_flag                : "DW_FORM_flag",
-    DW_FORM_sdata               : "DW_FORM_sdata",
-    DW_FORM_strp                : "DW_FORM_strp",
-    DW_FORM_udata               : "DW_FORM_udata",
-    DW_FORM_ref_addr            : "DW_FORM_ref_addr",
-    DW_FORM_ref1                : "DW_FORM_ref1",
-    DW_FORM_ref2                : "DW_FORM_ref2",
-    DW_FORM_ref4                : "DW_FORM_ref4",
-    DW_FORM_ref8                : "DW_FORM_ref8",
-    DW_FORM_ref_udata           : "DW_FORM_ref_udata",
-    DW_FORM_indirect            : "DW_FORM_indirect",
-    DW_FORM_sec_offset          : "DW_FORM_sec_offset",
-    DW_FORM_exprloc             : "DW_FORM_exprloc",
-    DW_FORM_flag_present        : "DW_FORM_flag_present",
-    DW_FORM_ref_sig8            : "DW_FORM_ref_sig8",
-}
-"""
+class FakeEncoding:
+
+    def __init__(self, value):
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def name(self):
+        return f"Unknown AT value (0x{self._value:04x})"
 
 
 class AttributeForm(EnumBase):
@@ -400,6 +410,43 @@ class AttributeForm(EnumBase):
     DW_FORM_exprloc = 0x18
     DW_FORM_flag_present = 0x19
     DW_FORM_ref_sig8 = 0x20
+
+    DW_FORM_implicit_const = 0x21
+    """
+    DW_FORM_loclistx ‡
+    0x22
+    loclist
+    DW_FORM_rnglistx ‡
+    0x23
+    rnglist
+    DW_FORM_ref_sup8 ‡
+    0x24
+    reference
+    DW_FORM_strx1 ‡
+    0x25
+    string
+    DW_FORM_strx2 ‡
+    0x26
+    string
+    DW_FORM_strx3 ‡
+    0x27
+    string
+    DW_FORM_strx4 ‡
+    0x28
+    string
+    DW_FORM_addrx1 ‡
+    0x29
+    address
+    DW_FORM_addrx2 ‡
+    0x2a
+    address
+    DW_FORM_addrx3 ‡
+    0x2b
+    address
+    DW_FORM_addrx4 ‡
+    0x2c
+    address
+    """
 
 
 class Operation(EnumBase):
@@ -557,18 +604,32 @@ class Operation(EnumBase):
     bit_piece = 0x9D
     implicit_value = 0x9E
     stack_value = 0x9F
+    implicit_pointer = 0xA0
+    addrx = 0xA1
+    constx = 0xA2
+
+    entry_value = 0xA3
+    const_type = 0xA4
+    regval_type = 0xA5
+    deref_type = 0xA6
+    xderef_type = 0xA7
+    convert = 0xA8
+    reinterpret = 0xA9
+
     lo_user = 0xE0
     hi_user = 0xFF
     GNU_push_tls_address = 0xE0
     GNU_uninit = 0xF0
     GNU_encoded_addr = 0xF1
     GNU_implicit_pointer = 0xF2
+
     GNU_entry_value = 0xF3
     GNU_const_type = 0xF4
     GNU_regval_type = 0xF5
     GNU_deref_type = 0xF6
     GNU_convert = 0xF7
     GNU_reinterpret = 0xF9
+
     GNU_parameter_ref = 0xFA
     GNU_addr_index = 0xFB
     GNU_const_index = 0xFC
@@ -621,69 +682,72 @@ class BaseTypeEncoding(EnumBase):
 
 
 class DecimalSign(EnumBase):
-    DW_DS_unsigned = 0x01
-    DW_DS_leading_overpunch = 0x02
-    DW_DS_trailing_overpunch = 0x03
-    DW_DS_leading_separate = 0x04
-    DW_DS_trailing_separate = 0x05
+    unsigned = 0x01
+    leading_overpunch = 0x02
+    trailing_overpunch = 0x03
+    leading_separate = 0x04
+    trailing_separate = 0x05
 
 
 class Endianity(EnumBase):
-    DW_END_default = 0x00
-    DW_END_big = 0x01
-    DW_END_little = 0x02
-    DW_END_lo_user = 0x40
-    DW_END_hi_user = 0xFF
+    default = 0x00
+    big = 0x01
+    little = 0x02
+    lo_user = 0x40
+    hi_user = 0xFF
 
 
 class Accessibility(EnumBase):
-    DW_ACCESS_public = 0x01
-    DW_ACCESS_protected = 0x02
-    DW_ACCESS_private = 0x03
+    public = 0x01
+    protected = 0x02
+    private = 0x03
 
 
 class Visibility(EnumBase):
-    DW_VIS_local = 0x01
-    DW_VIS_exported = 0x02
-    DW_VIS_qualified = 0x03
+    local = 0x01
+    exported = 0x02
+    qualified = 0x03
 
 
 class Virtuality(EnumBase):
-    DW_VIRTUALITY_none = 0x00
-    DW_VIRTUALITY_virtual = 0x01
-    DW_VIRTUALITY_pure_virtual = 0x02
+    none = 0x00
+    virtual = 0x01
+    pure_virtual = 0x02
 
 
 class IdentifierCase(EnumBase):
-    DW_ID_case_sensitive = 0x00
-    DW_ID_up_case = 0x01
-    DW_ID_down_case = 0x02
-    DW_ID_case_insensitive = 0x03
+    case_sensitive = 0x00
+    up_case = 0x01
+    down_case = 0x02
+    case_insensitive = 0x03
 
 
 class CallingConvention(EnumBase):
-    DW_CC_normal = 0x01
-    DW_CC_program = 0x02
-    DW_CC_nocall = 0x03
-    DW_CC_lo_user = 0x40
-    DW_CC_hi_user = 0xFF
+    normal = 0x01
+    program = 0x02
+    nocall = 0x03
+    renesas_sh = 0x40
+    borland_fastcall_i386 = 0x41
+    thiscall_i386 = 0x42
+    lo_user = 0x60
+    hi_user = 0xFF
 
 
 class Inline(EnumBase):
-    DW_INL_not_inlined = 0x00
-    DW_INL_inlined = 0x01
-    DW_INL_declared_not_inlined = 0x02
-    DW_INL_declared_inlined = 0x03
+    not_inlined = 0x00
+    inlined = 0x01
+    declared_not_inlined = 0x02
+    declared_inlined = 0x03
 
 
 class Ordering(EnumBase):
-    DW_ORD_row_major = 0x00
-    DW_ORD_col_major = 0x01
+    row_major = 0x00
+    col_major = 0x01
 
 
 class DiscriminantDescriptor(EnumBase):
-    DW_DSC_label = 0x00
-    DW_DSC_range = 0x01
+    label = 0x00
+    range = 0x01
 
 
 class LineNumberStandard(EnumBase):
@@ -811,7 +875,26 @@ class Languages(EnumBase):
     Fortran18 = 0x002D
     Ada2005 = 0x002E
     Ada2012 = 0x002F
+    HIP = 0x0030
+    Assembly = 0x0031
+    C_sharp = 0x0032
     Mojo = 0x0033
+    GLSL = 0x0034
+    GLSL_ES = 0x0035
+    HLSL = 0x0036
+    OpenCL_CPP = 0x0037
+    CPP_for_OpenCL = 0x0038
+    SYCL = 0x0039
+    Ruby = 0x0040
+    Move = 0x0041
+    Hylo = 0x0042
+
     Mips_Assembler = 0x8001
     GOOGLE_RenderScript = 0x8E57
     BORLAND_Delphi = 0xB000
+
+
+class Defaulted(EnumBase):
+    DW_DEFAULTED_no = 0x00
+    DW_DEFAULTED_in_class = 0x01
+    DW_DEFAULTED_out_of_class = 0x02

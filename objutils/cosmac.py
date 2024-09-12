@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,6 +26,7 @@ __copyright__ = """
 
 import objutils.hexfile as hexfile
 
+
 DATA0 = 1
 DATA1 = 2
 DATA2 = 3
@@ -35,10 +35,10 @@ DATA3 = 4
 
 class Reader(hexfile.Reader):
     FORMAT_SPEC = (
-        (DATA0, "!MAAAA DD"),
-        (DATA1, "\?MAAAA DD"),
-        (DATA2, "AAAA DD"),
-        (DATA3, "DD"),
+        (DATA0, r"!MAAAA DD"),
+        (DATA1, r"\?MAAAA DD"),
+        (DATA2, r"AAAA DD"),
+        (DATA3, r"DD"),
     )
     previous_address = 0
     previous_length = 0
@@ -67,5 +67,5 @@ class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 16
 
     def compose_row(self, address, length, row):
-        line = "!M{0:04X} {1}".format(address, Writer.hex_bytes(row))
+        line = f"!M{address:04X} {Writer.hex_bytes(row)}"
         return line

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,6 +26,7 @@ __copyright__ = """
 
 import io
 import unittest
+
 from objutils import dumps, load, loads
 
 
@@ -55,16 +55,12 @@ class TestIHex(unittest.TestCase):
     def testAddressGapFromString(self):
         data = loads("ihex", TEST2)
         self.assertEqual(data.sections[0].data, b"Example with an address gap")
-        self.assertEqual(
-            data.sections[1].data, b"Here is a gap in the memory allocation"
-        )
+        self.assertEqual(data.sections[1].data, b"Here is a gap in the memory allocation")
 
     def testAddressGapFromFileLike(self):
         data = load("ihex", io.BytesIO(TEST2))
         self.assertEqual(data.sections[0].data, b"Example with an address gap")
-        self.assertEqual(
-            data.sections[1].data, b"Here is a gap in the memory allocation"
-        )
+        self.assertEqual(data.sections[1].data, b"Here is a gap in the memory allocation")
 
     def testRoundtripFromString(self):
         dataIn = loads("ihex", TEST2)

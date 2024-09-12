@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Extract sections contributing to program image, e.g. for flash programming applications.
 """
 
@@ -38,11 +37,7 @@ def callback(state, section):
     elif state == "stop":
         print("-" * 45)
     elif state == "section":
-        print(
-            "{:25s} 0x{:08x} {}".format(
-                section.section_name, section.sh_addr, section.sh_size
-            )
-        )
+        print(f"{section.section_name:25s} 0x{section.sh_addr:08x} {section.sh_size}")
 
 
 def main():
@@ -84,11 +79,7 @@ def main():
     try:
         ep = ElfParser(args.elf_file)
     except Exception as e:
-        print(
-            "\n'{}' is not valid ELF file. Raised exception: '{}'.".format(
-                args.elf_file, repr(e)
-            )
-        )
+        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
         exit(1)
     print("\nExtracting from...\n")
     print("Section                   Address    Length")
@@ -101,11 +92,7 @@ def main():
     )
     if img:
         dump(args.file_type, args.output_file_name, img)
-        print(
-            "HEX image written to: '{}' [{} total bytes]".format(
-                args.output_file_name, len(img)
-            )
-        )
+        print(f"HEX image written to: '{args.output_file_name}' [{len(img)} total bytes]")
 
 
 if __name__ == "__main__":

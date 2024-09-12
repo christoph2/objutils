@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -25,9 +24,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from objutils import hexfile
-from objutils import utils
 import objutils.checksums as checksums
+from objutils import hexfile, utils
+
 
 DATA = 1
 EOF = 2
@@ -39,9 +38,7 @@ class Reader(hexfile.Reader):
     def check_line(self, line, format_type):
         if format_type == DATA:
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
             address_checksum = checksums.rotatedXOR(
                 utils.make_list(utils.int_to_array(line.address), line.length),
                 8,
@@ -67,11 +64,9 @@ class Writer(hexfile.Writer):
             checksums.ROTATE_LEFT,
         )
         data_checksum = checksums.rotatedXOR(row, 8, checksums.ROTATE_LEFT)
-        line = ":{0:04X}{1:02X}{2:02X}{3}{4:02X}".format(
-            address, length, address_checksum, Writer.hex_bytes(row), data_checksum
-        )
+        line = f":{address:04X}{length:02X}{address_checksum:02X}{Writer.hex_bytes(row)}{data_checksum:02X}"
         self.last_address = address + length
         return line
 
     def compose_footer(self, meta):
-        return ":{0:04X}00".format(self.last_address)
+        return f":{self.last_address:04X}00"

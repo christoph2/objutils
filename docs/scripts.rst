@@ -192,4 +192,3 @@ If you also want to see the contents, add *-d* option:
     ---------------
            16 bytes
     ---------------
-

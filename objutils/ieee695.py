@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -27,11 +26,12 @@ __copyright__ = """
 """
 
 
+import os
 from datetime import datetime
 from functools import reduce
-import os
 
 from objutils.logger import Logger
+
 
 """
 $00-$7F     Simple number in the range 0 to 127, or 7-bit ASCII string with length 0 to 127.
@@ -182,7 +182,7 @@ ASG = 0xC7  # Execution Starting Address.   - E2
 ## Module End (ASW7).
 ##
 ME = 0xE1  # Module End.
-##Checksum Records - 0xEE, 0xEF
+##  Checksum Records - 0xEE, 0xEF
 
 
 ##
@@ -274,11 +274,11 @@ class InvalidFormatError(Exception):
     pass
 
 
-class Info(object):
+class Info:
     pass
 
 
-class DebugInformation(object):
+class DebugInformation:
     def __init__(self):
         self.children = []
 
@@ -286,7 +286,7 @@ class DebugInformation(object):
         self.children.append(child)
 
 
-class Section(object):
+class Section:
     def __init__(self, sectionType, sectionName, parentSectionIndex):
         self.sectionType = sectionType
         self.sectionName = sectionName
@@ -299,7 +299,7 @@ class Section(object):
         self.segments = {}
 
 
-class Reader(object):
+class Reader:
     def __init__(self, inFile):
         if not hasattr(inFile, "read"):
             raise TypeError("Need a file-like object.")
@@ -363,7 +363,7 @@ class Reader(object):
             elif cc == ME:
                 self.onME()
             else:
-                raise NotImplementedError("0x{0:02X}".format(cc))
+                raise NotImplementedError(f"0x{cc:02X}")
 
     def setCurrentSectionIndex(self, index):
         self.currentSectionIndex = index
@@ -385,10 +385,10 @@ class Reader(object):
     def readWord(self, offset):
         "Read 16bit quantity"
         self.inFile.seek(offset, os.SEEK_SET)
-        h = ord(self.inFile.read(1))
-        l = ord(self.inFile.read(1))
+        hi = ord(self.inFile.read(1))
+        lo = ord(self.inFile.read(1))
         self.fpos = self.inFile.tell()
-        return h << 8 | l
+        return hi << 8 | lo
 
     def readNumber(self, offset):
         "Read number of abitrary length"
@@ -418,7 +418,7 @@ class Reader(object):
             # length: [0..65535]
             length = self.readWord(offset + 1)
         else:
-            raise TypeError("Invalid typecode [{0:02x}].".format(typecode))
+            raise TypeError(f"Invalid typecode [{typecode:02x}].")
         result = self.inFile.read(length)
         self.fpos = self.inFile.tell()
         return result
@@ -436,7 +436,7 @@ class Reader(object):
             self.inFile.seek(offset, os.SEEK_SET)  # Put back.
             self.fpos = offset
             return None
-        if isString == True:
+        if isString:
             self.inFile.seek(offset, os.SEEK_SET)  # Put back.
             self.fpos = offset
             return self.readString(offset)
@@ -462,11 +462,7 @@ class Reader(object):
         self.info.processor = self.readString(self.fpos)
         self.info.module = self.readString(self.fpos)
 
-        self.logger.debug(
-            "PROCESSOR: '{0!s}' MODULE: '{1!s}'.".format(
-                self.info.processor, self.info.module
-            )
-        )
+        self.logger.debug(f"PROCESSOR: '{self.info.processor!s}' MODULE: '{self.info.module!s}'.")
 
     def onAD(self):
         "$EC}{n1}{n2}[a]"
@@ -489,11 +485,7 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionSize = self.readNumber(self.fpos)
-            self.logger.debug(
-                "Section-Size: 0x{0:04x}".format(
-                    self.sections[sectionIndex].sectionSize
-                )
-            )
+            self.logger.debug(f"Section-Size: 0x{self.sections[sectionIndex].sectionSize:04x}")
         elif discr == ASA:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -501,9 +493,7 @@ class Reader(object):
         elif discr == ASB:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
-            self.sections[sectionIndex].physicalAddress.append(
-                self.readNumber(self.fpos)
-            )
+            self.sections[sectionIndex].physicalAddress.append(self.readNumber(self.fpos))
         elif discr == ASR:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -512,18 +502,12 @@ class Reader(object):
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].mauSize = self.readNumber(self.fpos)
-            self.logger.debug(
-                "MAU-Size: 0x{0:04x}".format(self.sections[sectionIndex].mauSize)
-            )
+            self.logger.debug(f"MAU-Size: 0x{self.sections[sectionIndex].mauSize:04x}")
         elif discr == ASL:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
             self.sections[sectionIndex].sectionBaseAddr = self.readNumber(self.fpos)
-            self.logger.debug(
-                "Section-BaseAddr: 0x{0:04x}".format(
-                    self.sections[sectionIndex].sectionBaseAddr
-                )
-            )
+            self.logger.debug(f"Section-BaseAddr: 0x{self.sections[sectionIndex].sectionBaseAddr:04x}")
         elif discr == ASM:
             sectionIndex = self.readNumber(self.fpos)
             self.checkSectionIndex(sectionIndex)
@@ -535,19 +519,17 @@ class Reader(object):
             expr = self.readNumber(self.fpos)
             self.symbols[symbolIndex].expr = expr
         elif discr == ASN:
-            symbolNameIndex = self.readNumber(self.fpos)
-            symbolTypeIndex = self.readNumber(self.fpos)
+            symbolNameIndex = self.readNumber(self.fpos)  # noqa: F841
+            symbolTypeIndex = self.readNumber(self.fpos)  # noqa: F841
         elif discr == ASP:
             sectionIndex = self.readNumber(self.fpos)  # ? check sec-Index!!?
-            newValue = self.readNumber(self.fpos)
+            newValue = self.readNumber(self.fpos)  # noqa: F841
         elif discr == ASG:
             delim = self.readByte(self.fpos)
             if delim != 0xBE:
                 pass  # todo: FormatError!!!
             executionStartingAddr = self.readNumber(self.fpos)
-            self.logger.debug(
-                "STARTING-ADDRESS: 0x{0:04X}".format(executionStartingAddr)
-            )
+            self.logger.debug(f"STARTING-ADDRESS: 0x{executionStartingAddr:04X}")
             delim = self.readByte(self.fpos)
             if delim != 0xBF:
                 pass  # todo: FormatError!!!
@@ -602,9 +584,7 @@ class Reader(object):
                 stringValue = self.checkOptional(self.fpos)
 
                 self.symbols[symbolNameIndex].symbolClass = symbolClass
-                self.symbols[
-                    symbolNameIndex
-                ].publicLocalIndicator = publicLocalIndicator
+                self.symbols[symbolNameIndex].publicLocalIndicator = publicLocalIndicator
                 self.symbols[symbolNameIndex].numericValue = numericValue
                 self.symbols[symbolNameIndex].stringValue = stringValue
             elif attrDef == 19:
@@ -624,15 +604,13 @@ class Reader(object):
             shortExternalFlag = self.readNumber(self.fpos)
             self.externalSymbols[externalReferenceIndex].typeIndex = typeIndex
             self.externalSymbols[externalReferenceIndex].sectionIndex = sectionIndex
-            self.externalSymbols[
-                externalReferenceIndex
-            ].shortExternalFlag = shortExternalFlag
+            self.externalSymbols[externalReferenceIndex].shortExternalFlag = shortExternalFlag
         elif discr == ATN:  # todo: onATN
             symbolNameIndex = self.readNumber(self.fpos)
             symbolTypeIndex = self.readNumber(self.fpos)
             attrDef = self.readNumber(self.fpos)
             if attrDef == 1:
-                stackOffset = self.readNumber(self.fpos)
+                stackOffset = self.readNumber(self.fpos)  # noqa: F841
             elif attrDef == 2:
                 registerIndex = self.readNumber(self.fpos)
             elif attrDef == 3:
@@ -640,69 +618,61 @@ class Reader(object):
             #            elif attrDef == 4:
             #                pass
             elif attrDef == 7:
-                lineNumber = self.readNumber(self.fpos)
-                columnNumber = self.readNumber(self.fpos)
-                res1 = self.checkOptional(self.fpos)
-                res2 = self.checkOptional(self.fpos)
+                lineNumber = self.readNumber(self.fpos)  # noqa: F841
+                columnNumber = self.readNumber(self.fpos)  # noqa: F841
+                res1 = self.checkOptional(self.fpos)  # noqa: F841
+                res2 = self.checkOptional(self.fpos)  # noqa: F841
             elif attrDef == 8:
                 pass
             elif attrDef == 9:
-                absoluteProgramCounterOffset = self.readNumber(self.fpos)
-                ##if symbolNameIndex == 0:
-                ##    registerResourceIndex = self.readByte(self.fpos)
+                absoluteProgramCounterOffset = self.readNumber(self.fpos)  # noqa: F841
+                # if symbolNameIndex == 0:
+                #     registerResourceIndex = self.readByte(self.fpos)
             elif attrDef == 10:
-                registerIndex = self.readNumber(self.fpos)
-                frameOffset = self.readNumber(self.fpos)
+                registerIndex = self.readNumber(self.fpos)  # noqa: F841
+                frameOffset = self.readNumber(self.fpos)  # noqa: F841
             #            elif attrDef == 11:
             #                pass
             elif attrDef == 19:
                 numberOfElements = self.readNumber(self.fpos)
-                localGlobal = self.checkOptional(self.fpos)
+                localGlobal = self.checkOptional(self.fpos)  # noqa: F841
             elif attrDef == 37:
                 self.info.objectFormatVersionNumber = self.readNumber(self.fpos)
-                self.info.objectFormatRevisionLevel = self.readNumber(self.fpos)
-            elif attrDef == 38:
-                self.info.objectFormatType = ObjectFormatTypes[
-                    self.readNumber(self.fpos)
-                ]
-            elif attrDef == 39:
-                self.info.symbolCaseSensitivity = CaseSensitivity[
-                    self.readNumber(self.fpos)
-                ]
+                self.info.objectFormatRevisionLevel = self.readNumber(self.fpos)  # noqa: F841
+            elif attrDef == 38:  # noqa: F841
+                self.info.objectFormatType = ObjectFormatTypes[self.readNumber(self.fpos)]  # noqa: F841
+            elif attrDef == 39:  # noqa: F841
+                self.info.symbolCaseSensitivity = CaseSensitivity[self.readNumber(self.fpos)]
             elif attrDef == 40:
                 self.info.memoryModel = MemoryModel[self.readNumber(self.fpos)]
-            elif attrDef == 50:
+            elif attrDef == 50:  # noqa: F841
                 year = self.readNumber(self.fpos)
                 month = self.readNumber(self.fpos)
                 day = self.readNumber(self.fpos)
-                hour = self.readNumber(self.fpos)
-                minute = self.readNumber(self.fpos)
+                hour = self.readNumber(self.fpos)  # noqa: F841
+                minute = self.readNumber(self.fpos)  # noqa: F841
                 second = self.readNumber(self.fpos)
-                self.info.creationDate = datetime(
-                    year, month, day, hour, minute, second
-                )
+                self.info.creationDate = datetime(year, month, day, hour, minute, second)
             elif attrDef == 51:
                 self.info.commandLine = self.readString(self.fpos)
-            elif attrDef == 52:
+            elif attrDef == 52:  # noqa: F841
                 self.info.executionStatus = self.readNumber(self.fpos)
             elif attrDef == 53:
                 self.info.hostEnvironment = self.readNumber(self.fpos)
             elif attrDef == 54:
-                tool = self.readNumber(self.fpos)
-                version = self.readNumber(self.fpos)
-                revision = self.readNumber(self.fpos)
-                revisionLevel = self.checkOptional(
-                    self.fpos
-                )  # single IEEE-695 letter in the range $C1-$DA
+                tool = self.readNumber(self.fpos)  # noqa: F841    # noqa: F841
+                version = self.readNumber(self.fpos)  # noqa: F841
+                revision = self.readNumber(self.fpos)  # noqa: F841
+                revisionLevel = self.checkOptional(self.fpos)  # noqa: F841
             elif attrDef == 55:
                 self.info.comments = self.readString(self.fpos)
             elif attrDef == 64:
-                typeIdent = self.readNumber(self.fpos)
-                addATN = self.readNumber(self.fpos)
+                typeIdent = self.readNumber(self.fpos)  # noqa: F841
+                addATN = self.readNumber(self.fpos)  # noqa: F841
             elif attrDef == 65:
-                miscString = self.readString(self.fpos)
+                miscString = self.readString(self.fpos)  # noqa: F841
             else:
-                raise NotImplementedError("Invalid ATN-Attr: 0x{0:02x}".format(attrDef))
+                raise NotImplementedError(f"Invalid ATN-Attr: 0x{attrDef:02x}")
                 # todo: FormatError
         else:
             raise NotImplementedError(hex(discr))
@@ -728,21 +698,19 @@ class Reader(object):
             pass
         # todo: 'ZC' / 'ZM'.
         else:
-            raise NotImplementedError("SEG-TYPE: {0!s}".format(f))
+            raise NotImplementedError(f"SEG-TYPE: {f!s}")
 
         sectionName = self.readString(self.fpos)
         parentSectionIndex = self.checkOptional(self.fpos)
 
         if f == "T":
-            brotherSectionIndex = self.readNumber(self.fpos)
+            brotherSectionIndex = self.readNumber(self.fpos)  # noqa: F841
 
         if f in ("B", "T"):
-            contextIndex = self.readNumber(self.fpos)
+            contextIndex = self.readNumber(self.fpos)  # noqa: F841
 
-        self.sections[sectionIndex] = Section(
-            sectionType, sectionName, parentSectionIndex
-        )
-        self.logger.debug("SECTION [{0!s}:{1!s}]".format(sectionType, sectionName))
+        self.sections[sectionIndex] = Section(sectionType, sectionName, parentSectionIndex)
+        self.logger.debug(f"SECTION [{sectionType!s}:{sectionName!s}]")
         # SA, ASA, ASB, ASF, ASL, ASM, ASR, and ASS records must appear after the ST record they refer to.
         """
         ASP absolute code
@@ -784,7 +752,7 @@ class Reader(object):
         info.nameIndex = nameIndex
         info.symbolName = symbolName
         self.symbols[nameIndex] = info
-        self.logger.debug("SYMBOL: {0!s}".format(symbolName))  # followed by ASI.
+        self.logger.debug(f"SYMBOL: {symbolName!s}")  # followed by ASI.
 
     def onBB(self):
         blockType = self.readByte(self.fpos)
@@ -800,7 +768,7 @@ class Reader(object):
             module_name = self.readString(self.fpos)
             info.module_name = module_name
             info.name = "BB1"
-            self.logger.debug("MODULE-NAME: {0!s}".format(module_name))
+            self.logger.debug(f"MODULE-NAME: {module_name!s}")
         elif blockType == BB2:
             self.blockType.append(2)
             zeroLengthName = self.readString(self.fpos)
@@ -900,16 +868,16 @@ class Reader(object):
         blockType = self.blockType.pop()
         self.diParents.pop()
         if blockType in (4, 6):
-            functionEndAddr = self.readNumber(self.fpos)
+            functionEndAddr = self.readNumber(self.fpos)  # noqa: F841
         elif blockType == 11:
-            moduleSectionSize = self.checkOptional(self.fpos)
+            moduleSectionSize = self.checkOptional(self.fpos)  # noqa: F841
 
     def onTY(self):
         """"""
-        typeIndex = self.readNumber(self.fpos)
+        typeIndex = self.readNumber(self.fpos)  # noqa: F841
         if self.readByte(self.fpos) != 0xCE:
             pass  # todo: raise FormatError!!
-        localNameIndex = self.readNumber(self.fpos)
+        localNameIndex = self.readNumber(self.fpos)  # noqa: F841
         values = []
         while True:
             value = self.checkOptional(self.fpos)
@@ -922,17 +890,13 @@ class Reader(object):
         "{$E5}{n1}"
         sectionIndex = self.readNumber(self.fpos)
         sec = self.sections[sectionIndex]
-        self.logger.debug(
-            "Data for section: '{0!s}'. {1:d} bytes of data to follow.".format(
-                sec.sectionName, sec.sectionSize
-            )
-        )
+        self.logger.debug(f"Data for section: '{sec.sectionName!s}'. {sec.sectionSize:d} bytes of data to follow.")
 
     def onLD(self):
         "{$ED}{n1}{...}"
         numberOfMAUs = self.readNumber(self.fpos)
         data = self.inFile.read((numberOfMAUs * self.info.numberOfBits) / 8)
-        self.logger.debug("reading {0:d} bytes".format(len(data)))
+        self.logger.debug(f"reading {len(data):d} bytes")
 
         # SB ASP LD
         self._nb += len(data)
@@ -943,7 +907,7 @@ class Reader(object):
     def onME(self):
         "Module End Record Type"
         self.finished = True
-        self.logger.debug("{0:d} Data-Bytes.".format(self._nb))
+        self.logger.debug(f"{self._nb:d} Data-Bytes.")
 
 
 ## $C0-$DA Variable letters (null, A-Z).

@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -25,12 +24,14 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from functools import partial
 import re
-from objutils.checksums import lrc, COMPLEMENT_ONES
-from objutils.utils import make_list
+from functools import partial
+
 import objutils.hexfile as hexfile
 import objutils.utils as utils
+from objutils.checksums import COMPLEMENT_ONES, lrc
+from objutils.utils import make_list
+
 
 S0 = 1
 S1 = 2
@@ -44,9 +45,7 @@ SYM = 9
 
 BIAS = {S0: 3, S1: 3, S2: 4, S3: 5, S5: 2, S7: 5, S8: 4, S9: 3}
 
-SYMBOLTABLE = re.compile(
-    r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)", re.MULTILINE | re.DOTALL
-)
+SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)", re.MULTILINE | re.DOTALL)
 SYMBOL = re.compile(r"\s+(?P<symbol>.*?)\s+\$(?P<value>.+)", re.MULTILINE | re.DOTALL)
 
 
@@ -82,11 +81,7 @@ class Reader(hexfile.Reader):
         if format_type in (S0, S1, S5, S9):
             checksum_of_address = ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
         elif format_type in (S2, S8):
-            checksum_of_address = (
-                ((line.address & 0xFF0000) >> 16)
-                + ((line.address & 0xFF00) >> 8)
-                + (line.address & 0xFF)
-            )
+            checksum_of_address = ((line.address & 0xFF0000) >> 16) + ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
         elif format_type in (S3, S7):
             checksum_of_address = (
                 ((line.address & 0xFF000000) >> 24)
@@ -95,20 +90,16 @@ class Reader(hexfile.Reader):
                 + (line.address & 0xFF)
             )
         else:
-            raise TypeError("Invalid format type '{0!s}'.".format(format_type))
+            raise TypeError(f"Invalid format type '{format_type!s}'.")
         if hasattr(line, "chunk"):
-            checksum = (
-                ~(sum([line.length, checksum_of_address]) + sum(line.chunk))
-            ) & 0xFF
+            checksum = (~(sum([line.length, checksum_of_address]) + sum(line.chunk))) & 0xFF
         else:
             checksum = (~(sum([line.length, checksum_of_address]))) & 0xFF
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
         line.length -= BIAS[format_type]  # calculate actual data length.
         if hasattr(line, "chunk") and line.length and (line.length != len(line.chunk)):
-            raise hexfile.InvalidRecordLengthError(
-                "Byte count doesn't match length of actual data."
-            )
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def is_data_line(self, line, format_type):
         return format_type in (S1, S2, S3)
@@ -119,23 +110,23 @@ class Reader(hexfile.Reader):
             pass
         elif format_type == S5:
             # print "S5: [%s]" % line.chunk
-            start_address = line.address
+            start_address = line.address  # noqa: F841
         elif format_type == S7:
-            start_address = line.address
+            start_address = line.address  # noqa: F841
             # print "Startaddress[S7]: %u" % start_address
             # print "32-Bit Start-Address: ", hex(start_address)
         elif format_type == S8:
-            start_address = line.address
+            start_address = line.address  # noqa: F841
             # print "Startaddress[S8]: %u" % start_address
             # print "24-Bit Start-Address: ", hex(start_address)
         elif format_type == S9:
-            start_address = line.address
+            start_address = line.address  # noqa: F841
             # print "Startaddress[S9]: %u" % start_address
             # print "16-Bit Start-Address: ", hex(start_address)
 
     def _strip_symbols(self, symbol_tables):
         self.symbols = []
-        for _, module_name, symbol_table in symbol_tables:
+        for _, _module_name, symbol_table in symbol_tables:
             sb = []
             for symbol in symbol_table.splitlines():
                 ma = SYMBOL.match(symbol)
@@ -169,7 +160,7 @@ class Writer(hexfile.Writer):
                 self.record_type = 2
             elif highest_address <= 0xFFFFFFFF:
                 self.record_type = 3
-        self.address_mask = "%0{0:d}X".format((self.record_type + 1) * 2)
+        self.address_mask = f"%0{(self.record_type + 1) * 2:d}X"
         self.offset = self.record_type + 2
 
     def srecord(self, record_type, length, address, data=None):
@@ -178,7 +169,7 @@ class Writer(hexfile.Writer):
         length += self.offset
         address_bytes = utils.int_to_array(address)
         checksum = self.checksum(make_list(address_bytes, length, data))
-        mask = "S%u%02X{0!s}%s%02X".format(self.address_mask)
+        mask = f"S%u%02X{self.address_mask!s}%s%02X"
         return mask % (record_type, length, address, Writer.hex_bytes(data), checksum)
 
     def compose_row(self, address, length, row):
@@ -189,10 +180,8 @@ class Writer(hexfile.Writer):
         self.record_count = 0
         result = []
         if S0 in meta:  # Usually only one S0 record, but be tolerant.
-            for meta in meta[S0]:
-                result.append(
-                    self.srecord(0, len(meta.chunk), meta.address, meta.chunk)
-                )
+            for m in meta[S0]:
+                result.append(self.srecord(0, len(m.chunk), m.address, m.chunk))
         return "\n".join(result)
 
     def compose_footer(self, meta):

@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -25,11 +24,11 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import ctypes
+import mmap
 import os
 import sys
 import threading
-
-import six
 
 
 def ffs(v: int) -> int:
@@ -47,10 +46,7 @@ def slicer(iterable, sliceLength, converter=None):
     if converter is None:
         converter = type(iterable)
     length = len(iterable)
-    return [
-        converter((iterable[item : item + sliceLength]))
-        for item in range(0, length, sliceLength)
-    ]
+    return [converter(iterable[item : item + sliceLength]) for item in range(0, length, sliceLength)]
 
 
 def make_list(*args):
@@ -87,9 +83,6 @@ class Curry:
         else:
             kw = kwargs or self.kwargs
         return self.fun(*(self.pending + args), **kw)
-
-
-identity = lambda self, x: x
 
 
 def get_python_version():
@@ -130,13 +123,10 @@ CYG_PREFIX = "/cygdrive/"
 def cygpath_to_win(path):
     if path.startswith(CYG_PREFIX):
         path = path[len(CYG_PREFIX) :]
-        drive_letter = "{0}:\\".format(path[0])
+        drive_letter = f"{path[0]}:\\"
         path = path[2:].replace("/", "\\")
-        path = "{0}{1}".format(drive_letter, path)
+        path = f"{drive_letter}{path}"
     return path
-
-
-import ctypes
 
 
 class StructureWithEnums(ctypes.Structure):
@@ -158,40 +148,20 @@ class StructureWithEnums(ctypes.Structure):
 
     def __str__(self):
         result = []
-        result.append("struct {0} {{".format(self.__class__.__name__))
+        result.append(f"struct {self.__class__.__name__} {{")
         for field in self._fields_:
             attr, attrType = field
             if attr in self._map:
                 attrType = self._map[attr]
             value = getattr(self, attr)
-            result.append(
-                "    {0} [{1}] = {2!r};".format(attr, attrType.__name__, value)
-            )
+            result.append(f"    {attr} [{attrType.__name__}] = {value!r};")
         result.append("};")
         return "\n".join(result)
 
     __repr__ = __str__
 
 
-import subprocess
-
-
-class CommandError(Exception):
-    pass
-
-
-def runCommand(cmd):
-    proc = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    result = proc.communicate()
-    proc.wait()
-    if proc.returncode:
-        raise CommandError("{0}".format(result[1]))
-    return result[0]
-
-
-class SingletonBase(object):
+class SingletonBase:
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kws):
@@ -200,47 +170,13 @@ class SingletonBase(object):
             try:
                 cls._lock.acquire()
                 if not hasattr(cls, "_instance"):
-                    cls._instance = super(SingletonBase, cls).__new__(cls)
+                    cls._instance = super().__new__(cls)
             finally:
                 cls._lock.release()
         return cls._instance
 
 
-"""
-class RepresentationMixIn(object):
-
-    def __repr__(self):
-        keys = [k for k in self.__dict__ if not (k.startswith('__') and k.endswith('__'))]
-        result = []
-        result.append("{0!s} {{".format(self.__class__.__name__))
-        for key in keys:
-            value = getattr(self, key)
-            if isinstance(value, int):
-                line = "    {0!s} = 0x{1:X}".format(key, value)
-            elif isinstance(value, (float, type(None))):
-                line = "    {0!s} = {1!s}".format(key, value)
-            elif isinstance(value, array):
-                line = "    {0!s} = {1!s}".format(key, helper.hexDump(value))
-            else:
-                line = "    {0!s} = '{1!s}'".format(key, value)
-            result.append(line)
-        result.append("}")
-        return '\n'.join(result)
-"""
-
-import mmap
-
-
 def create_memorymapped_fileview(filename, writeable=False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
-    if six.PY3:
-        return memoryview(
-            mmap.mmap(
-                fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ
-            )
-        )
-    else:
-        return mmap.mmap(
-            fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ
-        )
+    return memoryview(mmap.mmap(fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))

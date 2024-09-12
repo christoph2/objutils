@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -29,10 +28,11 @@ __copyright__ = """
 
 import abc
 
+
 DUMMY_PROTOCOL = None
 
 
-class PickleIF(object):
+class PickleIF:
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod

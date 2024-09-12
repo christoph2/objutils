@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -24,13 +23,14 @@ __copyright__ = """
   with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
-from functools import partial
 import os
 import re
+from functools import partial
+
 import objutils.hexfile as hexfile
-from objutils.utils import create_string_buffer, slicer, PYTHON_VERSION
-from objutils import checksums
 import objutils.utils as utils
+from objutils import checksums
+from objutils.utils import PYTHON_VERSION, create_string_buffer, slicer
 
 
 DATA_ABS = 1
@@ -40,12 +40,10 @@ EOF = 4
 
 PREFIX = "$"
 
-MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if not n in (42,)))
+MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if n not in (42,)))
 REV_MAPPING = {ord(value): key for key, value in MAPPING.items()}
 NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.M)
-VALID_CHARS = re.compile(
-    "^\{0}[{1}]+$".format(PREFIX, re.escape("".join(MAPPING.values())))
-)
+VALID_CHARS = re.compile(r"^\{}[{}]+$".format(PREFIX, re.escape("".join(MAPPING.values()))))
 
 atoi16 = partial(int, base=16)
 
@@ -74,14 +72,12 @@ class Reader(hexfile.Reader):
             values = []
             for quintuple in self.split_quintuples(line):
                 value = self.convert_quintuple(quintuple)
-                values.append("{0:08X}".format(value))
+                values.append(f"{value:08X}")
             out_lines.append("".join(values))
         return "\n".join(out_lines)
 
     def read(self, fp):
-        return super(Reader, self).read(
-            create_string_buffer(bytearray(self.decode(fp), "ascii"))
-        )
+        return super().read(create_string_buffer(bytearray(self.decode(fp), "ascii")))
 
     def convert_quintuple(self, quintuple):
         res = 0  # reduce(lambda accu, x: (accu * 85) + x, value, 0)
@@ -112,12 +108,10 @@ class Reader(hexfile.Reader):
             self.error("relative adressing not supported.")
             tmp = 2
         else:
-            self.error("Invalid format type: '{0}'".format(format_type))
+            self.error(f"Invalid format type: '{format_type}'")
             tmp = 0
         checksum = checksums.lrc(
-            utils.make_list(
-                tmp, line.length + 4, utils.int_to_array(line.address), line.chunk
-            ),
+            utils.make_list(tmp, line.length + 4, utils.int_to_array(line.address), line.chunk),
             8,
             checksums.COMPLEMENT_TWOS,
         )
@@ -135,9 +129,7 @@ class Reader(hexfile.Reader):
             if idx > 3:
                 break
         fp.seek(0, os.SEEK_SET)
-        return super(Reader, self).probe(
-            create_string_buffer(bytearray(self.decode(fp), "ascii"))
-        )
+        return super().probe(create_string_buffer(bytearray(self.decode(fp), "ascii")))
 
 
 class Writer(hexfile.Writer):
@@ -154,9 +146,7 @@ class Writer(hexfile.Writer):
             lengthToPad = self.row_length - length
             padding = [0] * (lengthToPad)
             row.extend(padding)
-        line = "{0:02X}{1}0000{2:08X}{3}".format(
-            checksum, length - 2, address, Writer.hex_bytes(row)
-        )
+        line = f"{checksum:02X}{length - 2}0000{address:08X}{Writer.hex_bytes(row)}"
         return line
 
     def compose_footer(self, meta):
@@ -172,7 +162,7 @@ class Writer(hexfile.Writer):
             for item in slicer(line, 8, atoi16):
                 item = self.convert_quintuple(item)
                 res.append(item)
-            result.append("{0}{1}".format(PREFIX, "".join(res)))
+            result.append("{}{}".format(PREFIX, "".join(res)))
         if PYTHON_VERSION.major == 3:
             return bytes("\n".join(result), "ascii")
         else:

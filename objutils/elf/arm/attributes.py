@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -28,21 +27,25 @@ __copyright__ = """
 
 
 from collections import namedtuple
-
-from construct import CString, Struct
-from construct import Byte, Bytes, this
-from construct import Computed, Switch, Tell
-from construct import Int32ul
-from construct import Int32ub
-
 from enum import IntEnum
+
+from construct import (
+    Byte,
+    Bytes,
+    Computed,
+    CString,
+    Int32ub,
+    Int32ul,
+    Struct,
+    Switch,
+    Tell,
+    this,
+)
 
 from objutils.dwarf.encoding import ULEB
 
 
-AttributeDescription = namedtuple(
-    "AttributeDescription", "tag value parameterType conv"
-)
+AttributeDescription = namedtuple("AttributeDescription", "tag value parameterType conv")
 
 
 class Reader(IntEnum):
@@ -119,7 +122,8 @@ Tag_Advanced_SIMD_arch = {
 }
 
 Tag_FP_HP_extension = {
-    0: "The user intended half-precision floating point instructions may be used if they exist in the available FP and ASIMD instruction sets as indicated by Tag_FP_arch and Tag_ASIMD_arch ",
+    0: "The user intended half-precision floating point instructions may be used if they exist "
+    "in the available FP and ASIMD instruction sets as indicated by Tag_FP_arch and Tag_ASIMD_arch ",
     1: "Use of the optional half-precision extension to VFPv3/Advanced SIMDv1 was permitted",
 }
 
@@ -146,9 +150,12 @@ Tag_MPextension_use = {
 }
 
 Tag_DIV_use = {
-    0: "The user intended divide instructions may be used if they exist, or no explicit information recorded. This code was permitted to use SDIV and UDIV if the instructions are guaranteed present in the architecture, as indicated by Tag_CPU_arch and Tag_CPU_arch_profile.",
+    0: "The user intended divide instructions may be used if they exist, or no explicit information recorded. "
+    "This code was permitted to use SDIV and UDIV if the instructions are guaranteed present in the "
+    "architecture, as indicated by Tag_CPU_arch and Tag_CPU_arch_profile.",
     1: "This code was explicitly not permitted to use SDIV or UDIV.",
-    2: "This code was permitted to use SDIV and UDIV in the ARM and Thumb ISAs; the instructions are present as an optional architectural extension above the base architecture implied by Tag_CPU_arch and Tag_CPU_arch_profile.",
+    2: "This code was permitted to use SDIV and UDIV in the ARM and Thumb ISAs; the instructions are present "
+    "as an optional architectural extension above the base architecture implied by Tag_CPU_arch and Tag_CPU_arch_profile.",
 }
 
 Tag_PCS_config = {
@@ -198,7 +205,8 @@ Tag_ABI_enum_size = {
     0: "The user prohibited the use of enums when building this entity ",
     1: "Enum values occupy the smallest container big enough to hold all their values ",
     2: "The user intended Enum containers to be 32-bit ",
-    3: "The user intended that every enumeration visible across an ABI-complying interface contains a value needing 32 bits to encode it; other enums can be containerized",
+    3: "The user intended that every enumeration visible across an ABI-complying interface "
+    "contains a value needing 32 bits to encode it; other enums can be containerized",
 }
 
 Tag_ABI_align_needed = {
@@ -206,15 +214,18 @@ Tag_ABI_align_needed = {
     1: "Code was permitted to depend on the 8-byte alignment of 8-byte data items",
     2: "Code was permitted to depend on the 4-byte alignment of 8-byte data items",
     3: "Reserved",
-    # n (in 4..12) Code was permitted to depend on the 8-byte alignment of 8-byte data items and the alignment of data items having up to 2n-byte extended alignment
+    # n (in 4..12) Code was permitted to depend on the 8-byte alignment of 8-byte
+    # data items and the alignment of data items having up to 2n-byte extended alignment
 }
 
 Tag_ABI_align_preserved = {
     0: "The user did not require code to preserve 8-byte alignment of 8-byte data objects",
     1: "Code was required to preserve 8-byte alignment of 8-byte data objects",
-    2: "Code was required to preserve 8-byte alignment of 8-byte data objects and to ensure (SP MOD 8) = 0 at all instruction boundaries (not just at function calls)",
+    2: "Code was required to preserve 8-byte alignment of 8-byte data objects and "
+    "to ensure (SP MOD 8) = 0 at all instruction boundaries (not just at function calls)",
     3: "Reserved",
-    # n (in 4..12) Code was required to preserve the alignments of case 2 and the alignment of data items having up to 2n-byte extended alignment.
+    # n (in 4..12) Code was required to preserve the alignments of case 2 and the
+    # alignment of data items having up to 2n-byte extended alignment.
 }
 
 Tag_ABI_FP_rounding = {
@@ -299,88 +310,48 @@ ATTRIBUTES = {
     4: AttributeDescription("Tag_CPU_raw_name", 4, Reader.CSTRING, Ident),
     5: AttributeDescription("Tag_CPU_name", 5, Reader.CSTRING, Ident),
     6: AttributeDescription("Tag_CPU_arch", 6, Reader.ULEB, Tag_CPU_arch),
-    7: AttributeDescription(
-        "Tag_CPU_arch_profile", 7, Reader.ULEB, Tag_CPU_arch_profile
-    ),
+    7: AttributeDescription("Tag_CPU_arch_profile", 7, Reader.ULEB, Tag_CPU_arch_profile),
     8: AttributeDescription("Tag_ARM_ISA_use", 8, Reader.ULEB, Tag_ARM_ISA_use),
     9: AttributeDescription("Tag_THUMB_ISA_use", 9, Reader.ULEB, Tag_THUMB_ISA_use),
     10: AttributeDescription("Tag_FP_arch", 10, Reader.ULEB, Tag_FP_arch),
     11: AttributeDescription("Tag_WMMX_arch", 11, Reader.ULEB, Tag_WMMX_arch),
-    12: AttributeDescription(
-        "Tag_Advanced_SIMD_arch", 12, Reader.ULEB, Tag_Advanced_SIMD_arch
-    ),
+    12: AttributeDescription("Tag_Advanced_SIMD_arch", 12, Reader.ULEB, Tag_Advanced_SIMD_arch),
     13: AttributeDescription("Tag_PCS_config", 13, Reader.ULEB, Tag_PCS_config),
     14: AttributeDescription("Tag_ABI_PCS_R9_use", 14, Reader.ULEB, Tag_ABI_PCS_R9_use),
-    15: AttributeDescription(
-        "Tag_ABI_PCS_RW_data", 15, Reader.ULEB, Tag_ABI_PCS_RW_data
-    ),
-    16: AttributeDescription(
-        "Tag_ABI_PCS_RO_data", 16, Reader.ULEB, Tag_ABI_PCS_RO_data
-    ),
-    17: AttributeDescription(
-        "Tag_ABI_PCS_GOT_use", 17, Reader.ULEB, Tag_ABI_PCS_GOT_use
-    ),
-    18: AttributeDescription(
-        "Tag_ABI_PCS_wchar_t", 18, Reader.ULEB, Tag_ABI_PCS_wchar_t
-    ),
-    19: AttributeDescription(
-        "Tag_ABI_FP_rounding", 19, Reader.ULEB, Tag_ABI_FP_rounding
-    ),
-    20: AttributeDescription(
-        "Tag_ABI_FP_denormal", 20, Reader.ULEB, Tag_ABI_FP_rounding
-    ),
-    21: AttributeDescription(
-        "Tag_ABI_FP_exceptions", 21, Reader.ULEB, Tag_ABI_FP_exceptions
-    ),
-    22: AttributeDescription(
-        "Tag_ABI_FP_user_exceptions", 22, Reader.ULEB, Tag_ABI_FP_user_exceptions
-    ),
-    23: AttributeDescription(
-        "Tag_ABI_FP_number_model", 23, Reader.ULEB, Tag_ABI_FP_number_model
-    ),
-    24: AttributeDescription(
-        "Tag_ABI_align_needed", 24, Reader.ULEB, Tag_ABI_align_needed
-    ),
-    25: AttributeDescription(
-        "Tag_ABI_align8_preserved", 25, Reader.ULEB, Tag_ABI_align_preserved
-    ),
+    15: AttributeDescription("Tag_ABI_PCS_RW_data", 15, Reader.ULEB, Tag_ABI_PCS_RW_data),
+    16: AttributeDescription("Tag_ABI_PCS_RO_data", 16, Reader.ULEB, Tag_ABI_PCS_RO_data),
+    17: AttributeDescription("Tag_ABI_PCS_GOT_use", 17, Reader.ULEB, Tag_ABI_PCS_GOT_use),
+    18: AttributeDescription("Tag_ABI_PCS_wchar_t", 18, Reader.ULEB, Tag_ABI_PCS_wchar_t),
+    19: AttributeDescription("Tag_ABI_FP_rounding", 19, Reader.ULEB, Tag_ABI_FP_rounding),
+    20: AttributeDescription("Tag_ABI_FP_denormal", 20, Reader.ULEB, Tag_ABI_FP_rounding),
+    21: AttributeDescription("Tag_ABI_FP_exceptions", 21, Reader.ULEB, Tag_ABI_FP_exceptions),
+    22: AttributeDescription("Tag_ABI_FP_user_exceptions", 22, Reader.ULEB, Tag_ABI_FP_user_exceptions),
+    23: AttributeDescription("Tag_ABI_FP_number_model", 23, Reader.ULEB, Tag_ABI_FP_number_model),
+    24: AttributeDescription("Tag_ABI_align_needed", 24, Reader.ULEB, Tag_ABI_align_needed),
+    25: AttributeDescription("Tag_ABI_align8_preserved", 25, Reader.ULEB, Tag_ABI_align_preserved),
     26: AttributeDescription("Tag_ABI_enum_size", 26, Reader.ULEB, Tag_ABI_enum_size),
     27: AttributeDescription("Tag_ABI_HardFP_use", 27, Reader.ULEB, Tag_ABI_HardFP_use),
     28: AttributeDescription("Tag_ABI_VFP_args", 28, Reader.ULEB, Tag_ABI_VFP_args),
     29: AttributeDescription("Tag_ABI_WMMX_args", 29, Reader.ULEB, Tag_ABI_WMMX_args),
-    30: AttributeDescription(
-        "Tag_ABI_optimization_goals", 30, Reader.ULEB, Tag_ABI_optimization_goals
-    ),
-    31: AttributeDescription(
-        "Tag_ABI_FP_optimization_goals", 31, Reader.ULEB, Tag_ABI_FP_optimization_goals
-    ),
+    30: AttributeDescription("Tag_ABI_optimization_goals", 30, Reader.ULEB, Tag_ABI_optimization_goals),
+    31: AttributeDescription("Tag_ABI_FP_optimization_goals", 31, Reader.ULEB, Tag_ABI_FP_optimization_goals),
     32: AttributeDescription("Tag_compatibility", 32, Reader.CSTRING, Ident),
-    34: AttributeDescription(
-        "Tag_CPU_unaligned_access", 34, Reader.ULEB, Tag_CPU_unaligned_access
-    ),
+    34: AttributeDescription("Tag_CPU_unaligned_access", 34, Reader.ULEB, Tag_CPU_unaligned_access),
     36: AttributeDescription(
         "Tag_FP_HP_extension (was Tag_VFP_HP_extension)",
         36,
         Reader.ULEB,
         Tag_FP_HP_extension,
     ),
-    38: AttributeDescription(
-        "Tag_ABI_FP_16bit_format", 38, Reader.ULEB, Tag_ABI_FP_16bit_format
-    ),
-    42: AttributeDescription(
-        "Tag_MPextension_use", 42, Reader.ULEB, Tag_MPextension_use
-    ),
+    38: AttributeDescription("Tag_ABI_FP_16bit_format", 38, Reader.ULEB, Tag_ABI_FP_16bit_format),
+    42: AttributeDescription("Tag_MPextension_use", 42, Reader.ULEB, Tag_MPextension_use),
     44: AttributeDescription("Tag_DIV_use", 44, Reader.ULEB, Tag_DIV_use),
     64: AttributeDescription("Tag_nodefaults", 64, Reader.ULEB, Ident),
     65: AttributeDescription("Tag_also_compatible_with", 65, Reader.CSTRING, Ident),
     67: AttributeDescription("Tag_conformance", 67, Reader.CSTRING, Ident),
     66: AttributeDescription("Tag_T2EE_use", 66, Reader.ULEB, Tag_T2EE_use),
-    68: AttributeDescription(
-        "Tag_Virtualization_use", 68, Reader.ULEB, Tag_Virtualization_use
-    ),
-    70: AttributeDescription(
-        "Tag_MPextension_use", 70, Reader.ULEB, Tag_MPextension_use
-    ),
+    68: AttributeDescription("Tag_Virtualization_use", 68, Reader.ULEB, Tag_Virtualization_use),
+    70: AttributeDescription("Tag_MPextension_use", 70, Reader.ULEB, Tag_MPextension_use),
 }
 
 """
@@ -429,10 +400,8 @@ class Attribute:
             self.description = value
 
     def __repr__(self):
-        return (
-            "Attribute(tag = {}, tag_name = {}, value = {}, description = {})".format(
-                self.tag, self.tag_name, self.value, self.description
-            )
+        return "Attribute(tag = {}, tag_name = {}, value = {}, description = {})".format(
+            self.tag, self.tag_name, self.value, self.description
         )
 
 
@@ -482,13 +451,12 @@ def parse(buffer, byteorder="<"):
         ),
         "pos" / Tell,
     )
-    format_version = buffer[0]
     i = 1
     length = len(buffer)
     result = {}
     while True:
         section = Section.parse(buffer[i:])
-        if not section.vendor in result:
+        if section.vendor not in result:
             result[section.vendor] = []
         i += section.len
         res = SubSectionHeader.parse(section.data)

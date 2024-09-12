@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -31,7 +30,7 @@ import os
 import struct
 
 
-class PlainBinaryReader(object):
+class PlainBinaryReader:
     LITTLE_ENDIAN = "<"
     BIG_ENDIAN = ">"
 

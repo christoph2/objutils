@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 __version__ = "0.1.0"
 
@@ -29,12 +28,12 @@ __copyright__ = """
 import logging
 
 
-class Logger(object):
+class Logger:
     LOGGER_BASE_NAME = "objutils"
     FORMAT = "[%(levelname)s (%(name)s)]: %(message)s"
 
     def __init__(self, name, level=logging.WARN):
-        self.logger = logging.getLogger("{0}.{1}".format(self.LOGGER_BASE_NAME, name))
+        self.logger = logging.getLogger(f"{self.LOGGER_BASE_NAME}.{name}")
         self.logger.setLevel(level)
         handler = logging.StreamHandler()
         handler.setLevel(level)
@@ -52,7 +51,7 @@ class Logger(object):
     def log(self, message, level):
         self.lastSeverity = level
         self.lastMessage = message
-        self.logger.log(level, "{0}".format(message))
+        self.logger.log(level, f"{message}")
 
     def info(self, message):
         self.log(message, logging.INFO)

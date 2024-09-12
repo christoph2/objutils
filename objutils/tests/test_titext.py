@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import unittest
 
-from objutils import dumps
-from objutils import loads
+from objutils import dumps, loads
+
 
 TITEXT = b"""@DEAD
 99 F2 B9 CB 79 D3 EE F8 8F C6 A9 40 AB CD 71 A6

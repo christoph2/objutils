@@ -285,7 +285,7 @@ We are now writing a string to our image.
    ---------------
 
 Notice the difference? In our **Section** example above, the string passed as a **data** parameter
-was just a bunch of bytes, but now it is a "real" C-string (there is a opposite function, **read_string**, 
+was just a bunch of bytes, but now it is a "real" C-string (there is a opposite function, **read_string**,
 that scans for a terminating **NULL** character).
 
 Use **write()** and **read()** functions, if you want to access plain bytes.
@@ -377,5 +377,3 @@ Contribution
 ------------
 
 If you contribute code to this project, you are implicitly allowing your code to be distributed under the GNU General Public License v2.0. You are also implicitly verifying that all code is your original work.
-
-
