@@ -26,10 +26,13 @@ __copyright__ = """
 
 import binascii
 import hashlib
+import os
 import re
 import time
+import typing
 from collections import OrderedDict, namedtuple
 from itertools import groupby
+from pathlib import Path
 
 from construct import (
     Adapter,
@@ -377,11 +380,17 @@ class ElfParser:
         ),
     )
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.fp = create_memorymapped_fileview(filename)
         # sha = calculate_crypto_hash(self.fp.tobytes())
+        self.filename = Path(filename)
 
-        self.db = model.Model()
+        self.db_name = self.filename.with_suffix(model.DB_EXTENSION)
+        try:
+            os.unlink(self.db_name)
+        except Exception as e:
+            print(e)
+        self.db = model.Model(self.db_name)
         self.session = self.db.session
         self.symbols = SymbolAPI(self)
         self.sections = SectionAPI(self)
@@ -407,6 +416,8 @@ class ElfParser:
         for section in self._symbol_sections:
             self._parse_symbol_section(section)
         self.session.commit()
+        md_class = defs.MACHINE_DATA.get(self.e_machine, defs.MachineData)
+        self._machine_data = md_class(self.e_machine, self.e_flags)
 
     def _parser_extended_header(self):
         ExtendedHeader = Struct(
@@ -854,12 +865,16 @@ class ElfParser:
     def query(self):
         return self.session.query
 
+    @property
+    def machine_data(self) -> str:
+        return str(self._machine_data)
+
     def create_image(
         self,
         join: bool = True,
-        include_pattern: str = None,
-        exclude_pattern: str = None,
-        callback: callable = None,
+        include_pattern: str = "",
+        exclude_pattern: str = "",
+        callback: typing.Optional[typing.Callable] = None,
     ):
         """
 
@@ -894,10 +909,16 @@ class ElfParser:
         Look at `scripts/oj_elf_extract.py` to see `create_image()` in action.
         """
         query = self.query(model.Elf_Section)
-        query = query.filter(
-            model.Elf_Section.flag_alloc is True,
-            model.Elf_Section.has_content is True,
-        )
+        # query = query.filter(
+        #    model.Elf_Section.flag_alloc is True,
+        #    model.Elf_Section.has_content is True,
+        # )
+        # defs.SectionFlags.SHF_ALLOC
+        #
+        query.filter(model.Elf_Section.sh_flags.bitwise_and(defs.SectionFlags.SHF_ALLOC) == defs.SectionFlags.SHF_ALLOC)
+
+        # sections = self.query(model.Elf_Section).all()
+        # print("SECTIONS", sections)
 
         if include_pattern:
             query = query.filter(func.regexp(model.Elf_Section.section_name, include_pattern))
@@ -910,6 +931,12 @@ class ElfParser:
         if callback:
             callback("start", None)
         for section in query.all():
+            if (
+                section.section_image is None
+                or (section.sh_flags & defs.SectionFlags.SHF_ALLOC) != defs.SectionFlags.SHF_ALLOC
+                or section.sh_type in (defs.SectionType.SHT_NOBITS, defs.SectionType.SHT_NULL)
+            ):
+                continue
             if callback:
                 callback("section", section)
             result.append(Section(section.sh_addr, section.section_image))

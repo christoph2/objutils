@@ -29,16 +29,19 @@ import mmap
 import re
 import sqlite3
 
-from sqlalchemy import Column, and_, create_engine, event, not_, orm, types
+from sqlalchemy import Column, ForeignKey, and_, create_engine, event, not_, orm, types
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.orm import relationship
 
 from objutils.elf import defs
 
 
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
+
+DB_EXTENSION = ".prgdb"
 
 Base = declarative_base()
 
@@ -175,6 +178,7 @@ class Elf_Section(Base, RidMixIn):
 
     @hybrid_method
     def test_flags(self, mask):
+        print("\ttest_flags", self.get_flags(), mask)
         return self.get_flags() & mask == mask
 
     @test_flags.expression
@@ -344,6 +348,73 @@ class Elf_Note(Base, RidMixIn):
     desc = Column(types.VARCHAR)
 
 
+"""
+class Parent(Base):
+    __tablename__ = 'parent'
+    id = Column(Integer, primary_key=True)
+    children = relationship("Child", back_populates="parent")
+
+class Child(Base):
+    __tablename__ = 'child'
+    id = Column(Integer, primary_key=True)
+    parent_id = Column(Integer, ForeignKey('parent.id'))
+    parent = relationship("Parent", back_populates="children")
+"""
+
+
+class DIEAttribute(Base, RidMixIn):
+    name = Column(types.VARCHAR)
+    raw_value = Column(types.VARCHAR)
+    display_value = Column(types.VARCHAR)
+    entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"))
+    entry = relationship("DebugInformationEntry", back_populates="attributes")
+
+
+class DebugInformationEntry(Base, RidMixIn):
+    tag = Column(types.VARCHAR)
+    attributes = relationship("DIEAttribute", back_populates="entry", uselist=True)
+
+
+class DebugInformation(Base, RidMixIn):
+    pass
+    # die_map: dict[int, DebugInformationEntry]
+    # die_entries: List[DebugInformationEntry]
+
+
+class CompilationUnit(Base, RidMixIn):
+    pass
+
+
+"""
+@dataclass
+class DIEAttribute:
+    raw_value: Any
+    display_value: str
+
+    def toJSON(self):
+        print("Hello!?")
+
+
+@dataclass
+class DebugInformationEntry:
+    name: str
+    attributes: List = field(default_factory=list)
+    children: List = field(default_factory=list)
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+
+@dataclass
+class DebugInformation:
+    die_map: dict[int, DebugInformationEntry]
+    die_entries: List[DebugInformationEntry]
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+"""
+
+
 def calculateCacheSize(value):
     return -(value // PAGE_SIZE)
 
@@ -372,10 +443,47 @@ def set_sqlite3_pragmas(dbapi_connection, connection_record):
     cursor.close()
 
 
-class Model:
-    def __init__(self, debug=False):
+"""
+class A2LDatabase(object):
+    def __init__(self, filename, debug=False, logLevel="INFO"):
+        if filename == ":memory:":
+            self.dbname = ""
+        else:
+            if not filename.lower().endswith(DB_EXTENSION):
+                self.dbname = "{}.{}".format(filename, DB_EXTENSION)
+            else:
+                self.dbname = filename
         self._engine = create_engine(
-            "sqlite:///:memory:",
+            "sqlite:///{}".format(self.dbname),
+            echo=debug,
+            connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
+            native_datetime=True,
+        )
+
+        self._session = orm.Session(self._engine, autoflush=False, autocommit=False)
+        self._metadata = Base.metadata
+        # loadInitialData(Node)
+        Base.metadata.create_all(self.engine)
+        meta = MetaData(schema_version=CURRENT_SCHEMA_VERSION)
+        self.session.add(meta)
+        self.session.flush()
+        self.session.commit()
+        self._closed = False
+"""
+
+
+class Model:
+    def __init__(self, filename: str = ":memory:", debug: bool = False):
+        if filename == ":memory:" or not filename:
+            self.dbname = ":memory:"
+        else:
+            # if not filename.lower().endswith(DB_EXTENSION):
+            #    self.dbname = f"{filename}.{DB_EXTENSION}"
+            # else:
+            self.dbname = filename
+
+        self._engine = create_engine(
+            f"sqlite:///{self.dbname}",
             echo=debug,
             connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
             native_datetime=True,

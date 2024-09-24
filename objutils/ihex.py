@@ -103,7 +103,7 @@ class Reader(hexfile.Reader):
         else:
             self.warn(f"Invalid record type [{line.type:u}] at line {line.line_number:u}")
 
-    def _address_calculator(x):
+    def _address_calculator(self, x):
         return x
 
 

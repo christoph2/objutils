@@ -17,6 +17,7 @@ install_reqs = [
     "attrs >= 19.3.0",
     "sortedcontainers",
     "SQLAlchemy",
+    "Rich",
 ]
 
 if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):

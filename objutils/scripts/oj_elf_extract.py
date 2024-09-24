@@ -30,6 +30,10 @@ from objutils import dump
 from objutils.elf import ElfParser
 
 
+# import sys
+# sys.argv.extend(["-t", "ihex", "./examples/hello_xcp.ino.elf", "./examples/hello_xcp.hex"])
+
+
 def callback(state, section):
     """ """
     if state == "start":

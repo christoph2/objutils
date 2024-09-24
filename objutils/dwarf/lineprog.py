@@ -9,5 +9,5 @@ class LineNumberProgram:
             opcode = single_byte()
             if not opcode:
                 break
-            print(ord(opcode), end=" ")
+            # print(ord(opcode), end=" ")
         print()

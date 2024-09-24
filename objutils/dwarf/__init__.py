@@ -6,7 +6,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2021 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2024 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -30,9 +30,7 @@ import io
 import json
 from collections import OrderedDict
 from dataclasses import dataclass, field
-
-# from pprint import pprint
-from typing import Any, List
+from typing import Any, List, Optional
 
 from construct import (
     Array,
@@ -42,6 +40,7 @@ from construct import (
     Enum,
     Flag,
     If,
+    IfThenElse,
     Int8sl,
     Int8ul,
     Int16sb,
@@ -76,13 +75,14 @@ from objutils.dwarf.encoding import (
     Block4b,
     Block4l,
     BlockUleb,
+    Endianess,
     FilenameSequence,
     One,
     StrP,
 )
 from objutils.dwarf.lineprog import LineNumberProgram
 from objutils.dwarf.sm import StackMachine
-from objutils.elf.defs import Endianess
+from objutils.elf import model
 
 
 ENCODED_ATTRIBUTES = {
@@ -115,10 +115,12 @@ def encoding_repr(encoding, value):
 class Attribute:
     encoding: constants.AttributeEncoding
     form: constants.AttributeForm
+    special_value: Optional[Any] = None
 
     def __iter__(self):
         yield self.encoding
         yield self.form
+        yield self.special_value
 
 
 @dataclass(frozen=True)
@@ -161,6 +163,127 @@ class DebugInformation:
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
+class Abbrevations:
+
+    AbbrevationHeader = Struct(
+        "start" / Tell,
+        "code" / ULEB,
+        "stop" / Tell,
+    )
+
+    AbbrevationBody = Struct(
+        "start" / Tell,
+        "tag" / ULEB,
+        "children" / Int8ul,
+        "stop" / Tell,
+    )
+
+    AttributeStruct = Struct(
+        "start" / Tell,
+        "attrValue" / ULEB,
+        "formValue" / ULEB,
+        "stop" / Tell,
+        "next" / Computed((this.attrValue != 0) and (this.formValue != 0)),
+    )
+
+    SpecialValueStruct = Struct(
+        "start" / Tell,
+        "value" / ULEB,
+        "stop" / Tell,
+    )
+
+    def __init__(self, section):
+        self.image = section.image
+        self.length = len(section.image)
+        self.abbrevations = {}
+
+    def get(self, abbr_offset, item):
+        if item == 0:
+            return None
+        if (abbr_offset, item) in self.abbrevations:
+            return self.abbrevations.get(
+                (
+                    abbr_offset,
+                    item,
+                )
+            )
+        else:
+            return self._fetch(abbr_offset, item)
+
+    def _fetch(self, abbr_offset, item):
+        offset = abbr_offset
+        while True:
+            abbrv_header = self.AbbrevationHeader.parse(self.image[offset:])
+            # print("ABBREV-CODE", hex(offset), abbrv_header)
+            code = abbrv_header.code
+            offset += abbrv_header.stop - abbrv_header.start
+            if code == 0:
+                # print("CONT!!!")
+                continue
+            key = (
+                abbr_offset,
+                code,
+            )
+            if offset >= self.length:
+                break
+            abbrv_body = self.AbbrevationBody.parse(self.image[offset:])
+            tag = abbrv_body.tag
+            children = abbrv_body.children
+            # print("BODY", abbrv_body, constants.Tag(tag).name)
+            offset += abbrv_body.stop - abbrv_body.start
+
+            try:
+                self.abbrevations[key] = Abbrevation(
+                    constants.Tag(tag).name,
+                    (children == 1),
+                    [],
+                )
+            except TypeError:
+                self.abbrevations[key] = Abbrevation(
+                    f"User TAG value: 0x{tag:04x}",
+                    (children == 1),
+                    [],
+                )
+
+            while True:
+                attr = self.AttributeStruct.parse(self.image[offset:])
+                # print("ATTR", attr)
+                if not attr.next:
+                    # key_offset = offset
+                    break
+                if attr.formValue == constants.AttributeForm.DW_FORM_implicit_const:
+                    offset += attr.stop - attr.start
+                    special_value = self.SpecialValueStruct.parse(self.image[offset:])
+                    offset += special_value.stop - special_value.start
+                    self.abbrevations[key].attrs.append(
+                        Attribute(
+                            constants.AttributeEncoding(attr.attrValue),
+                            constants.AttributeForm(attr.formValue),
+                            special_value.value,
+                        )
+                    )
+                    continue
+                if attr.attrValue != 0 and attr.formValue != 0:
+                    #
+                    try:
+                        self.abbrevations[key].attrs.append(
+                            Attribute(
+                                constants.AttributeEncoding(attr.attrValue),
+                                constants.AttributeForm(attr.formValue),
+                            )
+                        )
+                    except TypeError:
+                        self.abbrevations[key].attrs.append(
+                            Attribute(
+                                constants.FakeEncoding(attr.attrValue),
+                                constants.AttributeForm(attr.formValue),
+                            )
+                        )
+                offset += attr.stop - attr.start
+            if code == item:
+                return self.abbrevations[key]
+
+
 class DwarfProcessor:
     """ """
 
@@ -175,7 +298,7 @@ class DwarfProcessor:
         self.b64 = elf_parser.b64
         self.endianess = Endianess.Little if elf_parser.endianess == "<" else Endianess.Big
         self.debug_sections = elf_parser.debug_sections()
-        print(self.debug_sections.keys())
+        # print(self.debug_sections.keys())
         if not self.debug_sections:
             raise TypeError("File has no DWARF sections.")
         # self.debug_sections = {
@@ -185,8 +308,7 @@ class DwarfProcessor:
             self.strings = self.debug_sections[".debug_str"].image
         else:
             self.strings = b""
-
-        # print(self.strings.read())
+        self.db_session = elf_parser.session
         self.installReaders()
 
     def installReaders(self):
@@ -204,6 +326,7 @@ class DwarfProcessor:
             "block4": (Block4l, Block4b),
         }
         self.readers = Readers()
+        print("SIZE-INFO", 8 if self.b64 else 4, self.endianess)
         self.readers.native_address = Address(8 if self.b64 else 4, self.endianess)
         self.readers.uleb = ULEB
         self.readers.sleb = SLEB
@@ -222,8 +345,6 @@ class DwarfProcessor:
         # result = self.UTF8String.parse_stream(self.strings)
         result = str(self.debug_sections[".debug_str"])[offset : offset + 25]
         return bytes(result, encoding="ascii")
-
-    def do_abbrevs(self):
         if ".debug_abbrev" in self.debug_sections:
             key = ".debug_abbrev"
         elif ".debug_global_abbrev" in self.debug_sections:
@@ -233,19 +354,20 @@ class DwarfProcessor:
         section = self.debug_sections[key]
         image = section.image
         length = len(section.image)
-        AbbrevationStruct = Struct(
+
+        AbbrevationHeader = Struct(
             "start" / Tell,
             "code" / self.readers.uleb,
-            "details"
-            / If(
-                lambda ctx: ctx.code != 0,
-                Struct(
-                    "tag" / self.readers.uleb,
-                    "children" / self.readers.u8,
-                ),
-            ),
             "stop" / Tell,
         )
+
+        AbbrevationBody = Struct(
+            "start" / Tell,
+            "tag" / self.readers.uleb,
+            "children" / self.readers.u8,
+            "stop" / Tell,
+        )
+
         AttributeStruct = Struct(
             "start" / Tell,
             "attrValue" / self.readers.uleb,
@@ -253,37 +375,69 @@ class DwarfProcessor:
             "stop" / Tell,
             "next" / Computed((this.attrValue != 0) and (this.formValue != 0)),
         )
+
+        SpecialValueStruct = Struct(
+            "start" / Tell,
+            "value" / self.readers.uleb,
+            "stop" / Tell,
+        )
+
         offset: int = 0
         result = OrderedDict()
         key_offset: int = offset
         while True:
-            abbrev = AbbrevationStruct.parse(image[offset:])
+            abbrv_header = AbbrevationHeader.parse(image[offset:])
+            print("ABBREV-CODE", hex(offset), abbrv_header)
+            code = abbrv_header.code
             key = (
                 key_offset,
-                abbrev.code,
+                code,
             )
-            offset += abbrev.stop - abbrev.start
+            offset += abbrv_header.stop - abbrv_header.start
             if offset >= length:
                 break
-            if abbrev.code == 0:
-                key_offset = offset
-                result[key] = Abbrevation(0, False, [])
+            if code == 0:
+                # key_offset = offset
+                # result[key] = Abbrevation(0, False, [])
+                print("CONT!!!")
                 continue
+
+            abbrv_body = AbbrevationBody.parse(image[offset:])
+            tag = abbrv_body.tag
+            children = abbrv_body.children
+            print("BODY", abbrv_body, constants.Tag(tag).name)
+            offset += abbrv_body.stop - abbrv_body.start
+
             try:
                 result[key] = Abbrevation(
-                    constants.Tag(abbrev.details.tag).name,
-                    (abbrev.details.children == 1),
+                    constants.Tag(tag).name,
+                    (children == 1),
                     [],
                 )
             except TypeError:
                 result[key] = Abbrevation(
-                    f"User TAG value: 0x{abbrev.details.tag:04x}",
-                    (abbrev.details.children == 1),
+                    f"User TAG value: 0x{tag:04x}",
+                    (children == 1),
                     [],
                 )
 
             while True:
                 attr = AttributeStruct.parse(image[offset:])
+                print("ATTR", attr)
+                if not attr.next:
+                    # key_offset = offset
+                    break
+                if attr.formValue == constants.AttributeForm.DW_FORM_implicit_const:
+                    offset += attr.stop - attr.start
+                    special_value = SpecialValueStruct.parse(image[offset:])
+                    offset += special_value.stop - special_value.start
+                    result[key].attrs.append(
+                        Attribute(
+                            constants.AttributeEncoding(attr.attrValue),
+                            special_value.value,
+                        )
+                    )
+                    continue
                 if attr.attrValue != 0 and attr.formValue != 0:
                     #
                     try:
@@ -301,8 +455,10 @@ class DwarfProcessor:
                             )
                         )
                 offset += attr.stop - attr.start
-                if not attr.next:
-                    break
+            print("Finished Attrs.")
+        from pprint import pprint
+
+        pprint(result)
         self.abbrevations = result
 
     def do_lines(self):
@@ -318,7 +474,7 @@ class DwarfProcessor:
 
         VersionInformation = Struct("unit_length" / self.readers.u32, "version" / self.readers.u16)
         version_information = VersionInformation.parse_stream(image)
-        print(version_information)
+        # print(version_information)
 
         if version_information.version == 2:
             LineNumberProgramHeader = Struct(
@@ -344,8 +500,7 @@ class DwarfProcessor:
                 "stop" / Tell,
             )
 
-        header = LineNumberProgramHeader.parse_stream(image)
-        print("LineNumberProgramHeader:", header)
+        LineNumberProgramHeader.parse_stream(image)
         prg = LineNumberProgram(image)  # noqa: F841
 
     def do_mac_info(self):
@@ -384,7 +539,7 @@ class DwarfProcessor:
             while True:
                 macInfo = MacInfo.parse_stream(image)
                 offset += macInfo.stop - macInfo.start
-                print(offset, macInfo)
+                # print(offset, macInfo)
                 if offset >= length - 1:
                     break
         elif ".debug_macro" in self.debug_sections:
@@ -410,8 +565,7 @@ class DwarfProcessor:
                 "stop" / Tell,
             )
 
-            header = MacroInformationHeader.parse_stream(image)
-            print("debug_macro!!!", length, header)
+            MacroInformationHeader.parse_stream(image)
 
     def get_form_readers(self, addressSize):
         return {
@@ -440,7 +594,7 @@ class DwarfProcessor:
             constants.AttributeForm.DW_FORM_exprloc: self.readers.block_uleb,
             constants.AttributeForm.DW_FORM_flag_present: One,
             constants.AttributeForm.DW_FORM_ref_sig8: self.readers.u64,
-            constants.AttributeForm.DW_FORM_implicit_const: self.readers.block_sleb,
+            constants.AttributeForm.DW_FORM_implicit_const: None,
         }
 
     def process_attributes(self, image, readers, size, abbrevOffset):
@@ -482,24 +636,6 @@ class DwarfProcessor:
             if hasattr(abbr, "children") and abbr.children:
                 level += 1
 
-    def process_compile_unit(self, image):
-        CompileUnit = Struct(
-            "start" / Tell,
-            "unit_length" / self.readers.u32,
-            "version" / self.readers.u16,
-            "debug_abbrev_offset" / self.readers.u32,
-            "address_size" / self.readers.u8,
-            "stop" / Tell,
-            "size" / Computed(this.stop - this.start),
-        )
-        cu = CompileUnit.parse_stream(image)
-        print(f"   Compilation Unit @ offset 0x{cu.start:x}:")
-        print(f"   Length:        0x{cu.unit_length:x} (32-bit)")
-        print(f"   Version:       {cu.version}")
-        print(f"   Abbrev Offset: 0x{cu.debug_abbrev_offset:x}")
-        print(f"   Pointer Size:  {cu.address_size}")
-        return cu
-
     def do_dbg_info(self):
         if ".debug_info" in self.debug_sections:
             key = ".debug_info"
@@ -507,18 +643,51 @@ class DwarfProcessor:
             key = ".debug_global_info"
         else:
             raise TypeError("Neither .debug_info nor .debug_global_info section found")
+
+        if ".debug_abbrev" in self.debug_sections:
+            dbg_key = ".debug_abbrev"
+        elif ".debug_global_abbrev" in self.debug_sections:
+            dbg_key = ".debug_global_abbrev"
+        else:
+            raise TypeError("Neither .debug_abbrev nor .debug_global_abbrev section found")
+
+        dbg_section = self.debug_sections[dbg_key]
+        self.abbrevations = Abbrevations(dbg_section)
+
         section = self.debug_sections[key]
         image = io.BytesIO(section.image)
         section_length = len(section.image)
-        DbgInfo = Struct(
+
+        CommonHeader = Struct(
             "start" / Tell,
             "unit_length" / self.readers.u32,
             "version" / self.readers.u16,
+            "stop" / Tell,
+        )
+
+        UnitHeader5 = Struct(
+            "start" / Tell,
+            "unit_type" / self.readers.u8,
+            "address_size" / self.readers.u8,
+            "debug_abbrev_offset" / self.readers.u32,
+            "stop" / Tell,
+        )
+
+        UnitHeaderClassic = Struct(
+            "start" / Tell,
             "debug_abbrev_offset" / self.readers.u32,
             "address_size" / self.readers.u8,
             "stop" / Tell,
+        )
+
+        DbgInfo = Struct(
+            "start" / Tell,
+            "header" / CommonHeader,
+            "body" / IfThenElse(this.header.version < 5, UnitHeaderClassic, UnitHeader5),
+            "stop" / Tell,
             "size" / Computed(this.stop - this.start),
         )
+
         Attribute = Struct(
             "start" / Tell,
             "attr" / self.readers.uleb,
@@ -536,32 +705,44 @@ class DwarfProcessor:
             die_stack = [root_element]
 
             dbgInfo = DbgInfo.parse_stream(image)  # CU
+            # print(dbgInfo)
+            cu_length = dbgInfo.header.unit_length
+            version = dbgInfo.header.version
+            if version < 5:
+                debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                address_size = dbgInfo.body.address_size
+            else:
+                debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                address_size = dbgInfo.body.address_size
+
             print("*" * 80)
             print(f"   Compilation Unit @ offset 0x{dbgInfo.start:x}:")  # TODO: offset is needed for _refx types!!!
-            print(f"   Length:        0x{dbgInfo.unit_length:x} (32-bit)")
-            print(f"   Version:       {dbgInfo.version}")
-            print(f"   Abbrev Offset: 0x{dbgInfo.debug_abbrev_offset:x}")
-            print(f"   Pointer Size:  {dbgInfo.address_size}")
+            print(f"   Length:        0x{cu_length:x} (32-bit)")
+            print(f"   Version:       {version}")
+            print(f"   Abbrev Offset: 0x{debug_abbrev_offset:x}")
+            print(f"   Pointer Size:  {address_size}")
             level = 0
             pos = 0
             offset += dbgInfo.stop - dbgInfo.start
-            form_readers = self.get_form_readers(dbgInfo.address_size)
-            print("Pos, Length", pos, dbgInfo.unit_length)
-            if pos >= dbgInfo.unit_length:
+            form_readers = self.get_form_readers(address_size)
+            print("Pos, Length", pos, cu_length)
+            if pos >= cu_length:
                 break
             while True:
                 start = image.tell()
-                if start >= dbgInfo.start + dbgInfo.unit_length + 4:
+                if start >= dbgInfo.start + cu_length + 4:
                     break
                 if start >= section_length - 1:
                     break
                 attr = Attribute.parse_stream(image)
-                abbr = self.abbrevations.get((dbgInfo.debug_abbrev_offset, attr.attr))
+                abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
                 if not abbr:
                     print(f"<{start:2x}>: Abbrev Number: 0 ---")
                     level -= 1
                 else:
                     die = DebugInformationEntry(abbr.tag)
+                    db_die = model.DebugInformationEntry(tag=abbr.tag)
+                    self.db_session.add(db_die)
                     if attr.attr != 0:
                         die_stack[-1].children.append(die)
                     print(f"{'   ' * (level + 1)}<{level}><{start:02x}>: Abbrev Number: {attr.attr} ({abbr.tag})")
@@ -573,14 +754,35 @@ class DwarfProcessor:
                         pass
                     if attr.attr == 0:
                         level -= 1
-                        die_stack.pop()
-                    for enc, form in abbr.attrs:
+                        if len(die_stack):
+                            die_stack.pop()
+                        else:
+                            print("DIE_STACK empty!!!")
+                    for enc, form, special_value in abbr.attrs:
                         reader = form_readers.get(form)
-                        if reader is None:
-                            print("*EF", enc, form, start, attr, abbr)
                         start = image.tell()
-                        # if start >= 0xa103:
-                        #     print()
+                        if reader is None:
+                            if form == constants.AttributeForm.DW_FORM_implicit_const:
+                                print("DW_FORM_implicit_const")
+                                value = special_value
+                                display_value = value
+                                print(f"{'   ' * (level + 1)}<{start:02x}> {enc.name}: {display_value}")
+                                die.attributes.append(
+                                    (
+                                        enc.name,
+                                        DIEAttribute(value, display_value),
+                                    )
+                                )
+                                db_die.attributes.append(
+                                    model.DIEAttribute(name=enc.name, raw_value=value, display_value=display_value)
+                                )
+                                offset += attr.stop - attr.start
+                                pos = image.tell()
+                                if pos >= dbgInfo.start + cu_length + 4:
+                                    break
+                                continue
+                            else:
+                                print("*EF", enc, form, start, attr, abbr)
                         try:
                             value = reader.parse_stream(image)
                         except Exception as e:
@@ -633,12 +835,16 @@ class DwarfProcessor:
                                 DIEAttribute(value, display_value),
                             )
                         )
+                        db_die.attributes.append(model.DIEAttribute(name=enc.name, raw_value=value, display_value=display_value))
                     offset += attr.stop - attr.start
                     pos = image.tell()
-                    if pos >= dbgInfo.start + dbgInfo.unit_length + 4:
+                    if pos >= dbgInfo.start + cu_length + 4:
                         break
+                # print(db_die, db_die.attributes)
+                # self.db_session.bulk_save_objects([db_die])
                 die_map[die_start] = die
             result.append(root_element)
+        self.db_session.commit()
         return DebugInformation(die_map, [d.children[0] for d in result])
 
     def pubnames(self):
