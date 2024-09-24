@@ -18,7 +18,7 @@ __version__ = "0.5.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -37,6 +37,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from rich import pretty
+from rich.console import Console
+from rich.traceback import install as tb_install
 
 import objutils.ash
 import objutils.binfile
@@ -55,6 +58,9 @@ import objutils.titxt
 from objutils.image import Image  # noqa: F401
 from objutils.registry import registry
 from objutils.section import Section  # noqa: F401
+
+
+pretty.install()
 
 
 registry.register("bin", objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
@@ -92,6 +98,10 @@ registry.register("tek", objutils.tek.Reader, objutils.tek.Writer, "Tektonix for
 registry.register("cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
+
+
+console = Console()
+tb_install(show_locals=True, max_frames=3)  # Install custom exception handler.
 
 
 def load(codec_name, *args, **kws):

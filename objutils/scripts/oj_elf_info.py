@@ -33,10 +33,8 @@ from objutils.elf import ElfParser, model
 from objutils.elf.defs import (
     ELF_BYTE_ORDER_NAMES,
     ELF_CLASS_NAMES,
-    ELF_MACHINE_NAMES,
     ELF_TYPE_NAMES,
     ELFAbiType,
-    ELFMachineType,
     ELFType,
 )
 
@@ -77,7 +75,7 @@ def main():
     ep = ElfParser(args.elf_file)
     print(f"Class:       {ELF_CLASS_NAMES.get(ep.ei_class, '*** INVALID ***')}")
     print(f"Type:        {ELFType(ep.e_type).name[3:]} [{ELF_TYPE_NAMES.get(ep.e_type, '')}]")
-    print(f"Machine:     {ELFMachineType(ep.e_machine).name[3:]} [{ELF_MACHINE_NAMES.get(ep.e_machine, '')}]")
+    print(f"Machine:     {ep.machine_data}")
     print(f"Data:        {ELF_BYTE_ORDER_NAMES.get(ep.ei_data, '*** INVALID ***')}")
     print(f"OS/ABI       {ELFAbiType(ep.ei_osabi).name[9:]} / v{ep.ei_abiversion}")
 
@@ -90,6 +88,25 @@ def main():
             f"{sec.section_name:25} {sec.section_type.name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
             f" {sec.sh_size:06x} {sec.sh_addralign:2}"
         )
+
+    print_header("Segments")
+    print("Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
+    print("-" * 79)
+    for segment in ep.segments:
+        print(
+            f"{segment.p_type:12} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x}"
+        )
+        """
+        p_type = 1
+        p_offset = 148
+        p_vaddr = 0
+        p_paddr = 0
+        p_filesz = 12924
+        p_memsz = 12924
+        p_flags = 5
+        p_align = 2
+        """
+
     comment = ep.comment
     if comment:
         print_header(".comment")
@@ -109,6 +126,16 @@ def main():
     #     dp.do_abbrevs()
     #     dp.do_mac_info()
     #     dp.do_dbg_info()
+    from objutils.dwarf import DwarfProcessor
+
+    if ep.debug_sections():
+        dp = DwarfProcessor(ep)
+        dp.pubnames()
+        dp.aranges()
+        dp.do_lines()
+        dp.do_dbg_info()
+        # dp.processDebugInfo()
+        dp.do_mac_info()
 
 
 def print_header(text):

@@ -5,7 +5,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -34,11 +34,6 @@ ELF_MAGIC = b"\x7fELF"
 EI_NIDENT = 16  # Size of e_ident[].
 HDR_FMT32 = "HHIIIIIHHHHHH"
 HDR_FMT64 = "HHIQQQIHHHHHH"
-
-
-class Endianess(enum.IntEnum):
-    Little = 0
-    Big = 1
 
 
 Elf32_Ehdr = namedtuple(
@@ -451,6 +446,163 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_MOXIE: "Moxie",
     ELFMachineType.EM_MICROBLAZE_OLD: "Old MicroBlaze",
     ELFMachineType.EM_ADAPTEVA_EPIPHANY: "Adapteva Epiphany",
+}
+
+
+class AVRMachineType(enum.IntEnum):
+    E_AVR_MACH_AVR1 = 1
+    E_AVR_MACH_AVR2 = 2
+    E_AVR_MACH_AVR3 = 3
+    E_AVR_MACH_AVR4 = 4
+    E_AVR_MACH_AVR5 = 5
+    E_AVR_MACH_AVR6 = 6
+    E_AVR_MACH_AVR25 = 25
+    E_AVR_MACH_AVR31 = 31
+    E_AVR_MACH_AVR35 = 35
+    E_AVR_MACH_AVR51 = 51
+    E_AVR_MACH_AVRTINY = 100
+    E_AVR_MACH_XMEGA1 = 101
+    E_AVR_MACH_XMEGA2 = 102
+    E_AVR_MACH_XMEGA3 = 103
+    E_AVR_MACH_XMEGA4 = 104
+    E_AVR_MACH_XMEGA5 = 105
+    E_AVR_MACH_XMEGA6 = 106
+    E_AVR_MACH_XMEGA7 = 107
+
+
+AVRMachineTypeNames = {
+    AVRMachineType.E_AVR_MACH_AVR1: "avr:1",
+    AVRMachineType.E_AVR_MACH_AVR2: "avr:2",
+    AVRMachineType.E_AVR_MACH_AVR3: "avr:3",
+    AVRMachineType.E_AVR_MACH_AVR4: "avr:4",
+    AVRMachineType.E_AVR_MACH_AVR5: "avr:5",
+    AVRMachineType.E_AVR_MACH_AVR6: "avr:6",
+    AVRMachineType.E_AVR_MACH_AVR25: "avr:25",
+    AVRMachineType.E_AVR_MACH_AVR31: "avr:31",
+    AVRMachineType.E_AVR_MACH_AVR35: "avr:35",
+    AVRMachineType.E_AVR_MACH_AVR51: "avr:51",
+    AVRMachineType.E_AVR_MACH_AVRTINY: "avr:100",
+    AVRMachineType.E_AVR_MACH_XMEGA1: "avr:101",
+    AVRMachineType.E_AVR_MACH_XMEGA2: "avr:102",
+    AVRMachineType.E_AVR_MACH_XMEGA3: "avr:103",
+    AVRMachineType.E_AVR_MACH_XMEGA4: "avr:104",
+    AVRMachineType.E_AVR_MACH_XMEGA5: "avr:105",
+    AVRMachineType.E_AVR_MACH_XMEGA6: "avr:106",
+    AVRMachineType.E_AVR_MACH_XMEGA7: "avr:107",
+}
+
+EF_AVR_MACH = 0x7F
+EF_AVR_LINKRELAX_PREPARED = 0x80
+
+# Old ABI (ie GNU pre EABI).  These are deprecated.
+EF_ARM_RELEXEC = 0x01
+EF_ARM_INTERWORK = 0x04
+EF_ARM_APCS_26 = 0x08
+EF_ARM_APCS_FLOAT = 0x10
+EF_ARM_PIC = 0x20
+EF_ARM_ALIGN8 = 0x40  # 8-bit structure alignment is in use.
+EF_ARM_NEW_ABI = 0x80
+EF_ARM_OLD_ABI = 0x100
+EF_ARM_SOFT_FLOAT = 0x200
+EF_ARM_VFP_FLOAT = 0x400
+EF_ARM_MAVERICK_FLOAT = 0x800
+
+# Old ARM ELF spec. version B-01.  Mostly deprecated.
+EF_ARM_SYMSARESORTED = 0x04  # NB conflicts with EF_INTERWORK.
+EF_ARM_DYNSYMSUSESEGIDX = 0x08  # NB conflicts with EF_APCS26.
+EF_ARM_MAPSYMSFIRST = 0x10  # NB conflicts with EF_APCS_FLOAT.
+
+# New constants defined in the ARM ELF spec. version XXX (AAELF).
+# Only valid in conjunction with EF_ARM_EABI_VER5.
+EF_ARM_ABI_FLOAT_SOFT = 0x200  # NB conflicts with EF_ARM_SOFT_FLOAT.
+EF_ARM_ABI_FLOAT_HARD = 0x400  # NB conflicts with EF_ARM_VFP_FLOAT.
+
+# Constants defined in AAELF.
+EF_ARM_BE8 = 0x00800000
+EF_ARM_LE8 = 0x00400000
+
+EF_ARM_EABIMASK = 0xFF000000
+EF_ARM_EABIMASK_COM = 0x00FFFFFF
+
+EF_ARM_EABI_UNKNOWN = 0x00000000
+EF_ARM_EABI_VER1 = 0x01000000
+EF_ARM_EABI_VER2 = 0x02000000
+EF_ARM_EABI_VER3 = 0x03000000
+EF_ARM_EABI_VER4 = 0x04000000
+EF_ARM_EABI_VER5 = 0x05000000
+
+
+class MachineData:
+
+    type_name: str = "???"
+    type_value: int = -1
+    machine_name: str = "<unknown>"
+
+    def __init__(self, machine_code: int, flags: int) -> None:
+        self.flags = flags
+        try:
+            ELFMachineType(machine_code)
+        except Exception:
+            self.type_name = "???"
+            self.type_value = -1
+            self.machine_name = "<unknown>"
+        else:
+            machine = ELFMachineType(machine_code)
+            self.type_name = machine.name[3:]  # get rid of 'EM_'.
+            self.type_value = machine.value
+            self.machine_name = ELF_MACHINE_NAMES.get(self.type_value, "<unknown>")
+
+    def specific(self) -> list:
+        return []
+
+    def __str__(self):
+        spec = self.specific()
+        if spec:
+            return f'{self.type_name!s} [{self.machine_name!s}] [{", ".join(spec)}]'
+        else:
+            return f"{self.type_name!s} [{self.machine_name!s}]"
+
+    __repr__ = __str__
+
+
+class AvrMachineData(MachineData):
+
+    def specific(self) -> list:
+        flags = self.flags & EF_AVR_MACH
+        result = []
+        if flags in AVRMachineTypeNames:
+            result.append(AVRMachineTypeNames[flags])
+        else:
+            result.append("avr:<unknown>")
+        if flags & EF_AVR_LINKRELAX_PREPARED:
+            result.append("link-relax")
+        return result
+
+
+class ArmMachineData(MachineData):
+
+    def specific(self) -> list:
+        eabi = self.flags & EF_ARM_EABIMASK
+        flags = self.flags = self.flags & EF_ARM_EABIMASK_COM
+        print("ARM", hex(eabi), hex(flags))
+        result = []
+
+        if flags & EF_ARM_RELEXEC:
+            result.append("relocatable executable")
+            flags = flags & (~EF_ARM_RELEXEC & 0xFFFFFFFF)
+        if flags & EF_ARM_PIC:
+            result.append("position independent")
+            flags = flags & (~EF_ARM_PIC & 0xFFFFFFFF)
+        """
+
+        """
+        result = []
+        return result
+
+
+MACHINE_DATA = {
+    ELFMachineType.EM_AVR: AvrMachineData,
+    ELFMachineType.EM_ARM: ArmMachineData,
 }
 
 
