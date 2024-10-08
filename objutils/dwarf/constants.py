@@ -409,8 +409,18 @@ class AttributeForm(EnumBase):
     DW_FORM_sec_offset = 0x17
     DW_FORM_exprloc = 0x18
     DW_FORM_flag_present = 0x19
-    DW_FORM_ref_sig8 = 0x20
 
+    DW_FORM_line_strp = 0x1F
+
+    """
+    DW_FORM_strx = 0x1a
+    DW_FORM_addrx = 0x1b
+    DW_FORM_ref_sup4 = 0x1c
+    DW_FORM_strp_sup = 0x1d
+    DW_FORM_data16 = 0x1e
+    """
+
+    DW_FORM_ref_sig8 = 0x20
     DW_FORM_implicit_const = 0x21
     """
     DW_FORM_loclistx ‡

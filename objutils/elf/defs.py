@@ -871,30 +871,34 @@ class SymbolVisibility(enum.IntEnum):
 ##
 ##   ELF Program Header
 ##
-##
-PT_NULL = 0  # Program header table entry unused.
-PT_LOAD = 1  # Loadable program segment.
-PT_DYNAMIC = 2  # Dynamic linking information.
-PT_INTERP = 3  # Program interpreter.
-PT_NOTE = 4  # Auxiliary information.
-PT_SHLIB = 5  # Reserved.
-PT_PHDR = 6  # Entry for header table itself.
-PT_TLS = 7  # Thread-local storage segment
-PT_NUM = 8  # Number of defined types
-PT_LOOS = 0x60000000  # Start of OS-specific
-PT_GNU_EH_FRAME = 0x6474E550  # GCC .eh_frame_hdr segment
-PT_GNU_STACK = 0x6474E551  # Indicates stack executability
-PT_GNU_RELRO = 0x6474E552  # Read-only after relocation
-PT_GNU_PROPERTY = 0x6474E553  # GNU property
+class ProgramHeader(enum.IntEnum):
+    PT_NULL = 0  # Program header table entry unused.
+    PT_LOAD = 1  # Loadable program segment.
+    PT_DYNAMIC = 2  # Dynamic linking information.
+    PT_INTERP = 3  # Program interpreter.
+    PT_NOTE = 4  # Auxiliary information.
+    PT_SHLIB = 5  # Reserved.
+    PT_PHDR = 6  # Entry for header table itself.
+    PT_TLS = 7  # Thread-local storage segment
+    PT_NUM = 8  # Number of defined types
+    PT_LOOS = 0x60000000  # Start of OS-specific
+    PT_GNU_EH_FRAME = 0x6474E550  # GCC .eh_frame_hdr segment
+    PT_GNU_STACK = 0x6474E551  # Indicates stack executability
+    PT_GNU_RELRO = 0x6474E552  # Read-only after relocation
+    PT_GNU_PROPERTY = 0x6474E553  # GNU property
 
-PT_LOSUNW = 0x6FFFFFFA
-PT_SUNWBSS = 0x6FFFFFFA  # Sun Specific segment
-PT_SUNWSTACK = 0x6FFFFFFB  # Stack segment
-PT_HISUNW = 0x6FFFFFFF
-PT_HIOS = 0x6FFFFFFF  # End of OS-specific
-PT_LOPROC = 0x70000000  # Start of processor-specific.
-PT_ARM_EXIDX = PT_LOPROC + 1  # Frame unwind information
-PT_HIPROC = 0x7FFFFFFF  # End of processor-specific
+    PT_LOSUNW = 0x6FFFFFFA
+    PT_SUNWBSS = 0x6FFFFFFA  # Sun Specific segment
+    PT_SUNWSTACK = 0x6FFFFFFB  # Stack segment
+    PT_HISUNW = 0x6FFFFFFF
+    PT_HIOS = 0x6FFFFFFF  # End of OS-specific
+    PT_LOPROC = 0x70000000  # Start of processor-specific.
+    PT_ARM_EXIDX = PT_LOPROC + 1  # Frame unwind information
+    PT_HIPROC = 0x7FFFFFFF  # End of processor-specific
+
+
+def program_header_name(tp: int) -> str:
+    return ProgramHeader(tp).name[3:]
 
 
 PF_X = 0x1  # Execute.
@@ -903,6 +907,24 @@ PF_R = 0x4  # Read.
 PF_MASKPROC = 0xF0000000  # Unspecified.
 
 PN_XNUM = 0xFFFF  # Extended numbering.
+
+
+def program_header_flags_name(flg: int) -> str:
+    result = []
+
+    if flg & PF_R == PF_R:
+        result.append("R")
+    else:
+        result.append("-")
+    if flg & PF_W == PF_W:
+        result.append("W")
+    else:
+        result.append("-")
+    if flg & PF_X == PF_X:
+        result.append("X")
+    else:
+        result.append("-")
+    return "".join(result)
 
 
 class NoteSegmentDescriptorCore(enum.IntEnum):

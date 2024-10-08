@@ -249,7 +249,6 @@ class StrP(Construct):
 
     def _parse(self, stream, context, path=None):
         offset = self.ntype.parse_stream(stream)
-        # self.image.seek(offset)
         data = self.image[offset:]
         result = self.stype.parse(data)
         return result

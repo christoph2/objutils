@@ -29,7 +29,12 @@ __copyright__ = """
 import argparse
 
 # from objutils.dwarf import DwarfProcessor
-from objutils.elf import ElfParser, model
+from objutils.elf import (
+    ElfParser,
+    model,
+    program_header_flags_name,
+    program_header_name,
+)
 from objutils.elf.defs import (
     ELF_BYTE_ORDER_NAMES,
     ELF_CLASS_NAMES,
@@ -90,11 +95,11 @@ def main():
         )
 
     print_header("Segments")
-    print("Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
-    print("-" * 79)
+    print("Type         Offset     VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
+    print("-" * 71)
     for segment in ep.segments:
         print(
-            f"{segment.p_type:12} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x}"
+            f"{program_header_name(segment.p_type):12} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x} {program_header_flags_name(segment.p_flags):3} {segment.p_align:>5}"
         )
         """
         p_type = 1
