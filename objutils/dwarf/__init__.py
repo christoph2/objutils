@@ -218,7 +218,6 @@ class Abbrevations:
             code = abbrv_header.code
             offset += abbrv_header.stop - abbrv_header.start
             if code == 0:
-                # print("CONT!!!")
                 continue
             key = (
                 abbr_offset,
@@ -229,7 +228,6 @@ class Abbrevations:
             abbrv_body = self.AbbrevationBody.parse(self.image[offset:])
             tag = abbrv_body.tag
             children = abbrv_body.children
-            # print("BODY", abbrv_body, constants.Tag(tag).name)
             offset += abbrv_body.stop - abbrv_body.start
 
             try:
@@ -247,7 +245,6 @@ class Abbrevations:
 
             while True:
                 attr = self.AttributeStruct.parse(self.image[offset:])
-                # print("ATTR", attr)
                 if not attr.next:
                     # key_offset = offset
                     break
@@ -308,6 +305,11 @@ class DwarfProcessor:
             self.strings = self.debug_sections[".debug_str"].image
         else:
             self.strings = b""
+        if ".debug_line_str" in self.debug_sections:
+            self.line_strings = self.debug_sections[".debug_line_str"].image
+        else:
+            self.line_strings = b""
+
         self.db_session = elf_parser.session
         self.installReaders()
 
@@ -335,6 +337,7 @@ class DwarfProcessor:
         self.readers.cstring_ascii = CString(encoding="ascii")
         self.readers.cstring_utf8 = CString(encoding="utf8")
         self.readers.strp = StrP(self.strings, self.endianess)
+        self.readers.line_strp = StrP(self.line_strings, self.endianess)
         idx = 0 if self.endianess == Endianess.Little else 1
         for name, reader in BASIC_READERS.items():
             setattr(self.readers, name, reader[idx])
@@ -500,7 +503,8 @@ class DwarfProcessor:
                 "stop" / Tell,
             )
 
-        LineNumberProgramHeader.parse_stream(image)
+        hdr = LineNumberProgramHeader.parse_stream(image)
+        print("LineNumber", hdr)
         prg = LineNumberProgram(image)  # noqa: F841
 
     def do_mac_info(self):
@@ -594,6 +598,7 @@ class DwarfProcessor:
             constants.AttributeForm.DW_FORM_exprloc: self.readers.block_uleb,
             constants.AttributeForm.DW_FORM_flag_present: One,
             constants.AttributeForm.DW_FORM_ref_sig8: self.readers.u64,
+            constants.AttributeForm.DW_FORM_line_strp: self.readers.line_strp,
             constants.AttributeForm.DW_FORM_implicit_const: None,
         }
 

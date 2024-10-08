@@ -332,7 +332,7 @@ class SymbolAPI(DBAPI):
         return syms.order_by(model.Elf_Symbol.st_value).all()
 
 
-def calculate_crypto_hash(data):
+def calculate_crypto_hash(data: bytes) -> str:
     sha = hashlib.sha512(data)
     return sha.hexdigest()
 
@@ -380,44 +380,99 @@ class ElfParser:
         ),
     )
 
-    def __init__(self, filename: str):
-        self.fp = create_memorymapped_fileview(filename)
-        # sha = calculate_crypto_hash(self.fp.tobytes())
-        self.filename = Path(filename)
-
-        self.db_name = self.filename.with_suffix(model.DB_EXTENSION)
-        try:
-            os.unlink(self.db_name)
-        except Exception as e:
-            print(e)
+    def create_db_on_demand(self) -> None:
+        db_exists = self.db_name.exists()
+        new_db = False
+        hash_value = calculate_crypto_hash(self.fp.tobytes())
+        if db_exists:
+            db = model.Model(self.db_name)
+            session = db.session
+            meta = session.query(model.Meta).first()
+            if meta:
+                print(f"Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}")
+            if (meta is None) or (hash_value != meta.hash_value):
+                db.close()
+                new_db = True
+                try:
+                    os.unlink(self.db_name)
+                except Exception as e:
+                    print("Upps!", e)
+        else:
+            new_db = True
         self.db = model.Model(self.db_name)
         self.session = self.db.session
-        self.symbols = SymbolAPI(self)
-        self.sections = SectionAPI(self)
-        self._images = {}
-        self._sections_by_name = OrderedDict()
-        self.asciiCString = CString(encoding="ascii")
-        self._basic_header = ElfParser.BasicHeader.parse(self.fp)
-        self.b64 = self.ei_class == 2
-        if self.ei_data == 1:  # Little-Endian
-            offset = 0
-        elif self.ei_data == 2:  # Big-Endian
-            offset = 1
+        if new_db:
+            meta = model.Meta(hash_value=hash_value)
+            self.session.add(meta)
+            self.load_data()
         else:
-            raise ValueError(f"EI_DATA has an invalid value. Got: {self.ei_data}")
-        self._endianess = "<" if self.ei_data == 1 else ">"
-        datatypes = ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
-        for key, value in datatypes:
-            setattr(self, key, value[offset])
-        self._parser_extended_header()
+            self._header = self.session.query(model.Elf_Header).first()
+            self._program_headers = self.session.query(model.Elf_ProgramHeaders).all()
+            self.set_data_types(self)
+
+    def load_data(self):
+        basic_header = ElfParser.BasicHeader.parse(self.fp)
+        bh_fields = basic_header.header.fields
+        self.set_data_types(bh_fields)
+        eh_fields = self._parser_extended_header()
+
+        self._header = model.Elf_Header(
+            ei_class=bh_fields.ei_class,
+            ei_data=bh_fields.ei_data,
+            ei_version=bh_fields.ei_version,
+            ei_osabi=bh_fields.ei_osabi,
+            ei_abiversion=bh_fields.ei_abiversion,
+            e_type=eh_fields.e_type,
+            e_machine=eh_fields.e_machine,
+            e_version=eh_fields.e_version,
+            e_entry=eh_fields.e_entry,
+            e_phoff=eh_fields.e_phoff,
+            e_shoff=eh_fields.e_shoff,
+            e_flags=eh_fields.e_flags,
+            e_ehsize=eh_fields.e_ehsize,
+            e_phentsize=eh_fields.e_phentsize,
+            e_phnum=eh_fields.e_phnum,
+            e_shentsize=eh_fields.e_shentsize,
+            e_shnum=eh_fields.e_shnum,
+            e_shstrndx=eh_fields.e_shstrndx,
+        )
+        self.session.add(self._header)
         self._parse_section_headers()
         self._parse_program_headers()
         self.create_section_to_segment_mapping()
         for section in self._symbol_sections:
             self._parse_symbol_section(section)
         self.session.commit()
+
+    def __init__(self, filename: str):
+        self.fp = create_memorymapped_fileview(filename)
+        self.filename = Path(filename)
+        self.db_name = self.filename.with_suffix(model.DB_EXTENSION)
+
+        self._images = {}
+        self._sections_by_name = OrderedDict()
+        self.asciiCString = CString(encoding="ascii")
+
+        self.create_db_on_demand()
+
+        self.symbols = SymbolAPI(self)
+        self.sections = SectionAPI(self)
+
         md_class = defs.MACHINE_DATA.get(self.e_machine, defs.MachineData)
         self._machine_data = md_class(self.e_machine, self.e_flags)
+
+    def set_data_types(self, obj):
+        self.b64 = obj.ei_class == 2
+        if obj.ei_data == 1:  # Little-Endian
+            offset = 0
+        elif obj.ei_data == 2:  # Big-Endian
+            offset = 1
+        else:
+            raise ValueError(f"EI_DATA has an invalid value. Got: {obj.ei_data}")
+        self._endianess = "<" if obj.ei_data == 1 else ">"
+        datatypes = ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
+        for key, value in datatypes:
+            setattr(self, key, value[offset])
 
     def _parser_extended_header(self):
         ExtendedHeader = Struct(
@@ -435,7 +490,7 @@ class ElfParser:
             "e_shnum" / self.Half,  # Number of section header entries
             "e_shstrndx" / self.Half,  # Section name string table index
         )
-        self._extended_header = ExtendedHeader.parse(self.fp[self.EI_NIDENT :])
+        return ExtendedHeader.parse(self.fp[self.EI_NIDENT :])
 
     def _parse_section_headers(self):
         SectionHeaders = Struct(
@@ -552,9 +607,19 @@ class ElfParser:
             )
         )
         if hasattr(self, "e_shnum"):
-            # if self.e_shnum:
-            #    print("PG_size: {}".format(ProgramHeaders.sizeof() / self.e_phnum))
-            self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff :])
+            self._program_headers = ProgramHeaders.parse(self.fp[self.e_phoff :]).segments
+            for segment in self._program_headers:
+                header = model.Elf_ProgramHeaders(
+                    p_type=segment.p_type,
+                    p_offset=segment.p_offset,
+                    p_vaddr=segment.p_vaddr,
+                    p_paddr=segment.p_paddr,
+                    p_filesz=segment.p_filesz,
+                    p_memsz=segment.p_memsz,
+                    p_flags=segment.p_flags,
+                    p_align=segment.p_align,
+                )
+                self.session.add(header)
 
     def _parse_symbol_section(self, section):
         sh_link = section.sh_link
@@ -748,10 +813,12 @@ class ElfParser:
         return 0 if self.tbss_special(section_header, segment) else section_header.sh_size
 
     def get_basic_header_field(self, name):
-        return getattr(self._basic_header.header.fields, name)
+        # return getattr(self._basic_header.header.fields, name)
+        return getattr(self._header, name)
 
     def get_extended_header_field(self, name):
-        return getattr(self._extended_header, name)
+        # return getattr(self._extended_header, name)
+        return getattr(self._header, name)
 
     @property
     def ei_class(self):
@@ -835,7 +902,7 @@ class ElfParser:
 
     @property
     def segments(self):
-        return self._program_headers["segments"]
+        return self._program_headers
 
     @property
     def arm_attributes(self):

@@ -34,6 +34,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from objutils.elf import defs
 
@@ -130,6 +131,43 @@ def StdFloat(default=0.0, primary_key=False, unique=False, nullable=False):
         primary_key=primary_key,
         unique=unique,
     )
+
+
+class Meta(Base, RidMixIn):
+    hash_value = Column(types.VARCHAR)
+    ts_created = Column(types.DateTime(timezone=True), server_default=func.now())
+
+
+class Elf_Header(Base, RidMixIn):
+    ei_class = StdBigInt()
+    ei_data = StdBigInt()
+    ei_version = StdBigInt()
+    ei_osabi = StdBigInt()
+    ei_abiversion = StdBigInt()
+    e_type = StdBigInt()
+    e_machine = StdBigInt()
+    e_version = StdBigInt()
+    e_entry = StdBigInt()
+    e_phoff = StdBigInt()
+    e_shoff = StdBigInt()
+    e_flags = StdBigInt()
+    e_ehsize = StdBigInt()
+    e_phentsize = StdBigInt()
+    e_phnum = StdBigInt()
+    e_shentsize = StdBigInt()
+    e_shnum = StdBigInt()
+    e_shstrndx = StdBigInt()
+
+
+class Elf_ProgramHeaders(Base, RidMixIn):
+    p_type = StdBigInt()
+    p_offset = StdBigInt()
+    p_vaddr = StdBigInt()
+    p_paddr = StdBigInt()
+    p_filesz = StdBigInt()
+    p_memsz = StdBigInt()
+    p_flags = StdBigInt()
+    p_align = StdBigInt()
 
 
 class Elf_Section(Base, RidMixIn):
@@ -348,20 +386,6 @@ class Elf_Note(Base, RidMixIn):
     desc = Column(types.VARCHAR)
 
 
-"""
-class Parent(Base):
-    __tablename__ = 'parent'
-    id = Column(Integer, primary_key=True)
-    children = relationship("Child", back_populates="parent")
-
-class Child(Base):
-    __tablename__ = 'child'
-    id = Column(Integer, primary_key=True)
-    parent_id = Column(Integer, ForeignKey('parent.id'))
-    parent = relationship("Parent", back_populates="children")
-"""
-
-
 class DIEAttribute(Base, RidMixIn):
     name = Column(types.VARCHAR)
     raw_value = Column(types.VARCHAR)
@@ -495,6 +519,10 @@ class Model:
         Base.metadata.create_all(self.engine)
         self.session.flush()
         self.session.commit()
+
+    def close(self):
+        self.session.close()
+        self._engine.dispose()
 
     @property
     def engine(self):
