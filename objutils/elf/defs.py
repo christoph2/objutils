@@ -207,6 +207,9 @@ class ELFMachineType(enum.IntEnum):
     EM_TI_C6000 = 140  # Texas Instruments TMS320C6000 DSP family.
     EM_TI_C2000 = 141  # Texas Instruments TMS320C2000 DSP family.
     EM_TI_C5500 = 142  # Texas Instruments TMS320C55x DSP family.
+    EM_TI_ARP32 = 143  # Texas Instruments App. Specific RISC
+    EM_TI_PRU = 144  # Texas Instruments PRU I/O processor
+
     EM_MMDSP_PLUS = 160  # STMicroelectronics 64bit VLIW Data Signal Processor.
     EM_CYPRESS_M8C = 161  # Cypress M8C microprocessor.
     EM_R32C = 162  # Renesas R32C series microprocessors.
@@ -386,6 +389,8 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_TI_C6000: "Texas Instruments TMS320C6000 DSP family",
     ELFMachineType.EM_TI_C2000: "Texas Instruments TMS320C2000 DSP family",
     ELFMachineType.EM_TI_C5500: "Texas Instruments TMS320C55x DSP family",
+    ELFMachineType.EM_TI_ARP32: "Texas Instruments App. Specific RISC",
+    ELFMachineType.EM_TI_PRU: "Texas Instruments PRU I/O processor",
     ELFMachineType.EM_MMDSP_PLUS: "STMicroelectronics 64bit VLIW Data Signal Processor",
     ELFMachineType.EM_CYPRESS_M8C: "Cypress M8C microprocessor",
     ELFMachineType.EM_R32C: "Renesas R32C series microprocessors",

@@ -228,6 +228,18 @@ class Elf_Section(Base, RidMixIn):
         return defs.SectionType(self.sh_type)
 
     @hybrid_property
+    def section_display_name(self):
+        sh_type = self.sh_type
+        if sh_type > defs.SectionType.SHT_LOUSER.value:
+            diff = sh_type - defs.SectionType.SHT_LOUSER.value
+            return f"SHT_LOUSER + 0x{diff:08x}"
+        elif sh_type > defs.SectionType.SHT_LOPROC.value:
+            diff = sh_type - defs.SectionType.SHT_LOPROC.value
+            return f"SHT_LOPROC + 0x{diff:08x}"
+        else:
+            return defs.SectionType(self.sh_type).name
+
+    @hybrid_property
     def flag_writeable(self):
         return self.test_flags(defs.SectionFlags.SHF_WRITE)
 

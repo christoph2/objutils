@@ -29,18 +29,15 @@ __copyright__ = """
 import argparse
 
 # from objutils.dwarf import DwarfProcessor
-from objutils.elf import (
-    ElfParser,
-    model,
-    program_header_flags_name,
-    program_header_name,
-)
+from objutils.elf import ElfParser, model
 from objutils.elf.defs import (
     ELF_BYTE_ORDER_NAMES,
     ELF_CLASS_NAMES,
     ELF_TYPE_NAMES,
     ELFAbiType,
     ELFType,
+    program_header_flags_name,
+    program_header_name,
 )
 
 
@@ -90,7 +87,7 @@ def main():
     print("-" * 79)
     for sec in sections:
         print(
-            f"{sec.section_name:25} {sec.section_type.name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
+            f"{sec.section_name:25} {sec.section_display_name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
             f" {sec.sh_size:06x} {sec.sh_addralign:2}"
         )
 
