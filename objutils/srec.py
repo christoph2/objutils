@@ -90,7 +90,7 @@ class Reader(hexfile.Reader):
                 + (line.address & 0xFF)
             )
         else:
-            raise TypeError(f"Invalid format type '{format_type!s}'.")
+            raise TypeError(f"Invalid format type {format_type!r}.")
         if hasattr(line, "chunk"):
             checksum = (~(sum([line.length, checksum_of_address]) + sum(line.chunk))) & 0xFF
         else:
@@ -145,7 +145,7 @@ class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 32
 
-    checksum = partial(lrc, width=8, comp=COMPLEMENT_ONES)
+    checksum = staticmethod(partial(lrc, width=8, comp=COMPLEMENT_ONES))
 
     def pre_processing(self, image):
         if self.record_type is None:

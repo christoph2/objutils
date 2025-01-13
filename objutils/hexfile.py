@@ -343,7 +343,7 @@ class Writer(BaseType):
             return b""
         if self.calculate_address_bits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError("could not encode image.")
-        # params = self.set_parameters(**kws)
+        self.set_parameters(**kws)
         self.pre_processing(image)
         header = self.compose_header(image.meta if hasattr(image, "meta") else {})
         if header:
@@ -379,7 +379,7 @@ class Writer(BaseType):
     def pre_processing(self, image):
         pass
 
-    def set_parameters(self, **kws):
+    def set_parameters(self, **kws) -> None:
         params = {}
         for k, v in kws.items():
             try:
@@ -388,7 +388,6 @@ class Writer(BaseType):
                 raise AttributeError(f"Invalid keyword argument {k!r}.") from e
             else:
                 setattr(self, k, v)
-        return params
 
     def compose_row(self, address, length, row):
         raise NotImplementedError()

@@ -5,7 +5,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2025 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -31,9 +31,8 @@ import sqlite3
 
 from sqlalchemy import Column, ForeignKey, and_, create_engine, event, not_, orm, types
 from sqlalchemy.engine import Engine
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, declared_attr, relationship
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
@@ -57,7 +56,7 @@ class MixInBase:
         result = []
         for name, value in [(n, getattr(self, n)) for n in columns]:
             if isinstance(value, str):
-                result.append(f"{name} = '{value}'")
+                result.append(f"{name} = {value!r}")
             else:
                 result.append(f"{name} = {value}")
         return "{}({})".format(self.__class__.__name__, ", ".join(result))
