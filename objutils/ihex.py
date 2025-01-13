@@ -113,7 +113,7 @@ def divmod(a, b):
 
 class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 32
-    checksum = partial(lrc, width=8, comp=COMPLEMENT_TWOS)
+    checksum = staticmethod(partial(lrc, width=8, comp=COMPLEMENT_TWOS))
 
     def pre_processing(self, image):
         self.previosAddress = None
