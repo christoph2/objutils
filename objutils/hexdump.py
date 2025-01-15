@@ -44,7 +44,7 @@ class Dumper:
         self.previous_row = b""  # bytearray()
         self.elided = False
 
-    def dump_data(self, section, offset=0):
+    def dump_data(self, section, offset: int = 0):
         end = section.length
         # line_count = math.ceil(len(section.data) / self.LINE_LENGTH)
         start_pos = 0

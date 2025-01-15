@@ -5,7 +5,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -27,8 +27,8 @@ __copyright__ = """
 import ctypes
 import mmap
 import os
-import sys
 import threading
+from io import BytesIO
 
 
 def ffs(v: int) -> int:
@@ -85,27 +85,9 @@ class Curry:
         return self.fun(*(self.pending + args), **kw)
 
 
-def get_python_version():
-    return sys.version_info
-
-
-PYTHON_VERSION = get_python_version()
-
-if PYTHON_VERSION.major == 3:
-    from io import BytesIO as StringIO
-else:
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
-
-        # from io import TextIOWrapper as StringIO
-        # io.TextIOWrapper(create_string_buffer())
-
-
 def create_string_buffer(*args):
     """Create a string with file-like behaviour (StringIO on Python 2.x)."""
-    buf = StringIO(*args)
+    buf = BytesIO(*args)
     return buf
 
 

@@ -7,7 +7,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -33,7 +33,7 @@ from hashlib import sha1
 from objutils.image import Image
 from objutils.logger import Logger
 from objutils.section import Section
-from objutils.utils import PYTHON_VERSION, create_string_buffer
+from objutils.utils import create_string_buffer
 
 
 SHF_DTD = """<!--
@@ -135,11 +135,8 @@ class Reader:
         return img
 
     def loads(self, image):
-        if PYTHON_VERSION.major == 3:
-            if isinstance(image, str):
-                return self.load(create_string_buffer(bytes(image, "ascii")))
-            else:
-                return self.load(create_string_buffer(image))
+        if isinstance(image, str):
+            return self.load(create_string_buffer(bytes(image, "ascii")))
         else:
             return self.load(create_string_buffer(image))
 

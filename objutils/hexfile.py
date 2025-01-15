@@ -5,7 +5,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -34,7 +34,7 @@ from operator import itemgetter
 from objutils.image import Image
 from objutils.logger import Logger
 from objutils.section import Section, join_sections
-from objutils.utils import PYTHON_VERSION, create_string_buffer, slicer
+from objutils.utils import create_string_buffer, slicer
 
 
 """
@@ -194,23 +194,14 @@ class Reader(BaseType):
     def load(self, fp, **kws):
         if isinstance(fp, str):
             fp = open(fp, "rb")
-        if PYTHON_VERSION.major == 3:
-            data = self.read(fp)  # .decode()
-            if hasattr(fp, "close"):
-                fp.close()
-            return data
-        else:
-            data = self.read(fp)
-            if hasattr(fp, "close"):
-                fp.close()
-            return data
+        data = self.read(fp)  # .decode()
+        if hasattr(fp, "close"):
+            fp.close()
+        return data
 
     def loads(self, image, **kws):
-        if PYTHON_VERSION.major == 3:
-            if isinstance(image, str):
-                return self.load(create_string_buffer(bytes(image, "ascii")))
-            else:
-                return self.load(create_string_buffer(image))
+        if isinstance(image, str):
+            return self.load(create_string_buffer(bytes(image, "ascii")))
         else:
             return self.load(create_string_buffer(image))
 
@@ -301,11 +292,8 @@ class Reader(BaseType):
         return matched
 
     def probes(self, image):
-        if PYTHON_VERSION.major == 3:
-            if isinstance(image, str):
-                return self.probe(create_string_buffer(bytes(image, "ascii")))
-            else:
-                return self.probe(create_string_buffer(image))
+        if isinstance(image, str):
+            return self.probe(create_string_buffer(bytes(image, "ascii")))
         else:
             return self.probe(create_string_buffer(image))
 
@@ -358,10 +346,7 @@ class Writer(BaseType):
         footer = self.compose_footer(image.meta if hasattr(image, "meta") else {})
         if footer:
             result.append(footer)
-        if PYTHON_VERSION.major == 3:
-            return self.post_processing(bytes("\n".join(result), "ascii"))
-        else:
-            return self.post_processing(bytes("\n".join(result)))
+        return self.post_processing(bytes("\n".join(result), "ascii"))
 
     def calculate_address_bits(self, image):
         if hasattr(image, "sections"):
@@ -449,10 +434,7 @@ class ASCIIHexReader(Reader):
         return True
 
     def read(self, fp):
-        if PYTHON_VERSION.major == 3:
-            lines = fp.read().decode()
-        else:
-            lines = fp.read()
+        lines = fp.read().decode()
         self.sections = []
         self.address = 0
         breakRequest = False
