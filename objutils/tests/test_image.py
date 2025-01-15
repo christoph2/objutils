@@ -10,7 +10,7 @@ from objutils import dumps
 from objutils.exceptions import InvalidAddressError
 from objutils.image import Image
 from objutils.section import Section
-from objutils.utils import PYTHON_VERSION, create_string_buffer
+from objutils.utils import create_string_buffer
 
 
 class BaseTest(unittest.TestCase):
@@ -493,31 +493,28 @@ class TestCreateSections(BaseTest):
         self.assertEqual(result, b"\n")
 
     def testCreateSectionFromBytesWorks(self):
-        if PYTHON_VERSION.major == 3:
-            self.runSectionTestPass(
-                bytes(
-                    [
-                        0x00,
-                        0x01,
-                        0x02,
-                        0x03,
-                        0x04,
-                        0x05,
-                        0x06,
-                        0x07,
-                        0x08,
-                        0x09,
-                        0x0A,
-                        0x0B,
-                        0x0C,
-                        0x0D,
-                        0x0E,
-                        0x0F,
-                    ]
-                )
+        self.runSectionTestPass(
+            bytes(
+                [
+                    0x00,
+                    0x01,
+                    0x02,
+                    0x03,
+                    0x04,
+                    0x05,
+                    0x06,
+                    0x07,
+                    0x08,
+                    0x09,
+                    0x0A,
+                    0x0B,
+                    0x0C,
+                    0x0D,
+                    0x0E,
+                    0x0F,
+                ]
             )
-        else:
-            pass  # Unfortunately, this test-case isn't supported by Python 2.x
+        )
 
     def testCreateSectionFromByteArrayWorks(self):
         self.runSectionTestPass(
@@ -610,10 +607,7 @@ class TestImageSlices(BaseTest):
         self.createImage()
         image = self.b0
         section = image[1]
-        if PYTHON_VERSION.major == 3:
-            buf = io.TextIOWrapper(create_string_buffer())
-        else:
-            buf = create_string_buffer()
+        buf = io.TextIOWrapper(create_string_buffer())
         section.hexdump(buf)
 
 

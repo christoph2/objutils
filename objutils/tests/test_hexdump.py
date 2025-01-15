@@ -4,7 +4,7 @@ import os
 import unittest
 
 from objutils.image import Image
-from objutils.utils import PYTHON_VERSION, create_string_buffer
+from objutils.utils import create_string_buffer
 
 
 TEST1 = """
@@ -83,10 +83,7 @@ Section #0000
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        if PYTHON_VERSION.major == 3:
-            self.buf = io.TextIOWrapper(create_string_buffer())
-        else:
-            self.buf = create_string_buffer()
+        self.buf = io.TextIOWrapper(create_string_buffer())
         # self.stdout = sys.stdout
         # sys.stdout = self.buf
         self.image = Image()

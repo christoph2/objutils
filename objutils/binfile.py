@@ -7,7 +7,7 @@ __version__ = "0.1.1"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2019 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -32,7 +32,7 @@ from contextlib import closing
 
 from objutils.image import Image
 from objutils.section import Section
-from objutils.utils import PYTHON_VERSION, create_string_buffer
+from objutils.utils import create_string_buffer
 
 
 ##
@@ -45,7 +45,7 @@ class NoContiniousError(Exception):
 
 
 class Reader:
-    def load(self, fp, address=0x0000):
+    def load(self, fp, address: int = 0x0000):
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = fp.read()
@@ -55,25 +55,22 @@ class Reader:
             fp.close()
         return img
 
-    def loads(self, image, address=0x0000):
-        if PYTHON_VERSION.major == 3:
-            if isinstance(image, str):
-                return self.load(create_string_buffer(bytes(image, "ascii")), address)
-            else:
-                return self.load(create_string_buffer(image), address)
+    def loads(self, image: Image, address: int = 0x0000):
+        if isinstance(image, str):
+            return self.load(create_string_buffer(bytes(image, "ascii")), address)
         else:
             return self.load(create_string_buffer(image), address)
 
 
 class Writer:
-    def dump(self, fp, image, filler=b"\xff", **kws):
+    def dump(self, fp, image: Image, filler: bytes = b"\xff", **kws):
         if isinstance(fp, str):
             fp = open(fp, "wb")
         fp.write(self.dumps(image, filler))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, filler=b"\xff", **kws):
+    def dumps(self, image: Image, filler: bytes = b"\xff", **kws):
         if not isinstance(filler, (bytes, int)):
             raise TypeError("filler must be of type 'bytes' or 'int'")
         if isinstance(filler, bytes) and len(filler) > 1:
@@ -98,9 +95,6 @@ class Writer:
         return result
 
 
-#
-
-
 class BinZipReader:
     pass
 
@@ -109,12 +103,12 @@ class BinZipWriter:
     SECTION_FILE_NAME = "image{0:d}.bin"
     MANIFEST_FILE_NAME = "IMAGES.mf"
 
-    def dump(self, fp, image, **kws):
+    def dump(self, fp, image: Image, **kws):
         fp.write(self.dumps(image))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, **kws):
+    def dumps(self, image: Image, **kws):
         if hasattr(image, "sections") and not image.sections:
             return b""
         sections = sorted(image.sections, key=lambda x: x.start_address)

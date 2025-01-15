@@ -5,7 +5,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -30,7 +30,7 @@ from functools import partial
 import objutils.hexfile as hexfile
 import objutils.utils as utils
 from objutils import checksums
-from objutils.utils import PYTHON_VERSION, create_string_buffer, slicer
+from objutils.utils import create_string_buffer, slicer
 
 
 DATA_ABS = 1
@@ -108,7 +108,7 @@ class Reader(hexfile.Reader):
             self.error("relative adressing not supported.")
             tmp = 2
         else:
-            self.error(f"Invalid format type: '{format_type}'")
+            self.error(f"Invalid format type: {format_type!r}")
             tmp = 0
         checksum = checksums.lrc(
             utils.make_list(tmp, line.length + 4, utils.int_to_array(line.address), line.chunk),
@@ -163,10 +163,7 @@ class Writer(hexfile.Writer):
                 item = self.convert_quintuple(item)
                 res.append(item)
             result.append("{}{}".format(PREFIX, "".join(res)))
-        if PYTHON_VERSION.major == 3:
-            return bytes("\n".join(result), "ascii")
-        else:
-            return bytes("\n".join(result))
+        return bytes("\n".join(result), "ascii")
 
     def convert_quintuple(self, value):
         result = []

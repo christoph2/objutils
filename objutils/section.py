@@ -7,7 +7,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2025 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -34,14 +34,14 @@ import sys
 from array import array
 from collections import namedtuple
 from copy import copy
+from dataclasses import dataclass, field
 from operator import attrgetter
+from typing import Any, List, Union
 
-import attr
 from sortedcontainers import SortedList
 
 import objutils.hexdump as hexdump
 from objutils.exceptions import FeatureNotAvailableError, InvalidAddressError
-from objutils.utils import PYTHON_VERSION
 
 
 ##
@@ -127,7 +127,7 @@ RANGES = {
 }
 
 
-def filler(ch, n):
+def filler(ch: int, n: int) -> bytearray:
     """Create an bytearray consisting of `n` `ch`s.
 
     Parameters
@@ -152,21 +152,15 @@ def filler(ch, n):
     return bytearray([ch] * n)
 
 
-def _data_converter(data):
+def _data_converter(data: Union[str, bytearray, array, Any]) -> bytearray:
     if isinstance(data, bytearray):
         pass  # no conversion needed.
     elif isinstance(data, int):
         raise ValueError("single int not permitted")
     elif isinstance(data, str):
-        if PYTHON_VERSION.major == 3:
-            data = bytearray(data, encoding="ascii")
-        else:
-            data = bytearray(data)
+        data = bytearray(data, encoding="ascii")
     elif isinstance(data, array) and data.typecode != "B":
-        if PYTHON_VERSION.major == 3:
-            data = bytearray(data.tobytes())
-        else:
-            data = bytearray(data.tostring())
+        data = bytearray(data.tobytes())
     elif isinstance(data, Section):
         data = copy(data.data)  # just copy data from other section.
     else:
@@ -177,7 +171,7 @@ def _data_converter(data):
     return data
 
 
-@attr.s(repr=False, eq=True, order=True)
+@dataclass(repr=False, order=True)
 class Section:
     """Manage sections.
 
@@ -185,13 +179,14 @@ class Section:
 
     """
 
-    start_address = attr.ib(type=int, eq=True, order=True, default=0)
-    data = attr.ib(default=bytearray(), converter=_data_converter, eq=True, order=True)
+    start_address: int = field(hash=True, compare=True, default=0)
+    data: bytearray = field(default_factory=bytearray, compare=True, hash=True)
 
-    def __attrs_post_init__(self):
+    def __post_init__(self):
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
         self.repr.maxother = 64
+        self.data = _data_converter(self.data)
 
     def __iter__(self):
         yield self
@@ -200,13 +195,10 @@ class Section:
         dumper = hexdump.CanonicalDumper(fp)
         dumper.dump_data(self)
 
-    def tobytes(self):
-        if PYTHON_VERSION.major == 3:
-            return array("B", self.data).tobytes()
-        else:
-            return array("B", self.data).tostring()
+    def tobytes(self) -> bytes:
+        return array("B", self.data).tobytes()
 
-    def tolist(self):
+    def tolist(self) -> List[int]:
         return array("B", self.data).tolist()
 
     def _verify_dtype(self, dtype):
@@ -219,7 +211,7 @@ class Section:
             raise TypeError("dtype must be suffixed with '_be' or '_le'")
         match = DTYPE.match(dtype)
         if not match:
-            raise TypeError(f"Invalid datatype '{dtype}'")
+            raise TypeError(f"Invalid datatype {dtype!r}")
         return dtype.split("_")
 
     def _getformat(self, dtype, length=1):
@@ -342,10 +334,7 @@ class Section:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"write_string(0x{addr:08x}) access out of bounds.")
-        if PYTHON_VERSION.major == 3:
-            self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
-        else:
-            self.data[offset : offset + len(value)] = bytes(value)
+        self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
         self.data[offset + len(value)] = 0
 
     def write_ndarray(self, addr, array, order=None, **kws):

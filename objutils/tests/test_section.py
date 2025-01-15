@@ -279,10 +279,10 @@ def test_write_byte5(filler_0_16):
         filler_0_16.write_numeric(0, UINT8_RANGE.upper + 1, "byte")
 
 
-@pytest.mark.skip
 def test_write_byte6(filler_0_16):
-    filler_0_16.write_numeric(0, -100, "byte")
-    assert filler_0_16.data == bytearray([0x9C, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    with pytest.raises(struct.error):  # noqa: B908
+        filler_0_16.write_numeric(0, -100, "byte")  # Negative numbers are not permitted.
+        assert filler_0_16.data == bytearray([0x9C, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 
 def test_write_byte7(filler_0_16):
