@@ -38,8 +38,6 @@ from dataclasses import dataclass, field
 from operator import attrgetter
 from typing import Any, List, Union
 
-from sortedcontainers import SortedList
-
 import objutils.hexdump as hexdump
 from objutils.exceptions import FeatureNotAvailableError, InvalidAddressError
 
@@ -417,13 +415,10 @@ class Section:
 
 
 def join_sections(sections):
-    if isinstance(sections, SortedList):
-        result_sections = SortedList(key=attrgetter("start_address"))
-    else:
-        result_sections = []
+    result_sections = []
+    sections.sort(key=attrgetter("start_address"))
     prev_section = Section()
-    while sections:
-        section = sections.pop(0)
+    for section in sections:
         if not isinstance(section, Section):
             raise TypeError("'{}' is not a 'Section' instance", section)
         if section.start_address == prev_section.start_address + prev_section.length and result_sections:
@@ -431,15 +426,9 @@ def join_sections(sections):
             last_segment.data.extend(section.data)
         else:
             # Create a new section.
-            if isinstance(sections, SortedList):
-                result_sections.add(Section(section.start_address, section.data))
-            else:
-                result_sections.append(Section(section.start_address, section.data))
+            result_sections.append(Section(section.start_address, section.data))
         prev_section = section
     if result_sections:
         return result_sections
     else:
-        if isinstance(sections, SortedList):
-            return SortedList(key=attrgetter("start_address"))
-        else:
-            return []
+        return []
