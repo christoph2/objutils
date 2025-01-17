@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -29,16 +29,12 @@ __copyright__ = """
 
 import enum
 import sys
-from collections import namedtuple
+from bisect import bisect_right
 from operator import attrgetter, eq
-
-from sortedcontainers import SortedList
+from typing import Optional, Union
 
 from objutils.exceptions import InvalidAddressError
 from objutils.section import Section, join_sections
-
-
-SearchType = namedtuple("SearchType", "start_address")
 
 
 #
@@ -76,8 +72,8 @@ class Image:
         elif isinstance(sections, Section) or hasattr(sections, "__iter__"):
             sections = list(sections)
         else:
-            raise TypeError(f"Argument section is of wrong type '{sections}'")
-        self._sections = SortedList(sections, key=attrgetter("start_address"))
+            raise TypeError(f"Argument section is of wrong type {sections!r}")
+        self._sections = sorted(sections, key=attrgetter("start_address"))
         self._join = join
         if join:
             self.join_sections()
@@ -219,7 +215,9 @@ class Image:
         """
         return address in self or (address + length - 1) in self
 
-    def insert_section(self, data, start_address=None, join=True):
+    def insert_section(
+        self, data: Union[bytes, bytearray, memoryview, str], start_address: Optional[int] = None, join: bool = True
+    ):
         """Insert/add a new section to image.
 
         Parameters
@@ -246,7 +244,7 @@ class Image:
             raise InvalidAddressError("Overlapping address-space")
         if isinstance(data, str):
             data = [ord(x) for x in data]  # array.array('B',data)
-        self._sections.add(Section(start_address, data))
+        self._sections.append(Section(start_address, data))
         if join:
             self.join_sections()
         self.address = start_address + len(data)
@@ -271,7 +269,7 @@ class Image:
         """
         if address not in self:
             raise InvalidAddressError("Address not in range")
-        result = self._sections.bisect_right(SearchType(address))
+        result = bisect_right(self._sections, address, key=attrgetter("start_address"))
         return self._sections[result - 1]
 
     def update_section(self, data, address=None):

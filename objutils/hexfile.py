@@ -27,7 +27,8 @@ __copyright__ = """
 import math
 import os
 import re
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter
 
@@ -104,7 +105,11 @@ class AddressRangeToLargeError(Exception):
     pass
 
 
-MetaRecord = namedtuple("MetaRecord", "format_type address chunk")
+@dataclass
+class MetaRecord:
+    format_type: str
+    address: int
+    chunk: bytearray
 
 
 class FormatParser:

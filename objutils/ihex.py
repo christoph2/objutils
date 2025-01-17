@@ -107,10 +107,6 @@ class Reader(hexfile.Reader):
         return x
 
 
-def divmod(a, b):
-    return a / b, a % b
-
-
 class Writer(hexfile.Writer):
     MAX_ADDRESS_BITS = 32
     checksum = staticmethod(partial(lrc, width=8, comp=COMPLEMENT_TWOS))
