@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.6.0"
+version = "0.6.1"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
@@ -67,7 +67,7 @@ bandit = "^1.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
-bumpversion = "^0.6.0"
+bumpversion = "^0.6.1"
 pytest = "^8.1.1"
 flake8-bugbear = "^24.4.21"
 mccabe = "^0.7.0"
