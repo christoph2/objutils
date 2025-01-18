@@ -20,8 +20,6 @@ classifiers = [
 	"License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
 	# Specify the Python versions you support here. In particular, ensure
 	# that you indicate whether you support Python 2, Python 3 or both.
-	"Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -134,9 +132,9 @@ include = '\.pyi?$'
 
 
 [tool.cibuildwheel]
+build = "cp3{9,10,11,12,13}-*"
 build-verbosity = 3
 #test-command = "pytest {package}/tests"
 #test-command = "pytest -svv objutils/tests"
-build = "cp3{9,10,11,12}-*"
 skip = ["*-manylinux_i686", "*-musllinux_x86_64", "*-musllinux_i686"] # Skip Linux 32bit and MUSL builds.
 build-frontend = "build"
