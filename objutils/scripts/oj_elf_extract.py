@@ -79,6 +79,7 @@ def main():
         dest="include",
         default=None,
     )
+    parser.add_argument("-n", help="Number of data bytes per line", dest="row_length", default=16, type=int)
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
@@ -95,7 +96,7 @@ def main():
         include_pattern=args.include,
     )
     if img:
-        dump(args.file_type, args.output_file_name, img)
+        dump(args.file_type, args.output_file_name, img, row_length=args.row_length)
         print(f"HEX image written to: '{args.output_file_name}' [{len(img)} total bytes]")
 
 

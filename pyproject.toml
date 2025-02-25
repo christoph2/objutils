@@ -41,7 +41,7 @@ keywords=[
 	"shf",
 	"rfc4194",
 ]
-
+build = "build_ext.py"
 
 [tool.poetry.scripts]
 oj-elf-info = "objutils.scripts.oj_elf_info:main"
@@ -67,7 +67,6 @@ bandit = "^1.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
-bumpversion = "^0.6.1"
 pytest = "^8.1.1"
 flake8-bugbear = "^24.4.21"
 mccabe = "^0.7.0"
@@ -77,7 +76,7 @@ ruff = "^0.4.1"
 pyupgrade = "^3.17.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.6.0", "wheel", "cmake>=3.12", "pybind11[global]>=2.12.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest]

@@ -1062,7 +1062,7 @@ class Gnu_Entry_Value(OperationBase):
 
 class Gnu_Const_Type(OperationBase):
     DISPLAY_NAME = "GNU_const_type"
-    PARAMETERS = ["uleb", "u8", "block1"]
+    PARAMETERS = ["uleb", "u8"]  # , "block1"
 
 
 class Gnu_Regval_Type(OperationBase):
