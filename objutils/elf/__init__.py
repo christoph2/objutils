@@ -389,7 +389,9 @@ class ElfParser:
             session = db.session
             meta = session.query(model.Meta).first()
             if meta:
-                print(f"Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}")
+                pass
+                # TODO: log.debug
+                # print(f"Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}")
             if (meta is None) or (hash_value != meta.hash_value):
                 db.close()
                 new_db = True

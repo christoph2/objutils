@@ -27,8 +27,8 @@ __copyright__ = """
 import math
 import os
 import re
-from collections import defaultdict
-from dataclasses import dataclass
+from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
 
@@ -87,6 +87,13 @@ MAP_CHAR_TO_GROUP = {
 TYPE_FROM_RECORD = 0
 
 atoi = partial(int, base=16)
+
+
+@dataclass
+class Statistics:
+
+    record_types: Counter = field(default_factory=Counter)
+    data_bytes: Counter = field(default_factory=Counter)
 
 
 class Invalidrecord_typeError(Exception):
@@ -189,6 +196,7 @@ class Reader(BaseType):
 
     def __init__(self):
         self.logger = Logger("Reader")
+        self.stats = Statistics()
         if isinstance(self.FORMAT_SPEC, str):
             self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
@@ -227,6 +235,7 @@ class Reader(BaseType):
                     container.line_number = line_number
                     dict_ = match.groupdict()
                     if dict_ != {}:
+                        self.stats.record_types[format_type] += 1
                         # Handle scalar values.
                         for key, value in dict_.items():
                             if key not in ("chunk", "junk"):
@@ -241,6 +250,7 @@ class Reader(BaseType):
                                 chunk = dict_["chunk"]
                             dict_.pop("chunk")
                             container.chunk = chunk  # setattr(container, "chunk", chunk)
+                            self.stats.data_bytes[len(chunk)] += 1
                         self.check_line(container, format_type)
                         # this is to handle esoteric stuff like Intel seg:offs addressing and symbols.
                         self.special_processing(container, format_type)
