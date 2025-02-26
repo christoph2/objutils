@@ -83,7 +83,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions ${PROJECT_SOURCE_DIR}/objutils/aml)
 
 pybind11_add_module(hexfiles_ext ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/wrapper.cpp ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/exceptions.cpp)
-#	${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/tokenizer.cpp ${CMAKE_CURRENT_SOURCE_DIR}/objutils/aml/marshal.cpp	${CMAKE_CURRENT_SOURCE_DIR}/objutils/aml/parser.cpp)
 
 target_compile_options(hexfiles_ext PUBLIC "-DEXTENSION_NAME=hexfiles_ext" PUBLIC $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:MSVC>>:/utf-8>)
 
@@ -96,4 +95,4 @@ ELSEIF (CMAKE_C_COMPILER_ID MATCHES "MSVC")
 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${MSVC_BASE_OPTIONS} ${MSVC_EXTRA_OPTIONS}")
 ENDIF()
 
-install(TARGETS hexfiles_ext LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/objutils)
+# install(TARGETS hexfiles_ext LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/objutils)
