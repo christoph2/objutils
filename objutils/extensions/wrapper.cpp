@@ -15,5 +15,4 @@ PYBIND11_MODULE(hexfiles_ext, m) {
 		.def("ratio", &SequenceMatcher<std::string>::ratio)
 		.def("get_opcodes", &SequenceMatcher<std::string>::get_opcodes)
 	;
-
 }

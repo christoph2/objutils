@@ -48,10 +48,18 @@ using std::tuple;
 using std::make_tuple;
 using std::tie;
 
+enum class Tag: std::int8_t {
+  Null,
+  Replace,
+  Delete,
+  Insert,
+  Equal
+};
+
 // Exposed types
 using match_t = tuple<size_t, size_t, size_t>;
 using match_list_t = std::vector<match_t>;  // A vector to speed up copying
-using chunk_t = tuple<std::string, size_t, size_t, size_t, size_t>;
+using chunk_t = tuple<Tag, size_t, size_t, size_t, size_t>;
 using chunk_list_t = std::vector<chunk_t>;
 
 // This trait checks if a given type is a standard collection of hashable types
@@ -279,20 +287,20 @@ template <class T = std::string> class SequenceMatcher {
    * has i1 == j1 == 0, and remaining tuples have i1 == the i2 from the
    * tuple preceding it, and likewise for j1 == the previous j2.
    *
-   * The tags are strings, with these meanings:
+   * The tags have these meanings:
    *
-   * 'replace':  a[i1:i2] should be replaced by b[j1:j2]
-   * 'delete':   a[i1:i2] should be deleted.
+   * Replace:  a[i1:i2] should be replaced by b[j1:j2]
+   * Delete:   a[i1:i2] should be deleted.
    *             Note that j1==j2 in this case.
-   * 'insert':   b[j1:j2] should be inserted at a[i1:i1].
+   * Insert:   b[j1:j2] should be inserted at a[i1:i1].
    *             Note that i1==i2 in this case.
-   * 'equal':    a[i1:i2] == b[j1:j2]
+   * Equal:    a[i1:i2] == b[j1:j2]
    *
    * std::string a = "qabxcd";
    * std::string b = "abycdf";
    * auto s = MakeSequenceMatcher(None, a, b)
    * for (auto const& opcode : s.get_opcodes()) {
-   *  std::string tag;
+   *  Tag tag;
    *  std::size_t i1,i2,j1,j2;
    *  std::tie(tag, i1, i2, j1, j2) = opcode;
    *  std::cout
@@ -303,9 +311,9 @@ template <class T = std::string> class SequenceMatcher {
    * }
    *
    *  delete a[0:1] (q) b[0:0] ()
-   *   equal a[1:3] (ab) b[0:2] (ab)
+   *   Equal a[1:3] (ab) b[0:2] (ab)
    * replace a[3:4] (x) b[2:3] (y)
-   *   equal a[4:6] (cd) b[3:5] (cd)
+   *   Equal a[4:6] (cd) b[3:5] (cd)
    *  insert a[6:6] () b[5:6] (f)
    */
   chunk_list_t get_opcodes() {
@@ -326,16 +334,16 @@ template <class T = std::string> class SequenceMatcher {
       // a[ai:ai+size] == b[bj:bj+size].  So we need to pump
       // out a diff to change a[i:ai] into b[j:bj], pump out
       // the matching block, and move (i,j) beyond the match
-      std::string tag;
+      Tag tag{};
       if (i < ai and j < bj) {
-        tag = "replace";
+        tag = Tag::Replace;
       } else if (i < ai) {
-        tag = "delete";
+        tag = Tag::Delete;
       } else if (j < bj) {
-        tag = "insert";
+        tag = Tag::Insert;
       }
 
-      if (!tag.empty()) {
+      if (tag != Tag::Null) {
         opcodes_->emplace_back(tag, i, ai, j, bj);
       }
 
@@ -345,7 +353,7 @@ template <class T = std::string> class SequenceMatcher {
       // the list of matching blocks is terminated by a
       // sentinel with size 0
       if (size) {
-        opcodes_->emplace_back("equal", ai, i, bj, j);
+        opcodes_->emplace_back(Tag::Equal, ai, i, bj, j);
       }
     }
 
@@ -424,6 +432,17 @@ template <class T> auto MakeSequenceMatcher(
 }
 
 }  // namespace difflib
+
+inline std::ostream& operator<<(std::ostream& os, const difflib::Tag &tag) {
+  switch(tag) {
+    case difflib::Tag::Null   : os << "null";    break;
+    case difflib::Tag::Replace: os << "replace"; break;
+    case difflib::Tag::Delete : os << "delete";  break;
+    case difflib::Tag::Insert : os << "insert";  break;
+    case difflib::Tag::Equal  : os << "equal";   break;
+  }
+  return os;
+}
 
 #ifdef DIFFLIB_ENABLE_EXTERN_MACROS
 #  define DIFFLIB_MAKE_EXTERN_FOR_TYPE(A)\
