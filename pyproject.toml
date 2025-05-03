@@ -41,7 +41,7 @@ keywords=[
 	"shf",
 	"rfc4194",
 ]
-# build = "build_ext.py"
+build = "build_ext.py"
 
 [tool.poetry.scripts]
 oj-elf-info = "objutils.scripts.oj_elf_info:main"

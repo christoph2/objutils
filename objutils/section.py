@@ -42,6 +42,13 @@ import objutils.hexdump as hexdump
 from objutils.exceptions import FeatureNotAvailableError, InvalidAddressError
 
 
+try:
+    from .hexfiles_ext import SequenceMatcher  # noqa: F401
+except ImportError:
+    print("Error: cannot import `SequenceMatcher` from C++-extension, falling back to `difflib`")
+    from difflib import SequenceMatcher  # noqa: F401
+
+
 ##
 ## todo: find/search methode(n) mit slice funktion!
 ## Basic patch-interface: (addr (plus ext!), datatype (endianess)) - readAs()/writeAs()

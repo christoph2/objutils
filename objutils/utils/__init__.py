@@ -28,6 +28,7 @@ import ctypes
 import mmap
 import os
 import threading
+from enum import IntEnum
 from io import BytesIO
 
 
@@ -162,3 +163,27 @@ def create_memorymapped_fileview(filename, writeable=False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
     return memoryview(mmap.mmap(fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
+
+
+def enum_from_str(enum_class: IntEnum, enumerator: str) -> IntEnum:
+    """Create an `IntEnum` instance from an enumerator `str`.
+
+    Parameters
+    ----------
+    enum_class: IntEnum
+
+    enumerator: str
+
+    Example
+    -------
+
+    class Color(enum.IntEnum):
+        RED = 0
+        GREEN = 1
+        BLUE = 2
+
+    color: Color = enum_from_str(Color, "GREEN")
+
+
+    """
+    return enum_class(enum_class.__members__.get(enumerator))
