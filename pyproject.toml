@@ -63,6 +63,7 @@ prettier = "^0.0.7"
 black = "^24.4.1"
 rich = "^13.8.1"
 bandit = "^1.8.2"
+numpy = "<=2.2.5"
 
 
 [tool.poetry.group.dev.dependencies]
