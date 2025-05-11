@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.7.0"
+version = "0.7.1"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
@@ -70,7 +70,7 @@ numpy = "<=2.2.5"
 pre-commit = "^3.7.0"
 pytest = "^8.1.1"
 flake8-bugbear = "^24.4.21"
-mccabe = "^0.7.0"
+mccabe = "^0.7.1"
 pycodestyle = "^2.11.1"
 pyflakes = "^3.2.0"
 ruff = "^0.4.1"
