@@ -631,3 +631,139 @@ def test_read_ndarray_flat():
 
     result = sec.read_ndarray(0x1000, 24, "int32_le")
     assert np.array_equal(result, np.array([11, 22, 33, 44, 55, 66]))
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_read_ndarray_fortan_01():
+    sec = Section(
+        start_address=0x1000,
+        data=bytearray(b"\x01\x00\x04\x00\x07\x00\n\x00\x02\x00\x05\x00\x08\x00\x0b\x00\x03\x00\x06\x00\t\x00\x0c\x00"),
+    )
+
+    result = sec.read_ndarray(0x1000, 24, shape=(3, 4), order="F", dtype="int16_le")
+    assert np.array_equal(
+        result,
+        np.array(
+            [
+                [1, 2, 3],
+                [
+                    4,
+                    5,
+                    6,
+                ],
+                [7, 8, 9],
+                [10, 11, 12],
+            ],
+            dtype=np.int16,
+        ),
+    )
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_read_ndarray_fortan_02():
+    sec = Section(
+        start_address=0x1000,
+        data=[
+            1,
+            3,
+            5,
+            2,
+            4,
+            6,
+            7,
+            9,
+            11,
+            8,
+            10,
+            12,
+            13,
+            15,
+            17,
+            14,
+            16,
+            18,
+            19,
+            21,
+            23,
+            20,
+            22,
+            24,
+            25,
+            27,
+            29,
+            26,
+            28,
+            30,
+            31,
+            33,
+            35,
+            32,
+            34,
+            36,
+            37,
+            39,
+            41,
+            38,
+            40,
+            42,
+            43,
+            45,
+            47,
+            44,
+            46,
+            48,
+        ],
+    )
+
+    result = sec.read_ndarray(0x1000, 48, shape=(2, 4, 3, 2), order="F", dtype="int8_le")
+    assert np.array_equal(
+        result,
+        np.array(
+            [
+                [
+                    [[1, 2], [3, 4], [5, 6]],
+                    [[7, 8], [9, 10], [11, 12]],
+                    [[13, 14], [15, 16], [17, 18]],
+                    [[19, 20], [21, 22], [23, 24]],
+                ],
+                [
+                    [[25, 26], [27, 28], [29, 30]],
+                    [[31, 32], [33, 34], [35, 36]],
+                    [[37, 38], [39, 40], [41, 42]],
+                    [[43, 44], [45, 46], [47, 48]],
+                ],
+            ],
+            dtype=np.int8,
+        ),
+    )
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_ndarray_fortan_01():
+    sec = Section(start_address=0x1000, data=bytearray(128))
+    arr = np.array(
+        [
+            [[[1, 2], [3, 4], [5, 6]], [[7, 8], [9, 10], [11, 12]], [[13, 14], [15, 16], [17, 18]], [[19, 20], [21, 22], [23, 24]]],
+            [
+                [[25, 26], [27, 28], [29, 30]],
+                [[31, 32], [33, 34], [35, 36]],
+                [[37, 38], [39, 40], [41, 42]],
+                [[43, 44], [45, 46], [47, 48]],
+            ],
+        ],
+        dtype=np.int8,
+    )
+    sec.write_ndarray(0x1000, arr, order="F")
+    assert sec.read(0x1000, 48) == bytearray(
+        b"\x01\x03\x05\x02\x04\x06\x07\t\x0b\x08\n\x0c\r\x0f\x11\x0e\x10\x12\x13\x15\x17\x14\x16\x18\x19\x1b\x1d\x1a\x1c\x1e\x1f!# \"$%')&(*+-/,.0"
+    )
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_ndarray_fortan_02():
+    sec = Section(start_address=0x1000, data=bytearray(128))
+    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec.write_ndarray(0x1000, arr, order="F")
+    assert sec.read(0x1000, 24) == bytearray(
+        b"\x01\x00\x04\x00\x07\x00\n\x00\x02\x00\x05\x00\x08\x00\x0b\x00\x03\x00\x06\x00\t\x00\x0c\x00"
+    )

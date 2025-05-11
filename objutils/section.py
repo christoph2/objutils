@@ -35,11 +35,14 @@ from array import array
 from collections import namedtuple
 from copy import copy
 from dataclasses import dataclass, field
-from operator import attrgetter
+from functools import reduce
+from operator import attrgetter, mul
 from typing import Any, List, Union
 
+import numpy as np
+
 import objutils.hexdump as hexdump
-from objutils.exceptions import FeatureNotAvailableError, InvalidAddressError
+from objutils.exceptions import InvalidAddressError
 
 
 try:
@@ -176,6 +179,42 @@ def _data_converter(data: Union[str, bytearray, array, Any]) -> bytearray:
     return data
 
 
+def fortran_array_from_buffer(arr: bytearray, shape: tuple, dtype: str) -> np.ndarray:
+    if len(shape) <= 2:
+        return np.frombuffer(arr, dtype=dtype).reshape(shape).T
+    lhs = shape[:-2]
+    num_slices = reduce(mul, lhs, 1)
+    rhs = shape[-2:]
+    slice_len = reduce(mul, rhs, 1)
+    buf = arr.copy()
+    offset = 0
+    for idx in range(num_slices):
+        ddx = buf[offset : offset + slice_len]
+        res = np.frombuffer(ddx, dtype=dtype).reshape(*reversed(rhs)).T
+        buf[offset : offset + slice_len] = res.tobytes()
+        offset += slice_len
+    return np.frombuffer(buf, dtype=dtype).reshape(shape)
+
+
+def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
+    shape = array.shape
+    if len(shape) <= 2:
+        return array.tobytes("F")
+    else:
+        lhs = shape[:-2]
+        num_slices = reduce(mul, lhs, 1)
+        rhs = shape[-2:]
+        slice_len = reduce(mul, rhs, 1)
+        rs_arr = array.reshape(num_slices, *rhs)
+        offset = 0
+        result = bytearray(array.nbytes)
+        for idx in range(num_slices):
+            slice = rs_arr[idx]
+            result[offset : offset + slice_len] = slice.T.tobytes()
+            offset += slice_len
+        return result
+
+
 @dataclass(repr=False, order=True)
 class Section:
     """Manage sections.
@@ -206,7 +245,7 @@ class Section:
     def tolist(self) -> List[int]:
         return array("B", self.data).tolist()
 
-    def _verify_dtype(self, dtype):
+    def _verify_dtype(self, dtype: str) -> str:
         """ """
         dtype = dtype.lower().strip()
         if dtype == "byte":
@@ -219,7 +258,7 @@ class Section:
             raise TypeError(f"Invalid datatype {dtype!r}")
         return dtype.split("_")
 
-    def _getformat(self, dtype, length=1):
+    def _getformat(self, dtype: str, length: int = 1) -> str:
         """ """
         fmt, bo = self._verify_dtype(dtype)
 
@@ -228,7 +267,7 @@ class Section:
         else:
             return f"{BYTEORDER.get(bo)}{FORMATS.get(fmt)}"
 
-    def read(self, addr, length, **kws):
+    def read(self, addr: int, length: int, **kws) -> bytes:
         """
         Parameters
         ----------
@@ -244,7 +283,7 @@ class Section:
         data = self.data[offset : offset + length]
         return data
 
-    def write(self, addr, data, **kws):
+    def write(self, addr: int, data: bytes, **kws) -> None:
         """
         Parameters
         ----------
@@ -262,7 +301,7 @@ class Section:
             raise InvalidAddressError(f"write(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + length] = data
 
-    def read_numeric(self, addr, dtype, **kws):
+    def read_numeric(self, addr: int, dtype: str, **kws) -> Union[int, float]:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_numeric(0x{addr:08x}) access out of bounds.")
@@ -276,7 +315,7 @@ class Section:
             data = self.apply_bitmask(data, dtype, bit_mask)
         return struct.unpack(fmt, data)[0]
 
-    def apply_bitmask(self, data, dtype, bit_mask):
+    def apply_bitmask(self, data: bytes, dtype: str, bit_mask: int) -> bytes:
         """ """
         dtype, byteorder = dtype.lower().strip().split("_")
         byteorder = "little" if byteorder == "le" else "big"
@@ -286,7 +325,7 @@ class Section:
         tmp &= bit_mask
         return tmp.to_bytes(data_size, byteorder, signed=False)
 
-    def write_numeric(self, addr, value, dtype, **kws):
+    def write_numeric(self, addr: int, value: Union[int, float], dtype: str, **kws) -> None:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"write_numeric(0x{addr:08x}) access out of bounds.")
@@ -299,7 +338,7 @@ class Section:
 
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
-    def read_numeric_array(self, addr, length, dtype, **kws):
+    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws) -> Union[List[int], List[float]]:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
@@ -310,7 +349,7 @@ class Section:
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
-    def write_numeric_array(self, addr, data, dtype, **kws):
+    def write_numeric_array(self, addr: int, data: Union[List[int], List[float]], dtype: str, **kws) -> None:
         if not hasattr(data, "__iter__"):
             raise TypeError("data must be iterable")
         length = len(data)
@@ -323,7 +362,7 @@ class Section:
             raise InvalidAddressError(f"write_numeric_array(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + data_size] = struct.pack(fmt, *data)
 
-    def read_string(self, addr, encoding="latin1", length=-1, **kws):
+    def read_string(self, addr: int, encoding: str = "latin1", length: int = -1, **kws) -> str:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_string(0x{addr:08x}) access out of bounds.")
@@ -335,19 +374,15 @@ class Section:
             raise TypeError("Unterminated String!!!")  # TODO: Testcase.
         return self.data[offset : offset + pos].decode(encoding=encoding)
 
-    def write_string(self, addr, value, encoding="latin1", **kws):
+    def write_string(self, addr: int, value: str, encoding: str = "latin1", **kws):
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"write_string(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + len(value)] = bytes(value, encoding=encoding)
         self.data[offset + len(value)] = 0
 
-    def write_ndarray(self, addr, array, order=None, **kws):
+    def write_ndarray(self, addr: int, array: np.ndarray, order: str = None, **kws) -> None:
         """ """
-        try:
-            import numpy as np
-        except ImportError as e:
-            raise FeatureNotAvailableError("write_ndarray() requires Numpy.") from e
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
@@ -356,36 +391,26 @@ class Section:
         data_size = array.nbytes
         if offset + data_size > self.length:
             raise InvalidAddressError(f"write_ndarray(0x{addr:08x}) access out of bounds.")
-        self.data[offset : offset + data_size] = array.tobytes()
+        if order is not None and order == "F":
+            self.data[offset : offset + data_size] = fortran_array_to_buffer(array=array)
+        else:
+            self.data[offset : offset + data_size] = array.tobytes()
 
-    def read_ndarray(self, addr, length, dtype, shape=None, order=None, **kws):
+    def read_ndarray(self, addr: int, length: int, dtype: str, shape: tuple = None, order: str = None, **kws) -> np.ndarray:
         """ """
-        try:
-            import numpy as np
-        except ImportError as e:
-            raise FeatureNotAvailableError("read_ndarray() requires Numpy.") from e
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
             raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
-
-        """
-        If the buffer has data that is not in machine byte-order, this should
-        be specified as part of the data-type, e.g.::
-
-          >>> dt = np.dtype(int)
-          >>> dt = dt.newbyteorder('>')
-          >>> np.frombuffer(buf, dtype=dt)
-        """
         type_, byte_order = self._verify_dtype(dtype)
         dt = np.dtype(type_)
         dt = dt.newbyteorder(BYTEORDER.get(byte_order))
-        arr = np.frombuffer(self.data[offset : offset + length], dtype=dt).reshape(shape)
-        if order == "F":
-            return arr.T  # Fortran deposit, i.e. col-maj means transposition.
+        if order is not None and order == "F":
+            arr = fortran_array_from_buffer(arr=self.data[offset : offset + length], shape=shape, dtype=dt)
         else:
-            return arr
+            arr = np.frombuffer(self.data[offset : offset + length], dtype=dt).reshape(shape)
+        return arr
 
     """
     def write_timestamp():
@@ -395,33 +420,33 @@ class Section:
         pass
     """
 
-    def find(self, expr, addr=-1):
+    def find(self, expr: str, addr: int = -1) -> int:
         for item in re.finditer(bytes(expr), self.data):
             yield (self.start_address + item.start(), item.end() - item.start())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Section(address = 0X{:08X}, length = {:d}, data = {})".format(
             self.start_address,
             self.length,
             self.repr.repr(memoryview(self.data).tobytes()),
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
     @property
-    def length(self):
+    def length(self) -> int:
         return len(self)
 
-    def __contains__(self, addr):
+    def __contains__(self, addr) -> bool:
         return self.start_address <= addr < (self.start_address + self.length)
 
     @property
-    def address(self):  # Alias
+    def address(self) -> int:  # Alias
         return self.start_address
 
 
-def join_sections(sections):
+def join_sections(sections: List[Section]) -> List[Section]:
     result_sections = []
     sections.sort(key=attrgetter("start_address"))
     prev_section = Section()
