@@ -181,7 +181,8 @@ def _data_converter(data: Union[str, bytearray, array, Any]) -> bytearray:
 
 def fortran_array_from_buffer(arr: bytearray, shape: tuple, dtype: str) -> np.ndarray:
     if len(shape) <= 2:
-        return np.frombuffer(arr, dtype=dtype).reshape(shape).T
+        return np.frombuffer(arr, dtype=dtype).reshape(shape[::-1]).T
+    # shape = list(reversed(shape))
     lhs = shape[:-2]
     num_slices = reduce(mul, lhs, 1)
     rhs = shape[-2:]
@@ -198,7 +199,7 @@ def fortran_array_from_buffer(arr: bytearray, shape: tuple, dtype: str) -> np.nd
 
 def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
     shape = array.shape
-    if len(shape) <= 2:
+    if array.ndim <= 2:
         return array.tobytes("F")
     else:
         lhs = shape[:-2]
