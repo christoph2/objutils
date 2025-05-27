@@ -39,13 +39,21 @@ def build_artifacts(sketch_name: str) -> Path:
     return result
 
 
-if __name__ == "__main__":
+def main():
     import sys
 
     if len(sys.argv) != 2:
         print("usage: arduino-build-artifacts <sketch-name>")
         sys.exit(1)
-    artifacts = build_artifacts(sys.argv[1])
+    try:
+        artifacts = build_artifacts(sys.argv[1])
+    except FileNotFoundError:
+        print(f"could not find sketch {sys.argv[1]!r}")
+        sys.exit(1)
     print()
     for name, value in artifacts.items():
         print(f"{name:9s}: {value}")
+
+
+if __name__ == "__main__":
+    main()
