@@ -94,9 +94,13 @@ Extract sections from *ELF* suitible for flashing;
 
     optional arguments:
       -h, --help            show this help message and exit
-      -j, --join            Try to make continuous sections.
-      -t {ihex,shf,srec}, --file-type {ihex,shf,srec}
-                            Type of output HEX file.
+      -j, --join            Try to make continuous sections (merge adjacent ranges)
+      -t {ihex,shf,srec,titxt}, --file-type {ihex,shf,srec,titxt}
+                            Type of output HEX file (default: ihex)
+      -e EXCLUDE, --exclude_pattern EXCLUDE
+                            Exclude sections matching a Python regex
+      -i INCLUDE, --include_pattern INCLUDE
+                            Include only sections matching a Python regex
 
 For example:
 
@@ -121,8 +125,71 @@ For example:
 oj_elf_info
 -----------
 
+.. code-block:: shell
+
+    usage: oj-elf-info [-h] [-k] [-l LOGLEVEL] [-S] [-u] elf_file
+
+    Display informations about ELF files.
+
+    positional arguments:
+      elf_file              ELF file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -k                    keep directory; otherwise create db in current directory
+      -l LOGLEVEL           loglevel [warn | info | error | debug]
+      -S, --sections, --section-headers
+                            Display the sections' headers.
+      -u                    Generate UTF-8 encoded output (otherwise Latin-1).
+
+Example:
+
+.. code-block:: shell
+
+    oj-elf-info build/app.elf
+
+This prints ELF class, type, machine, byte-order, OS/ABI, followed by a sections table and common notes/comments when present.
+
 oj_elf_syms
 -----------
+
+.. code-block:: shell
+
+    usage: oj-elf-syms [-h] [-s SECTIONS] [-p PATTERN] [-t TYPES]
+                       [-a ACCESS] [-b BINDINGS] [-o {N,V}] elf_file
+
+    Display ELF symbols.
+
+    positional arguments:
+      elf_file              ELF file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -s SECTIONS, --sections SECTIONS
+                            Use only symbols from listed sections (comma-separated)
+      -p PATTERN, --pattern PATTERN
+                            Only display symbols matching a (Python) regex
+      -t TYPES, --types TYPES
+                            Use only symbols with listed types (comma-separated)
+      -a ACCESS, --access ACCESS
+                            Filter by access flags: A (allocate), W (write), X (execute)
+      -b BINDINGS, --bindings BINDINGS
+                            Use only symbols with listed bindings (comma-separated)
+      -o {N,V}, --order-by {N,V}
+                            Order symbols by Name or Value (default: V)
+
+Examples:
+
+.. code-block:: shell
+
+    # All symbols ordered by address
+    oj-elf-syms build/app.elf -o V
+
+    # Only functions from .text, ordered by name
+    oj-elf-syms build/app.elf -s .text -t FUNC -o N
+
+    # Filter by regex and show only GLOBAL bindings that are executable
+    oj-elf-syms build/app.elf -p '^(reset|_?start)$' -b GLOBAL -a X
 
 oj_hex_info
 -----------
