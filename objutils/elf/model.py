@@ -29,7 +29,17 @@ import mmap
 import re
 import sqlite3
 
-from sqlalchemy import Column, ForeignKey, and_, create_engine, event, not_, orm, types
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    and_,
+    create_engine,
+    event,
+    not_,
+    orm,
+    text,
+    types,
+)
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import declarative_base, declared_attr, relationship
@@ -407,7 +417,44 @@ class DIEAttribute(Base, RidMixIn):
 
 class DebugInformationEntry(Base, RidMixIn):
     tag = Column(types.VARCHAR)
+    # Offset of this DIE within the .debug_info section (CU-relative start used by DwarfProcessor)
+    offset = Column(types.Integer, index=True)
+    # Parent DIE linkage for building a tree
+    parent_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"), index=True, nullable=True)
+
+    # Relationships
     attributes = relationship("DIEAttribute", back_populates="entry", uselist=True)
+    # Self-referential relationship for DIE tree
+    parent = relationship(
+        "DebugInformationEntry",
+        remote_side=lambda: DebugInformationEntry.rid,
+        back_populates="children",
+        uselist=False,
+    )
+    children = relationship(
+        "DebugInformationEntry",
+        back_populates="parent",
+        cascade="all, delete-orphan",
+    )
+
+    @property
+    def abbrev(self):
+        class _Abbrev:
+            def __init__(self, tag):
+                self.tag = tag
+
+        return _Abbrev(self.tag)
+
+    @property
+    def attributes_map(self):
+        cache = getattr(self, "_attributes_map_cache", None)
+        if cache is None:
+            cache = {attr.name: attr for attr in self.attributes or []}
+            setattr(self, "_attributes_map_cache", cache)
+        return cache
+
+    def get_attribute(self, name: str):
+        return self.attributes_map.get(name)
 
 
 class DebugInformation(Base, RidMixIn):
@@ -528,8 +575,32 @@ class Model:
 
         self._metadata = Base.metadata
         Base.metadata.create_all(self.engine)
+        # Ensure schema upgrades for existing databases opened directly via Model
+        self._ensure_schema()
         self.session.flush()
         self.session.commit()
+
+    def _ensure_schema(self):
+        """Ensure required columns exist for older databases opened directly.
+        Adds missing columns with minimal changes without rebuilding the DB.
+        """
+        try:
+            from sqlalchemy import inspect as sa_inspect
+
+            inspector = sa_inspect(self.engine)
+            # Ensure debuginformationentry.offset and parent_id exist
+            try:
+                die_cols = {c["name"] for c in inspector.get_columns("debuginformationentry")}
+            except Exception:
+                die_cols = set()
+            with self.engine.begin() as conn:
+                if "offset" not in die_cols:
+                    conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "offset" INTEGER'))
+                if "parent_id" not in die_cols:
+                    conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "parent_id" INTEGER'))
+        except Exception:
+            # Be permissive: if inspection or ALTER fails, leave as-is.
+            pass
 
     def close(self):
         self.session.close()

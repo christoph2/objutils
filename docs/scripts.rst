@@ -197,8 +197,8 @@ oj_hex_info
 .. code-block:: shell
 
     usage: oj-hex-info [-h] [-d]
-                       {ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt}
-                       hex_file
+                      {ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt}
+                      hex_file
 
     Displays informations about HEX files.
 
@@ -259,3 +259,45 @@ If you also want to see the contents, add *-d* option:
     ---------------
            16 bytes
     ---------------
+
+arduino_build_artifacts
+-----------------------
+
+Locate Arduino build artifacts (ELF/HEX/EEP/MAP) produced by the Arduino IDE for a given sketch.
+You can pass either the path to a .ino file or the sketch directory.
+
+.. code-block:: shell
+
+    usage: arduino-build-artifacts [-h] [--only {DIRECTORY,ELF,HEX,EEP,MAP} ...]
+                                   [--as-paths] [--missing-ok] [--quiet]
+                                   sketch
+
+    positional arguments:
+      sketch                Path to the sketch directory or .ino file
+
+    options:
+      -h, --help            show this help message and exit
+      --only {DIRECTORY,ELF,HEX,EEP,MAP} ...
+                            Limit output to specific artifact types (may be given multiple times)
+      --as-paths            Print only paths (one per line) without labels
+      --missing-ok          Do not treat missing artifacts as an error; just omit them from output
+      -q, --quiet           Suppress non-error output
+
+Examples:
+
+.. code-block:: shell
+
+    # Show all available artifacts with labels
+    $ arduino-build-artifacts MySketch/MySketch.ino
+    DIRECTORY: C:\\Users\\<you>\\AppData\\Local\\arduino\\sketches\\ABCD1234...
+    ELF      : C:\\...\\MySketch.ino.elf
+    HEX      : C:\\...\\MySketch.ino.hex
+    MAP      : C:\\...\\MySketch.ino.map
+
+    # Print only the ELF and HEX paths, one per line
+    $ arduino-build-artifacts MySketch --only ELF HEX --as-paths
+    C:\\...\\MySketch.ino.elf
+    C:\\...\\MySketch.ino.hex
+
+    # Ignore missing artifacts (e.g., no EEP generated)
+    $ arduino-build-artifacts MySketch --only ELF EEP --missing-ok
