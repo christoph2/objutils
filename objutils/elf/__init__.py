@@ -393,12 +393,53 @@ class ElfParser:
                 # TODO: log.debug
                 # print(f"Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}")
             if (meta is None) or (hash_value != meta.hash_value):
-                db.close()
                 new_db = True
                 try:
-                    os.unlink(self.db_name)
+                    db.close()
+                finally:
+                    try:
+                        os.unlink(self.db_name)
+                    except Exception as e:
+                        print(f"{e}")
+            else:
+                # Validate schema compatibility (e.g., required columns exist)
+                try:
+                    from sqlalchemy import inspect as sa_inspect
+
+                    inspector = sa_inspect(db.engine)
+                    try:
+                        die_cols = [c["name"] for c in inspector.get_columns("debuginformationentry")]
+                    except Exception:
+                        die_cols = []
+                    try:
+                        dieattr_cols = [c["name"] for c in inspector.get_columns("dieattribute")]
+                    except Exception:
+                        dieattr_cols = []
+                    required_die_cols = {"tag", "offset", "parent_id"}
+                    required_dieattr_cols = {"entry_id"}
+                    if (not required_die_cols.issubset(set(die_cols))) or (not required_dieattr_cols.issubset(set(dieattr_cols))):
+                        # Invalidate outdated schema: rebuild database
+                        new_db = True
+                        try:
+                            db.close()
+                        finally:
+                            try:
+                                os.unlink(self.db_name)
+                            except Exception as e:
+                                print(f"{e}")
+                    else:
+                        # Close the preliminary connection before opening the main one to avoid file locking.
+                        db.close()
                 except Exception as e:
-                    print("Upps!", e)
+                    # If inspection fails for any reason, rebuild to be safe
+                    new_db = True
+                    try:
+                        db.close()
+                    finally:
+                        try:
+                            os.unlink(self.db_name)
+                        except Exception as e:
+                            print(f"{e}")
         else:
             new_db = True
         self.db = model.Model(self.db_name)

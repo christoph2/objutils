@@ -708,6 +708,7 @@ class DwarfProcessor:
                 break
             root_element = DebugInformationEntry("root")
             die_stack = [root_element]
+            db_die_stack = []
 
             dbgInfo = DbgInfo.parse_stream(image)  # CU
             # print(dbgInfo)
@@ -743,10 +744,23 @@ class DwarfProcessor:
                 abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
                 if not abbr:
                     print(f"<{start:2x}>: Abbrev Number: 0 ---")
-                    level -= 1
+                    # End of a sibling list: pop one level on both in-memory and DB stacks
+                    if level > 0:
+                        level -= 1
+                    # Pop in-memory DIE stack if we have a nested context (keep root at index 0)
+                    if len(die_stack) > 1:
+                        die_stack.pop()
+                    # Pop DB parent stack so subsequent siblings attach to the correct parent
+                    if db_die_stack:
+                        db_die_stack.pop()
                 else:
                     die = DebugInformationEntry(abbr.tag)
                     db_die = model.DebugInformationEntry(tag=abbr.tag)
+                    # Cache-friendly: store DIE offset for quick lookups by external tools
+                    db_die.offset = start
+                    # Set parent on DB DIE if we have one on stack
+                    if db_die_stack:
+                        db_die.parent = db_die_stack[-1]
                     self.db_session.add(db_die)
                     if attr.attr != 0:
                         die_stack[-1].children.append(die)
@@ -754,15 +768,11 @@ class DwarfProcessor:
                     die_start = start
                     if abbr.children:
                         die_stack.append(die)
+                        # Push this db_die as the current parent for subsequent entries until a null DIE is encountered
+                        db_die_stack.append(db_die)
                         level += 1
                     else:
                         pass
-                    if attr.attr == 0:
-                        level -= 1
-                        if len(die_stack):
-                            die_stack.pop()
-                        else:
-                            print("DIE_STACK empty!!!")
                     for enc, form, special_value in abbr.attrs:
                         reader = form_readers.get(form)
                         start = image.tell()
