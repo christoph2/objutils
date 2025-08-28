@@ -138,45 +138,33 @@ def loads(codec_name, *args, **kws):
 def probe(*args, **kws):
     """Try to guess codec from file.
 
-    Parameters
-    ----------
-    codec_name: str
-        Name of a registered codec.
-
     Returns
     -------
-    str
+    str | None
+        The detected codec name or None if undetected.
     """
 
-    found = False
-    for _, codec in registry._codecs.items():
+    for name, codec in registry:
         reader = codec.Reader()
-        found = reader.probe(*args, **kws)
-        if found:
-            break
-    return reader.codec_name if found else None
+        if reader.probe(*args, **kws):
+            return name
+    return None
 
 
 def probes(*args, **kws):
     """Try to guess codec from bytes.
 
-    Parameters
-    ----------
-    codec_name: str
-        Name of a registered codec.
-
     Returns
     -------
-    str
+    str | None
+        The detected codec name or None if undetected.
     """
 
-    found = False
-    for _, codec in registry:
+    for name, codec in registry:
         reader = codec.Reader()
-        found = reader.probes(*args, **kws)
-        if found:
-            break
-    return reader.codec_name if found else None
+        if reader.probes(*args, **kws):
+            return name
+    return None
 
 
 def dump(codec_name, *args, **kws):

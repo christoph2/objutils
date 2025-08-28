@@ -29,7 +29,14 @@ def build_artifacts(sketch_name: str) -> Path:
         base = ARDUINO_TEMP_BASE_B
     else:
         raise ValueError("Could not determine Arduino base directory")
-    sketch_dir = base / hashlib.md5(path_to_dir.encode("ascii")).hexdigest().upper()
+    # Non-cryptographic hash used solely to derive a stable cache directory name.
+    # Bandit: B324 (hashlib.md5) is acceptable here; use usedforsecurity=False where available.
+    try:
+        digest = hashlib.md5(path_to_dir.encode("ascii"), usedforsecurity=False).hexdigest()  # nosec B324
+    except TypeError:
+        # Python < 3.9 does not support usedforsecurity param; still non-crypto use.  # nosec B324
+        digest = hashlib.md5(path_to_dir.encode("ascii")).hexdigest()
+    sketch_dir = base / digest.upper()
     if not sketch_dir.exists():
         ValueError(f"directory {sketch_dir!r} does not exist.")
     result["DIRECTORY"] = sketch_dir

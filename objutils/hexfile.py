@@ -285,26 +285,97 @@ class Reader(BaseType):
         fp.seek(0, os.SEEK_SET)
         header = fp.read(128)
         fp.seek(0, os.SEEK_SET)
-        result = not bool(self.VALID_CHARS.match(header.decode()))
+        try:
+            hdr = header.decode(errors="ignore")
+        except Exception:
+            hdr = ""
+        result = not bool(self.VALID_CHARS.match(hdr))
         return result
 
     def probe(self, fp):
-        "Determine if object is valid."
+        """Determine if object is likely valid for this codec.
+
+        Strategy (robust, production-grade):
+        - Quickly reject binary-looking content.
+        - Sample up to 50 non-empty lines (or 8KB), decoding safely.
+        - Count how many lines match this codec's patterns.
+        - Accept when we see sufficient evidence (>= 2 matches), or when
+          there's exactly one non-empty sampled line and it matches (tiny files).
+        - Always restore the file pointer to the beginning before returning.
+        """
+        # Always start from beginning
+        try:
+            fp.seek(0, os.SEEK_SET)
+        except Exception:
+            pass
+
         if self.maybe_binary_file(fp):
+            try:
+                fp.seek(0, os.SEEK_SET)
+            except Exception:
+                pass
             return False
-        matched = False
-        for line_number, line in enumerate(fp.readlines(), 1):
-            for _format_type, fmt in self.formats:  # NOTE: Same as in 'read()'!
-                if isinstance(line, bytes):
-                    match = fmt.match(line.decode())
-                else:
-                    match = fmt.match(line)
-                if match:
-                    matched = True
-                    break
-            if matched or line_number > 3:
+
+        matched_count = 0
+        examined = 0
+        max_lines = 50
+        max_bytes = 8192
+        consumed = 0
+
+        # Iterate lines safely, up to limits
+        for line_number, raw in enumerate(fp.readlines(), 1):
+            if isinstance(raw, bytes):
+                try:
+                    line = raw.decode(errors="ignore")
+                except Exception:
+                    line = ""
+            else:
+                line = raw
+
+            consumed += len(raw) if isinstance(raw, (bytes, bytearray)) else len(line)
+            if consumed > max_bytes:
                 break
-        return matched
+
+            s = line.strip()
+            if not s:
+                continue  # skip empty/blank lines
+
+            examined += 1
+
+            # If the line has clearly invalid characters for ASCII-hex records, reject fast.
+            if not self.VALID_CHARS.match(s):
+                try:
+                    fp.seek(0, os.SEEK_SET)
+                except Exception:
+                    pass
+                return False
+
+            # Try all known formats for this codec
+            this_line_matched = False
+            for _format_type, fmt in self.formats:
+                if fmt.match(s):
+                    this_line_matched = True
+                    break
+            if this_line_matched:
+                matched_count += 1
+
+            if matched_count >= 3:
+                break  # strong signal; no need to continue
+            if examined >= max_lines:
+                break
+
+        # Reset file pointer before returning
+        try:
+            fp.seek(0, os.SEEK_SET)
+        except Exception:
+            pass
+
+        if matched_count >= 2:
+            return True
+        # Allow tiny one-line files (headers or footers) when it's the only sampled line
+        if matched_count == 1 and examined == 1:
+            return True
+        return False
 
     def probes(self, image):
         if isinstance(image, str):
