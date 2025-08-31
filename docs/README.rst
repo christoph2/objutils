@@ -2,7 +2,7 @@
 objutils
 ========
 
-.. image:: objutils_basic.png
+.. image:: objutils_dark.jpg
     :align: center
     :scale: 25%
 

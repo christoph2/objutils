@@ -12,6 +12,8 @@
 import os
 import sys
 
+from objutils import __version__ as xversion
+
 
 sys.path.insert(0, os.path.abspath("../objutils"))
 
@@ -19,13 +21,13 @@ sys.path.insert(0, os.path.abspath("../objutils"))
 # -- Project information -----------------------------------------------------
 
 project = "objutils"
-copyright = "2019, Christoph Schueler"
+copyright = "2025, Christoph Schueler"
 author = "Christoph Schueler"
 
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "0.9"
+release = xversion
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +41,13 @@ release = "0.9"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "numpydoc",
     "sphinx.ext.doctest",
+    "sphinx.ext.autosummary",
+    "sphinx_copybutton",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,7 +56,6 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
 source_suffix = ".rst"
 
 # The master toctree document.
@@ -75,7 +82,7 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-# html_theme = 'alabaster'
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -160,7 +167,6 @@ texinfo_documents = [
     ),
 ]
 
-
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for todo extension ----------------------------------------------
@@ -168,18 +174,13 @@ texinfo_documents = [
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+numpydoc_show_class_members = False
+autosummary_generate = True
+autosummary_imported_members = True
 
-# Napoleon settings
-napoleon_google_docstring = False
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = False
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
-napoleon_use_keyword = True
-napoleon_custom_sections = None
+autodoc_default_options = {
+    "member_order": "bysource",
+    "private-members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}
