@@ -31,6 +31,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
+from typing import Any, Dict, Iterable, Iterator, List, Mapping, MutableMapping, Optional, Sequence, Tuple, Union
 
 from objutils.image import Image
 from objutils.logger import Logger
@@ -91,9 +92,8 @@ atoi = partial(int, base=16)
 
 @dataclass
 class Statistics:
-
-    record_types: Counter = field(default_factory=Counter)
-    data_bytes: Counter = field(default_factory=Counter)
+    record_types: Counter[int] = field(default_factory=Counter)
+    data_bytes: Counter[int] = field(default_factory=Counter)
 
 
 class Invalidrecord_typeError(Exception):
@@ -115,17 +115,17 @@ class AddressRangeToLargeError(Exception):
 @dataclass
 class MetaRecord:
     format_type: str
-    address: int
-    chunk: bytearray
+    address: Optional[int]
+    chunk: Optional[bytearray]
 
 
 class FormatParser:
-    def __init__(self, fmt, data_separator=None):
-        self.fmt = fmt
-        self.translated_format = []
-        self.data_separator = data_separator
+    def __init__(self, fmt: str, data_separator: Optional[str] = None):
+        self.fmt: str = fmt
+        self.translated_format: List[Tuple[int, int, str]] = []
+        self.data_separator: Optional[str] = data_separator
 
-    def parse(self):
+    def parse(self) -> re.Pattern[str]:
         group = ""
         prevCh = ""
         for ch in self.fmt:
@@ -140,7 +140,7 @@ class FormatParser:
         ft = r"^{}".format("".join(map(itemgetter(2), self.translated_format)))
         return re.compile(ft, re.DOTALL | re.MULTILINE)
 
-    def translateFormat(self, group):
+    def translateFormat(self, group: str) -> None:
         group_number = MAP_CHAR_TO_GROUP.get(group[0])
         length = len(group)
         if group_number is None:  # Handle invariants (i.e. fixed chars).
@@ -167,44 +167,50 @@ class FormatParser:
 
 
 class Container:
-    def __init__(self):
-        self.processing_instructions = []
+    def __init__(self) -> None:
+        self.processing_instructions: List[Any] = []
 
-    def add_processing_instruction(self, pi):
+    def add_processing_instruction(self, pi: Any) -> None:
         self.processing_instructions.append(pi)
 
 
 class BaseType:
-    def error(self, msg):
+    logger: Logger
+    valid: bool
+
+    def error(self, msg: str) -> None:
         self.logger.error(msg)
         self.valid = False
 
-    def warn(self, msg):
+    def warn(self, msg: str) -> None:
         self.logger.warn(msg)
 
-    def info(self, msg):
+    def info(self, msg: str) -> None:
         self.logger.info(msg)
 
-    def debug(self, msg):
+    def debug(self, msg: str) -> None:
         self.logger.debug(msg)
 
 
 class Reader(BaseType):
     ALIGMENT = 0  # 2**n
-    DATA_SEPARATOR = None
+    DATA_SEPARATOR: Optional[str] = None
     VALID_CHARS = re.compile(r"^[a-fA-F0-9 :/;,%\n\r!?S]*$")  # General case, fits most formats.
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = Logger("Reader")
         self.stats = Statistics()
+        # formats is a list of (format_type, compiled_pattern)
         if isinstance(self.FORMAT_SPEC, str):
-            self.formats = [FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse()]
+            self.formats: List[Tuple[int, re.Pattern[str]]] = [(0, FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse())]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
             for format_type, format in self.FORMAT_SPEC:
                 self.formats.append((format_type, FormatParser(format, self.DATA_SEPARATOR).parse()))
+        else:
+            self.formats = []
 
-    def load(self, fp, **kws):
+    def load(self, fp: Union[str, Any], **kws: Any) -> Image:
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = self.read(fp)  # .decode()
@@ -212,13 +218,13 @@ class Reader(BaseType):
             fp.close()
         return data
 
-    def loads(self, image, **kws):
+    def loads(self, image: Union[str, bytes, bytearray], **kws: Any) -> Image:
         if isinstance(image, str):
             return self.load(create_string_buffer(bytes(image, "ascii")))
         else:
             return self.load(create_string_buffer(image))
 
-    def read(self, fp):
+    def read(self, fp: Any) -> Image:
         sections = []
         matched = False
         self.valid = True
@@ -269,7 +275,7 @@ class Reader(BaseType):
             self.error("File seems to be invalid.")
             return Image([], valid=False)
 
-    def _address_space(self, value):
+    def _address_space(self, value: int) -> int:
         if value < 2**16:
             return SIXTEEN_BITS
         elif value < 2**20:
@@ -281,7 +287,7 @@ class Reader(BaseType):
         else:
             raise ValueError("Unsupported Addressspace size.")
 
-    def maybe_binary_file(self, fp):
+    def maybe_binary_file(self, fp: Any) -> bool:
         fp.seek(0, os.SEEK_SET)
         header = fp.read(128)
         fp.seek(0, os.SEEK_SET)
@@ -292,7 +298,7 @@ class Reader(BaseType):
         result = not bool(self.VALID_CHARS.match(hdr))
         return result
 
-    def probe(self, fp):
+    def probe(self, fp: Any) -> bool:
         """Determine if object is likely valid for this codec.
 
         Strategy (robust, production-grade):
@@ -377,41 +383,41 @@ class Reader(BaseType):
             return True
         return False
 
-    def probes(self, image):
+    def probes(self, image: Union[str, bytes, bytearray]) -> bool:
         if isinstance(image, str):
             return self.probe(create_string_buffer(bytes(image, "ascii")))
         else:
             return self.probe(create_string_buffer(image))
 
-    def check_line(self, line, format_type):
+    def check_line(self, line: Any, format_type: int) -> None:
         raise NotImplementedError()
 
-    def is_data_line(self, line, format_type):
+    def is_data_line(self, line: Any, format_type: int) -> bool:
         raise NotImplementedError()
 
-    def classifyLine(self, line):
+    def classifyLine(self, line: Any) -> int:
         raise NotImplementedError()
 
-    def special_processing(self, line, format_type):
+    def special_processing(self, line: Any, format_type: int) -> None:
         pass
 
-    def parseData(self, line, format_type):
+    def parseData(self, line: Any, format_type: int) -> bool:
         return True
 
 
 class Writer(BaseType):
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = Logger("Writer")
 
-    def dump(self, fp, image, row_length=16, **kws):  # TODO: rename to bytesPerRow!
+    def dump(self, fp: Union[str, Any], image: Image, row_length: int = 16, **kws: Any) -> None:  # TODO: rename to bytesPerRow!
         if isinstance(fp, str):
             fp = open(fp, "wb")
         fp.write(self.dumps(image, row_length))
         if hasattr(fp, "close"):
             fp.close()
 
-    def dumps(self, image, row_length=16, **kws):
-        result = []
+    def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> bytes:
+        result: List[str] = []
         self.row_length = row_length
         if hasattr(image, "sections") and not image.sections:
             return b""
@@ -434,7 +440,7 @@ class Writer(BaseType):
             result.append(footer)
         return self.post_processing(bytes("\n".join(result), "ascii"))
 
-    def calculate_address_bits(self, image):
+    def calculate_address_bits(self, image: Image) -> int:
         if hasattr(image, "sections"):
             last_segment = sorted(image.sections, key=lambda s: s.start_address)[-1]
         else:
@@ -442,16 +448,16 @@ class Writer(BaseType):
         highest_address = last_segment.start_address + last_segment.length
         return int(math.ceil(math.log(highest_address + 1) / math.log(2)))
 
-    def post_processing(self, data):
+    def post_processing(self, data: bytes) -> bytes:
         if not data.endswith(b"\n"):
             data += b"\n"
         return data
 
-    def pre_processing(self, image):
+    def pre_processing(self, image: Image) -> None:
         pass
 
-    def set_parameters(self, **kws) -> None:
-        params = {}
+    def set_parameters(self, **kws: Any) -> None:
+        params: Dict[str, Any] = {}
         for k, v in kws.items():
             try:
                 params[k] = getattr(self, k)
@@ -460,23 +466,23 @@ class Writer(BaseType):
             else:
                 setattr(self, k, v)
 
-    def compose_row(self, address, length, row):
+    def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
         raise NotImplementedError()
 
-    def compose_header(self, meta):
+    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]:
         return None
 
-    def compose_footer(self, meta):
+    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
         return None
 
-    def word_to_bytes(self, word):
+    def word_to_bytes(self, word: int) -> Tuple[int, int]:
         word = int(word)
         hi = (word & 0xFF00) >> 8
         lo = word & 0x00FF
         return hi, lo
 
     @staticmethod
-    def hex_bytes(row, spaced=False):
+    def hex_bytes(row: Sequence[int], spaced: bool = False) -> str:
         spacer = " " if spaced else ""
         return spacer.join([f"{x:02X}" for x in row])
 
@@ -484,33 +490,33 @@ class Writer(BaseType):
 class ASCIIHexReader(Reader):
     FORMAT_SPEC = None
 
-    def __init__(self, address_pattern, data_pattern, etx_pattern, separators=", "):
+    def __init__(self, address_pattern: str, data_pattern: str, etx_pattern: str, separators: str = ", "):
         self.separators = separators
-        self.DATA_PATTERN = re.compile(data_pattern.format(separators), re.DOTALL | re.MULTILINE)
-        self.ADDRESS_PATTERN = re.compile(address_pattern, re.DOTALL | re.MULTILINE)
-        self.ETX_PATTERN = re.compile(etx_pattern, re.DOTALL | re.MULTILINE)
+        self.DATA_PATTERN: re.Pattern[str] = re.compile(data_pattern.format(separators), re.DOTALL | re.MULTILINE)
+        self.ADDRESS_PATTERN: re.Pattern[str] = re.compile(address_pattern, re.DOTALL | re.MULTILINE)
+        self.ETX_PATTERN: re.Pattern[str] = re.compile(etx_pattern, re.DOTALL | re.MULTILINE)
         self.SPLITTER = re.compile(f"[{separators}]")
-        self.patterns = (
+        self.patterns: Sequence[Tuple[re.Pattern[str], Any]] = (
             (self.ADDRESS_PATTERN, self.getAddress),
             (self.DATA_PATTERN, self.parse_line),
             (self.ETX_PATTERN, self.nop),
         )
-        self.formats = [
+        self.formats: List[Tuple[int, re.Pattern[str]]] = [
             (0, self.ADDRESS_PATTERN),
             (1, self.DATA_PATTERN),
             (2, self.ETX_PATTERN),
         ]
         super().__init__()
 
-    def getAddress(self, line, match):
+    def getAddress(self, line: str, match: re.Match[str]) -> bool:
         self.address = int(match.group("address"), 16)
         self.previous_address = self.address
         return True
 
-    def nop(self, line, match):
+    def nop(self, line: str, match: re.Match[str]) -> bool:
         return False
 
-    def parse_line(self, line, match):
+    def parse_line(self, line: str, match: re.Match[str]) -> bool:
         section = Section(
             self.address,
             bytearray([int(ch, 16) for ch in filter(lambda x: x, self.SPLITTER.split(line))]),
@@ -519,9 +525,9 @@ class ASCIIHexReader(Reader):
         self.address += len(section)
         return True
 
-    def read(self, fp):
+    def read(self, fp: Any) -> Image:
         lines = fp.read().decode()
-        self.sections = []
+        self.sections: List[Section] = []
         self.address = 0
         breakRequest = False
         for line in lines.splitlines():
@@ -538,14 +544,14 @@ class ASCIIHexReader(Reader):
 
 class ASCIIHexWriter(Writer):
     MAX_ADDRESS_BITS = 16
-    previous_address = None
+    previous_address: Optional[int] = None
 
-    def __init__(self, address_designator):
+    def __init__(self, address_designator: str):
         self.separator = " "
         self.address_designator = address_designator
         super().__init__()
 
-    def compose_row(self, address, length, row):
+    def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
         prepend_address = True if address != self.previous_address else False
         self.previous_address = address + length
         if prepend_address:
@@ -558,5 +564,5 @@ class ASCIIHexWriter(Writer):
         self.row_callout(address, length, row)
         return line
 
-    def row_callout(self, address, length, row):
+    def row_callout(self, address: int, length: int, row: Sequence[int]) -> None:
         pass

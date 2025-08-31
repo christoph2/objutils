@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
+
+__all__ = ["Reader", "Writer"]
 
 __copyright__ = """
     objutils - Object file library for Python.
@@ -26,6 +28,7 @@ __copyright__ = """
 
 import re
 from functools import partial
+from typing import Any, Mapping, Optional, Sequence
 
 import objutils.hexfile as hexfile
 import objutils.utils as utils
@@ -61,7 +64,7 @@ class Reader(hexfile.Reader):
         (S9, "S9LLAAAACC"),
     )
 
-    def load(self, fp, **kws):
+    def load(self, fp: Any, **kws: Any):
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = self.read(fp)
@@ -76,7 +79,7 @@ class Reader(hexfile.Reader):
 
         return data
 
-    def check_line(self, line, format_type):
+    def check_line(self, line: Any, format_type: int) -> None:
         # todo: Fkt.!!!
         if format_type in (S0, S1, S5, S9):
             checksum_of_address = ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
@@ -101,10 +104,10 @@ class Reader(hexfile.Reader):
         if hasattr(line, "chunk") and line.length and (line.length != len(line.chunk)):
             raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
-    def is_data_line(self, line, format_type):
+    def is_data_line(self, line: Any, format_type: int) -> bool:
         return format_type in (S1, S2, S3)
 
-    def special_processing(self, line, format_type):
+    def special_processing(self, line: Any, format_type: int) -> None:
         if format_type == S0:
             # print("S0: [{}]".format(line.chunk))
             pass
@@ -139,15 +142,15 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
-    record_type = None
-    s5record = False
-    start_address = None
+    record_type: Optional[int] = None
+    s5record: bool = False
+    start_address: Optional[int] = None
 
     MAX_ADDRESS_BITS = 32
 
     checksum = staticmethod(partial(lrc, width=8, comp=COMPLEMENT_ONES))
 
-    def pre_processing(self, image):
+    def pre_processing(self, image) -> None:
         if self.record_type is None:
             if hasattr(image, "sections"):
                 last_segment = sorted(image.sections, key=lambda s: s.start_address)[-1]
@@ -163,7 +166,7 @@ class Writer(hexfile.Writer):
         self.address_mask = f"%0{(self.record_type + 1) * 2:d}X"
         self.offset = self.record_type + 2
 
-    def srecord(self, record_type, length, address, data=None):
+    def srecord(self, record_type: int, length: int, address: int, data: Optional[Sequence[int]] = None) -> str:
         if data is None:
             data = []
         length += self.offset
@@ -172,39 +175,40 @@ class Writer(hexfile.Writer):
         mask = f"S%u%02X{self.address_mask!s}%s%02X"
         return mask % (record_type, length, address, Writer.hex_bytes(data), checksum)
 
-    def compose_row(self, address, length, row):
+    def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
         self.record_count += 1
-        return self.srecord(self.record_type, length, address, row)
+        return self.srecord(self.record_type or 1, length, address, row)
 
-    def compose_header(self, meta):
+    def compose_header(self, meta: Mapping[int, Sequence[hexfile.MetaRecord]]) -> str:
         self.record_count = 0
-        result = []
+        result: list[str] = []
         if S0 in meta:  # Usually only one S0 record, but be tolerant.
             for m in meta[S0]:
-                result.append(self.srecord(0, len(m.chunk), m.address, m.chunk))
+                if m.chunk is not None and m.address is not None:
+                    result.append(self.srecord(0, len(m.chunk), m.address, m.chunk))
         return "\n".join(result)
 
-    def compose_footer(self, meta):
-        result = []
+    def compose_footer(self, meta: Mapping[int, Sequence[hexfile.MetaRecord]]) -> str:
+        result: list[str] = []
         if self.s5record:
             result.append(self.srecord(5, 0, self.record_count))
         if self.start_address is not None:
             if self.record_type == 1:  # 16bit.
                 if S9 in meta:
                     s9 = meta[S9][0]
-                    result.append(self.srecord(9, 0, s9.address))
+                    result.append(self.srecord(9, 0, s9.address or 0))
                 else:
                     result.append(self.srecord(9, 0, self.start_address))
             elif self.record_type == 2:  # 24bit.
                 if S8 in meta:
                     s8 = meta[S8][0]
-                    result.append(self.srecord(8, 0, s8.address))
+                    result.append(self.srecord(8, 0, s8.address or 0))
                 else:
                     result.append(self.srecord(8, 0, self.start_address))
             elif self.record_type == 3:  # 32bit.
                 if S7 in meta:
                     s7 = meta[S7][0]
-                    result.append(self.srecord(7, 0, s7.address))
+                    result.append(self.srecord(7, 0, s7.address or 0))
                 else:
                     result.append(self.srecord(7, 0, self.start_address))
         return "\n".join(result)

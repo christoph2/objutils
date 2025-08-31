@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
+
+__all__ = ["Reader", "Writer"]
 
 __copyright__ = """
     objutils - Object file library for Python.
