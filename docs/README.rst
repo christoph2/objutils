@@ -1,32 +1,12 @@
 
-objutils
-========
+Readme
+======
 
 .. image:: objutils_dark.jpg
     :align: center
     :scale: 25%
 
-.. image:: https://codeclimate.com/github/christoph2/objutils/badges/gpa.svg
-   :target: https://codeclimate.com/github/christoph2/objutils
-
-.. image:: https://coveralls.io/repos/github/christoph2/objutils/badge.svg?branch=master
-    :target: https://coveralls.io/github/christoph2/objutils?branch=master
-
-.. image:: https://github.com/christoph2/objutils/workflows/objutils/badge.svg
-    :target: https://github.com/christoph2/objutils
-
-.. image:: https://ci.appveyor.com/api/projects/status/owpi324b6wbwocq9?svg=true
-    :target: https://ci.appveyor.com/project/christoph2/objutils
-
-.. image:: https://results.pre-commit.ci/badge/github/christoph2/objutils/master.svg
-   :target: https://results.pre-commit.ci/latest/github/christoph2/objutils/master
-   :alt: pre-commit.ci status
-
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
-
-.. image:: http://img.shields.io/badge/license-GPL-blue.svg
-   :target: http://opensource.org/licenses/GPL-2.0
+|PyPI| |Python Versions| |License: LGPL v3+| |Code style: black|
 
 
 Binary data stored in hex-files is in widespread use especially in embedded systems applications.
@@ -381,3 +361,15 @@ Contribution
 ------------
 
 If you contribute code to this project, you are implicitly allowing your code to be distributed under the GNU General Public License v2.0. You are also implicitly verifying that all code is your original work.
+
+
+.. |CI| image:: https://github.com/christoph2/objutils/workflows/Python%20application/badge.svg
+   :target: https://github.com/christoph2/objutils/actions
+.. |PyPI| image:: https://img.shields.io/pypi/v/objutils.svg
+   :target: https://pypi.org/project/objutils/
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/objutils.svg
+   :target: https://pypi.org/project/objutils/
+.. |License: LGPL v3+| image:: https://img.shields.io/badge/License-LGPL%20v3%2B-blue.svg
+   :target: https://www.gnu.org/licenses/lgpl-3.0
+.. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
