@@ -2,6 +2,9 @@
 objutils
 ========
 
+.. image:: objutils_basic.png
+	:align: center
+
 .. image:: https://codeclimate.com/github/christoph2/objutils/badges/gpa.svg
    :target: https://codeclimate.com/github/christoph2/objutils
 
