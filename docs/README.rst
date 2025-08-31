@@ -3,7 +3,7 @@ objutils
 ========
 
 .. image:: objutils_basic.png
-	:align: center
+    :align: center
     :scale: 50%
 
 .. image:: https://codeclimate.com/github/christoph2/objutils/badges/gpa.svg
