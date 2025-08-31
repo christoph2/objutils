@@ -13,7 +13,19 @@ Registers CODECS and implements an interface to them.
 The first parameter is always the codec name.
 """
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
+
+__all__ = [
+    "Image",
+    "Section",
+    "registry",
+    "load",
+    "loads",
+    "dump",
+    "dumps",
+    "probe",
+    "probes",
+]
 
 __copyright__ = """
     objutils - Object file library for Python.
@@ -37,6 +49,8 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import os
+import sys
 from rich import pretty
 from rich.console import Console
 from rich.traceback import install as tb_install
@@ -60,8 +74,14 @@ from objutils.registry import registry
 from objutils.section import Section  # noqa: F401
 
 
-pretty.install()
-
+# Optional developer-friendly console and tracebacks; disabled by default for library consumers.
+_ENABLE_RICH = os.getenv("OBJUTILS_RICH", "0").lower() in {"1", "true", "yes"}
+if _ENABLE_RICH and sys.stderr.isatty():
+    pretty.install()
+    tb_install(show_locals=True, max_frames=3)
+    console = Console()
+else:
+    console = None  # type: ignore[assignment]
 
 registry.register("bin", objutils.binfile.Reader, objutils.binfile.Writer, "Plain binary format.")
 registry.register(
@@ -100,11 +120,10 @@ registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex sp
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 
-console = Console()
-tb_install(show_locals=True, max_frames=3)  # Install custom exception handler.
+from typing import Any, Optional
 
 
-def load(codec_name, *args, **kws):
+def load(codec_name: str, *args: Any, **kws: Any) -> Image:
     """Load hex data from file.
 
     Parameters
@@ -119,7 +138,7 @@ def load(codec_name, *args, **kws):
     return registry.get(codec_name).Reader().load(*args, **kws)
 
 
-def loads(codec_name, *args, **kws):
+def loads(codec_name: str, *args: Any, **kws: Any) -> Image:
     """Load hex data from bytes.
 
     Parameters
@@ -135,7 +154,7 @@ def loads(codec_name, *args, **kws):
     return registry.get(codec_name).Reader().loads(*args, **kws)
 
 
-def probe(*args, **kws):
+def probe(*args: Any, **kws: Any) -> Optional[str]:
     """Try to guess codec from file.
 
     Returns
@@ -151,7 +170,7 @@ def probe(*args, **kws):
     return None
 
 
-def probes(*args, **kws):
+def probes(*args: Any, **kws: Any) -> Optional[str]:
     """Try to guess codec from bytes.
 
     Returns
@@ -167,7 +186,7 @@ def probes(*args, **kws):
     return None
 
 
-def dump(codec_name, *args, **kws):
+def dump(codec_name: str, *args: Any, **kws: Any) -> None:
     """Save hex data to file.
 
     Parameters
@@ -183,7 +202,7 @@ def dump(codec_name, *args, **kws):
     registry.get(codec_name).Writer().dump(*args, **kws)
 
 
-def dumps(codec_name, *args, **kws):
+def dumps(codec_name: str, *args: Any, **kws: Any) -> bytes:
     """Save hex data to bytes.
 
     Parameters

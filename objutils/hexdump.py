@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
+
+__all__ = [
+    "Dumper",
+    "CanonicalDumper",
+    "isprintable",
+]
 
 __copyright__ = """
     objutils - Object file library for Python.
@@ -24,29 +30,31 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+from typing import BinaryIO, Iterable, Sequence, TextIO
 import sys
 
 
-def isprintable(ch) -> bool:
+def isprintable(ch: int) -> bool:
     return 0x1F < ch < 0x80
 
 
-def unpack(*args):
+def unpack(*args: int) -> Sequence[int]:
     return args
 
 
 class Dumper:
-    def __init__(self, fp=sys.stdout, num_address_bits=32):
-        self._fp = fp
-        self._rolloverMask = 2**num_address_bits
-        self._nibbles = num_address_bits >> 2
-        self._addressMask = f"%0{self._nibbles:d}x "
-        self.previous_row = b""  # bytearray()
-        self.elided = False
+    LINE_LENGTH: int = 16
 
-    def dump_data(self, section, offset: int = 0):
+    def __init__(self, fp: TextIO = sys.stdout, num_address_bits: int = 32) -> None:
+        self._fp: TextIO = fp
+        self._rolloverMask: int = 2**num_address_bits
+        self._nibbles: int = num_address_bits >> 2
+        self._addressMask: str = f"%0{self._nibbles:d}x "
+        self.previous_row: bytes = b""
+        self.elided: bool = False
+
+    def dump_data(self, section, offset: int = 0) -> None:
         end = section.length
-        # line_count = math.ceil(len(section.data) / self.LINE_LENGTH)
         start_pos = 0
         line_num = 0
         end_pos = self.LINE_LENGTH
@@ -73,21 +81,22 @@ class Dumper:
 class CanonicalDumper(Dumper):
     LINE_LENGTH = 0x10
 
-    def printhex_bytes(self, row):
+    def printhex_bytes(self, row: Sequence[int]) -> None:
         row = list(row)
-        filler = list([0x20] * (self.LINE_LENGTH - len(row)))
-        print(
-            "|{}|".format(("%s" * self.LINE_LENGTH) % unpack(*[isprintable(x) and chr(x) or "." for x in row + filler])),
-            file=self._fp,
-        )
+        filler = [0x20] * (self.LINE_LENGTH - len(row))
+        ascii_part = [isprintable(x) and chr(x) or "." for x in row + filler]
+        print("|{}|".format(("%s" * self.LINE_LENGTH) % unpack(*ascii_part)), file=self._fp)
 
-    def dump_row(self, row, startAddr):
+    def dump_row(self, row: Sequence[int] | bytes | bytearray, startAddr: int) -> None:
         start_pos = 0
         print(self._addressMask % ((start_pos + startAddr) % self._rolloverMask), file=self._fp, end=" ")
-        print("%02x " * len(row) % unpack(*row), file=self._fp, end=" ")
-        if len(row) == 0:
+        # Convert row to a tuple of ints to avoid TypeError for empty sequences
+        ints = tuple(row)
+        if ints:
+            print("%02x " * len(ints) % unpack(*ints), file=self._fp, end=" ")
+        else:
             print("", file=self._fp, end="")
-        if len(row) < self.LINE_LENGTH:
-            spaces = "   " * (self.LINE_LENGTH - len(row))
+        if len(ints) < self.LINE_LENGTH:
+            spaces = "   " * (self.LINE_LENGTH - len(ints))
             print(spaces, file=self._fp, end="")
-        self.printhex_bytes(row)
+        self.printhex_bytes(ints)

@@ -25,6 +25,7 @@ __copyright__ = """
 """
 
 from collections import OrderedDict, namedtuple
+from typing import Iterator, MutableMapping, Any, Type, NamedTuple
 
 from objutils.utils import SingletonBase
 
@@ -37,29 +38,32 @@ class CodecAlreadyExistError(Exception):
     pass
 
 
-Codec = namedtuple("Codec", "Reader Writer description")
+class Codec(NamedTuple):
+    Reader: Type[Any]
+    Writer: Type[Any]
+    description: str
 
 
 class Registry(SingletonBase):
     def __init__(self):
-        self._codecs = OrderedDict()
+        self._codecs: "OrderedDict[str, Codec]" = OrderedDict()
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[tuple[str, Codec]]:
         return iter(self._codecs.items())
 
-    def _get_codecs(self):
+    def _get_codecs(self) -> "OrderedDict[str, Codec]":
         return self._codecs
 
-    def _get_formats(self):
+    def _get_formats(self) -> list[str]:
         return sorted(self.codecs.keys())
 
-    def get(self, name):
+    def get(self, name: str) -> Codec:
         codec = self.codecs.get(name.lower())
         if not codec:
             raise CodecDoesNotExistError(name)
         return codec
 
-    def register(self, name, readerClass, writerClass, description=""):
+    def register(self, name: str, readerClass: Type[Any], writerClass: Type[Any], description: str = "") -> None:
         if name in self.codecs:
             raise CodecAlreadyExistError(name)
         self._codecs[name] = Codec(readerClass, writerClass, description)
