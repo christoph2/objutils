@@ -13,7 +13,7 @@ Registers CODECS and implements an interface to them.
 The first parameter is always the codec name.
 """
 
-__version__ = "0.8.1"
+__version__ = "0.8.0"
 
 __all__ = [
     "Image",
@@ -51,6 +51,8 @@ __copyright__ = """
 
 import os
 import sys
+from typing import Any, Optional
+
 from rich import pretty
 from rich.console import Console
 from rich.traceback import install as tb_install
@@ -118,9 +120,6 @@ registry.register("tek", objutils.tek.Reader, objutils.tek.Writer, "Tektonix for
 registry.register("cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
-
-
-from typing import Any, Optional
 
 
 def load(codec_name: str, *args: Any, **kws: Any) -> Image:
