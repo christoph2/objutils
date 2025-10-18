@@ -20,7 +20,7 @@ repos:
         language: system
         types: [python]
         require_serial: true
-        args: ["check"]
+        args: ["check", "--fix", "--exit-non-zero-on-fix"]
       - id: check-added-large-files
         name: Check for added large files
         entry: check-added-large-files
@@ -56,7 +56,6 @@ repos:
         name: check-case-conflict
         entry: check-case-conflict
         language: python
-        types: [python]
         stages: [pre-commit]
       - id: check-merge-conflict
         name: check-merge-conflict
@@ -68,19 +67,14 @@ repos:
         name: fix-byte-order-marker
         entry: fix-byte-order-marker
         language: python
-        types: [python]
+        types: [text]
         stages: [pre-commit]
       - id: mixed-line-ending
         name: mixed-line-ending
         entry: mixed-line-ending
         language: python
-        types_or: [c, c++, python]
-        stages: [pre-commit]
-      - id: end-of-file-fixer
-        name: end-of-file-fixer
-        entry: end-of-file-fixer
-        language: python
-        types_or: [python]
+        types_or: [c, c++, python, text]
+        args: ["--fix=lf"]
         stages: [pre-commit]
       - id: end-of-file-fixer
         name: Fix End of Files
@@ -94,21 +88,19 @@ repos:
         language: system
         types: [python]
         require_serial: true
-        args: []
       - id: isort
         name: isort
         entry: isort
         require_serial: true
         language: system
         types_or: [cython, pyi, python]
-        args: ["--filter-files"]
       - id: pyupgrade
         name: pyupgrade
         description: Automatically upgrade syntax for newer versions.
         entry: pyupgrade
         language: system
         types: [python]
-        args: [--py37-plus]
+        args: [--py39-plus]
       - id: trailing-whitespace
         name: Trim Trailing Whitespace
         entry: trailing-whitespace-fixer
