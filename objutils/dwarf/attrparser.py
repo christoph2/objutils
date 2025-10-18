@@ -36,7 +36,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Dict, List, Set, Union
+from typing import Any
 
 from objutils.elf import model
 
@@ -75,6 +75,8 @@ class AttributeParser:
         self.type_stack: set[int] = set()
         # Parsed type cache: offset -> structured dict
         self.parsed_types: dict[int, dict[str, Any]] = {}
+        # DIEs already processed by traverse_tree to avoid redundant work
+        self.visited_die_offsets: set[int] = set()
         # Tag -> set(attributes encountered) for insights/statistics
         self.att_types: dict[str, set[str]] = defaultdict(set)
 
@@ -128,8 +130,20 @@ class AttributeParser:
 
     def traverse_tree(self, entry: model.DebugInformationEntry, level: int = 0) -> None:
         """Depth-first traversal printing a summary and parsing types on-demand."""
+        # Skip if already visited to avoid redundant work
+        if entry.offset in self.visited_die_offsets:
+            return
+        self.visited_die_offsets.add(entry.offset)
+
         tag = entry.abbrev.tag if hasattr(entry, "abbrev") else entry.tag
         lev_print(level, f"Tag: {tag}")
+
+        # If this is a type that's already been parsed, we can stop here.
+        # The summary calls above will use the cached version.
+        if tag.endswith("_type") and entry.offset in self.parsed_types:
+            # Optional: print a note that we're using a cached type
+            lev_print(level + 1, f"(Using cached type for offset {entry.offset})")
+            return
 
         # Domain-specific summaries for common DIE kinds
         if tag == "variable":
