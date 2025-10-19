@@ -408,15 +408,55 @@ class Elf_Note(Base, RidMixIn):
 
 
 class DIEAttribute(Base, RidMixIn):
-    name = Column(types.VARCHAR)
+    # Store attribute name (DW_AT_*) as integer enum (AttributeEncoding) for performance
+    name = StdInteger(index=True)
     raw_value = Column(types.VARCHAR)
     display_value = Column(types.VARCHAR)
     entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"))
     entry = relationship("DebugInformationEntry", back_populates="attributes")
 
+    @orm.validates("name")
+    def _coerce_name(self, key, value):
+        """Accept attribute name as int, enum, or string and coerce to integer for storage."""
+        try:
+            if isinstance(value, int):
+                return value
+            # enum instance or int-like
+            try:
+                return int(value)
+            except Exception:
+                pass
+            # string name
+            from objutils.dwarf.constants import AttributeEncoding as AttrEnc
+
+            return int(AttrEnc[str(value)])
+        except Exception:
+            # Leave as-is if coercion fails; SQLite will accept, and map builder will handle
+            return value
+
+    @property
+    def encoding_name(self):
+        """Expose attribute name as string, regardless of integer storage."""
+        try:
+            from objutils.dwarf.constants import AttributeEncoding as AttrEnc
+        except Exception:
+            AttrEnc = None
+        v = getattr(self, "name", None)
+        if isinstance(v, int) and AttrEnc is not None:
+            try:
+                return AttrEnc(v).name
+            except Exception:
+                return str(v)
+        # enum-like or string
+        try:
+            return v.name  # enum
+        except Exception:
+            return str(v)
+
 
 class DebugInformationEntry(Base, RidMixIn):
-    tag = Column(types.VARCHAR)
+    # Store DWARF Tag as integer enum value to reduce memory and speed up queries
+    tag = StdInteger(index=True)
     # Offset of this DIE within the .debug_info section (CU-relative start used by DwarfProcessor)
     offset = Column(types.Integer, index=True)
     # Parent DIE linkage for building a tree
@@ -437,11 +477,45 @@ class DebugInformationEntry(Base, RidMixIn):
         cascade="all, delete-orphan",
     )
 
+    @orm.validates("tag")
+    def _coerce_tag(self, key, value):
+        """Accept tag as int, enum, or string name and coerce to integer for storage."""
+        try:
+            if isinstance(value, int):
+                return value
+            # enum instance or int-like
+            try:
+                return int(value)
+            except Exception:
+                pass
+            # string name
+            from objutils.dwarf.constants import Tag as DwarfTag
+
+            return int(DwarfTag[str(value)])
+        except Exception:
+            # Leave as-is if coercion fails; SQLite will accept, and abbrev mapping will handle
+            return value
+
     @property
     def abbrev(self):
         class _Abbrev:
-            def __init__(self, tag):
-                self.tag = tag
+            def __init__(self, tag_value):
+                # Expose string tag name for consumer code even though DB stores int
+                try:
+                    from objutils.dwarf.constants import Tag as DwarfTag
+                except Exception:
+                    DwarfTag = None
+                if isinstance(tag_value, int) and DwarfTag is not None:
+                    try:
+                        self.tag = DwarfTag(tag_value).name
+                    except Exception:
+                        self.tag = str(tag_value)
+                else:
+                    # already a string or enum-like; best effort string
+                    try:
+                        self.tag = tag_value.name  # enum
+                    except Exception:
+                        self.tag = str(tag_value)
 
         return _Abbrev(self.tag)
 
@@ -449,7 +523,19 @@ class DebugInformationEntry(Base, RidMixIn):
     def attributes_map(self):
         cache = getattr(self, "_attributes_map_cache", None)
         if cache is None:
-            cache = {attr.name: attr for attr in self.attributes or []}
+
+            def _attr_key(a):
+                # Normalize attribute key to string even if stored as integer enum
+                try:
+                    return a.encoding_name
+                except Exception:
+                    v = getattr(a, "name", None)
+                    try:
+                        return v.name  # enum-like
+                    except Exception:
+                        return str(v)
+
+            cache = {_attr_key(attr): attr for attr in (self.attributes or [])}
             setattr(self, "_attributes_map_cache", cache)
         return cache
 
