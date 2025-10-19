@@ -127,7 +127,7 @@ class Attribute:
 class Abbrevation:
     tag: str
     children: bool = False
-    attrs: List[Any] = field(default_factory=List)
+    attrs: list[Any] = field(default_factory=list)
 
 
 @dataclass
@@ -147,8 +147,8 @@ class DIEAttribute:
 @dataclass
 class DebugInformationEntry:
     name: str
-    attributes: List = field(default_factory=list)
-    children: List = field(default_factory=list)
+    attributes: list = field(default_factory=list)
+    children: list = field(default_factory=list)
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -157,7 +157,7 @@ class DebugInformationEntry:
 @dataclass
 class DebugInformation:
     die_map: dict[int, DebugInformationEntry]
-    die_entries: List[DebugInformationEntry]
+    die_entries: list[DebugInformationEntry]
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -789,7 +789,7 @@ class DwarfProcessor:
                                     )
                                 )
                                 db_die.attributes.append(
-                                    model.DIEAttribute(name=enc.name, raw_value=value, display_value=display_value)
+                                    model.DIEAttribute(name=int(enc), raw_value=value, display_value=display_value)
                                 )
                                 offset += attr.stop - attr.start
                                 pos = image.tell()
@@ -850,13 +850,11 @@ class DwarfProcessor:
                                 DIEAttribute(value, display_value),
                             )
                         )
-                        db_die.attributes.append(model.DIEAttribute(name=enc.name, raw_value=value, display_value=display_value))
+                        db_die.attributes.append(model.DIEAttribute(name=int(enc), raw_value=value, display_value=display_value))
                     offset += attr.stop - attr.start
                     pos = image.tell()
                     if pos >= dbgInfo.start + cu_length + 4:
                         break
-                # print(db_die, db_die.attributes)
-                # self.db_session.bulk_save_objects([db_die])
                 die_map[die_start] = die
             result.append(root_element)
         self.db_session.commit()
