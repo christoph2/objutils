@@ -243,6 +243,7 @@ class AttributeEncoding(EnumBase):
     str_offsets_base = 0x72
     addr_base = 0x73
     rnglists_base = 0x74
+    dwo_id = 0x75
     dwo_name = 0x76
     reference = 0x77
     rvalue_reference = 0x78
@@ -267,8 +268,15 @@ class AttributeEncoding(EnumBase):
     defaulted = 0x8B
     loclists_base = 0x8C
 
-    lo_user = 0x2000
-    hi_user = 0x3FFF
+    language_name = 0x90
+    language_version = 0x91
+
+    ghs_namespace_alias = 0x806
+    ghs_using_namespace = 0x807
+    ghs_using_declaration = 0x808
+
+    HP_block_index = 0x2000
+
     MIPS_fde = 0x2001
     MIPS_loop_begin = 0x2002
     MIPS_tail_loop_begin = 0x2003
@@ -280,12 +288,17 @@ class AttributeEncoding(EnumBase):
     MIPS_abstract_name = 0x2009
     MIPS_clone_origin = 0x200A
     MIPS_has_inlines = 0x200B
-    HP_block_index = 0x2000
-    HP_unmodifiable = 0x2001
-    HP_prologue = 0x2005
-    HP_epilogue = 0x2008
-    HP_actuals_stmt_list = 0x2010
-    HP_proc_per_section = 0x2011
+
+    TI_version = 0x200B
+    MIPS_stride_byte = 0x200C
+    TI_asm = 0x200C
+    MIPS_stride_elem = 0x200D
+    MIPS_ptr_dopetype = 0x200E
+    TI_skeletal = 0x200E
+    MIPS_allocatable_dopetype = 0x200F
+    MIPS_assumed_shape_dopetype = 0x2010
+    MIPS_assumed_size = 0x2011
+    TI_interrupt = 0x2011
     HP_raw_data_ptr = 0x2012
     HP_pass_by_reference = 0x2013
     HP_opt_level = 0x2014
@@ -302,6 +315,7 @@ class AttributeEncoding(EnumBase):
     HP_definition_points = 0x2022
     HP_default_location = 0x2023
     HP_is_result_param = 0x2029
+
     sf_names = 0x2101
     src_info = 0x2102
     mac_info = 0x2103
@@ -335,29 +349,122 @@ class AttributeEncoding(EnumBase):
     GNU_pubnames = 0x2134
     GNU_pubtypes = 0x2135
     GNU_discriminator = 0x2136
-    VMS_rtnbeg_pd_address = 0x2201
+    GNU_locviews = 0x2137
+    GNU_entry_view = 0x2138
+
+    SUN_template = 0x2201
+    SUN_alignment = 0x2202
+    SUN_vtable = 0x2203
+    SUN_count_guarantee = 0x2204
+    SUN_command_line = 0x2205
+    SUN_vbase = 0x2206
+    SUN_compile_options = 0x2207
+    SUN_language = 0x2208
+    SUN_browser_file = 0x2209
+    SUN_vtable_abi = 0x2210
+    SUN_func_offsets = 0x2211
+    SUN_cf_kind = 0x2212
+    SUN_vtable_index = 0x2213
+    SUN_omp_tpriv_addr = 0x2214
+    SUN_omp_child_func = 0x2215
+    SUN_func_offset = 0x2216
+    SUN_memop_type_ref = 0x2217
+    SUN_profile_id = 0x2218
+    SUN_memop_signature = 0x2219
+    SUN_obj_dir = 0x2220
+    SUN_obj_file = 0x2221
+    SUN_original_name = 0x2222
+    SUN_hwcprof_signature = 0x2223
+    SUN_amd64_parmdump = 0x2224
+    SUN_part_link_name = 0x2225
+    SUN_link_name = 0x2226
+    SUN_pass_with_const = 0x2227
+    SUN_return_with_const = 0x2228
+    SUN_import_by_name = 0x2229
+    SUN_f90_pointer = 0x222A
+    SUN_pass_by_ref = 0x222B
+    SUN_f90_allocatable = 0x222C
+    SUN_f90_assumed_shape_array = 0x222D
+    SUN_c_vla = 0x222E
+    SUN_return_value_ptr = 0x2230
+    SUN_dtor_start = 0x2231
+    SUN_dtor_length = 0x2232
+    SUN_dtor_state_initial = 0x2233
+    SUN_dtor_state_final = 0x2234
+    SUN_dtor_state_deltas = 0x2235
+    SUN_import_by_lname = 0x2236
+    SUN_f90_use_only = 0x2237
+    SUN_namelist_spec = 0x2238
+    SUN_is_omp_child_func = 0x2239
+    SUN_fortran_main_alias = 0x223A
+    SUN_fortran_based = 0x223B
+
+    ALTIUM_loclist = 0x2300
     use_GNAT_descriptive_type = 0x2301
     GNAT_descriptive_type = 0x2302
     GNU_numerator = 0x2303
     GNU_denominator = 0x2304
     GNU_bias = 0x2305
+
+    go_kind = 0x2900
+    go_key = 0x2901
+    go_elem = 0x2902
+    go_embedded_field = 0x2903
+    go_runtime_type = 0x2904
+
     upc_threads_scaled = 0x3210
+    IBM_wsa_addr = 0x393E
+    IBM_home_location = 0x393F
+    IBM_alt_srcview = 0x3940
+
     PGI_lbase = 0x3A00
     PGI_soffset = 0x3A01
     PGI_lstride = 0x3A02
-    PPLE_optimized = 0x3FE1
-    PPLE_flags = 0x3FE2
-    PPLE_isa = 0x3FE3
-    PPLE_block = 0x3FE4
-    PPLE_major_runtime_vers = 0x3FE5
-    PPLE_runtime_class = 0x3FE6
-    PPLE_omit_frame_ptr = 0x3FE7
-    PPLE_property_name = 0x3FE8
-    PPLE_property_getter = 0x3FE9
-    PPLE_property_setter = 0x3FEA
-    PPLE_property_attribute = 0x3FEB
-    PPLE_objc_complete_type = 0x3FEC
-    PPLE_property = 0x3FED
+
+    BORLAND_property_read = 0x3B11
+    BORLAND_property_write = 0x3B12
+    BORLAND_property_implements = 0x3B13
+    BORLAND_property_index = 0x3B14
+    BORLAND_property_default = 0x3B15
+    BORLAND_Delphi_unit = 0x3B20
+    BORLAND_Delphi_class = 0x3B21
+    BORLAND_Delphi_record = 0x3B22
+    BORLAND_Delphi_metaclass = 0x3B23
+    BORLAND_Delphi_constructor = 0x3B24
+    BORLAND_Delphi_destructor = 0x3B25
+    BORLAND_Delphi_anonymous_method = 0x3B26
+    BORLAND_Delphi_interface = 0x3B27
+    BORLAND_Delphi_ABI = 0x3B28
+    BORLAND_Delphi_frameptr = 0x3B30
+    BORLAND_closure = 0x3B31
+
+    LLVM_include_path = 0x3E00
+    LLVM_config_macros = 0x3E01
+    LLVM_sysroot = 0x3E02
+    LLVM_tag_offset = 0x3E03
+    LLVM_apinotes = 0x3E07
+    LLVM_active_lane = 0x3E08
+    LLVM_augmentation = 0x3E09
+    LLVM_lanes = 0x3E0A
+    LLVM_lane_pc = 0x3E0B
+    LLVM_vector_size = 0x3E0C
+
+    APPLE_optimized = 0x3FE1
+    APPLE_flags = 0x3FE2
+    APPLE_isa = 0x3FE3
+    APPLE_block = 0x3FE4
+    APPLE_major_runtime_vers = 0x3FE5
+    APPLE_runtime_class = 0x3FE6
+    APPLE_omit_frame_ptr = 0x3FE7
+    APPLE_property_name = 0x3FE8
+    APPLE_property_getter = 0x3FE9
+    APPLE_property_setter = 0x3FEA
+    APPLE_property_attribute = 0x3FEB
+    APPLE_objc_complete_type = 0x3FEC
+    APPLE_property = 0x3FED
+    APPLE_objc_direct = 0x3FEE
+    APPLE_sdk = 0x3FEF
+    APPLE_origin = 0x3FF0
 
     UNKOWN = 0xFFFF
 
@@ -370,6 +477,9 @@ class FakeEncoding:
 
     def __init__(self, value):
         self._value = value
+
+    def __int__(self):
+        return self._value
 
     @property
     def value(self):
@@ -628,7 +738,6 @@ class Operation(EnumBase):
     implicit_pointer = 0xA0
     addrx = 0xA1
     constx = 0xA2
-
     entry_value = 0xA3
     const_type = 0xA4
     regval_type = 0xA5
@@ -637,31 +746,37 @@ class Operation(EnumBase):
     convert = 0xA8
     reinterpret = 0xA9
 
-    lo_user = 0xE0
-    hi_user = 0xFF
     GNU_push_tls_address = 0xE0
+    LLVM_form_aspace_address = 0xE1
+    LLVM_push_lane = 0xE2
+    LLVM_offset = 0xE3
+    LLVM_offset_uconst = 0xE4
+    LLVM_bit_offset = 0xE5
+    LLVM_call_frame_entry_reg = 0xE6
+    LLVM_undefined = 0xE7
+    LLVM_aspace_bregx = 0xE8
+    LLVM_aspace_implicit_pointer = 0xE9
+    LLVM_piece_end = 0xEA
+    LLVM_extend = 0xEB
+    LLVM_select_bit_piece = 0xEC
+    WASM_location = 0xED
+    WASM_location_int = 0xEE
+
     GNU_uninit = 0xF0
     GNU_encoded_addr = 0xF1
     GNU_implicit_pointer = 0xF2
-
     GNU_entry_value = 0xF3
     GNU_const_type = 0xF4
     GNU_regval_type = 0xF5
     GNU_deref_type = 0xF6
     GNU_convert = 0xF7
+    PGI_omp_thread_num = 0xF8
     GNU_reinterpret = 0xF9
-
     GNU_parameter_ref = 0xFA
     GNU_addr_index = 0xFB
     GNU_const_index = 0xFC
-    HP_unknown = 0xE0
-    HP_is_value = 0xE1
-    HP_fltconst4 = 0xE2
-    HP_fltconst8 = 0xE3
-    HP_mod_range = 0xE4
-    HP_unmod_range = 0xE5
-    HP_tls = 0xE6
-    GI_omp_thread_num = 0xF8
+    lo_user = 0xFF
+    hi_user = 0xFFFF
 
 
 class BaseTypeEncoding(EnumBase):
@@ -682,6 +797,8 @@ class BaseTypeEncoding(EnumBase):
     unsigned_fixed = 0xE
     decimal_float = 0xF
     UTF = 0x10
+    UCS = 0x11
+    ASCII = 0x12
     lo_user = 0x80
     hi_user = 0xFF
     HP_float80 = 0x80
