@@ -412,7 +412,7 @@ class DIEAttribute(Base, RidMixIn):
     name = StdInteger(index=True)
     raw_value = Column(types.VARCHAR)
     display_value = Column(types.VARCHAR)
-    entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"))
+    entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"), index=True)
     entry = relationship("DebugInformationEntry", back_populates="attributes")
 
     @orm.validates("name")
@@ -516,6 +516,11 @@ class DebugInformationEntry(Base, RidMixIn):
                         self.tag = tag_value.name  # enum
                     except Exception:
                         self.tag = str(tag_value)
+
+            def __str__(self) -> str:
+                return f"Tag({self.tag})"
+
+            __repr__ = __str__
 
         return _Abbrev(self.tag)
 
@@ -661,7 +666,7 @@ class Model:
 
         self._metadata = Base.metadata
         Base.metadata.create_all(self.engine)
-        # Ensure schema upgrades for existing databases opened directly via Model
+        # Ensure schema upgrades for older databases opened directly via Model
         self._ensure_schema()
         self.session.flush()
         self.session.commit()
