@@ -40,7 +40,7 @@ from objutils.dwarf import constants
 class Stack:
 
     def __init__(self):
-        self._values: List[Any] = []
+        self._values: list[Any] = []
 
     def push(self, value: Any) -> None:
         self._values.append(value)
@@ -1310,14 +1310,7 @@ OP_MAP = {
     constants.Operation.GNU_parameter_ref: Gnu_Parameter_Ref,
     constants.Operation.GNU_addr_index: Gnu_Addr_Index,
     constants.Operation.GNU_const_index: Gnu_Const_Index,
-    constants.Operation.HP_unknown: Hp_Unknown,
-    constants.Operation.HP_is_value: Hp_Is_Value,
-    constants.Operation.HP_fltconst4: Hp_Fltconst4,
-    constants.Operation.HP_fltconst8: Hp_Fltconst8,
-    constants.Operation.HP_mod_range: Hp_Mod_Range,
-    constants.Operation.HP_unmod_range: Hp_Unmod_Range,
-    +constants.Operation.HP_tls: Hp_Tls,
-    constants.Operation.GI_omp_thread_num: Gi_Omp_Thread_Num,
+    constants.Operation.PGI_omp_thread_num: Gi_Omp_Thread_Num,
 }
 
 ######################
