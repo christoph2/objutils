@@ -806,8 +806,8 @@ class Model:
         self.session.commit()
 
     def _ensure_schema(self):
-        """Ensure required columns exist for older databases opened directly.
-        Adds missing columns with minimal changes without rebuilding the DB.
+        """Ensure required columns and critical indexes exist for older databases.
+        Adds missing columns and creates indexes with minimal changes without rebuilding the DB.
         """
         try:
             from sqlalchemy import inspect as sa_inspect
@@ -824,6 +824,7 @@ class Model:
             except Exception:
                 dia_cols = set()
             with self.engine.begin() as conn:
+                # --- Columns ---
                 if "offset" not in die_cols:
                     conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "offset" INTEGER'))
                 if "parent_id" not in die_cols:
@@ -832,6 +833,34 @@ class Model:
                     conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "cu_start" INTEGER'))
                 if "form" not in dia_cols:
                     conn.execute(text('ALTER TABLE dieattribute ADD COLUMN "form" INTEGER'))
+
+                # --- Indexes ---
+                try:
+                    die_indexes = {i.get("name") for i in inspector.get_indexes("debuginformationentry")}
+                except Exception:
+                    die_indexes = set()
+                try:
+                    dia_indexes = {i.get("name") for i in inspector.get_indexes("dieattribute")}
+                except Exception:
+                    dia_indexes = set()
+
+                # Critical for traversal speed: lookups by DIE.offset
+                if "idx_die_offset" not in die_indexes:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_offset ON debuginformationentry ("offset")'))
+                # Helpful for reference resolution across CUs
+                if "idx_die_cu_start" not in die_indexes and "cu_start" in die_cols:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_cu_start ON debuginformationentry ("cu_start")'))
+                # Helpful for parent/child traversal
+                if "idx_die_parent_id" not in die_indexes and "parent_id" in die_cols:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_parent_id ON debuginformationentry ("parent_id")'))
+                # Attribute-side foreign key lookups (speed attributes_map building)
+                if "idx_dia_entry_id" not in dia_indexes:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_entry_id ON dieattribute ("entry_id")'))
+                # Optional filters by attribute name/form
+                if "idx_dia_name" not in dia_indexes:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_name ON dieattribute ("name")'))
+                if "idx_dia_form" not in dia_indexes and "form" in dia_cols:
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_form ON dieattribute ("form")'))
         except Exception:
             # Be permissive: if inspection or ALTER fails, leave as-is.
             pass
