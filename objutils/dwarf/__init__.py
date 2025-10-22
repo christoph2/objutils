@@ -702,6 +702,7 @@ class DwarfProcessor:
         offset = 0
         result = []
         die_map = {}
+        idx = 0
         while True:
             section_pos = image.tell()
             if section_pos >= section_length - 1:
@@ -720,18 +721,14 @@ class DwarfProcessor:
             else:
                 debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
                 address_size = dbgInfo.body.address_size
-
-            print("*" * 80)
-            print(f"   Compilation Unit @ offset 0x{dbgInfo.start:x}:")  # TODO: offset is needed for _refx types!!!
-            print(f"   Length:        0x{cu_length:x} (32-bit)")
-            print(f"   Version:       {version}")
-            print(f"   Abbrev Offset: 0x{debug_abbrev_offset:x}")
-            print(f"   Pointer Size:  {address_size}")
+            idx += 1
+            print(
+                f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}  pointer-size:  {address_size}  version: {version}"
+            )
             level = 0
             pos = 0
             offset += dbgInfo.stop - dbgInfo.start
             form_readers = self.get_form_readers(address_size)
-            print("Pos, Length", pos, cu_length)
             if pos >= cu_length:
                 break
             while True:
@@ -743,7 +740,6 @@ class DwarfProcessor:
                 attr = Attribute.parse_stream(image)
                 abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
                 if not abbr:
-                    print(f"<{start:2x}>: Abbrev Number: 0 ---")
                     # End of a sibling list: pop one level on both in-memory and DB stacks
                     if level > 0:
                         level -= 1
@@ -758,13 +754,14 @@ class DwarfProcessor:
                     db_die = model.DebugInformationEntry(tag=abbr.tag)
                     # Cache-friendly: store DIE offset for quick lookups by external tools
                     db_die.offset = start
+                    # Store CU start for reference resolution later
+                    db_die.cu_start = dbgInfo.start
                     # Set parent on DB DIE if we have one on stack
                     if db_die_stack:
                         db_die.parent = db_die_stack[-1]
                     self.db_session.add(db_die)
                     if attr.attr != 0:
                         die_stack[-1].children.append(die)
-                    print(f"{'   ' * (level + 1)}<{level}><{start:02x}>: Abbrev Number: {attr.attr} ({abbr.tag})")
                     die_start = start
                     if abbr.children:
                         die_stack.append(die)
@@ -778,79 +775,31 @@ class DwarfProcessor:
                         start = image.tell()
                         if reader is None:
                             if form == constants.AttributeForm.DW_FORM_implicit_const:
-                                print("DW_FORM_implicit_const")
                                 value = special_value
-                                display_value = value
-                                print(f"{'   ' * (level + 1)}<{start:02x}> {enc.name}: {display_value}")
-                                die.attributes.append(
-                                    (
-                                        enc.name,
-                                        DIEAttribute(value, display_value),
-                                    )
-                                )
-                                db_die.attributes.append(
-                                    model.DIEAttribute(name=int(enc), raw_value=value, display_value=display_value)
-                                )
+                                # In-memory representation (keep minimal to preserve structure)
+                                die.attributes.append((enc.name, DIEAttribute(value, value)))
+                                # DB attribute: store name, form, raw value; display computed lazily
+                                db_die.attributes.append(model.DIEAttribute(name=int(enc), form=int(form), raw_value=value))
                                 offset += attr.stop - attr.start
                                 pos = image.tell()
                                 if pos >= dbgInfo.start + cu_length + 4:
                                     break
                                 continue
                             else:
-                                print("*EF", enc, form, start, attr, abbr)
+                                # Unknown reader; skip gracefully
+                                continue
                         try:
                             value = reader.parse_stream(image)
-                        except Exception as e:
-                            print("EXC", e, reader, form)
+                        except Exception:
+                            # Reraise without printing for performance
                             raise
-                        if enc in (
-                            constants.AttributeEncoding.location,
-                            constants.AttributeEncoding.GNU_call_site_value,
-                            constants.AttributeEncoding.frame_base,
-                            constants.AttributeEncoding.GNU_call_site_target,
-                            constants.AttributeEncoding.vtable_elem_location,
-                            constants.AttributeEncoding.data_member_location,
-                            constants.AttributeEncoding.return_addr,
-                        ):
-                            if form in (
-                                constants.AttributeForm.DW_FORM_exprloc,
-                                constants.AttributeForm.DW_FORM_block,
-                                constants.AttributeForm.DW_FORM_block1,
-                                constants.AttributeForm.DW_FORM_block2,
-                                constants.AttributeForm.DW_FORM_block4,
-                            ):
-                                display_value = self.dwarf_expression(value)
-                            else:
-                                try:
-                                    display_value = f"0x{value:08x}"
-                                except Exception:
-                                    print("VALUE", value, enc, form)
-                                    raise
-                        elif enc in ENCODED_ATTRIBUTES:
-                            res = encoding_repr(enc, value)
-                            display_value = f"{res} (0x{value:08x})"
-                        else:
-                            if form in (
-                                constants.AttributeForm.DW_FORM_ref1,
-                                constants.AttributeForm.DW_FORM_ref2,
-                                constants.AttributeForm.DW_FORM_ref4,
-                                constants.AttributeForm.DW_FORM_ref8,
-                                constants.AttributeForm.DW_FORM_ref_udata,
-                            ):
-                                value += dbgInfo.start
-                                display_value = f"0x{value:08x}"
-                            elif form == constants.AttributeForm.DW_FORM_ref_addr:
-                                display_value = f"0x{value:08x}"
-                            else:
-                                display_value = value
-                        print(f"{'   ' * (level + 1)}<{start:02x}> {enc.name}: {display_value}")
-                        die.attributes.append(
-                            (
-                                enc.name,
-                                DIEAttribute(value, display_value),
-                            )
-                        )
-                        db_die.attributes.append(model.DIEAttribute(name=int(enc), raw_value=value, display_value=display_value))
+                        # In-memory representation: do not compute heavy display, keep simple
+                        die.attributes.append((enc.name, DIEAttribute(value, value)))
+                        # DB attribute: store for lazy display
+                        try:
+                            db_die.attributes.append(model.DIEAttribute(name=int(enc), form=int(form), raw_value=value))
+                        except Exception:
+                            db_die.attributes.append(model.DIEAttribute(name=int(enc), raw_value=value))
                     offset += attr.stop - attr.start
                     pos = image.tell()
                     if pos >= dbgInfo.start + cu_length + 4:

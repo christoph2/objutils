@@ -410,8 +410,11 @@ class Elf_Note(Base, RidMixIn):
 class DIEAttribute(Base, RidMixIn):
     # Store attribute name (DW_AT_*) as integer enum (AttributeEncoding) for performance
     name = StdInteger(index=True)
+    # Form of the attribute (DW_FORM_*), stored as integer enum for later interpretation
+    form = StdInteger(index=True, nullable=True)
     raw_value = Column(types.VARCHAR)
-    display_value = Column(types.VARCHAR)
+    # Keep DB column for backward compatibility; if None, we compute lazily on access
+    display_value = Column(types.VARCHAR, nullable=True)
     entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"), index=True)
     entry = relationship("DebugInformationEntry", back_populates="attributes")
 
@@ -453,12 +456,143 @@ class DIEAttribute(Base, RidMixIn):
         except Exception:
             return str(v)
 
+    # ----- Display value computation with caching -----
+    def _compute_display_value(self):
+        try:
+            from objutils.dwarf import constants as c
+        except Exception:
+            return str(self.raw_value)
+
+        # Normalize helpers
+        def to_int(v):
+            try:
+                return int(v)
+            except Exception:
+                return None
+
+        enc = None
+        try:
+            enc = c.AttributeEncoding(self.name)
+        except Exception:
+            pass
+        frm = None
+        try:
+            frm = c.AttributeForm(self.form) if self.form is not None else None
+        except Exception:
+            pass
+
+        raw = self.raw_value
+
+        # Location-like attributes
+        if enc in (
+            getattr(c.AttributeEncoding, "location", None),
+            getattr(c.AttributeEncoding, "GNU_call_site_value", None),
+            getattr(c.AttributeEncoding, "frame_base", None),
+            getattr(c.AttributeEncoding, "GNU_call_site_target", None),
+            getattr(c.AttributeEncoding, "vtable_elem_location", None),
+            getattr(c.AttributeEncoding, "data_member_location", None),
+            getattr(c.AttributeEncoding, "return_addr", None),
+        ):
+            if frm in (
+                getattr(c.AttributeForm, "DW_FORM_exprloc", None),
+                getattr(c.AttributeForm, "DW_FORM_block", None),
+                getattr(c.AttributeForm, "DW_FORM_block1", None),
+                getattr(c.AttributeForm, "DW_FORM_block2", None),
+                getattr(c.AttributeForm, "DW_FORM_block4", None),
+                getattr(c.AttributeForm, "DW_FORM_implicit_const", None),
+            ):
+                # We cannot run the DWARF stack machine here; present as hex bytes for performance.
+                if isinstance(raw, (bytes, bytearray)):
+                    return raw.hex()
+                # Strings like "b'..'" or iterables of ints
+                try:
+                    if isinstance(raw, str) and raw.startswith("b'"):
+                        # best effort: eval-safe removal
+                        hexed = raw.encode("latin1", "ignore")
+                        return hexed.hex()
+                except Exception:
+                    pass
+                return str(raw)
+            else:
+                ival = to_int(raw)
+                if ival is not None:
+                    return f"0x{ival:08x}"
+                return str(raw)
+
+        # Encoded attributes mapped to enums (language, accessibility, etc.)
+        try:
+            ENCODED_MAP = {
+                c.AttributeEncoding.decimal_sign: c.DecimalSign,
+                c.AttributeEncoding.endianity: c.Endianity,
+                c.AttributeEncoding.accessibility: c.Accessibility,
+                c.AttributeEncoding.visibility: c.Visibility,
+                c.AttributeEncoding.virtuality: c.Virtuality,
+                c.AttributeEncoding.language: c.Languages,
+                c.AttributeEncoding.identifier_case: c.IdentifierCase,
+                c.AttributeEncoding.calling_convention: c.CallingConvention,
+                c.AttributeEncoding.inline: c.Inline,
+                c.AttributeEncoding.ordering: c.Ordering,
+                c.AttributeEncoding.discr_list: c.DiscriminantDescriptor,
+                c.AttributeEncoding.defaulted: c.Defaulted,
+            }
+            if enc in ENCODED_MAP:
+                ival = to_int(raw)
+                if ival is not None and ival in ENCODED_MAP[enc].__members__.values():
+                    try:
+                        name = ENCODED_MAP[enc](ival).name
+                        return f"{name} (0x{ival:08x})"
+                    except Exception:
+                        return f"0x{ival:08x}"
+        except Exception:
+            pass
+
+        # References
+        if frm in (
+            getattr(c.AttributeForm, "DW_FORM_ref1", None),
+            getattr(c.AttributeForm, "DW_FORM_ref2", None),
+            getattr(c.AttributeForm, "DW_FORM_ref4", None),
+            getattr(c.AttributeForm, "DW_FORM_ref8", None),
+            getattr(c.AttributeForm, "DW_FORM_ref_udata", None),
+        ):
+            ival = to_int(raw)
+            base = getattr(self.entry, "cu_start", None)
+            if ival is not None:
+                if base is not None:
+                    try:
+                        ival += int(base)
+                    except Exception:
+                        pass
+                return f"0x{ival:08x}"
+            return str(raw)
+        if frm == getattr(c.AttributeForm, "DW_FORM_ref_addr", None):
+            ival = to_int(raw)
+            if ival is not None:
+                return f"0x{ival:08x}"
+            return str(raw)
+
+        # Default: best-effort string
+        return raw if isinstance(raw, str) else str(raw)
+
+    def get_display_value(self):
+        # If column is set, use it; otherwise compute and cache per-instance
+        dv = getattr(self, "display_value", None)
+        if dv not in (None, ""):
+            return dv
+        cached = getattr(self, "_display_value_cache", None)
+        if cached is not None:
+            return cached
+        dv = self._compute_display_value()
+        setattr(self, "_display_value_cache", dv)
+        return dv
+
 
 class DebugInformationEntry(Base, RidMixIn):
     # Store DWARF Tag as integer enum value to reduce memory and speed up queries
     tag = StdInteger(index=True)
     # Offset of this DIE within the .debug_info section (CU-relative start used by DwarfProcessor)
     offset = Column(types.Integer, index=True)
+    # Start offset of the Compilation Unit this DIE belongs to; used for ref form resolution
+    cu_start = Column(types.Integer, index=True, nullable=True)
     # Parent DIE linkage for building a tree
     parent_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"), index=True, nullable=True)
 
@@ -679,16 +813,25 @@ class Model:
             from sqlalchemy import inspect as sa_inspect
 
             inspector = sa_inspect(self.engine)
-            # Ensure debuginformationentry.offset and parent_id exist
+            # Ensure debuginformationentry columns exist
             try:
                 die_cols = {c["name"] for c in inspector.get_columns("debuginformationentry")}
             except Exception:
                 die_cols = set()
+            # Ensure dieattribute columns exist
+            try:
+                dia_cols = {c["name"] for c in inspector.get_columns("dieattribute")}
+            except Exception:
+                dia_cols = set()
             with self.engine.begin() as conn:
                 if "offset" not in die_cols:
                     conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "offset" INTEGER'))
                 if "parent_id" not in die_cols:
                     conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "parent_id" INTEGER'))
+                if "cu_start" not in die_cols:
+                    conn.execute(text('ALTER TABLE debuginformationentry ADD COLUMN "cu_start" INTEGER'))
+                if "form" not in dia_cols:
+                    conn.execute(text('ALTER TABLE dieattribute ADD COLUMN "form" INTEGER'))
         except Exception:
             # Be permissive: if inspection or ALTER fails, leave as-is.
             pass
