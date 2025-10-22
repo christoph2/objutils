@@ -33,11 +33,11 @@ Usage (example):
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
 from mako.template import Template
 
-from objutils.dwarf.attrparser import AttributeParser
+from objutils.dwarf.traverser import AttributeParser
 from objutils.elf import model
 
 
