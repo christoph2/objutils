@@ -2,9 +2,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 from itertools import groupby
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
-from objutils.dwarf.constants import AttributeEncoding, Tag
+from objutils.dwarf.constants import AttributeEncoding, AttributeForm, Tag
 from objutils.elf import model
 from objutils.elf.model import DIEAttribute
 
@@ -136,10 +136,29 @@ class AttributeParser:
         tag = getattr(entry.abbrev, "tag", entry.tag)
         name = self._name_of(entry)
         type_info = ""
-        if "type" in getattr(entry, "attributes_map", {}):
-            type_offset = self._attr_raw(entry, "type")
-            if type_offset is not None:
-                type_info = f" -> {self._type_summary(int(type_offset))}"
+        # Resolve type summary with proper CU-relative adjustment for ref forms
+        attr = self._get_attr(entry, "type")
+        if attr is not None:
+            raw = getattr(attr, "raw_value", None)
+            try:
+                off = int(raw) if raw is not None else None
+            except Exception:
+                off = None
+            if off is not None:
+                try:
+                    frm = getattr(attr, "form", None)
+                    if frm in (
+                        getattr(AttributeForm, "DW_FORM_ref1", None),
+                        getattr(AttributeForm, "DW_FORM_ref2", None),
+                        getattr(AttributeForm, "DW_FORM_ref4", None),
+                        getattr(AttributeForm, "DW_FORM_ref8", None),
+                        getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                    ):
+                        base = getattr(entry, "cu_start", 0) or 0
+                        off += int(base)
+                except Exception:
+                    pass
+                type_info = f" -> {self._type_summary(int(off))}"
 
         print(f"{'    ' * level}{tag} '{name}'{type_info} [off=0x{entry.offset:08x}]")
 
@@ -168,6 +187,21 @@ class AttributeParser:
                     referenced_offset = int(attr.raw_value)
                 except Exception:
                     referenced_offset = None
+                if referenced_offset is not None:
+                    # Adjust CU-relative reference forms to absolute DIE offsets
+                    try:
+                        frm = getattr(attr, "form", None)
+                        if frm in (
+                            getattr(AttributeForm, "DW_FORM_ref1", None),
+                            getattr(AttributeForm, "DW_FORM_ref2", None),
+                            getattr(AttributeForm, "DW_FORM_ref4", None),
+                            getattr(AttributeForm, "DW_FORM_ref8", None),
+                            getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                        ):
+                            base = getattr(die, "cu_start", 0) or 0
+                            referenced_offset += int(base)
+                    except Exception:
+                        pass
                 if referenced_offset and referenced_offset != die.offset:
                     result.setdefault("attrs", {})[attr_name] = self.parse_type(referenced_offset, level + 1)
                     continue
@@ -251,7 +285,7 @@ class AttributeParser:
     def _type_summary(self, offset: int) -> str:
         die = self.get_die(offset)
         if die is None:
-            return f"<missing type at {offset}>"
+            return f"<missing type at 0x{offset:08x}>"
         tag = getattr(die.abbrev, "tag", die.tag)
         name = self._name_of(die)
         return name or tag
