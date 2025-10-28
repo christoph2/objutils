@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from objutils.utils.arduino import build_artifacts
 
@@ -27,6 +27,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--only",
+        "-o",
         choices=["DIRECTORY", "ELF", "HEX", "EEP", "MAP"],
         nargs="+",
         help="Limit output to specific artifact types (may be given multiple times)",
@@ -51,7 +52,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        artifacts: Dict[str, Any] = build_artifacts(args.sketch)
+        artifacts: dict[str, Any] = build_artifacts(args.sketch)
     except ValueError as exc:
         if not args.quiet:
             print(str(exc))
@@ -72,8 +73,12 @@ def main() -> int:
             for value in selected.values():
                 print(value)
         else:
+            item_count = len(selected.items())
             for name, value in selected.items():
-                print(f"{name:9s}: {value}")
+                if item_count == 1:
+                    print(f"{value}")
+                else:
+                    print(f"{name:9s}: {value}")
 
     return 0
 
