@@ -726,14 +726,17 @@ def calculateCacheSize(value):
     return -(value // PAGE_SIZE)
 
 
-REGEXER_CACHE = {}
+REGEX_CACHE = {}
 
 
-def regexer(value, expr):
-    if not REGEXER_CACHE.get(expr):
-        REGEXER_CACHE[expr] = re.compile(expr, re.UNICODE)
-    re_expr = REGEXER_CACHE[expr]
-    return re_expr.match(value) is not None
+def regexer(value: str, expr: str):
+    if value is None or expr is None:
+        return 0
+    pattern = REGEX_CACHE.get(expr)
+    if pattern is None:
+        pattern = re.compile(expr, re.UNICODE)
+        REGEX_CACHE[expr] = pattern
+    return 1 if pattern.search(value) else 0
 
 
 @event.listens_for(Engine, "connect")
