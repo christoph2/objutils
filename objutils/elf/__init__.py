@@ -217,6 +217,16 @@ class SectionAPI(DBAPI):
         # return result
 
 
+def filter_symbols(symbols: list[model.Elf_Symbol], name_pattern: str = None):
+    if name_pattern is None:
+        return symbols
+    result = []
+    for symbol in symbols:
+        if re.match(name_pattern, symbol.symbol_name):
+            result.append(symbol)
+    return result
+
+
 class SymbolAPI(DBAPI):
     """ """
 
@@ -245,6 +255,7 @@ class SymbolAPI(DBAPI):
         self,
         sections: str = None,
         name_pattern: str = None,
+        symbol_list: str = None,  # comma-separated list of symbols
         bindings: str = None,
         access: str = None,
         types_str: str = None,
@@ -304,15 +315,18 @@ class SymbolAPI(DBAPI):
                 elif item == "tls":
                     flt.append(defs.SymbolType.STT_TLS)
                 query = query.filter(model.Elf_Symbol.st_type.in_(flt))
-        if name_pattern:
-            query = query.filter(func.regexp(model.Elf_Symbol.symbol_name, name_pattern))
+        if symbol_list:
+            name_flt = frozenset(symbol_list.split(","))
+            query = query.filter(model.Elf_Symbol.symbol_name.in_(name_flt))
         query = query.order_by(model.Elf_Symbol.section_name)
         if order_by_value:
             query = query.order_by(model.Elf_Symbol.st_value)
         else:
             query = query.order_by(model.Elf_Symbol.symbol_name)
-        for key, value in groupby(query.all(), lambda s: s.section_name):
-            result[key] = list(value)
+        for key, values in groupby(query.all(), lambda s: s.section_name):
+            symbols = filter_symbols(list(values), name_pattern)
+            if symbols:
+                result[key] = symbols
         return result
 
     def fetch_gcc_special_symbols(self):
@@ -430,7 +444,7 @@ class ElfParser:
                     else:
                         # Close the preliminary connection before opening the main one to avoid file locking.
                         db.close()
-                except Exception as e:
+                except Exception:
                     # If inspection fails for any reason, rebuild to be safe
                     new_db = True
                     try:
