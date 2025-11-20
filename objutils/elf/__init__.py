@@ -200,13 +200,13 @@ class SectionAPI(DBAPI):
         """
 
         query = self.query(model.Elf_Section)
-        if name_pattern:
-            query = query.filter(func.regexp(model.Elf_Section.section_name, name_pattern))
         if order_by_address:
             query = query.order_by(model.Elf_Section.sh_addr)
         else:
             query = query.order_by(model.Elf_Section.section_name)
         result = query.all()
+        if name_pattern:
+            result = [s for s in result if re.search(name_pattern, s.section_name)]
         return result
 
         # query = query.order_by(model.Elf_Symbol.section_name)
