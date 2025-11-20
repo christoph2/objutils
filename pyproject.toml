@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.8.1"
+version = "0.8.2"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
@@ -58,31 +58,24 @@ python = ">=3.9,<4.0"
 construct = "^2.10.70"
 mako = "^1.3.3"
 sqlalchemy = "^2.0.29"
-darglint = "^1.8.1"
-flake8 = "^7.0.0"
-isort = "^5.13.2"
-prettier = "^0.0.7"
-black = "^24.4.1"
 rich = "^13.8.1"
-bandit = "^1.8.2"
 numpy = "<=2.2.5"
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
 pytest = "^8.1.1"
-flake8-bugbear = "^24.4.21"
-mccabe = "^0.8.1"
-pycodestyle = "^2.11.1"
-pyflakes = "^3.2.0"
-ruff = "^0.4.1"
+black = "^24.10.0"
+isort = "^5.13.2"
+ruff = "^0.6.9"
 pyupgrade = "^3.17.0"
+bandit = "^1.7.10"
 
 [build-system]
 requires = ["poetry-core>=1.6.0", "wheel", "cmake>=3.12", "pybind11[global]>=2.12.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = "--verbose --tb=short --junitxml=result.xml -o junit_family=xunit2"
 testpaths = "objutils/tests"
 
@@ -98,32 +91,6 @@ pretty = true
 show_column_numbers = true
 show_error_context = true
 
-[tool.flake8]
-ignore = ["D203", "E203", "E266", "E501", "W503", "F403", "F401", "BLK100"]
-exclude = '''
-/(
-    \.git
-    | __pycache__
-    | __pypackages__
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | \.eggs
-    | _build
-    | build
-    | docs
-    | dist
-    | experimental
-)/
-'''
-
-max-complexity = 10
-count = true
-statistics = true
-show-source = true
-max-line-length = 132
-select = ["B","C","E","F","W","T4","B9"]
-extend-select = "B950"
 
 [tool.ruff]
 line-length = 132
