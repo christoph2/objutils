@@ -48,6 +48,15 @@ def main():
         type=str,
         default=None,
     )
+
+    parser.add_argument(
+        "-l",
+        "--list",
+        help="Comma-separated list of symbol names",
+        dest="symbol_list",
+        default=None,
+        type=str,
+    )
     parser.add_argument(
         "-t",
         "--types",
@@ -91,6 +100,7 @@ def main():
         bindings=args.bindings,
         types_str=args.types,
         access=args.access,
+        symbol_list=args.symbol_list,
     ).items():
         separator = "=" * len(section)
         print("\n{1:}\n{0:}\n{1:}\n".format(section, separator))
