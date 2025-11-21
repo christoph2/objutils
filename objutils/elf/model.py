@@ -583,11 +583,14 @@ class DebugInformationEntry(Base, RidMixIn):
         remote_side=lambda: DebugInformationEntry.rid,
         back_populates="children",
         uselist=False,
+        foreign_keys=[parent_id],
     )
     children = relationship(
         "DebugInformationEntry",
         back_populates="parent",
         cascade="all, delete-orphan",
+        foreign_keys=[parent_id],
+        order_by="DebugInformationEntry.offset",
     )
 
     @orm.validates("tag")
