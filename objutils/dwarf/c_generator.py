@@ -33,6 +33,7 @@ Usage (example):
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 from mako.template import Template
@@ -54,6 +55,8 @@ class CGenerator:
         self.session = session
         self.ap = attribute_parser or AttributeParser(session)
         self.options = options or RenderOptions()
+        # Cache for expensive per-DIE computations
+        self._decls_cache: dict[int, dict[str, list[dict[str, Any]]]] = {}
 
     # ------------- Public API -------------------------------------------------
     def generate_header(self, start_die: model.DebugInformationEntry, header_name: str | None = None) -> str:
@@ -66,6 +69,11 @@ class CGenerator:
         Returns a dict with keys: typedefs, enums, records, unions, variables, functions.
         Each value is a list of normalized dicts ready for templating.
         """
+        # Use DIE offset as a stable cache key when available
+        key = getattr(start_die, "offset", None)
+        if isinstance(key, int) and key in self._decls_cache:
+            return self._decls_cache[key]
+
         typedefs: list[dict[str, Any]] = []
         enums: list[dict[str, Any]] = []
         records: list[dict[str, Any]] = []  # struct/class
@@ -101,7 +109,7 @@ class CGenerator:
 
         walk(start_die)
 
-        return {
+        decls = {
             "typedefs": typedefs,
             "enums": enums,
             "records": records,
@@ -109,6 +117,9 @@ class CGenerator:
             "variables": variables,
             "functions": functions,
         }
+        if isinstance(key, int):
+            self._decls_cache[key] = decls
+        return decls
 
     # ------------- Normalization utilities -----------------------------------
     def _name_of(self, die: model.DebugInformationEntry) -> str:
@@ -258,6 +269,7 @@ class CGenerator:
         # For everything else, keep full representation in head
         return (self._render_type(t), "")
 
+    @lru_cache(maxsize=16384)
     def _split_type_desc(self, offset: int | None) -> tuple[str, str]:
         """Return (head, suffix) for a type at DIE offset.
         head is the type specifier with pointer/ref/qualifiers, suffix carries array dimensions like [3][N].
