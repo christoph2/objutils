@@ -27,20 +27,6 @@ from enum import IntEnum
 
 
 class EnumBase(IntEnum):
-    """
-    def __init__(self, value):
-        self._value = value
-
-    def _getValue(self):
-        return self._value
-
-    def __str__(self):
-        return "{0!s}".format((self.MAP.get(self._value, self._value)))
-
-    __repr__ = __str__
-
-    value = property(_getValue)
-    """
 
     def __contains__(self, value: int) -> bool:
         return value in self.__members__.values()
@@ -522,51 +508,8 @@ class AttributeForm(EnumBase):
 
     DW_FORM_line_strp = 0x1F
 
-    """
-    DW_FORM_strx = 0x1a
-    DW_FORM_addrx = 0x1b
-    DW_FORM_ref_sup4 = 0x1c
-    DW_FORM_strp_sup = 0x1d
-    DW_FORM_data16 = 0x1e
-    """
-
     DW_FORM_ref_sig8 = 0x20
     DW_FORM_implicit_const = 0x21
-    """
-    DW_FORM_loclistx ‡
-    0x22
-    loclist
-    DW_FORM_rnglistx ‡
-    0x23
-    rnglist
-    DW_FORM_ref_sup8 ‡
-    0x24
-    reference
-    DW_FORM_strx1 ‡
-    0x25
-    string
-    DW_FORM_strx2 ‡
-    0x26
-    string
-    DW_FORM_strx3 ‡
-    0x27
-    string
-    DW_FORM_strx4 ‡
-    0x28
-    string
-    DW_FORM_addrx1 ‡
-    0x29
-    address
-    DW_FORM_addrx2 ‡
-    0x2a
-    address
-    DW_FORM_addrx3 ‡
-    0x2b
-    address
-    DW_FORM_addrx4 ‡
-    0x2c
-    address
-    """
 
 
 class UnitHeader(EnumBase):
@@ -1030,50 +973,6 @@ class Languages(EnumBase):
     Mips_Assembler = 0x8001
     GOOGLE_RenderScript = 0x8E57
     BORLAND_Delphi = 0xB000
-
-    """
-    | Hex-Wert   | Sprache                  | Typ            |
-|------------|--------------------------|----------------|
-| `0x0001`   | C89                      | Standard       |
-| `0x0002`   | C++                      | Standard       |
-| `0x0003`   | FORTRAN77                | Standard       |
-| `0x0004`   | Pascal                   | Standard       |
-| `0x0005`   | Ada83                    | Standard       |
-| `0x0006`   | C (K&R)                  | Standard       |
-| `0x0007`   | C++ (Draft)              | Standard       |
-| `0x0008`   | FORTRAN90                | Standard       |
-| `0x0009`   | Ada95                    | Standard       |
-| `0x000a`   | Cobol74                  | Standard       |
-| `0x000b`   | Cobol85                  | Standard       |
-| `0x000c`   | Fortran95                | Standard       |
-| `0x000d`   | PL/1                     | Standard       |
-| `0x000e`   | PLI                      | Standard       |
-| `0x000f`   | Java                     | Standard       |
-| `0x0010`   | JavaScript               | Standard       |
-| `0x0011`   | D                        | Standard       |
-| `0x0012`   | Python                   | Standard       |
-| `0x0013`   | OpenCL                   | Standard       |
-| `0x0014`   | Go                       | Standard       |
-| `0x0015`   | Modula-2                 | Standard       |
-| `0x0016`   | Haskell                  | Standard       |
-| `0x0017`   | Rust                     | Standard       |
-| `0x0018`   | Swift                    | Standard       |
-| `0x0019`   | Kotlin                   | Standard       |
-| `0x001a`   | Zig                      | Standard       |
-| `0x001b`   | LLVM IR                  | Standard       |
-| `0x001c`   | Julia                    | Standard       |
-| `0x001d`   | Dylan                    | Standard       |
-| `0x001e`   | OCaml                    | Standard       |
-| `0x001f`   | F#                       | Standard       |
-| `0x0020`   | TypeScript               | Standard       |
-| `0x0021`   | SQL                      | Standard       |
-| `0x0022`   | Assembly                 | Standard       |
-| `0x0023`   | C23                      | Standard       |
-| `0x0024`   | C++23                    | Standard       |
-| `0x8001`   | HP Pascal                | Hersteller     |
-| `0x8002`   | GNU Modula-2             | Hersteller     |
-| `0x8003`   | GNU Ada                  | Hersteller     |
-| `0x8004`   | CUDA (NVIDIA)            | Hersteller"""
 
 
 class Defaulted(EnumBase):
