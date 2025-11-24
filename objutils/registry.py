@@ -24,8 +24,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections import OrderedDict, namedtuple
-from typing import Iterator, MutableMapping, Any, Type, NamedTuple
+from collections import OrderedDict
+from typing import Any, NamedTuple, Type
+from collections.abc import Iterator
 
 from objutils.utils import SingletonBase
 
@@ -39,8 +40,8 @@ class CodecAlreadyExistError(Exception):
 
 
 class Codec(NamedTuple):
-    Reader: Type[Any]
-    Writer: Type[Any]
+    Reader: type[Any]
+    Writer: type[Any]
     description: str
 
 
@@ -63,7 +64,7 @@ class Registry(SingletonBase):
             raise CodecDoesNotExistError(name)
         return codec
 
-    def register(self, name: str, readerClass: Type[Any], writerClass: Type[Any], description: str = "") -> None:
+    def register(self, name: str, readerClass: type[Any], writerClass: type[Any], description: str = "") -> None:
         if name in self.codecs:
             raise CodecAlreadyExistError(name)
         self._codecs[name] = Codec(readerClass, writerClass, description)
