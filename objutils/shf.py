@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Reader/Writer S Hexdump Format (rfc4149).
-"""
+"""Reader/Writer S Hexdump Format (rfc4149)."""
 
 __version__ = "0.1.1"
 

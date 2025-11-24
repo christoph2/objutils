@@ -30,7 +30,7 @@ __copyright__ = """
 
 import io
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any
 
 from construct import Array
 

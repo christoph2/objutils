@@ -31,7 +31,8 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
-from typing import Any, Dict, Iterable, Iterator, List, Mapping, MutableMapping, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+from collections.abc import Mapping, Sequence
 
 from objutils.image import Image
 from objutils.logger import Logger
@@ -122,7 +123,7 @@ class MetaRecord:
 class FormatParser:
     def __init__(self, fmt: str, data_separator: Optional[str] = None):
         self.fmt: str = fmt
-        self.translated_format: List[Tuple[int, int, str]] = []
+        self.translated_format: list[tuple[int, int, str]] = []
         self.data_separator: Optional[str] = data_separator
 
     def parse(self) -> re.Pattern[str]:
@@ -168,7 +169,7 @@ class FormatParser:
 
 class Container:
     def __init__(self) -> None:
-        self.processing_instructions: List[Any] = []
+        self.processing_instructions: list[Any] = []
 
     def add_processing_instruction(self, pi: Any) -> None:
         self.processing_instructions.append(pi)
@@ -202,7 +203,7 @@ class Reader(BaseType):
         self.stats = Statistics()
         # formats is a list of (format_type, compiled_pattern)
         if isinstance(self.FORMAT_SPEC, str):
-            self.formats: List[Tuple[int, re.Pattern[str]]] = [(0, FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse())]
+            self.formats: list[tuple[int, re.Pattern[str]]] = [(0, FormatParser(self.FORMAT_SPEC, self.DATA_SEPARATOR).parse())]
         elif isinstance(self.FORMAT_SPEC, (list, tuple)):
             self.formats = []
             for format_type, format in self.FORMAT_SPEC:
@@ -417,7 +418,7 @@ class Writer(BaseType):
             fp.close()
 
     def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> bytes:
-        result: List[str] = []
+        result: list[str] = []
         self.row_length = row_length
         if hasattr(image, "sections") and not image.sections:
             return b""
@@ -457,7 +458,7 @@ class Writer(BaseType):
         pass
 
     def set_parameters(self, **kws: Any) -> None:
-        params: Dict[str, Any] = {}
+        params: dict[str, Any] = {}
         for k, v in kws.items():
             try:
                 params[k] = getattr(self, k)
@@ -475,7 +476,7 @@ class Writer(BaseType):
     def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
         return None
 
-    def word_to_bytes(self, word: int) -> Tuple[int, int]:
+    def word_to_bytes(self, word: int) -> tuple[int, int]:
         word = int(word)
         hi = (word & 0xFF00) >> 8
         lo = word & 0x00FF
@@ -496,12 +497,12 @@ class ASCIIHexReader(Reader):
         self.ADDRESS_PATTERN: re.Pattern[str] = re.compile(address_pattern, re.DOTALL | re.MULTILINE)
         self.ETX_PATTERN: re.Pattern[str] = re.compile(etx_pattern, re.DOTALL | re.MULTILINE)
         self.SPLITTER = re.compile(f"[{separators}]")
-        self.patterns: Sequence[Tuple[re.Pattern[str], Any]] = (
+        self.patterns: Sequence[tuple[re.Pattern[str], Any]] = (
             (self.ADDRESS_PATTERN, self.getAddress),
             (self.DATA_PATTERN, self.parse_line),
             (self.ETX_PATTERN, self.nop),
         )
-        self.formats: List[Tuple[int, re.Pattern[str]]] = [
+        self.formats: list[tuple[int, re.Pattern[str]]] = [
             (0, self.ADDRESS_PATTERN),
             (1, self.DATA_PATTERN),
             (2, self.ETX_PATTERN),
@@ -527,7 +528,7 @@ class ASCIIHexReader(Reader):
 
     def read(self, fp: Any) -> Image:
         lines = fp.read().decode()
-        self.sections: List[Section] = []
+        self.sections: list[Section] = []
         self.address = 0
         breakRequest = False
         for line in lines.splitlines():

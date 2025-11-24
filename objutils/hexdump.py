@@ -30,8 +30,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from typing import BinaryIO, Iterable, Sequence, TextIO
 import sys
+from typing import TextIO
+from collections.abc import Sequence
 
 
 def isprintable(ch: int) -> bool:

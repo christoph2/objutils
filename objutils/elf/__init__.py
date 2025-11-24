@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Parser for ELF files.
-"""
+"""Parser for ELF files."""
 
 __copyright__ = """
    objutils - Object file library for Python.

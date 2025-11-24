@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""List symbols contained in an ELF file (but not DWARF symbols!).
-"""
+"""List symbols contained in an ELF file (but not DWARF symbols!)."""
 
 __copyright__ = """
    objutils - Object file library for Python.

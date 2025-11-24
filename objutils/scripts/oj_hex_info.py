@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Displays informations about HEX files.
-"""
+"""Displays informations about HEX files."""
 
 __version__ = "0.1.0"
 
