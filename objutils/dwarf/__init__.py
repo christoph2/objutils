@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""DWARF4 Parser.
-"""
+"""DWARF4 Parser."""
 
 __version__ = "0.1.0"
 __copyright__ = """

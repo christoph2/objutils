@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Reader/Writer for plain binfiles.
-"""
+"""Reader/Writer for plain binfiles."""
 
 __version__ = "0.1.1"
 

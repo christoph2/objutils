@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""
-"""
+""" """
 
 __version__ = "0.1.0"
 
@@ -243,7 +242,7 @@ class Section:
     def tobytes(self) -> bytes:
         return array("B", self.data).tobytes()
 
-    def tolist(self) -> List[int]:
+    def tolist(self) -> list[int]:
         return array("B", self.data).tolist()
 
     def _verify_dtype(self, dtype: str) -> str:
@@ -339,7 +338,7 @@ class Section:
 
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
-    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws) -> Union[List[int], List[float]]:
+    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws) -> Union[list[int], list[float]]:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
@@ -350,7 +349,7 @@ class Section:
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
-    def write_numeric_array(self, addr: int, data: Union[List[int], List[float]], dtype: str, **kws) -> None:
+    def write_numeric_array(self, addr: int, data: Union[list[int], list[float]], dtype: str, **kws) -> None:
         if not hasattr(data, "__iter__"):
             raise TypeError("data must be iterable")
         length = len(data)
@@ -447,7 +446,7 @@ class Section:
         return self.start_address
 
 
-def join_sections(sections: List[Section]) -> List[Section]:
+def join_sections(sections: list[Section]) -> list[Section]:
     result_sections = []
     sections.sort(key=attrgetter("start_address"))
     prev_section = Section()

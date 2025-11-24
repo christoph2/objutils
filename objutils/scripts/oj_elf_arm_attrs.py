@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-""" Dumps '.ARM.attributes' section in an ELF file.
-"""
+"""Dumps '.ARM.attributes' section in an ELF file."""
 
 __version__ = "0.1.0"
 

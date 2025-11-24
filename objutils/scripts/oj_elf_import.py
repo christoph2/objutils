@@ -21,7 +21,6 @@ from __future__ import annotations
 import argparse
 import shutil
 from pathlib import Path
-from typing import Optional
 
 from objutils.dwarf import DwarfProcessor
 from objutils.elf import ElfParser

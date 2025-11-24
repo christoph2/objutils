@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Extract sections contributing to program image, e.g. for flash programming applications.
-"""
+"""Extract sections contributing to program image, e.g. for flash programming applications."""
 
 __copyright__ = """
    objutils - Object file library for Python.
