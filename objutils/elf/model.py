@@ -47,7 +47,6 @@ from sqlalchemy.sql import func
 
 from objutils.elf import defs
 
-
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
 
@@ -74,26 +73,6 @@ class MixInBase:
 
 class RidMixIn(MixInBase):
     rid = Column("rid", types.Integer, primary_key=True)
-
-
-"""
-class SLBigInteger(BigInteger):
-    pass
-
-@compiles(SLBigInteger, 'sqlite')
-def bi_c(element, compiler, **kw):
-    return "INTEGER"
-
-@compiles(SLBigInteger)
-def bi_c(element, compiler, **kw):
-    return compiler.visit_BIGINT(element, **kw)
-
-
-table = Table(
-    "my_table", metadata,
-    Column("id", SLBigInteger(), primary_key=True)
-)
-"""
 
 
 def StdInteger(default=0, primary_key=False, unique=False, nullable=False, index=False):
@@ -485,21 +464,21 @@ class DIEAttribute(Base, RidMixIn):
 
         # Location-like attributes
         if enc in (
-            getattr(c.AttributeEncoding, "location", None),
-            getattr(c.AttributeEncoding, "GNU_call_site_value", None),
-            getattr(c.AttributeEncoding, "frame_base", None),
-            getattr(c.AttributeEncoding, "GNU_call_site_target", None),
-            getattr(c.AttributeEncoding, "vtable_elem_location", None),
-            getattr(c.AttributeEncoding, "data_member_location", None),
-            getattr(c.AttributeEncoding, "return_addr", None),
+                getattr(c.AttributeEncoding, "location", None),
+                getattr(c.AttributeEncoding, "GNU_call_site_value", None),
+                getattr(c.AttributeEncoding, "frame_base", None),
+                getattr(c.AttributeEncoding, "GNU_call_site_target", None),
+                getattr(c.AttributeEncoding, "vtable_elem_location", None),
+                getattr(c.AttributeEncoding, "data_member_location", None),
+                getattr(c.AttributeEncoding, "return_addr", None),
         ):
             if frm in (
-                getattr(c.AttributeForm, "DW_FORM_exprloc", None),
-                getattr(c.AttributeForm, "DW_FORM_block", None),
-                getattr(c.AttributeForm, "DW_FORM_block1", None),
-                getattr(c.AttributeForm, "DW_FORM_block2", None),
-                getattr(c.AttributeForm, "DW_FORM_block4", None),
-                getattr(c.AttributeForm, "DW_FORM_implicit_const", None),
+                    getattr(c.AttributeForm, "DW_FORM_exprloc", None),
+                    getattr(c.AttributeForm, "DW_FORM_block", None),
+                    getattr(c.AttributeForm, "DW_FORM_block1", None),
+                    getattr(c.AttributeForm, "DW_FORM_block2", None),
+                    getattr(c.AttributeForm, "DW_FORM_block4", None),
+                    getattr(c.AttributeForm, "DW_FORM_implicit_const", None),
             ):
                 # We cannot run the DWARF stack machine here; present as hex bytes for performance.
                 if isinstance(raw, (bytes, bytearray)):
@@ -548,11 +527,11 @@ class DIEAttribute(Base, RidMixIn):
 
         # References
         if frm in (
-            getattr(c.AttributeForm, "DW_FORM_ref1", None),
-            getattr(c.AttributeForm, "DW_FORM_ref2", None),
-            getattr(c.AttributeForm, "DW_FORM_ref4", None),
-            getattr(c.AttributeForm, "DW_FORM_ref8", None),
-            getattr(c.AttributeForm, "DW_FORM_ref_udata", None),
+                getattr(c.AttributeForm, "DW_FORM_ref1", None),
+                getattr(c.AttributeForm, "DW_FORM_ref2", None),
+                getattr(c.AttributeForm, "DW_FORM_ref4", None),
+                getattr(c.AttributeForm, "DW_FORM_ref8", None),
+                getattr(c.AttributeForm, "DW_FORM_ref_udata", None),
         ):
             ival = to_int(raw)
             base = getattr(self.entry, "cu_start", None)
@@ -692,36 +671,6 @@ class CompilationUnit(Base, RidMixIn):
     pass
 
 
-"""
-@dataclass
-class DIEAttribute:
-    raw_value: Any
-    display_value: str
-
-    def toJSON(self):
-        print("Hello!?")
-
-
-@dataclass
-class DebugInformationEntry:
-    name: str
-    attributes: List = field(default_factory=list)
-    children: List = field(default_factory=list)
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
-
-@dataclass
-class DebugInformation:
-    die_map: dict[int, DebugInformationEntry]
-    die_entries: List[DebugInformationEntry]
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-"""
-
-
 def calculateCacheSize(value):
     return -(value // PAGE_SIZE)
 
@@ -852,10 +801,12 @@ class Model:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_offset ON debuginformationentry ("offset")'))
                 # Helpful for reference resolution across CUs
                 if "idx_die_cu_start" not in die_indexes and "cu_start" in die_cols:
-                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_cu_start ON debuginformationentry ("cu_start")'))
+                    conn.execute(
+                        text('CREATE INDEX IF NOT EXISTS idx_die_cu_start ON debuginformationentry ("cu_start")'))
                 # Helpful for parent/child traversal
                 if "idx_die_parent_id" not in die_indexes and "parent_id" in die_cols:
-                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_parent_id ON debuginformationentry ("parent_id")'))
+                    conn.execute(
+                        text('CREATE INDEX IF NOT EXISTS idx_die_parent_id ON debuginformationentry ("parent_id")'))
                 # Attribute-side foreign key lookups (speed attributes_map building)
                 if "idx_dia_entry_id" not in dia_indexes:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_entry_id ON dieattribute ("entry_id")'))
