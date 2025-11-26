@@ -159,8 +159,11 @@ class AttributeParser:
                 except Exception:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
-
-        print(f"{'    ' * level}{tag} '{name}'{type_info} [off=0x{entry.offset:08x}]")
+        if "location" in entry.attributes_map:
+            location = entry.attributes_map["location"].display_value
+            print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
+        else:
+            print(f"{'    ' * level}{tag} '{name}'{type_info} [off=0x{entry.offset:08x}]")
 
         for child in getattr(entry, "children", []) or []:
             self.traverse_tree(child, level + 1)
