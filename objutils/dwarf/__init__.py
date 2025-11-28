@@ -80,6 +80,7 @@ from objutils.dwarf.encoding import (
     StrP,
 )
 from objutils.dwarf.lineprog import LineNumberProgram
+from objutils.dwarf.readers import DwarfReaders
 from objutils.dwarf.sm import StackMachine
 from objutils.elf import model
 
@@ -310,37 +311,19 @@ class DwarfProcessor:
             self.line_strings = b""
 
         self.db_session = elf_parser.session
-        self.installReaders()
+        self.install_dwarf_readers()
 
-    def installReaders(self):
-        BASIC_READERS = {
-            #      Little    Big
-            "u8": (Int8ul, Int8ul),
-            "s8": (Int8sl, Int8sl),
-            "u16": (Int16ul, Int16ub),
-            "s16": (Int16sl, Int16sb),
-            "u32": (Int32ul, Int32ub),
-            "s32": (Int32sl, Int32sb),
-            "u64": (Int64ul, Int64ub),
-            "s64": (Int64sl, Int64sb),
-            "block2": (Block2l, Block2b),
-            "block4": (Block4l, Block4b),
-        }
-        self.readers = Readers()
-        print("SIZE-INFO", 8 if self.b64 else 4, self.endianess)
-        self.readers.native_address = Address(8 if self.b64 else 4, self.endianess)
-        self.readers.uleb = ULEB
-        self.readers.sleb = SLEB
-        self.readers.block1 = Block1
-        self.readers.block_uleb = BlockUleb
-        self.readers.cstring_ascii = CString(encoding="ascii")
-        self.readers.cstring_utf8 = CString(encoding="utf8")
-        self.readers.strp = StrP(self.strings, self.endianess)
-        self.readers.line_strp = StrP(self.line_strings, self.endianess)
-        idx = 0 if self.endianess == Endianess.Little else 1
-        for name, reader in BASIC_READERS.items():
-            setattr(self.readers, name, reader[idx])
-        self.stack_machine = StackMachine(self.readers)
+    def install_dwarf_readers(self):
+        # Verwende die neue, wiederverwendbare Readers-Klasse
+        address_size = 8 if self.b64 else 4
+        factory = DwarfReaders(
+            endianess=self.endianess,
+            address_size=address_size,
+            strings=self.strings,
+            line_strings=self.line_strings,
+        )
+        self.readers = factory.readers
+        self.stack_machine = factory.stack_machine
 
     def get_string(self, offset: int):
         # self.strings.seek(offset)
@@ -399,15 +382,11 @@ class DwarfProcessor:
             if offset >= length:
                 break
             if code == 0:
-                # key_offset = offset
-                # result[key] = Abbrevation(0, False, [])
-                print("CONT!!!")
                 continue
 
             abbrv_body = AbbrevationBody.parse(image[offset:])
             tag = abbrv_body.tag
             children = abbrv_body.children
-            print("BODY", abbrv_body, constants.Tag(tag).name)
             offset += abbrv_body.stop - abbrv_body.start
 
             try:
@@ -441,7 +420,6 @@ class DwarfProcessor:
                     )
                     continue
                 if attr.attrValue != 0 and attr.formValue != 0:
-                    #
                     try:
                         result[key].attrs.append(
                             Attribute(
@@ -458,9 +436,6 @@ class DwarfProcessor:
                         )
                 offset += attr.stop - attr.start
             print("Finished Attrs.")
-        from pprint import pprint
-
-        pprint(result)
         self.abbrevations = result
 
     def do_lines(self):
@@ -805,7 +780,7 @@ class DwarfProcessor:
                         break
                 die_map[die_start] = die
             result.append(root_element)
-        self.db_session.commit()
+            self.db_session.commit()
         return DebugInformation(die_map, [d.children[0] for d in result])
 
     def pubnames(self):
@@ -887,110 +862,3 @@ class DwarfProcessor:
                 if entry.stop >= header.unit_length:
                     finished = True
                     break
-
-    def dwarf_expression(self, expr: bytes) -> str:
-        return self.stack_machine.evaluate(expr)
-
-        OPs = constants.Operation
-        OPERATIONS_WITH_OPERANDS = {
-            OPs.addr: (self.readers.native_address,),
-            OPs.const1u: (self.readers.u8,),
-            OPs.const1s: (self.readers.s8,),
-            OPs.const2u: (self.readers.u16,),
-            OPs.const2s: (self.readers.s16,),
-            OPs.const4u: (self.readers.u32,),
-            OPs.const4s: (self.readers.s32,),
-            OPs.const8u: (self.readers.u64,),
-            OPs.const8s: (self.readers.s64,),
-            OPs.constu: (self.readers.uleb,),
-            OPs.consts: (self.readers.sleb,),
-            OPs.pick: (self.readers.u8,),
-            OPs.plus_uconst: (self.readers.uleb,),
-            OPs.bra: (self.readers.s16,),
-            OPs.skip: (self.readers.s16,),
-            OPs.breg0: (self.readers.sleb,),
-            OPs.breg1: (self.readers.sleb,),
-            OPs.breg2: (self.readers.sleb,),
-            OPs.breg3: (self.readers.sleb,),
-            OPs.breg4: (self.readers.sleb,),
-            OPs.breg5: (self.readers.sleb,),
-            OPs.breg6: (self.readers.sleb,),
-            OPs.breg7: (self.readers.sleb,),
-            OPs.breg8: (self.readers.sleb,),
-            OPs.breg9: (self.readers.sleb,),
-            OPs.breg10: (self.readers.sleb,),
-            OPs.breg11: (self.readers.sleb,),
-            OPs.breg12: (self.readers.sleb,),
-            OPs.breg13: (self.readers.sleb,),
-            OPs.breg14: (self.readers.sleb,),
-            OPs.breg15: (self.readers.sleb,),
-            OPs.breg16: (self.readers.sleb,),
-            OPs.breg17: (self.readers.sleb,),
-            OPs.breg18: (self.readers.sleb,),
-            OPs.breg19: (self.readers.sleb,),
-            OPs.breg20: (self.readers.sleb,),
-            OPs.breg21: (self.readers.sleb,),
-            OPs.breg22: (self.readers.sleb,),
-            OPs.breg23: (self.readers.sleb,),
-            OPs.breg24: (self.readers.sleb,),
-            OPs.breg25: (self.readers.sleb,),
-            OPs.breg26: (self.readers.sleb,),
-            OPs.breg27: (self.readers.sleb,),
-            OPs.breg29: (self.readers.sleb,),
-            OPs.breg30: (self.readers.sleb,),
-            OPs.breg31: (self.readers.sleb,),
-            OPs.regx: (self.readers.uleb,),
-            OPs.fbreg: (self.readers.sleb,),
-            OPs.bregx: (self.readers.uleb, self.readers.sleb),
-            OPs.piece: (self.readers.uleb,),
-            OPs.deref_size: (self.readers.u8,),
-            OPs.xderef_size: (self.readers.u8,),
-            OPs.call2: (self.readers.u16,),
-            OPs.call4: (self.readers.u32,),
-            OPs.call_ref: (self.readers.native_address,),
-            OPs.bit_piece: (self.readers.uleb, self.readers.uleb),
-            OPs.implicit_value: (self.readers.uleb,),  # todo: array (size os param #0)
-            OPs.implicit_pointer: (self.readers.native_address, self.readers.sleb),
-            OPs.addrx: (self.readers.uleb,),  # offset into .debug_addr
-            OPs.constx: (self.readers.uleb,),  # offset into .debug_addr
-            OPs.entry_value: (self.readers.uleb,),  # todo: array (size os param #0)
-            OPs.const_type: (self.readers.uleb, self.readers.u8, self.readers.block1),  # todo: array (size os param #1)
-            OPs.regval_type: (self.readers.uleb, self.readers.uleb),
-            OPs.deref_type: (self.readers.u8, self.readers.uleb),
-            OPs.xderef_type: (self.readers.u8, self.readers.uleb),
-            OPs.convert: (self.readers.uleb,),
-            OPs.reinterpret: (self.readers.uleb,),
-            OPs.GNU_entry_value: (self.readers.uleb,),  # todo: array (size os param #0)
-            OPs.GNU_const_type: (self.readers.uleb, self.readers.u8, self.readers.block1),  # todo: array (size os param #1)
-            OPs.GNU_regval_type: (self.readers.uleb, self.readers.uleb),
-            OPs.GNU_deref_type: (self.readers.u8, self.readers.uleb),
-            OPs.GNU_convert: (self.readers.uleb,),
-            OPs.GNU_reinterpret: (self.readers.uleb,),
-            OPs.GNU_parameter_ref: (self.readers.native_address,),
-        }
-        opcode_num = 0
-        image = io.BytesIO(expr)
-        result: list[str] = []
-        while True:
-            data = image.read(1)
-            if data == b"":
-                break
-            opcode_num = data[0]
-            try:
-                opcode = OPs(opcode_num)
-            except ValueError:
-                print(f"Opcode not found {opcode_num!r}")
-                opcode_name = "<unk>"
-            else:
-                opcode_name = opcode.name
-            print("\tEXPR: ", opcode_num, opcode_name)
-            if opcode in OPERATIONS_WITH_OPERANDS:
-                for operand in OPERATIONS_WITH_OPERANDS.get(opcode, []):
-                    value = operand.parse_stream(image)
-                    print(value, end=" ")
-                if opcode in (OPs.entry_value, OPs.implicit_value, OPs.GNU_entry_value):
-                    data = Array(value, self.readers.u8).parse_stream(image)
-                    print("KRASS!!!", opcode, value, list(data))
-            else:
-                result.append(opcode_name)
-        return result
