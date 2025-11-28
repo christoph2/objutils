@@ -40,8 +40,10 @@ class Tag(EnumBase):
     enumeration_type = 0x4
     formal_parameter = 0x5
     imported_declaration = 0x8
+    ordering = 0x09
     label = 0xA
     lexical_block = 0xB
+    bit_offset = 0xC
     member = 0xD
     pointer_type = 0xF
     reference_type = 0x10
@@ -89,12 +91,21 @@ class Tag(EnumBase):
     unspecified_type = 0x3B
     partial_unit = 0x3C
     imported_unit = 0x3D
+    encoding = 0x3E
     condition = 0x3F
     shared_type = 0x40
     type_unit = 0x41
     rvalue_reference_type = 0x42
     template_alias = 0x43
+    coarray_type = 0x44
+    generic_subrange = 0x45
+    dynamic_type = 0x46
     atomic_type = 0x47
+    call_site = 0x48
+    call_site_parameter = 0x49
+    skeleton_unit = 0x4A
+    immutable_type = 0x4B
+
     lo_user = 0x4080
     hi_user = 0xFFFF
     MIPS_loop = 0x4081
@@ -505,11 +516,25 @@ class AttributeForm(EnumBase):
     DW_FORM_sec_offset = 0x17
     DW_FORM_exprloc = 0x18
     DW_FORM_flag_present = 0x19
-
+    DW_FORM_strx = 0x1A
+    DW_FORM_addrx = 0x1B
+    DW_FORM_ref_sup4 = 0x1C
+    DW_FORM_strp_sup = 0x1D
+    DW_FORM_data16 = 0x1E
     DW_FORM_line_strp = 0x1F
-
     DW_FORM_ref_sig8 = 0x20
     DW_FORM_implicit_const = 0x21
+    DW_FORM_loclistx = 0x22
+    DW_FORM_rnglistx = 0x23
+    DW_FORM_ref_sup8 = 0x24
+    DW_FORM_strx1 = 0x25
+    DW_FORM_strx2 = 0x26
+    DW_FORM_strx3 = 0x27
+    DW_FORM_strx4 = 0x28
+    DW_FORM_addrx1 = 0x29
+    DW_FORM_addrx2 = 0x2A
+    DW_FORM_addrx3 = 0x2B
+    DW_FORM_addrx4 = 0x2C
 
 
 class UnitHeader(EnumBase):

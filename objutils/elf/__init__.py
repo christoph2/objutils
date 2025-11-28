@@ -4,7 +4,7 @@
 __copyright__ = """
    objutils - Object file library for Python.
 
-  (C) 2010-2023 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
   All Rights Reserved
 
@@ -849,12 +849,6 @@ class ElfParser:
         mapping = OrderedDict()
         for idx in range(self.e_phnum):
             mapping[idx] = []
-        ##
-        ##            for j in range(self.e_shnum):
-        ##                section = self.sections[j]
-        ##                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):
-        ##                    mapping[idx].append(j)
-        ##
         self.sections_to_segments = mapping
         return self.sections_to_segments
 

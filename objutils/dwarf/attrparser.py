@@ -182,7 +182,7 @@ class AttributeParser:
 
         # Print attributes (already decoded by DWARF pass)
         for attr in entry.attributes:
-            lev_print(level + 1, f"Attribute: {attr.name} = {attr.display_value}")
+            lev_print(level + 1, f"Attribute: {attr.name} = {attr.raw_value}")
 
         # If this DIE is itself a type or typedef/subrange etc., parse it once
         if tag == "type" or tag.endswith("_type") or tag in ("typedef", "subrange_type"):

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-__version__ = "0.1.0"
-
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -46,6 +44,7 @@ from sqlalchemy.orm import declarative_base, declared_attr, relationship
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
+
 
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
@@ -145,6 +144,23 @@ class Elf_Header(Base, RidMixIn):
     e_shentsize = StdBigInt()
     e_shnum = StdBigInt()
     e_shstrndx = StdBigInt()
+
+    @hybrid_property
+    def endianess(self) -> defs.ELFDataEncoding:
+        if self.ei_data == 1:  # Little-Endian
+            return defs.ELFDataEncoding.ELFDATA2LSB
+        elif self.ei_data == 2:  # Big-Endian
+            return defs.ELFDataEncoding.ELFDATA2MSB
+        else:
+            raise ValueError(f"EI_DATA has an invalid value. Got: {self.ei_data}")
+
+    @hybrid_property
+    def is_64bit(self) -> bool:
+        return self.ei_class == 2
+
+    @hybrid_property
+    def address_size(self) -> int:
+        return 8 if self.is_64bit else 4
 
 
 class Elf_ProgramHeaders(Base, RidMixIn):
@@ -392,8 +408,6 @@ class DIEAttribute(Base, RidMixIn):
     # Form of the attribute (DW_FORM_*), stored as integer enum for later interpretation
     form = StdInteger(index=True, nullable=True)
     raw_value = Column(types.VARCHAR)
-    # Keep DB column for backward compatibility; if None, we compute lazily on access
-    display_value = Column(types.VARCHAR, nullable=True)
     entry_id = Column(types.Integer, ForeignKey("debuginformationentry.rid"), index=True)
     entry = relationship("DebugInformationEntry", back_populates="attributes")
 
@@ -434,135 +448,6 @@ class DIEAttribute(Base, RidMixIn):
             return v.name  # enum
         except Exception:
             return str(v)
-
-    # ----- Display value computation with caching -----
-    def _compute_display_value(self):
-        try:
-            from objutils.dwarf import constants as c
-        except Exception:
-            return str(self.raw_value)
-
-        # Normalize helpers
-        def to_int(v):
-            try:
-                return int(v)
-            except Exception:
-                return None
-
-        enc = None
-        try:
-            enc = c.AttributeEncoding(self.name)
-        except Exception:
-            pass
-        frm = None
-        try:
-            frm = c.AttributeForm(self.form) if self.form is not None else None
-        except Exception:
-            pass
-
-        raw = self.raw_value
-
-        # Location-like attributes
-        if enc in (
-                getattr(c.AttributeEncoding, "location", None),
-                getattr(c.AttributeEncoding, "GNU_call_site_value", None),
-                getattr(c.AttributeEncoding, "frame_base", None),
-                getattr(c.AttributeEncoding, "GNU_call_site_target", None),
-                getattr(c.AttributeEncoding, "vtable_elem_location", None),
-                getattr(c.AttributeEncoding, "data_member_location", None),
-                getattr(c.AttributeEncoding, "return_addr", None),
-        ):
-            if frm in (
-                    getattr(c.AttributeForm, "DW_FORM_exprloc", None),
-                    getattr(c.AttributeForm, "DW_FORM_block", None),
-                    getattr(c.AttributeForm, "DW_FORM_block1", None),
-                    getattr(c.AttributeForm, "DW_FORM_block2", None),
-                    getattr(c.AttributeForm, "DW_FORM_block4", None),
-                    getattr(c.AttributeForm, "DW_FORM_implicit_const", None),
-            ):
-                # We cannot run the DWARF stack machine here; present as hex bytes for performance.
-                if isinstance(raw, (bytes, bytearray)):
-                    return raw.hex()
-                # Strings like "b'..'" or iterables of ints
-                try:
-                    if isinstance(raw, str) and raw.startswith("b'"):
-                        # best effort: eval-safe removal
-                        hexed = raw.encode("latin1", "ignore")
-                        return hexed.hex()
-                except Exception:
-                    pass
-                return str(raw)
-            else:
-                ival = to_int(raw)
-                if ival is not None:
-                    return f"0x{ival:08x}"
-                return str(raw)
-
-        # Encoded attributes mapped to enums (language, accessibility, etc.)
-        try:
-            ENCODED_MAP = {
-                c.AttributeEncoding.decimal_sign: c.DecimalSign,
-                c.AttributeEncoding.endianity: c.Endianity,
-                c.AttributeEncoding.accessibility: c.Accessibility,
-                c.AttributeEncoding.visibility: c.Visibility,
-                c.AttributeEncoding.virtuality: c.Virtuality,
-                c.AttributeEncoding.language: c.Languages,
-                c.AttributeEncoding.identifier_case: c.IdentifierCase,
-                c.AttributeEncoding.calling_convention: c.CallingConvention,
-                c.AttributeEncoding.inline: c.Inline,
-                c.AttributeEncoding.ordering: c.Ordering,
-                c.AttributeEncoding.discr_list: c.DiscriminantDescriptor,
-                c.AttributeEncoding.defaulted: c.Defaulted,
-            }
-            if enc in ENCODED_MAP:
-                ival = to_int(raw)
-                if ival is not None and ival in ENCODED_MAP[enc].__members__.values():
-                    try:
-                        name = ENCODED_MAP[enc](ival).name
-                        return f"{name} (0x{ival:08x})"
-                    except Exception:
-                        return f"0x{ival:08x}"
-        except Exception:
-            pass
-
-        # References
-        if frm in (
-                getattr(c.AttributeForm, "DW_FORM_ref1", None),
-                getattr(c.AttributeForm, "DW_FORM_ref2", None),
-                getattr(c.AttributeForm, "DW_FORM_ref4", None),
-                getattr(c.AttributeForm, "DW_FORM_ref8", None),
-                getattr(c.AttributeForm, "DW_FORM_ref_udata", None),
-        ):
-            ival = to_int(raw)
-            base = getattr(self.entry, "cu_start", None)
-            if ival is not None:
-                if base is not None:
-                    try:
-                        ival += int(base)
-                    except Exception:
-                        pass
-                return f"0x{ival:08x}"
-            return str(raw)
-        if frm == getattr(c.AttributeForm, "DW_FORM_ref_addr", None):
-            ival = to_int(raw)
-            if ival is not None:
-                return f"0x{ival:08x}"
-            return str(raw)
-
-        # Default: best-effort string
-        return raw if isinstance(raw, str) else str(raw)
-
-    def get_display_value(self):
-        # If column is set, use it; otherwise compute and cache per-instance
-        dv = getattr(self, "display_value", None)
-        if dv not in (None, ""):
-            return dv
-        cached = getattr(self, "_display_value_cache", None)
-        if cached is not None:
-            return cached
-        dv = self._compute_display_value()
-        setattr(self, "_display_value_cache", dv)
-        return dv
 
 
 class DebugInformationEntry(Base, RidMixIn):
@@ -804,12 +689,10 @@ class Model:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_offset ON debuginformationentry ("offset")'))
                 # Helpful for reference resolution across CUs
                 if "idx_die_cu_start" not in die_indexes and "cu_start" in die_cols:
-                    conn.execute(
-                        text('CREATE INDEX IF NOT EXISTS idx_die_cu_start ON debuginformationentry ("cu_start")'))
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_cu_start ON debuginformationentry ("cu_start")'))
                 # Helpful for parent/child traversal
                 if "idx_die_parent_id" not in die_indexes and "parent_id" in die_cols:
-                    conn.execute(
-                        text('CREATE INDEX IF NOT EXISTS idx_die_parent_id ON debuginformationentry ("parent_id")'))
+                    conn.execute(text('CREATE INDEX IF NOT EXISTS idx_die_parent_id ON debuginformationentry ("parent_id")'))
                 # Attribute-side foreign key lookups (speed attributes_map building)
                 if "idx_dia_entry_id" not in dia_indexes:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_entry_id ON dieattribute ("entry_id")'))

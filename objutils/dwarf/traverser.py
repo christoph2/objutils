@@ -4,8 +4,15 @@ from functools import lru_cache
 from itertools import groupby
 from typing import Any, Optional, Union
 
-from objutils.dwarf.constants import AttributeEncoding, AttributeForm, Tag
-from objutils.elf import model
+from objutils.dwarf.constants import (
+    AttributeEncoding,
+    AttributeForm,
+    BaseTypeEncoding,
+    Tag,
+)
+from objutils.dwarf.encoding import Endianess
+from objutils.dwarf.readers import DwarfReaders
+from objutils.elf import defs, model
 from objutils.elf.model import DIEAttribute
 
 
@@ -51,7 +58,7 @@ def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, 
     if attr is None:
         return default
     else:
-        return attr.display_value
+        return attr.raw_value
 
 
 class CompiledUnitsSummary:
@@ -87,10 +94,10 @@ class CompiledUnitsSummary:
 def compile_units_summary(session) -> None:
     cus = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.tag == Tag.compile_unit).all()
     for idx, cu in enumerate(cus):
-        name = cu.attributes_map.get("name", "N/A").display_value
-        producer = cu.attributes_map.get("producer", "N/A").display_value
-        comp_dir = cu.attributes_map.get("comp_dir", "N/A").display_value
-        language = cu.attributes_map.get("language", "N/A").display_value
+        name = cu.attributes_map.get("name", "N/A").raw_value
+        producer = cu.attributes_map.get("producer", "N/A").raw_value
+        comp_dir = cu.attributes_map.get("comp_dir", "N/A").raw_value
+        language = cu.attributes_map.get("language", "N/A").raw_value
         print(f"Compile Unit #{idx}: {name!r}, Name: {comp_dir!r} Producer: {producer!r}, Language: {language!r}")
 
 
@@ -121,11 +128,38 @@ class AttributeParser:
         "abstract_origin",
     }
 
+    # class Endianess(IntEnum):
+    #    Little = 0
+    #    Big = 1
+
     def __init__(self, session):
         self.session = session
         self.type_stack: set[int] = set()
         self.parsed_types: dict = {}
         self.att_types: dict = defaultdict(set)
+
+        debug_str_section = self.session.query(model.Elf_Section).filter_by(section_name=".debug_str").first()
+        if debug_str_section:
+            debug_str = debug_str_section.section_image
+        else:
+            debug_str = b""
+        debug_line_str_section = self.session.query(model.Elf_Section).filter_by(section_name=".debug_line_str").first()
+        if debug_line_str_section:
+            debug_line_str = debug_line_str_section.section_image
+        else:
+            debug_line_str = b""
+        elf_header = self.session.query(model.Elf_Header).first()
+        address_size = elf_header.address_size
+        endianess = Endianess.Little if elf_header.endianess == defs.ELFDataEncoding.ELFDATA2LSB else Endianess.Big
+        factory = DwarfReaders(
+            endianess=endianess,
+            address_size=address_size,
+            strings=debug_str,
+            line_strings=debug_line_str,
+        )
+        self.readers = factory.readers
+        self.stack_machine = factory.stack_machine
+        self.dwarf_expression = factory.dwarf_expression
 
     # The cache lives per-instance because "self" participates in the key.
     @lru_cache(maxsize=8192)
@@ -160,10 +194,30 @@ class AttributeParser:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = entry.attributes_map["location"].display_value
+            location = self.dwarf_expression(entry.attributes_map["location"].form, entry.attributes_map["location"].raw_value)
             print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
         else:
-            print(f"{'    ' * level}{tag} '{name}'{type_info} [off=0x{entry.offset:08x}]")
+            if tag == "enumerator" and "const_value" in entry.attributes_map:
+                enumerator_value = int(entry.attributes_map["const_value"].raw_value)
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
+            elif tag == "member" and "data_member_location" in entry.attributes_map:
+                data_member_location = self.dwarf_expression(
+                    entry.attributes_map["data_member_location"].form, entry.attributes_map["data_member_location"].raw_value
+                )
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
+            elif tag == "base_type":
+                descr = ""
+                if "byte_size" in entry.attributes_map:
+                    byte_size = int(entry.attributes_map["byte_size"].raw_value)
+                    descr = f"{byte_size} bytes"
+                if "encoding" in entry.attributes_map:
+                    encoding = BaseTypeEncoding(int(entry.attributes_map["encoding"].raw_value)).name
+                    descr += f" - {encoding}"
+                if descr:
+                    descr = f"[{descr}]"
+                print(f"{'    ' * level}{tag} '{name}'{type_info} {descr} [off=0x{entry.offset:08x}]")
+            else:
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [off=0x{entry.offset:08x}]")
 
         for child in getattr(entry, "children", []) or []:
             self.traverse_tree(child, level + 1)
