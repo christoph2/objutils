@@ -254,7 +254,7 @@ class SymbolAPI(DBAPI):
         self,
         sections: str = None,
         name_pattern: str = None,
-        symbol_list: str = None,  # comma-separated list of symbols
+        symbol_list: typing.Optional[list[str]] = None,  # comma-separated list of symbols
         bindings: str = None,
         access: str = None,
         types_str: str = None,
@@ -315,7 +315,7 @@ class SymbolAPI(DBAPI):
                     flt.append(defs.SymbolType.STT_TLS)
                 query = query.filter(model.Elf_Symbol.st_type.in_(flt))
         if symbol_list:
-            name_flt = frozenset(symbol_list.split(","))
+            name_flt = frozenset(symbol_list)
             query = query.filter(model.Elf_Symbol.symbol_name.in_(name_flt))
         query = query.order_by(model.Elf_Symbol.section_name)
         if order_by_value:
@@ -1061,3 +1061,153 @@ class ElfParser:
         if callback:
             callback("stop", None)
         return img
+
+
+def import_dwarf_to_db(
+    elf_path: str,
+    out_db: str | None,
+    *,
+    quiet: bool = False,
+    verbose: bool = False,
+    run_lines: bool = True,
+    run_pubnames: bool = True,
+    run_aranges: bool = True,
+    run_mac: bool = False,
+    force: bool = False,
+) -> int:
+    """Import DWARF data from ELF into a .prgdb database file.
+
+    Returns an exit code compatible with the CLI script.
+    """
+    # Local import to avoid potential circular import at module import time.
+    from objutils.dwarf import DwarfProcessor
+
+    def _print(msg: str):
+        if not quiet:
+            print(msg)
+
+    elf_p = Path(elf_path)
+    if not elf_p.exists() or not elf_p.is_file():
+        _print(f"ELF file not found: {elf_path}")
+        return 2
+
+    default_db_path = elf_p.with_suffix(model.DB_EXTENSION)
+    try:
+        if force:
+            if default_db_path.exists():
+                try:
+                    default_db_path.unlink()
+                except Exception:
+                    pass
+            if out_db:
+                outp = Path(out_db)
+                if outp.exists():
+                    try:
+                        outp.unlink()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+    try:
+        ep = ElfParser(str(elf_p))
+    except Exception as e:
+        _print(f"Failed to open ELF file '{elf_path}': {e}")
+        return 2
+
+    if verbose:
+        _print(str(ep))
+
+    try:
+        dp = DwarfProcessor(ep)
+    except TypeError as te:
+        _print(f"No DWARF sections available in '{elf_path}': {te}")
+        return 1
+
+    if run_pubnames:
+        try:
+            dp.pubnames()
+        except Exception as e:
+            if verbose:
+                _print(f"Warning: pubnames failed: {e}")
+    if run_aranges:
+        try:
+            dp.aranges()
+        except Exception as e:
+            if verbose:
+                _print(f"Warning: aranges failed: {e}")
+    if run_lines:
+        try:
+            dp.do_lines()
+        except Exception as e:
+            if verbose:
+                _print(f"Warning: do_lines failed: {e}")
+
+    try:
+        dp.do_dbg_info()
+    except Exception as e:
+        _print(f"Error while parsing .debug_info: {e}")
+        return 3
+
+    if run_mac:
+        try:
+            dp.do_mac_info()
+        except Exception as e:
+            if verbose:
+                _print(f"Warning: do_mac_info failed: {e}")
+
+    try:
+        if out_db:
+            src_db = default_db_path
+            dst_db = Path(out_db)
+            if str(dst_db.resolve()) != str(src_db.resolve()):
+                if not src_db.exists():
+                    with model.Model(str(dst_db)) as _mdb:  # type: ignore[attr-defined]
+                        pass
+                else:
+                    try:
+                        ep.db.close()
+                    except Exception:
+                        pass
+                    import shutil as _shutil
+
+                    _shutil.copyfile(str(src_db), str(dst_db))
+                    _print(f"Wrote database: {dst_db}")
+            else:
+                _print(f"Database available at: {src_db}")
+        else:
+            _print(f"Database available at: {default_db_path}")
+    except Exception as e:
+        _print(f"Failed to write/copy database: {e}")
+        return 4
+
+    return 0
+
+
+def open_program_database(
+    path: str | os.PathLike,
+    *,
+    import_if_needed: bool = True,
+    force_import: bool = False,
+    quiet: bool = True,
+) -> model.Model:
+    """Open a program database (.prgdb) or derive it from an ELF file.
+
+    If `path` points to a .prgdb file, open and return it. If it points to an ELF
+    file (or a .prgdb does not yet exist next to the ELF), optionally import
+    DWARF to create the database and return the opened model.
+    """
+    p = Path(path)
+    if p.suffix.lower() == model.DB_EXTENSION:
+        return model.Model(str(p))
+
+    # Treat as ELF input; determine the sibling .prgdb
+    elf_path = p
+    db_path = elf_path.with_suffix(model.DB_EXTENSION)
+    if not db_path.exists():
+        if not import_if_needed:
+            raise FileNotFoundError(str(db_path))
+        rc = import_dwarf_to_db(str(elf_path), str(db_path), quiet=quiet, force=force_import)
+        if rc != 0:
+            raise RuntimeError(f"Failed to import DWARF from '{elf_path}' (rc={rc})")
+    return model.Model(str(db_path))

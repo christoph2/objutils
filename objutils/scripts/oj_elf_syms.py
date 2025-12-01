@@ -92,6 +92,10 @@ def main():
     except Exception as e:
         print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
         exit(1)
+    if args.symbol_list:
+        symbol_list = args.symbol_list.split(",")
+    else:
+        symbol_list = []
     for section, syms in ep.symbols.fetch(
         sections=args.sections,
         name_pattern=args.pattern,
@@ -99,7 +103,7 @@ def main():
         bindings=args.bindings,
         types_str=args.types,
         access=args.access,
-        symbol_list=args.symbol_list,
+        symbol_list=symbol_list,
     ).items():
         separator = "=" * len(section)
         print("\n{1:}\n{0:}\n{1:}\n".format(section, separator))

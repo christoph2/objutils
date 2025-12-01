@@ -132,8 +132,40 @@ class AttributeParser:
     #    Little = 0
     #    Big = 1
 
-    def __init__(self, session):
-        self.session = session
+    def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False, quiet: bool = True):
+        """
+        Create an AttributeParser.
+
+        Parameters
+        ----------
+        session_or_path:
+            Either an existing SQLAlchemy session (backward compatible) or a path to an ELF/.prgdb file.
+            If a path is given, the corresponding program database will be opened (and imported if needed).
+        import_if_needed: bool
+            When a path to an ELF is provided, import DWARF into a sibling .prgdb if it doesn't exist yet.
+        force_import: bool
+            Force re-import when creating the database from an ELF path.
+        quiet: bool
+            Suppress non-error output during on-demand import when a path is provided.
+        """
+        # Lazy import to avoid heavy module import/cycles at module import time.
+        from objutils.elf import open_program_database  # local import by design
+
+        # Determine whether we received a session or a filesystem path.
+        if hasattr(session_or_path, "query"):
+            # Assume it's a SQLAlchemy session (backward compatible path)
+            self.session = session_or_path
+            self._model = None
+        else:
+            # Treat as a path (str or Path-like)
+            db_model = open_program_database(
+                session_or_path,
+                import_if_needed=import_if_needed,
+                force_import=force_import,
+                quiet=quiet,
+            )
+            self._model = db_model
+            self.session = db_model.session
         self.type_stack: set[int] = set()
         self.parsed_types: dict = {}
         self.att_types: dict = defaultdict(set)
@@ -160,6 +192,82 @@ class AttributeParser:
         self.readers = factory.readers
         self.stack_machine = factory.stack_machine
         self.dwarf_expression = factory.dwarf_expression
+
+    @lru_cache(maxsize=64 * 1024)
+    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
+        """Return a fully traversed type tree as a dict.
+
+        Accepts one of:
+        - a DIE offset (absolute),
+        - a DIE instance that has a DW_AT_type attribute,
+        - a DIEAttribute instance (DW_AT_type) whose value references a type.
+
+        The returned dictionary contains:
+        - tag: DWARF tag name for the type DIE
+        - attrs: non-structural attributes with values; nested "type" attributes
+                 are resolved recursively into dicts
+        - children: list of child DIE dicts (e.g., members, enumerators, subranges)
+
+        Circular references are represented by CircularReference(tag, name).
+        """
+        # Case 1: already an absolute DIE offset
+        if isinstance(obj, int):
+            return self.parse_type(obj)
+
+        # Case 2: attribute object (expected to be DW_AT_type)
+        if isinstance(obj, DIEAttribute):
+            # Try to resolve relative ref forms to absolute offset using the parent DIE if available
+            parent: Optional[model.DebugInformationEntry] = getattr(obj, "entry", None)
+            off = self._resolve_type_offset(obj, parent)
+            if off is None:
+                return {"tag": "<invalid>", "attrs": {}}
+            return self.parse_type(off)
+
+        # Case 3: a DIE that should have a DW_AT_type attribute
+        if hasattr(obj, "attributes_map") or hasattr(obj, "attributes"):
+            die = obj  # type: ignore[assignment]
+            type_attr = self._get_attr(die, "type")
+            if type_attr is None:
+                return {"tag": "<no-type>", "attrs": {}}
+            off = self._resolve_type_offset(type_attr, die)
+            if off is None:
+                return {"tag": "<invalid>", "attrs": {}}
+            return self.parse_type(off)
+
+        # Fallback
+        return {"tag": "<unsupported>", "attrs": {}}
+
+    def _resolve_type_offset(
+        self,
+        type_attr: DIEAttribute,
+        context_die: Optional[model.DebugInformationEntry],
+    ) -> Optional[int]:
+        """Resolve a DW_AT_type attribute's value to an absolute DIE offset.
+
+        Handles CU-relative reference forms by adding the DIE's cu_start.
+        Returns None if the attribute cannot be interpreted as an integer offset.
+        """
+        raw = getattr(type_attr, "raw_value", None)
+        try:
+            off = int(raw) if raw is not None else None
+        except Exception:
+            off = None
+        if off is None:
+            return None
+        try:
+            frm = getattr(type_attr, "form", None)
+            if frm in (
+                getattr(AttributeForm, "DW_FORM_ref1", None),
+                getattr(AttributeForm, "DW_FORM_ref2", None),
+                getattr(AttributeForm, "DW_FORM_ref4", None),
+                getattr(AttributeForm, "DW_FORM_ref8", None),
+                getattr(AttributeForm, "DW_FORM_ref_udata", None),
+            ):
+                base = getattr(context_die, "cu_start", 0) if context_die is not None else 0
+                off += int(base or 0)
+        except Exception:
+            pass
+        return off
 
     # The cache lives per-instance because "self" participates in the key.
     @lru_cache(maxsize=8192)
