@@ -25,8 +25,8 @@ __copyright__ = """
 """
 
 from collections import OrderedDict
-from typing import Any, NamedTuple, Type
 from collections.abc import Iterator
+from typing import Any, NamedTuple
 
 from objutils.utils import SingletonBase
 
