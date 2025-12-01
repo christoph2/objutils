@@ -31,8 +31,8 @@ __copyright__ = """
 """
 
 import sys
-from typing import TextIO
 from collections.abc import Sequence
+from typing import TextIO
 
 
 def isprintable(ch: int) -> bool:

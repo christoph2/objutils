@@ -36,7 +36,7 @@ from copy import copy
 from dataclasses import dataclass, field
 from functools import reduce
 from operator import attrgetter, mul
-from typing import Any, List, Union
+from typing import Any, Union
 
 import numpy as np
 

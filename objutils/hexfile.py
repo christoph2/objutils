@@ -28,11 +28,11 @@ import math
 import os
 import re
 from collections import Counter, defaultdict
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
-from typing import Any, Dict, List, Optional, Tuple, Union
-from collections.abc import Mapping, Sequence
+from typing import Any, Optional, Union
 
 from objutils.image import Image
 from objutils.logger import Logger
