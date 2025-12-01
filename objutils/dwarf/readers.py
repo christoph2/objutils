@@ -46,8 +46,6 @@ class Readers:
     pass
 
 
-
-
 class DwarfReaders:
 
     def __init__(

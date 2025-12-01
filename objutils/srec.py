@@ -27,9 +27,9 @@ __copyright__ = """
 """
 
 import re
+from collections.abc import Mapping, Sequence
 from functools import partial
 from typing import Any, Optional
-from collections.abc import Mapping, Sequence
 
 import objutils.hexfile as hexfile
 import objutils.utils as utils
