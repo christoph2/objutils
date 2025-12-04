@@ -342,8 +342,7 @@ class AttributeParser:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = self.dwarf_expression(entry.attributes_map["location"].form,
-                                             entry.attributes_map["location"].raw_value)
+            location = entry.attributes_map["location"].display_value
             print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
