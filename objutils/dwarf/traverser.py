@@ -1,20 +1,31 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from itertools import groupby
 from typing import Any, Optional, Union
 
 from objutils.dwarf.constants import (
+    Accessibility,
     AttributeEncoding,
     AttributeForm,
     BaseTypeEncoding,
+    CallingConvention,
+    Defaulted,
+    DecimalSign,
+    DiscriminantDescriptor,
+    Endianity,
+    IdentifierCase,
+    Inline,
+    Languages,
+    Ordering,
     Tag,
+    Virtuality,
+    Visibility,
 )
 from objutils.dwarf.encoding import Endianess
 from objutils.dwarf.readers import DwarfReaders
 from objutils.elf import defs, model
 from objutils.elf.model import DIEAttribute
-
 
 DWARF_TYPE_ENCODINGS = frozenset(
     {
@@ -53,6 +64,31 @@ class CompiledUnit:
     language: str
 
 
+@dataclass
+class DIE:
+    tag: str
+    children: list[Any] = field(default_factory=list)
+    attributes: dict[str, Any] = field(default_factory=dict)
+
+
+DATA_REPRESENTATION = {
+    "encoding": BaseTypeEncoding,
+    "decimal_sign": DecimalSign,
+    "endianity": Endianity,
+    "accessibility": Accessibility,
+    "visibility": Visibility,
+    "virtuality": Virtuality,
+    "language": Languages,
+    "identifier_case": IdentifierCase,
+    "calling_convention": CallingConvention,
+    "inline": Inline,
+    "ordering": Ordering,
+    "discr_list": DiscriminantDescriptor,
+    "defaulted": Defaulted,
+
+}
+
+
 def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, str]) -> Union[int, str]:
     attr: Optional[DIEAttribute] = attrs.get(key)
     if attr is None:
@@ -64,7 +100,8 @@ def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, 
 class CompiledUnitsSummary:
 
     def __init__(self, session) -> None:
-        cus = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.tag == Tag.compile_unit).all()
+        cus = session.query(model.DebugInformationEntry).filter(
+            model.DebugInformationEntry.tag == Tag.compile_unit).all()
         units = []
         tps = set()
         for cu in cus:
@@ -80,7 +117,8 @@ class CompiledUnitsSummary:
                         print(f"\t\tVariable without type: {ch.attributes_map}")
                     else:
                         tpx = int(ch.attributes_map["type"].raw_value)
-                        tp = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.offset == tpx).first()
+                        tp = session.query(model.DebugInformationEntry).filter(
+                            model.DebugInformationEntry.offset == tpx).first()
                         print(tp.attributes_map)
 
         groups = groupby(sorted(units, key=lambda x: x.comp_dir), key=lambda x: x.comp_dir)
@@ -132,7 +170,8 @@ class AttributeParser:
     #    Little = 0
     #    Big = 1
 
-    def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False, quiet: bool = True):
+    def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False,
+                 quiet: bool = True):
         """
         Create an AttributeParser.
 
@@ -194,7 +233,8 @@ class AttributeParser:
         self.dwarf_expression = factory.dwarf_expression
 
     @lru_cache(maxsize=64 * 1024)
-    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
+    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[
+                                                                                           str, Any] | CircularReference:
         """Return a fully traversed type tree as a dict.
 
         Accepts one of:
@@ -238,9 +278,9 @@ class AttributeParser:
         return {"tag": "<unsupported>", "attrs": {}}
 
     def _resolve_type_offset(
-        self,
-        type_attr: DIEAttribute,
-        context_die: Optional[model.DebugInformationEntry],
+            self,
+            type_attr: DIEAttribute,
+            context_die: Optional[model.DebugInformationEntry],
     ) -> Optional[int]:
         """Resolve a DW_AT_type attribute's value to an absolute DIE offset.
 
@@ -257,11 +297,11 @@ class AttributeParser:
         try:
             frm = getattr(type_attr, "form", None)
             if frm in (
-                getattr(AttributeForm, "DW_FORM_ref1", None),
-                getattr(AttributeForm, "DW_FORM_ref2", None),
-                getattr(AttributeForm, "DW_FORM_ref4", None),
-                getattr(AttributeForm, "DW_FORM_ref8", None),
-                getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                    getattr(AttributeForm, "DW_FORM_ref1", None),
+                    getattr(AttributeForm, "DW_FORM_ref2", None),
+                    getattr(AttributeForm, "DW_FORM_ref4", None),
+                    getattr(AttributeForm, "DW_FORM_ref8", None),
+                    getattr(AttributeForm, "DW_FORM_ref_udata", None),
             ):
                 base = getattr(context_die, "cu_start", 0) if context_die is not None else 0
                 off += int(base or 0)
@@ -290,11 +330,11 @@ class AttributeParser:
                 try:
                     frm = getattr(attr, "form", None)
                     if frm in (
-                        getattr(AttributeForm, "DW_FORM_ref1", None),
-                        getattr(AttributeForm, "DW_FORM_ref2", None),
-                        getattr(AttributeForm, "DW_FORM_ref4", None),
-                        getattr(AttributeForm, "DW_FORM_ref8", None),
-                        getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                            getattr(AttributeForm, "DW_FORM_ref1", None),
+                            getattr(AttributeForm, "DW_FORM_ref2", None),
+                            getattr(AttributeForm, "DW_FORM_ref4", None),
+                            getattr(AttributeForm, "DW_FORM_ref8", None),
+                            getattr(AttributeForm, "DW_FORM_ref_udata", None),
                     ):
                         base = getattr(entry, "cu_start", 0) or 0
                         off += int(base)
@@ -302,17 +342,30 @@ class AttributeParser:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = self.dwarf_expression(entry.attributes_map["location"].form, entry.attributes_map["location"].raw_value)
+            location = self.dwarf_expression(entry.attributes_map["location"].form,
+                                             entry.attributes_map["location"].raw_value)
             print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
                 enumerator_value = int(entry.attributes_map["const_value"].raw_value)
-                print(f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
+                print(
+                    f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
+            elif tag == 'subrange_type':
+                lower_bound = 0
+                upper_bound = 0
+                if "lower_bound" in entry.attributes_map:
+                    lower_bound = int(entry.attributes_map["lower_bound"].raw_value)
+                if "upper_bound" in entry.attributes_map:
+                    upper_bound = int(entry.attributes_map["upper_bound"].raw_value)
+                print(
+                    f"{'    ' * level}{tag} '{name}'{type_info} [lower_bound={lower_bound}: upper_bound={upper_bound}] [off=0x{entry.offset:08x}]")
             elif tag == "member" and "data_member_location" in entry.attributes_map:
                 data_member_location = self.dwarf_expression(
-                    entry.attributes_map["data_member_location"].form, entry.attributes_map["data_member_location"].raw_value
+                    entry.attributes_map["data_member_location"].form,
+                    entry.attributes_map["data_member_location"].raw_value
                 )
-                print(f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
+                print(
+                    f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
             elif tag == "base_type":
                 descr = ""
                 if "byte_size" in entry.attributes_map:
@@ -330,6 +383,7 @@ class AttributeParser:
         for child in getattr(entry, "children", []) or []:
             self.traverse_tree(child, level + 1)
 
+    @lru_cache(maxsize=8192)
     def parse_attributes(self, die: model.DebugInformationEntry, level: int) -> dict[str, Any]:
         result: dict[str, Any] = defaultdict(dict)
         # Prefer attributes_map to avoid repeated scans
@@ -357,23 +411,36 @@ class AttributeParser:
                     try:
                         frm = getattr(attr, "form", None)
                         if frm in (
-                            getattr(AttributeForm, "DW_FORM_ref1", None),
-                            getattr(AttributeForm, "DW_FORM_ref2", None),
-                            getattr(AttributeForm, "DW_FORM_ref4", None),
-                            getattr(AttributeForm, "DW_FORM_ref8", None),
-                            getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                                getattr(AttributeForm, "DW_FORM_ref1", None),
+                                getattr(AttributeForm, "DW_FORM_ref2", None),
+                                getattr(AttributeForm, "DW_FORM_ref4", None),
+                                getattr(AttributeForm, "DW_FORM_ref8", None),
+                                getattr(AttributeForm, "DW_FORM_ref_udata", None),
                         ):
                             base = getattr(die, "cu_start", 0) or 0
                             referenced_offset += int(base)
                     except Exception:
                         pass
                 if referenced_offset and referenced_offset != die.offset:
-                    result.setdefault("attrs", {})[attr_name] = self.parse_type(referenced_offset, level + 1)
+                    # result.setdefault("attrs", {})[attr_name] = self.parse_type(referenced_offset, level + 1)
+                    result[attr_name] = self.parse_type(referenced_offset, level + 1)
                     continue
-
             # Default: keep raw_value to stay close to DB content
-            result.setdefault("attrs", {})[attr_name] = attr.raw_value
-
+            # result.setdefault("attrs", {})[attr_name] = attr.raw_value
+            elif attr_name in DATA_REPRESENTATION:
+                converter = DATA_REPRESENTATION[attr_name]
+                try:
+                    attr_value = int(attr.raw_value)
+                except Exception:
+                    result[attr_name] = attr.raw_value
+                    continue
+                try:
+                    converted_value = converter(attr_value)
+                except Exception:
+                    converted_value = attr_value
+                result[attr_name] = converted_value
+            else:
+                result[attr_name] = attr.raw_value
         return result
 
     def parse_type(self, offset: int, level: int = 0) -> dict[str, Any] | CircularReference:
@@ -408,19 +475,22 @@ class AttributeParser:
 
         self.type_stack.add(offset)
         try:
-            result: dict[str, Any] = defaultdict(dict)
-            result["tag"] = getattr(die.abbrev, "tag", die.tag)
-            result["children"] = []
+            # result: dict[str, Any] = defaultdict(dict)
+            # result["tag"] = getattr(die.abbrev, "tag", die.tag)
+            # result["children"] = []
+
+            result: DIE = DIE(getattr(die.abbrev, "tag", die.tag))
 
             # Parse this DIE's attributes
-            result.update(self.parse_attributes(die, level))
+            result.attributes.update(self.parse_attributes(die, level))
 
             # Parse interesting children (e.g., members of a struct, enumerators, subrange bounds)
             for child in getattr(die, "children", []) or []:
-                sub: dict[str, Any] = defaultdict(dict)
-                sub["tag"] = getattr(child.abbrev, "tag", child.tag)
-                sub.update(self.parse_attributes(child, level + 1))
-                result["children"].append(sub)
+                # sub: dict[str, Any] = defaultdict(dict)
+                # sub["tag"] = getattr(child.abbrev, "tag", child.tag)
+                sub: DIE = DIE(getattr(child.abbrev, "tag", child.tag))
+                sub.attributes.update(self.parse_attributes(child, level + 1))
+                result.children.append(sub)
 
             # cache result
             self.parsed_types[offset] = result

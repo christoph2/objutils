@@ -856,6 +856,12 @@ class DiscriminantDescriptor(EnumBase):
     range = 0x01
 
 
+class Defaulted(EnumBase):
+    no = 0x00
+    in_class = 0x01
+    out_of_class = 0x02
+
+
 class LineNumberStandard(EnumBase):
     DW_LNS_copy = 0x01
     DW_LNS_advance_pc = 0x02
@@ -999,8 +1005,3 @@ class Languages(EnumBase):
     GOOGLE_RenderScript = 0x8E57
     BORLAND_Delphi = 0xB000
 
-
-class Defaulted(EnumBase):
-    DW_DEFAULTED_no = 0x00
-    DW_DEFAULTED_in_class = 0x01
-    DW_DEFAULTED_out_of_class = 0x02
