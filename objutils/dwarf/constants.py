@@ -1004,4 +1004,3 @@ class Languages(EnumBase):
     Mips_Assembler = 0x8001
     GOOGLE_RenderScript = 0x8E57
     BORLAND_Delphi = 0xB000
-

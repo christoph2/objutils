@@ -10,8 +10,8 @@ from objutils.dwarf.constants import (
     AttributeForm,
     BaseTypeEncoding,
     CallingConvention,
-    Defaulted,
     DecimalSign,
+    Defaulted,
     DiscriminantDescriptor,
     Endianity,
     IdentifierCase,
@@ -26,6 +26,7 @@ from objutils.dwarf.encoding import Endianess
 from objutils.dwarf.readers import DwarfReaders
 from objutils.elf import defs, model
 from objutils.elf.model import DIEAttribute
+
 
 DWARF_TYPE_ENCODINGS = frozenset(
     {
@@ -85,7 +86,6 @@ DATA_REPRESENTATION = {
     "ordering": Ordering,
     "discr_list": DiscriminantDescriptor,
     "defaulted": Defaulted,
-
 }
 
 
@@ -100,8 +100,7 @@ def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, 
 class CompiledUnitsSummary:
 
     def __init__(self, session) -> None:
-        cus = session.query(model.DebugInformationEntry).filter(
-            model.DebugInformationEntry.tag == Tag.compile_unit).all()
+        cus = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.tag == Tag.compile_unit).all()
         units = []
         tps = set()
         for cu in cus:
@@ -117,8 +116,7 @@ class CompiledUnitsSummary:
                         print(f"\t\tVariable without type: {ch.attributes_map}")
                     else:
                         tpx = int(ch.attributes_map["type"].raw_value)
-                        tp = session.query(model.DebugInformationEntry).filter(
-                            model.DebugInformationEntry.offset == tpx).first()
+                        tp = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.offset == tpx).first()
                         print(tp.attributes_map)
 
         groups = groupby(sorted(units, key=lambda x: x.comp_dir), key=lambda x: x.comp_dir)
@@ -170,8 +168,7 @@ class AttributeParser:
     #    Little = 0
     #    Big = 1
 
-    def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False,
-                 quiet: bool = True):
+    def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False, quiet: bool = True):
         """
         Create an AttributeParser.
 
@@ -233,8 +230,7 @@ class AttributeParser:
         self.dwarf_expression = factory.dwarf_expression
 
     @lru_cache(maxsize=64 * 1024)
-    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[
-                                                                                           str, Any] | CircularReference:
+    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
         """Return a fully traversed type tree as a dict.
 
         Accepts one of:
@@ -278,9 +274,9 @@ class AttributeParser:
         return {"tag": "<unsupported>", "attrs": {}}
 
     def _resolve_type_offset(
-            self,
-            type_attr: DIEAttribute,
-            context_die: Optional[model.DebugInformationEntry],
+        self,
+        type_attr: DIEAttribute,
+        context_die: Optional[model.DebugInformationEntry],
     ) -> Optional[int]:
         """Resolve a DW_AT_type attribute's value to an absolute DIE offset.
 
@@ -297,11 +293,11 @@ class AttributeParser:
         try:
             frm = getattr(type_attr, "form", None)
             if frm in (
-                    getattr(AttributeForm, "DW_FORM_ref1", None),
-                    getattr(AttributeForm, "DW_FORM_ref2", None),
-                    getattr(AttributeForm, "DW_FORM_ref4", None),
-                    getattr(AttributeForm, "DW_FORM_ref8", None),
-                    getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                getattr(AttributeForm, "DW_FORM_ref1", None),
+                getattr(AttributeForm, "DW_FORM_ref2", None),
+                getattr(AttributeForm, "DW_FORM_ref4", None),
+                getattr(AttributeForm, "DW_FORM_ref8", None),
+                getattr(AttributeForm, "DW_FORM_ref_udata", None),
             ):
                 base = getattr(context_die, "cu_start", 0) if context_die is not None else 0
                 off += int(base or 0)
@@ -330,11 +326,11 @@ class AttributeParser:
                 try:
                     frm = getattr(attr, "form", None)
                     if frm in (
-                            getattr(AttributeForm, "DW_FORM_ref1", None),
-                            getattr(AttributeForm, "DW_FORM_ref2", None),
-                            getattr(AttributeForm, "DW_FORM_ref4", None),
-                            getattr(AttributeForm, "DW_FORM_ref8", None),
-                            getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                        getattr(AttributeForm, "DW_FORM_ref1", None),
+                        getattr(AttributeForm, "DW_FORM_ref2", None),
+                        getattr(AttributeForm, "DW_FORM_ref4", None),
+                        getattr(AttributeForm, "DW_FORM_ref8", None),
+                        getattr(AttributeForm, "DW_FORM_ref_udata", None),
                     ):
                         base = getattr(entry, "cu_start", 0) or 0
                         off += int(base)
@@ -347,9 +343,8 @@ class AttributeParser:
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
                 enumerator_value = int(entry.attributes_map["const_value"].raw_value)
-                print(
-                    f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
-            elif tag == 'subrange_type':
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
+            elif tag == "subrange_type":
                 lower_bound = 0
                 upper_bound = 0
                 if "lower_bound" in entry.attributes_map:
@@ -357,14 +352,13 @@ class AttributeParser:
                 if "upper_bound" in entry.attributes_map:
                     upper_bound = int(entry.attributes_map["upper_bound"].raw_value)
                 print(
-                    f"{'    ' * level}{tag} '{name}'{type_info} [lower_bound={lower_bound}: upper_bound={upper_bound}] [off=0x{entry.offset:08x}]")
+                    f"{'    ' * level}{tag} '{name}'{type_info} [lower_bound={lower_bound}: upper_bound={upper_bound}] [off=0x{entry.offset:08x}]"
+                )
             elif tag == "member" and "data_member_location" in entry.attributes_map:
                 data_member_location = self.dwarf_expression(
-                    entry.attributes_map["data_member_location"].form,
-                    entry.attributes_map["data_member_location"].raw_value
+                    entry.attributes_map["data_member_location"].form, entry.attributes_map["data_member_location"].raw_value
                 )
-                print(
-                    f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
             elif tag == "base_type":
                 descr = ""
                 if "byte_size" in entry.attributes_map:
@@ -410,11 +404,11 @@ class AttributeParser:
                     try:
                         frm = getattr(attr, "form", None)
                         if frm in (
-                                getattr(AttributeForm, "DW_FORM_ref1", None),
-                                getattr(AttributeForm, "DW_FORM_ref2", None),
-                                getattr(AttributeForm, "DW_FORM_ref4", None),
-                                getattr(AttributeForm, "DW_FORM_ref8", None),
-                                getattr(AttributeForm, "DW_FORM_ref_udata", None),
+                            getattr(AttributeForm, "DW_FORM_ref1", None),
+                            getattr(AttributeForm, "DW_FORM_ref2", None),
+                            getattr(AttributeForm, "DW_FORM_ref4", None),
+                            getattr(AttributeForm, "DW_FORM_ref8", None),
+                            getattr(AttributeForm, "DW_FORM_ref_udata", None),
                         ):
                             base = getattr(die, "cu_start", 0) or 0
                             referenced_offset += int(base)
