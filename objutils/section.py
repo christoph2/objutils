@@ -179,21 +179,8 @@ def _data_converter(data: Union[str, bytearray, array, Any]) -> bytearray:
 
 
 def fortran_array_from_buffer(arr: bytearray, shape: tuple, dtype: str) -> np.ndarray:
-    if len(shape) <= 2:
-        return np.frombuffer(arr, dtype=dtype).reshape(shape[::-1]).T
-    # shape = list(reversed(shape))
-    lhs = shape[:-2]
-    num_slices = reduce(mul, lhs, 1)
-    rhs = shape[-2:]
-    slice_len = reduce(mul, rhs, 1)
-    buf = arr.copy()
-    offset = 0
-    for idx in range(num_slices):
-        ddx = buf[offset : offset + slice_len]
-        res = np.frombuffer(ddx, dtype=dtype).reshape(*reversed(rhs)).T
-        buf[offset : offset + slice_len] = res.tobytes()
-        offset += slice_len
-    return np.frombuffer(buf, dtype=dtype).reshape(shape)
+    """Converts a bytearray to a Fortran-ordered numpy array."""
+    return np.frombuffer(arr, dtype=dtype).reshape(shape, order="F")
 
 
 def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
