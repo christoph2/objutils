@@ -338,12 +338,12 @@ class AttributeParser:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = entry.attributes_map["location"].display_value
-            print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
+            location = self.stack_machine.evaluate(entry.attributes_map["location"].raw_value)
+            print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}]x [off=0x{entry.offset:08x}]")
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
                 enumerator_value = int(entry.attributes_map["const_value"].raw_value)
-                print(f"{'    ' * level}{tag} '{name}'{type_info} [value=0x{enumerator_value:04x}] [off=0x{entry.offset:08x}]")
+                print(f"{'    ' * level}{tag} '{name}'{type_info} [value={enumerator_value}] [off=0x{entry.offset:08x}]")
             elif tag == "subrange_type":
                 lower_bound = 0
                 upper_bound = 0

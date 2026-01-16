@@ -773,10 +773,14 @@ class ElfParser:
         )
         if not data:
             return None
-        result = Note.parse(data)
-        result.desc = binascii.b2a_hex(result.desc).decode()
-        result.name = self.asciiCString.parse(result.name)
-        return result
+        try:
+            result = Note.parse(data)
+            result.desc = binascii.b2a_hex(result.desc).decode()
+            result.name = self.asciiCString.parse(result.name)
+        except StreamError as e:
+            return None
+        else:
+            return result
 
     def debug_sections(self):
         ds = OrderedDict()
