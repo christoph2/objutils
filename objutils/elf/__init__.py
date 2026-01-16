@@ -259,6 +259,7 @@ class SymbolAPI(DBAPI):
         access: str = None,
         types_str: str = None,
         order_by_value: bool = True,
+        group_by_section: bool = True,
     ):
         """
 
@@ -322,10 +323,13 @@ class SymbolAPI(DBAPI):
             query = query.order_by(model.Elf_Symbol.st_value)
         else:
             query = query.order_by(model.Elf_Symbol.symbol_name)
-        for key, values in groupby(query.all(), lambda s: s.section_name):
-            symbols = filter_symbols(list(values), name_pattern)
-            if symbols:
-                result[key] = symbols
+        if group_by_section:
+            for key, values in groupby(query.all(), lambda s: s.section_name):
+                symbols = filter_symbols(list(values), name_pattern)
+                if symbols:
+                    result[key] = symbols
+        else:
+            result = filter_symbols(query.all(), name_pattern)
         return result
 
     def fetch_gcc_special_symbols(self):
@@ -777,7 +781,7 @@ class ElfParser:
             result = Note.parse(data)
             result.desc = binascii.b2a_hex(result.desc).decode()
             result.name = self.asciiCString.parse(result.name)
-        except StreamError as e:
+        except StreamError:
             return None
         else:
             return result
