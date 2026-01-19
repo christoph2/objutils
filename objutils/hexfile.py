@@ -274,7 +274,7 @@ class Reader(BaseType):
             return Image(sections=join_sections(sections), meta=meta_data)
         else:
             self.error("File seems to be invalid.")
-            return Image([], valid=False)
+            return Image([])
 
     def _address_space(self, value: int) -> int:
         if value < 2**16:
