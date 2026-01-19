@@ -36,7 +36,7 @@ from typing import TextIO
 
 
 def isprintable(ch: int) -> bool:
-    return 0x1F < ch < 0x80
+    return 0x1F < ch < 0x7f
 
 
 def unpack(*args: int) -> Sequence[int]:
