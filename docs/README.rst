@@ -2,7 +2,7 @@
 Readme
 ======
 
-.. image:: objutils_dark.jpg
+.. image:: https://github.com/christoph2/objutils/raw/master/docs/objutils_dark.jpg
     :align: center
     :scale: 25%
 
