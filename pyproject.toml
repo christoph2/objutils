@@ -63,6 +63,7 @@ numpy = "<=2.2.5"
 
 
 [tool.poetry.group.dev.dependencies]
+bumpver = "^2023.1129"
 pre-commit = "^3.7.0"
 pytest = "^8.1.1"
 black = "^24.10.0"
