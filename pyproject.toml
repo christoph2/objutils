@@ -130,4 +130,3 @@ push = false
 "objutils/version.py" = [
     '__version__ = "{version}"',
 ]
-

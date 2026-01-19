@@ -84,9 +84,7 @@ S9030000FC"""
     sr = loads("srec", SREC1)
     img = Image([sr[0]])
     shf = dumps("shf", img)
-    assert (
-        shf
-        == """<?xml version="1.0" encoding="UTF-8"?>
+    assert shf == """<?xml version="1.0" encoding="UTF-8"?>
 <dump name="SHF dump by objutils" blocks="0001">
     <block name="Section #0000" address="0000b000" word_size="01" length="0000003c" checksum="9a8e02926903975688683136d71ff38ca9fc9847">
         57 6f 77 21 20 44 69 64 20 79 6f 75 20 72 65 61
@@ -95,4 +93,3 @@ S9030000FC"""
         6f 20 72 65 61 64 20 74 68 69 73 3f
     </block>
 </dump>"""
-    )
