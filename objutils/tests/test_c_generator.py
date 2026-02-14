@@ -15,9 +15,12 @@ def add_die(session, tag: str, offset: int, parent=None):
 
 
 def add_attr(session, die, name: str, raw_value, display_value=None):
-    if display_value is None:
-        display_value = raw_value
-    a = elf_model.DIEAttribute(name=name, raw_value=raw_value, display_value=str(display_value), entry=die)
+    """Helper to add DIEAttribute.
+    
+    Note: display_value parameter is kept for backward compatibility but not used
+    by DIEAttribute ORM model. Only name, raw_value, and entry are stored.
+    """
+    a = elf_model.DIEAttribute(name=name, raw_value=str(raw_value), entry=die)
     session.add(a)
     # invalidate attributes_map cache if present
     if hasattr(die, "_attributes_map_cache"):
@@ -140,9 +143,6 @@ def test_cgenerator_generate_header_contains_expected_decls(tmp_path):
         db.close()
 
 
-
-
-
 # Helpers to construct a tiny DWARF-like tree in the ORM
 
 
@@ -156,9 +156,12 @@ def add_die(session, tag: str, offset: int, parent=None):
 
 
 def add_attr(session, die, name: str, raw_value, display_value=None):
-    if display_value is None:
-        display_value = raw_value
-    a = elf_model.DIEAttribute(name=name, raw_value=raw_value, display_value=str(display_value), entry=die)
+    """Helper to add DIEAttribute.
+    
+    Note: display_value parameter is kept for backward compatibility but not used
+    by DIEAttribute ORM model. Only name, raw_value, and entry are stored.
+    """
+    a = elf_model.DIEAttribute(name=name, raw_value=str(raw_value), entry=die)
     session.add(a)
     # invalidate attributes_map cache if present
     if hasattr(die, "_attributes_map_cache"):
