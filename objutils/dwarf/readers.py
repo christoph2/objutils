@@ -1,3 +1,30 @@
+"""DWARF Data Readers and Stack Machine Support.
+
+This module provides high-level interfaces for reading DWARF attribute values
+with appropriate binary encodings. DwarfReaders encapsulates encoding selection
+and provides a unified interface for parsing various DWARF data types.
+
+Reader Pattern:
+    DwarfReaders maintains a Readers container with attributes for each supported
+    encoding type (u8, s16, uleb, block1, cstring_utf8, etc.). The appropriate reader
+    is selected based on the endianness and address size of the debug information.
+
+Stack Machine Integration:
+    Includes integration with StackMachine for evaluating DWARF expressions and
+    location descriptions (DW_FORM_exprloc, DW_FORM_block*, etc.).
+
+Usage:
+    Create a DwarfReaders instance with target architecture parameters, then use
+    the readers attribute or stack_machine for decoding debug information.
+
+Example:
+    >>> from objutils.dwarf.encoding import Endianess
+    >>> readers = DwarfReaders(Endianess.Little, 8)
+    >>> value = readers.readers.uleb.parse(data)
+
+Copyright (C) 2010-2025 by Christoph Schueler
+"""
+
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -38,15 +65,33 @@ from objutils.dwarf.sm import StackMachine
 
 @dataclass
 class Readers:
+    """Container for DWARF data readers.
+    
+    A simple dataclass whose attributes are dynamically populated with Construct
+    parsers for different DWARF encoding formats. Attributes are set based on
+    architecture endianness and address size.
+    
+    Typical attributes include:
+        u8, s8, u16, s16, u32, s32, u64, s64: Fixed-width integer readers.
+        uleb, sleb: Variable-length integer readers.
+        block1, block2, block4, block_uleb: Block data readers.
+        native_address: Target-specific address reader.
+        cstring_ascii, cstring_utf8: Null-terminated string readers.
+        strp, line_strp: String pointer readers.
     """
-    Simple container whose attributes are populated with Construct parsers
-    and helpers for reading DWARF fields.
-    """
-
     pass
 
 
 class DwarfReaders:
+    """High-Level DWARF Data Reader Interface.
+    
+    Provides architecture-aware readers for parsing DWARF debug information.
+    Selects appropriate binary encodings based on target endianness and address size.
+    
+    Attributes:
+        readers: Readers container with encoding-specific parser instances.
+        stack_machine: StackMachine for evaluating DWARF expressions.
+    """
 
     def __init__(
         self,
@@ -57,6 +102,15 @@ class DwarfReaders:
         *,
         enable_debug_log: bool = False,
     ) -> None:
+        """Initialize DWARF readers for specific target architecture.
+        
+        Args:
+            endianess: Target byte order (Endianess.Little or Endianess.Big).
+            address_size: Address width in bytes (1, 2, 4, or 8).
+            strings: Complete debug_str section (for string pointer resolution).
+            line_strings: Complete debug_line_str section (for line string resolution).
+            enable_debug_log: Enable debug logging (default: False).
+        """
         self._endianess = endianess
         self._address_size = address_size
         self._strings = strings
@@ -64,7 +118,7 @@ class DwarfReaders:
         self._enable_debug_log = enable_debug_log
 
         #      Little    Big
-        self._BASIC_READERS = {
+        self._BASIC_READERS: dict[str, tuple] = {
             "u8": (Int8ul, Int8ul),
             "s8": (Int8sl, Int8sl),
             "u16": (Int16ul, Int16ub),
@@ -99,14 +153,31 @@ class DwarfReaders:
 
     @property
     def endianess(self) -> Endianess:
+        """Get target byte order."""
         return self._endianess
 
     @property
     def address_size(self) -> int:
+        """Get target address width in bytes."""
         return self._address_size
 
     @lru_cache(maxsize=64 * 1024)
     def dwarf_expression(self, form: constants.AttributeForm, expr: bytes) -> str:
+        """Evaluate DWARF expression or location description.
+        
+        Interprets DWARF expressions (DW_OP_* operations) and converts them to
+        human-readable format. Handles both location descriptions and constant values.
+        
+        Args:
+            form: Attribute form identifying the expression type.
+            expr: Raw expression bytes to evaluate.
+            
+        Returns:
+            String representation of the expression or value.
+            
+        Raises:
+            NotImplementedError: If form type is unsupported.
+        """
         if form in (
             constants.AttributeForm.DW_FORM_exprloc,
             constants.AttributeForm.DW_FORM_block,
