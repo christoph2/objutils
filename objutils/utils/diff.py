@@ -1,9 +1,14 @@
 #!/usr/bin/env python
+"""Binary diff utilities.
+
+This module provides simple binary diff algorithms for comparing
+byte sequences and identifying modifications, additions, and deletions.
+"""
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2022 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2022-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -24,73 +29,86 @@ __copyright__ = """
 
 from collections import namedtuple
 
-
-"""BinDiff
-
-Represents a difference between two binaries.
-
-Attributes
-----------
-
-    type: str
-        Type of Modification:
-
-        - 'A' something was appended.
-        - 'D' something was deleted.
-        - 'M' a modification happend.
-
-    offset: int
-        Location
-
-    a: bytes or bytearray
-        Considered as the original.
-
-    b: bytes or bytearray
-        Considered as the modification.
-"""
+# Type representing a binary difference
 BinDiff = namedtuple("BinDiff", "type offset a b")
+BinDiff.__doc__ = """Binary difference between two byte sequences.
+
+Attributes:
+    type (str): Type of modification:
+        - 'A': Appended data (b has extra bytes at end)
+        - 'D': Deleted data (a has extra bytes at end)
+        - 'M': Modified data (bytes differ at offset)
+    offset (int): Location of difference
+    a (bytearray | None): Original bytes (None for 'A' type)
+    b (bytearray | None): Modified bytes (None for 'D' type)
+"""
 
 
-def diff_bin(a, b):
-    """Simplicistic binary diff algorithm.
+def diff_bin(a: bytes | bytearray, b: bytes | bytearray) -> list[BinDiff]:
+    """Simple binary diff algorithm.
 
-    Parameters
-    ----------
-    a: bytes or bytearray
-        Considered as the original.
+    Compares two byte sequences and identifies differences as modifications,
+    additions, or deletions. Adjacent differing bytes are grouped together.
 
-    b: bytes or bytearray
-        Considered as the modification.
+    Args:
+        a: Original byte sequence
+        b: Modified byte sequence
 
-    Returns
-    list of `BinDiff`s.
-    -------
+    Returns:
+        List of BinDiff objects describing all differences
+
+    Raises:
+        TypeError: If a or b are not bytes or bytearray
+
+    Example:
+        >>> a = b'\\x00\\x01\\x02\\x03'
+        >>> b = b'\\x00\\x01\\xFF\\x03'
+        >>> diffs = diff_bin(a, b)
+        >>> diffs[0].type
+        'M'
+        >>> diffs[0].offset
+        2
     """
     if not isinstance(a, (bytes, bytearray)):
-        raise TypeError("Parameter `a` must be of type `bytes` or `bytearray`")
+        raise TypeError("Parameter 'a' must be of type 'bytes' or 'bytearray'")
     if not isinstance(b, (bytes, bytearray)):
-        raise TypeError("Parameter `b` must be of type `bytes` or `bytearray`")
+        raise TypeError("Parameter 'b' must be of type 'bytes' or 'bytearray'")
+
     la, lb = len(a), len(b)
     length = min(la, lb)
-    tmp = []
+    result: list[BinDiff] = []
     start_offset = 0
-    diff_bytes_a, diff_bytes_b = bytearray(), bytearray()
+    diff_bytes_a = bytearray()
+    diff_bytes_b = bytearray()
+
+    # Compare overlapping bytes
     for offset in range(length):
         ai = a[offset]
         bi = b[offset]
         diff = ai - bi
         if diff:
+            # Bytes differ - accumulate
             if not diff_bytes_a:
                 start_offset = offset
             diff_bytes_a.append(ai)
             diff_bytes_b.append(bi)
         else:
+            # Bytes match - flush accumulated diffs
             if diff_bytes_a:
-                tmp.append(BinDiff("M", start_offset, diff_bytes_a, diff_bytes_b))
-                diff_bytes_a, diff_bytes_b = bytearray(), bytearray()
+                result.append(BinDiff("M", start_offset, diff_bytes_a, diff_bytes_b))
+                diff_bytes_a = bytearray()
+                diff_bytes_b = bytearray()
+
+    # Flush any remaining diffs
+    if diff_bytes_a:
+        result.append(BinDiff("M", start_offset, diff_bytes_a, diff_bytes_b))
+
+    # Handle length differences
     if lb > la:
-        tmp.append(BinDiff("A", len(a), None, b[-(lb - la) :]))
+        # b is longer - data was appended
+        result.append(BinDiff("A", len(a), None, b[-(lb - la) :]))
     elif lb < la:
-        tmp.append(BinDiff("D", len(b), a[-(la - lb) :], None))
-    result = tmp
+        # a is longer - data was deleted
+        result.append(BinDiff("D", len(b), a[-(la - lb) :], None))
+
     return result
