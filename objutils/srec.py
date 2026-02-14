@@ -1,11 +1,32 @@
 #!/usr/bin/env python
+"""Motorola S-Record (SREC) format reader/writer.
 
-__all__ = ["Reader", "Writer"]
+This module handles the Motorola S-Record format, a widely-used file format
+for representing binary data in hexadecimal text form. It was developed by
+Motorola for their microprocessors and is now an industry standard.
+
+Format specification:
+- Record types:
+  - S0: Header record (vendor-specific data)
+  - S1: 16-bit address data record
+  - S2: 24-bit address data record
+  - S3: 32-bit address data record
+  - S5: 16-bit record count (optional)
+  - S7: 32-bit start address termination record
+  - S8: 24-bit start address termination record
+  - S9: 16-bit start address termination record
+- Record format: SXLLAA...AADDCC
+  - SX: Record type (S0-S9)
+  - LL: Byte count (address + data + checksum)
+  - AA...AA: Address (16/24/32 bits depending on record type)
+  - DD: Data bytes (optional, not present in termination records)
+  - CC: One's complement checksum of (count + address + data)
+"""
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -24,6 +45,8 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+__all__ = ["Reader", "Writer"]
+
 import re
 from collections.abc import Mapping, Sequence
 from functools import partial
@@ -35,6 +58,7 @@ from objutils.checksums import COMPLEMENT_ONES, lrc
 from objutils.utils import make_list
 
 
+# Record type identifiers
 S0 = 1
 S1 = 2
 S2 = 3
@@ -45,13 +69,21 @@ S8 = 7
 S9 = 8
 SYM = 9
 
+# Byte count bias for each record type (address bytes + checksum byte)
 BIAS = {S0: 3, S1: 3, S2: 4, S3: 5, S5: 2, S7: 5, S8: 4, S9: 3}
 
+# Regular expressions for symbol table parsing
 SYMBOLTABLE = re.compile(r"(^\$\$\s+(?P<modulename>\S*)(?P<symbols>.*?)\$\$)", re.MULTILINE | re.DOTALL)
 SYMBOL = re.compile(r"\s+(?P<symbol>.*?)\s+\$(?P<value>.+)", re.MULTILINE | re.DOTALL)
 
 
 class Reader(hexfile.Reader):
+    """Motorola S-Record format reader.
+
+    Reads S-Record files with support for all record types (S0-S9) including
+    16-bit, 24-bit, and 32-bit address modes. Also supports optional symbol
+    table parsing.
+    """
     FORMAT_SPEC = (
         (S0, "S0LLAAAADDCC"),
         (S1, "S1LLAAAADDCC"),
@@ -63,7 +95,20 @@ class Reader(hexfile.Reader):
         (S9, "S9LLAAAACC"),
     )
 
-    def load(self, fp: Any, **kws: Any):
+    def load(self, fp: Any, **kws: Any) -> Any:
+        """Load and parse S-Record file.
+
+        Args:
+            fp: File path (str) or file object to read from
+            **kws: Additional keyword arguments (unused)
+
+        Returns:
+            Parsed data from the S-Record file
+
+        Note:
+            Symbol table extraction is currently disabled but code is preserved
+            for future implementation.
+        """
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = self.read(fp)
@@ -79,7 +124,19 @@ class Reader(hexfile.Reader):
         return data
 
     def check_line(self, line: Any, format_type: int) -> None:
-        # todo: Fkt.!!!
+        """Validate S-Record checksum and byte count.
+
+        Args:
+            line: Parsed line container with attributes: address, length,
+                checksum, chunk (data bytes)
+            format_type: Record type (S0-S9)
+
+        Raises:
+            TypeError: If format_type is not a valid S-Record type
+            InvalidRecordChecksumError: If checksum validation fails
+            InvalidRecordLengthError: If byte count doesn't match data length
+        """
+        # Calculate checksum of address bytes based on record type
         if format_type in (S0, S1, S5, S9):
             checksum_of_address = ((line.address & 0xFF00) >> 8) + (line.address & 0xFF)
         elif format_type in (S2, S8):
@@ -92,7 +149,7 @@ class Reader(hexfile.Reader):
                 + (line.address & 0xFF)
             )
         else:
-            raise TypeError(f"Invalid format type {format_type!r}.")
+            raise TypeError(f"Invalid format type {format_type}.")
         if hasattr(line, "chunk"):
             checksum = (~(sum([line.length, checksum_of_address]) + sum(line.chunk))) & 0xFF
         else:
@@ -104,9 +161,29 @@ class Reader(hexfile.Reader):
             raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def is_data_line(self, line: Any, format_type: int) -> bool:
+        """Determine if record contains data.
+
+        Args:
+            line: Parsed line container (unused)
+            format_type: Record type
+
+        Returns:
+            True for S1/S2/S3 data records, False otherwise
+        """
         return format_type in (S1, S2, S3)
 
     def special_processing(self, line: Any, format_type: int) -> None:
+        """Process special S-Record types (header, count, start address).
+
+        Args:
+            line: Parsed line container
+            format_type: Record type
+
+        Note:
+            - S0: Header record (currently no processing)
+            - S5: Record count (extracted but not used)
+            - S7/S8/S9: Start address records (extracted but not used)
+        """
         if format_type == S0:
             # print("S0: [{}]".format(line.chunk))
             pass
@@ -126,7 +203,16 @@ class Reader(hexfile.Reader):
             # print "Startaddress[S9]: %u" % start_address
             # print "16-Bit Start-Address: ", hex(start_address)
 
-    def _strip_symbols(self, symbol_tables):
+    def _strip_symbols(self, symbol_tables: list[tuple[str, str, str]]) -> None:
+        """Parse and extract symbol tables from S-Record file.
+
+        Args:
+            symbol_tables: List of tuples containing (full_match, module_name, symbol_table_text)
+
+        Note:
+            Populates self.symbols with list of symbol lists, where each symbol
+            is a tuple of (name, value).
+        """
         self.symbols = []
         for _, _module_name, symbol_table in symbol_tables:
             sb = []
@@ -141,6 +227,12 @@ class Reader(hexfile.Reader):
 
 
 class Writer(hexfile.Writer):
+    """Motorola S-Record format writer.
+
+    Writes S-Record files with automatic record type selection based on
+    address range. Supports optional S5 record count and start address
+    termination records.
+    """
     record_type: Optional[int] = None
     s5record: bool = False
     start_address: Optional[int] = None
@@ -149,7 +241,20 @@ class Writer(hexfile.Writer):
 
     checksum = staticmethod(partial(lrc, width=8, comp=COMPLEMENT_ONES))
 
-    def pre_processing(self, image) -> None:
+    def pre_processing(self, image: hexfile.Image) -> None:
+        """Initialize writer state before processing image.
+
+        Determines the appropriate record type (S1/S2/S3) based on the highest
+        address in the image.
+
+        Args:
+            image: Image object to write
+
+        Note:
+            - Addresses up to 0xFFFF use S1 records (16-bit)
+            - Addresses up to 0xFFFFFF use S2 records (24-bit)
+            - Addresses up to 0xFFFFFFFF use S3 records (32-bit)
+        """
         if self.record_type is None:
             if hasattr(image, "sections"):
                 last_segment = sorted(image.sections, key=lambda s: s.start_address)[-1]
@@ -166,19 +271,48 @@ class Writer(hexfile.Writer):
         self.offset = self.record_type + 2
 
     def srecord(self, record_type: int, length: int, address: int, data: Optional[Sequence[int]] = None) -> str:
+        """Generate a single S-Record line.
+
+        Args:
+            record_type: Record type (0-9)
+            length: Data length in bytes (excluding address and checksum)
+            address: Memory address
+            data: Optional data bytes
+
+        Returns:
+            Formatted S-Record string (without line terminator)
+        """
         if data is None:
             data = []
         length += self.offset
         address_bytes = utils.int_to_array(address)
         checksum = self.checksum(make_list(address_bytes, length, data))
-        mask = f"S%u%02X{self.address_mask!s}%s%02X"
+        mask = f"S%u%02X{self.address_mask}%s%02X"
         return mask % (record_type, length, address, Writer.hex_bytes(data), checksum)
 
     def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
+        """Compose data record for a row of bytes.
+
+        Args:
+            address: Start address
+            length: Number of bytes
+            row: Data bytes to encode
+
+        Returns:
+            Formatted S-Record data record
+        """
         self.record_count += 1
         return self.srecord(self.record_type or 1, length, address, row)
 
     def compose_header(self, meta: Mapping[int, Sequence[hexfile.MetaRecord]]) -> str:
+        """Compose S0 header record(s).
+
+        Args:
+            meta: Metadata dictionary mapping record types to MetaRecord objects
+
+        Returns:
+            Newline-separated S0 header records, or empty string if no S0 metadata
+        """
         self.record_count = 0
         result: list[str] = []
         if S0 in meta:  # Usually only one S0 record, but be tolerant.
@@ -188,6 +322,19 @@ class Writer(hexfile.Writer):
         return "\n".join(result)
 
     def compose_footer(self, meta: Mapping[int, Sequence[hexfile.MetaRecord]]) -> str:
+        """Compose termination records (S5/S7/S8/S9).
+
+        Args:
+            meta: Metadata dictionary mapping record types to MetaRecord objects
+
+        Returns:
+            Newline-separated termination records
+
+        Note:
+            - Optionally includes S5 record count if s5record is True
+            - Includes appropriate start address record (S7/S8/S9) based on
+              record_type, using metadata if available or start_address if set
+        """
         result: list[str] = []
         if self.s5record:
             result.append(self.srecord(5, 0, self.record_count))
