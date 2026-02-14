@@ -1,9 +1,45 @@
 #!/usr/bin/env python
+"""ELF (Executable and Linkable Format) definitions module.
+
+This module contains comprehensive definitions for the ELF file format, including:
+
+- **File Type Definitions**: ELF file types (relocatable, executable, shared objects, core dumps)
+- **Machine Architecture Types**: Support for 100+ processor architectures (x86, ARM, AVR, MIPS, etc.)
+- **Section Definitions**: Section types, flags, and special section indices
+- **Symbol Table Definitions**: Symbol bindings, types, and visibility attributes
+- **Program Headers**: Segment types and flags for program loading
+- **Data Classes**: Machine-specific data structures (AVR, ARM) for architecture details
+- **Constants**: Magic numbers, version identifiers, and format strings
+
+The module provides type-safe enumerations for all ELF constants following the official
+ELF specification (System V ABI, ARM EABI, AVR EABI, etc.). All enumerations use IntEnum
+for compatibility with C-style integer constants.
+
+Key Classes:
+    ELFType: ELF file type identifiers
+    ELFMachineType: Machine/processor architecture identifiers
+    ELFClass: 32-bit vs 64-bit architecture
+    SectionType: Section type identifiers
+    SectionFlags: Section attribute flags
+    SymbolBinding: Symbol binding types (local, global, weak)
+    SymbolType: Symbol types (function, object, section, etc.)
+    ProgramHeader: Program segment types
+
+Data Classes:
+    MachineData: Base class for machine-specific data
+    AvrMachineData: AVR-specific machine data and flags
+    ArmMachineData: ARM-specific machine data and EABI flags
+
+References:
+    - ELF Specification: http://www.sco.com/developers/gabi/
+    - ARM EABI: https://github.com/ARM-software/abi-aa
+    - AVR EABI: http://ww1.microchip.com/downloads/en/AppNotes/doc1455.pdf
+"""
 
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2024 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -42,6 +78,23 @@ Elf32_Ehdr = namedtuple(
 
 
 class ELFType(enum.IntEnum):
+    """ELF file type identifiers.
+    
+    Defines the object file type identifying what kind of ELF file this is.
+    The file type determines how the ELF file should be interpreted and used.
+    
+    Attributes:
+        ET_NONE: No file type (unknown or invalid)
+        ET_REL: Relocatable file (object file, .o)
+        ET_EXEC: Executable file (standalone program)
+        ET_DYN: Shared object file (dynamic library, .so)
+        ET_CORE: Core dump file (process memory snapshot)
+        ET_NUM: Number of defined standard types
+        ET_LOOS: OS-specific range start (0xFE00)
+        ET_HIOS: OS-specific range end (0xFEFF)
+        ET_LOPROC: Processor-specific range start (0xFF00)
+        ET_HIPROC: Processor-specific range end (0xFFFF)
+    """
     ET_NONE = 0
     " No file type"
     ET_REL = 1
@@ -74,6 +127,27 @@ ELF_TYPE_NAMES = {
 
 
 class ELFMachineType(enum.IntEnum):
+    """ELF machine (processor architecture) type identifiers.
+    
+    Identifies the target processor architecture for the ELF file. This extensive
+    enumeration covers over 100 processor architectures including modern and legacy
+    systems, embedded microcontrollers, DSPs, and specialized processors.
+    
+    The values are standardized by the ELF specification and various processor
+    vendors. Architecture-specific behavior and relocations are defined by the
+    corresponding processor supplement to the ELF specification.
+    
+    Common architectures include:
+        - x86: EM_386 (Intel 80386)
+        - x86-64: EM_X86_64 (AMD/Intel 64-bit)
+        - ARM: EM_ARM (32-bit ARM)
+        - AVR: EM_AVR (Atmel AVR 8-bit)
+        - MIPS: EM_MIPS
+        - PowerPC: EM_PPC, EM_PPC64
+        - SPARC: EM_SPARC, EM_SPARCV9
+    
+    Note: Some values are reserved or obsolete but maintained for compatibility.
+    """
     EM_NONE = 0  # No machine.
     EM_M32 = 1  # AT&T WE 32100.
     EM_SPARC = 2  # SPARC.
@@ -453,6 +527,32 @@ ELF_MACHINE_NAMES = {
 
 
 class AVRMachineType(enum.IntEnum):
+    """AVR microcontroller architecture sub-types.
+    
+    Defines specific AVR architecture variants used in the ELF flags field.
+    Each variant represents a different AVR instruction set and feature set.
+    These values are defined by the AVR EABI specification.
+    
+    Attributes:
+        E_AVR_MACH_AVR1: AVR1 architecture (basic instruction set)
+        E_AVR_MACH_AVR2: AVR2 architecture
+        E_AVR_MACH_AVR3: AVR3 architecture  
+        E_AVR_MACH_AVR4: AVR4 architecture
+        E_AVR_MACH_AVR5: AVR5 architecture
+        E_AVR_MACH_AVR6: AVR6 architecture
+        E_AVR_MACH_AVR25: AVR25 architecture
+        E_AVR_MACH_AVR31: AVR31 architecture
+        E_AVR_MACH_AVR35: AVR35 architecture
+        E_AVR_MACH_AVR51: AVR51 architecture
+        E_AVR_MACH_AVRTINY: AVR Tiny architecture (reduced instruction set)
+        E_AVR_MACH_XMEGA1: AVR XMEGA1 architecture
+        E_AVR_MACH_XMEGA2: AVR XMEGA2 architecture
+        E_AVR_MACH_XMEGA3: AVR XMEGA3 architecture
+        E_AVR_MACH_XMEGA4: AVR XMEGA4 architecture
+        E_AVR_MACH_XMEGA5: AVR XMEGA5 architecture
+        E_AVR_MACH_XMEGA6: AVR XMEGA6 architecture
+        E_AVR_MACH_XMEGA7: AVR XMEGA7 architecture
+    """
     E_AVR_MACH_AVR1 = 1
     E_AVR_MACH_AVR2 = 2
     E_AVR_MACH_AVR3 = 3
@@ -536,12 +636,30 @@ EF_ARM_EABI_VER5 = 0x05000000
 
 
 class MachineData:
+    """Base class for machine-specific ELF data.
+    
+    Provides a common interface for extracting and presenting machine-specific
+    information from ELF file headers. Subclasses implement architecture-specific
+    flag interpretation and formatting.
+    
+    Attributes:
+        type_name: Short machine type name (e.g., "ARM", "AVR")
+        type_value: Numeric machine type value from ELFMachineType
+        machine_name: Full descriptive machine name
+        flags: Machine-specific flags from ELF header
+    """
 
     type_name: str = "???"
     type_value: int = -1
     machine_name: str = "<unknown>"
 
     def __init__(self, machine_code: int, flags: int) -> None:
+        """Initialize machine data from ELF header values.
+        
+        Args:
+            machine_code: Machine type code from ELF header (e_machine)
+            flags: Machine-specific flags from ELF header (e_flags)
+        """
         self.flags = flags
         try:
             ELFMachineType(machine_code)
@@ -555,10 +673,21 @@ class MachineData:
             self.type_value = machine.value
             self.machine_name = ELF_MACHINE_NAMES.get(self.type_value, "<unknown>")
 
-    def specific(self) -> list:
+    def specific(self) -> list[str]:
+        """Extract machine-specific flag information.
+        
+        Returns:
+            List of human-readable strings describing machine-specific flags.
+            Base implementation returns empty list.
+        """
         return []
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Format machine data as human-readable string.
+        
+        Returns:
+            Formatted string with type, machine name, and specific flags.
+        """
         spec = self.specific()
         if spec:
             return f'{self.type_name!s} [{self.machine_name!s}] [{", ".join(spec)}]'
@@ -569,8 +698,20 @@ class MachineData:
 
 
 class AvrMachineData(MachineData):
+    """AVR-specific machine data and flag interpretation.
+    
+    Extracts and formats AVR architecture-specific information from ELF flags,
+    including the specific AVR sub-architecture variant and linker relaxation status.
+    Follows the AVR EABI specification for flag interpretation.
+    """
 
-    def specific(self) -> list:
+    def specific(self) -> list[str]:
+        """Extract AVR-specific flags.
+        
+        Returns:
+            List containing AVR architecture variant and optional features like
+            link-relax preparation.
+        """
         flags = self.flags & EF_AVR_MACH
         result = []
         if flags in AVRMachineTypeNames:
@@ -583,11 +724,22 @@ class AvrMachineData(MachineData):
 
 
 class ArmMachineData(MachineData):
+    """ARM-specific machine data and EABI flag interpretation.
+    
+    Extracts and formats ARM architecture-specific information from ELF flags,
+    including EABI version and ARM-specific attributes like relocatable executable
+    and position-independent code flags. Follows the ARM EABI specification.
+    """
 
-    def specific(self) -> list:
+    def specific(self) -> list[str]:
+        """Extract ARM-specific flags.
+        
+        Returns:
+            List of ARM-specific features extracted from e_flags.
+            Currently returns empty list (implementation placeholder).
+        """
         eabi = self.flags & EF_ARM_EABIMASK
         flags = self.flags = self.flags & EF_ARM_EABIMASK_COM
-        print("ARM", hex(eabi), hex(flags))
         result = []
 
         if flags & EF_ARM_RELEXEC:
@@ -630,6 +782,16 @@ EI_ABIVERSION = 8  # ABI version.
 
 
 class ELFClass(enum.IntEnum):
+    """ELF file class (32-bit vs 64-bit architecture).
+    
+    Identifies whether the ELF file is for 32-bit or 64-bit architecture.
+    This affects the size of addresses, offsets, and various data structures.
+    
+    Attributes:
+        ELFCLASSNONE: Invalid/unknown class
+        ELFCLASS32: 32-bit architecture (4-byte addresses)
+        ELFCLASS64: 64-bit architecture (8-byte addresses)
+    """
     ELFCLASSNONE = 0  # Invalid class.
     ELFCLASS32 = 1  # 32-bit objects.
     ELFCLASS64 = 2  # 64-bit objects.
@@ -643,6 +805,16 @@ ELF_CLASS_NAMES = {
 
 
 class ELFDataEncoding(enum.IntEnum):
+    """ELF data encoding (byte order/endianness).
+    
+    Specifies the byte ordering used for multi-byte data in the ELF file.
+    This applies to all numeric fields in headers and data structures.
+    
+    Attributes:
+        ELFDATANONE: Invalid/unknown data encoding
+        ELFDATA2LSB: Little-endian (least significant byte first)
+        ELFDATA2MSB: Big-endian (most significant byte first)
+    """
     ELFDATANONE = 0  # Invalid data encoding.
     ELFDATA2LSB = 1  # Little-Endian.
     ELFDATA2MSB = 2  # Big-Endian.
@@ -656,6 +828,37 @@ ELF_BYTE_ORDER_NAMES = {
 
 
 class ELFAbiType(enum.IntEnum):
+    """ELF OS/ABI type identifiers.
+    
+    Identifies the operating system and ABI to which the ELF file is targeted.
+    This allows OS-specific interpretation of certain fields and sections.
+    
+    Multiple operating systems and embedded ABIs are supported. Most general-purpose
+    Unix systems use ELFOSABI_NONE (System V ABI). Embedded systems may use
+    ELFOSABI_STANDALONE.
+    
+    Attributes:
+        ELFOSABI_NONE: UNIX System V ABI (generic/portable)
+        ELFOSABI_HPUX: HP-UX operating system
+        ELFOSABI_NETBSD: NetBSD
+        ELFOSABI_GNU: GNU/Linux (also aliased as ELFOSABI_LINUX)
+        ELFOSABI_LINUX: Alias for ELFOSABI_GNU
+        ELFOSABI_SOLARIS: Solaris
+        ELFOSABI_AIX: IBM AIX
+        ELFOSABI_IRIX: SGI IRIX
+        ELFOSABI_FREEBSD: FreeBSD
+        ELFOSABI_TRU64: Compaq TRU64 UNIX
+        ELFOSABI_MODESTO: Novell Modesto
+        ELFOSABI_OPENBSD: OpenBSD
+        ELFOSABI_OPENVMS: OpenVMS
+        ELFOSABI_NSK: HP Non-Stop Kernel
+        ELFOSABI_AROS: AROS
+        ELFOSABI_FENIXOS: FenixOS
+        ELFOSABI_C6000_ELFABI: TMS320C6000 bare-metal (also ARM AEABI)
+        ELFOSABI_C6000_LINUX: TMS320C6000 Linux
+        ELFOSABI_ARM: ARM architecture
+        ELFOSABI_STANDALONE: Standalone/embedded (no OS)
+    """
     ELFOSABI_NONE = 0  # UNIX System V ABI
     ELFOSABI_HPUX = 1  # HP-UX operating system
     ELFOSABI_NETBSD = 2  # NetBSD
@@ -698,6 +901,26 @@ Elf_Shdr = namedtuple(
 
 
 class SectionName(enum.IntEnum):
+    """ELF special section index values.
+    
+    Defines special section indices that have specific meanings beyond regular
+    section references. These are used in symbol table entries and other contexts
+    to indicate special section relationships.
+    
+    Attributes:
+        SHN_UNDEF: Undefined/missing section reference
+        SHN_LORESERVE: Start of reserved index range
+        SHN_LOPROC: Start of processor-specific section indices
+        SHN_BEFORE: Section ordered before all others (Solaris)
+        SHN_AFTER: Section ordered after all others (Solaris)
+        SHN_HIPROC: End of processor-specific section indices
+        SHN_LOOS: Start of OS-specific section indices
+        SHN_HIOS: End of OS-specific section indices
+        SHN_ABS: Absolute symbols (not affected by relocation)
+        SHN_COMMON: Common block symbols (unallocated C externals)
+        SHN_XINDEX: Extended section index (actual index in separate table)
+        SHN_HIRESERVE: End of reserved index range
+    """
     SHN_UNDEF = 0
     # SHN_UNDEF This value marks an undefined, missing, irrelevant, or otherwise
     # meaningless section reference. For example, a symbol "defined'' relative to
@@ -741,7 +964,16 @@ class SectionName(enum.IntEnum):
 SpecialSections = {v: k for k, v in SectionName.__members__.items()}
 
 
-def special_section_name(ndx):
+def special_section_name(ndx: int) -> str:
+    """Convert section index to special section name if applicable.
+    
+    Args:
+        ndx: Section index value
+        
+    Returns:
+        Section name string if index is a special section, otherwise string
+        representation of the numeric index.
+    """
     if ndx in SpecialSections:
         return SectionName(ndx).name
     else:
@@ -749,7 +981,20 @@ def special_section_name(ndx):
 
 
 class SectionType(enum.IntEnum):
-    """ """
+    """ELF section type identifiers.
+    
+    Defines the type/purpose of each section in the ELF file. Section types
+    determine how the linker and loader interpret the section contents.
+    
+    Common types include program data (PROGBITS), symbol tables (SYMTAB, DYNSYM),
+    string tables (STRTAB), relocation entries (REL, RELA), and uninitialized
+    data (NOBITS for .bss sections).
+    
+    GNU-specific extensions (SHT_GNU_*) provide additional functionality like
+    GNU-style hash tables and version information.
+    
+    Processor-specific types are defined in the range SHT_LOPROC to SHT_HIPROC.
+    """
 
     SHT_NULL = 0  # Section header table entry unused.
     SHT_PROGBITS = 1  # Program data.
@@ -798,6 +1043,35 @@ class SectionType(enum.IntEnum):
 
 
 class SectionFlags(enum.IntEnum):
+    """ELF section attribute flags.
+    
+    Defines section attributes that control how sections are processed by the
+    linker and loader. Flags can be combined using bitwise OR.
+    
+    Key flags include:
+        - Memory attributes: WRITE, ALLOC, EXECINSTR
+        - Optimization hints: MERGE, STRINGS
+        - Grouping: GROUP, LINK_ORDER
+        - Thread-local storage: TLS
+        - Compression: COMPRESSED
+    
+    Attributes:
+        SHF_WRITE: Section is writable at runtime
+        SHF_ALLOC: Section occupies memory during execution
+        SHF_EXECINSTR: Section contains executable instructions
+        SHF_MERGE: Section data may be merged to eliminate duplicates
+        SHF_STRINGS: Section contains null-terminated strings
+        SHF_INFO_LINK: sh_info field contains section header table index
+        SHF_LINK_ORDER: Special ordering requirements apply
+        SHF_OS_NONCONFORMING: Non-standard OS-specific processing required
+        SHF_GROUP: Section is member of a section group
+        SHF_TLS: Section holds thread-local storage
+        SHF_COMPRESSED: Section data is compressed
+        SHF_MASKOS: Mask for OS-specific flags
+        SHF_MASKPROC: Mask for processor-specific flags
+        SHF_ORDERED: Special ordering requirement (Solaris)
+        SHF_EXCLUDE: Section excluded unless referenced (Solaris)
+    """
     SHF_WRITE = 0x1  # Writeable.
     SHF_ALLOC = 0x2  # Occupies memory during execution
     SHF_EXECINSTR = 0x4  # Executable.
@@ -837,6 +1111,19 @@ STN_UNDEF = 0
 
 
 class SymbolBinding(enum.IntEnum):
+    """ELF symbol binding types.
+    
+    Defines the linkage and visibility scope of symbols in the symbol table.
+    The binding determines how symbols are resolved during linking.
+    
+    Attributes:
+        STB_LOCAL: Local symbols (not visible outside object file, like C static)
+        STB_GLOBAL: Global symbols (visible to all object files)
+        STB_WEAK: Weak symbols (can be overridden by global symbols)
+        STB_GNU_UNIQUE: GNU extension - symbol is unique in namespace
+        STB_LOPROC: Start of processor-specific binding types
+        STB_HIPROC: End of processor-specific binding types
+    """
     STB_LOCAL = 0  # i.e. `static`
     STB_GLOBAL = 1
     STB_WEAK = 2
@@ -847,6 +1134,25 @@ class SymbolBinding(enum.IntEnum):
 
 
 class SymbolType(enum.IntEnum):
+    """ELF symbol type identifiers.
+    
+    Defines the type/category of symbols in the symbol table. The type indicates
+    what kind of entity the symbol represents.
+    
+    Attributes:
+        STT_NOTYPE: Symbol type not specified
+        STT_OBJECT: Symbol is a data object (variable, array, etc.)
+        STT_FUNC: Symbol is a function or executable code
+        STT_SECTION: Symbol associated with a section
+        STT_FILE: Symbol gives source file name
+        STT_COMMON: Symbol labels an uninitialized common block
+        STT_TLS: Symbol specifies thread-local storage entity
+        STT_RELC: Complex relocation expression
+        STT_SRELC: Signed complex relocation expression
+        STT_GNU_IFUNC: GNU indirect function (resolved at runtime)
+        STT_LOPROC: Start of processor-specific types
+        STT_HIPROC: End of processor-specific types
+    """
     STT_NOTYPE = 0
     STT_OBJECT = 1
     STT_FUNC = 2
@@ -862,7 +1168,17 @@ class SymbolType(enum.IntEnum):
 
 
 class SymbolVisibility(enum.IntEnum):
-    """Symbol visibility specification encoded in the st_other field."""
+    """ELF symbol visibility specification.
+    
+    Defines symbol visibility encoded in the st_other field. Controls whether
+    symbols are visible across module boundaries and preemption rules.
+    
+    Attributes:
+        STV_DEFAULT: Default visibility (globally visible, can be preempted)
+        STV_INTERNAL: Processor-specific hidden class
+        STV_HIDDEN: Symbol not visible in other modules
+        STV_PROTECTED: Visible but not preemptible (references bind locally)
+    """
 
     STV_DEFAULT = 0  # Default symbol visibility rules
     STV_INTERNAL = 1  # Processor specific hidden class
@@ -875,6 +1191,35 @@ class SymbolVisibility(enum.IntEnum):
 ##   ELF Program Header
 ##
 class ProgramHeader(enum.IntEnum):
+    """ELF program header (segment) type identifiers.
+    
+    Defines the types of segments in program headers, which describe how to
+    load and execute the program. Segments may overlap with sections and
+    define memory layout at runtime.
+    
+    Attributes:
+        PT_NULL: Unused program header entry
+        PT_LOAD: Loadable segment (mapped into memory)
+        PT_DYNAMIC: Dynamic linking information
+        PT_INTERP: Path to program interpreter (dynamic linker)
+        PT_NOTE: Auxiliary/note information
+        PT_SHLIB: Reserved (unspecified semantics)
+        PT_PHDR: Location and size of program header table
+        PT_TLS: Thread-local storage segment
+        PT_NUM: Number of defined standard types
+        PT_LOOS: Start of OS-specific segment types
+        PT_GNU_EH_FRAME: GCC exception handling frame header
+        PT_GNU_STACK: Stack executability flags
+        PT_GNU_RELRO: Segment becomes read-only after relocation
+        PT_GNU_PROPERTY: GNU property segment
+        PT_LOSUNW: Sun-specific low bound
+        PT_SUNWBSS: Sun-specific BSS segment
+        PT_SUNWSTACK: Sun-specific stack segment
+        PT_HISUNW: Sun-specific high bound
+        PT_HIOS: End of OS-specific segment types
+        PT_LOPROC: Start of processor-specific segment types
+        PT_HIPROC: End of processor-specific segment types
+    """
     PT_NULL = 0  # Program header table entry unused.
     PT_LOAD = 1  # Loadable program segment.
     PT_DYNAMIC = 2  # Dynamic linking information.
@@ -901,6 +1246,14 @@ class ProgramHeader(enum.IntEnum):
 
 
 def program_header_name(tp: int) -> str:
+    """Get the name of a program header type.
+    
+    Args:
+        tp: Program header type value
+        
+    Returns:
+        Program header type name without the "PT_" prefix.
+    """
     return ProgramHeader(tp).name[3:]
 
 
@@ -913,6 +1266,19 @@ PN_XNUM = 0xFFFF  # Extended numbering.
 
 
 def program_header_flags_name(flg: int) -> str:
+    """Format program header flags as readable string.
+    
+    Converts numeric program header flags to a human-readable format showing
+    read, write, and execute permissions.
+    
+    Args:
+        flg: Program header flags value
+        
+    Returns:
+        String in "RWX" format where each letter indicates the presence of
+        Read, Write, or eXecute permission. Absent permissions shown as "-".
+        Example: "R-X" means readable and executable but not writable.
+    """
     result = []
 
     if flg & PF_R == PF_R:
@@ -931,8 +1297,35 @@ def program_header_flags_name(flg: int) -> str:
 
 
 class NoteSegmentDescriptorCore(enum.IntEnum):
-    """
-    Legal values for note segment descriptor types for core files.
+    """ELF note segment descriptor types for core files.
+    
+    Defines the types of note segments that can appear in core dump files.
+    These notes contain various process state information captured during
+    core dump creation.
+    
+    Core file notes include register states, process info, task structures,
+    and platform-specific data. Values are standardized across Unix systems
+    for core file portability.
+    
+    Attributes:
+        NT_PRSTATUS: Process status (prstatus struct)
+        NT_FPREGSET: Floating point registers (fpregset struct)
+        NT_PRPSINFO: Process info (prpsinfo struct)
+        NT_PRXREG: Processor extended registers
+        NT_TASKSTRUCT: Task structure
+        NT_PLATFORM: Platform string from sysinfo
+        NT_AUXV: Auxiliary vector
+        NT_GWINDOWS: SPARC register windows
+        NT_ASRS: Ancillary state registers
+        NT_PSTATUS: Process status (pstatus struct)
+        NT_PSINFO: Process info (psinfo struct)
+        NT_PRCRED: Process credentials
+        NT_UTSNAME: System name info (utsname struct)
+        NT_LWPSTATUS: Lightweight process status
+        NT_LWPSINFO: Lightweight process info
+        NT_PRFPXREG: Floating point extended registers
+        NT_PRXFPREG: User FP extended registers
+        NT_PPC_VMX: PowerPC Altivec/VMX registers
     """
 
     NT_PRSTATUS = 1  # prstatus struct.
@@ -961,8 +1354,13 @@ class NoteSegmentDescriptorCore(enum.IntEnum):
 
 
 class NoteSegmentDescriptorObject(enum.IntEnum):
-    """
-    Legal values for the note segment descriptor types for object files.
+    """ELF note segment descriptor types for object files.
+    
+    Defines note segment types that appear in regular object files (not core dumps).
+    These notes contain metadata about the object file such as version information.
+    
+    Attributes:
+        NT_VERSION: Contains version string information
     """
 
     NT_VERSION = 1  # Contains a version string.
