@@ -1,0 +1,1626 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>objutils.elf &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/objutils/elf';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../objutils.html" class="nav-link">objutils</a></li>
+
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils.elf</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <h1>Source code for objutils.elf</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;Parser for ELF files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">   objutils - Object file library for Python.</span>
+
+<span class="s2">  (C) 2010-2023 by Christoph Schueler &lt;cpu12.gems@googlemail.com&gt;</span>
+
+<span class="s2">  All Rights Reserved</span>
+
+<span class="s2">  This program is free software; you can redistribute it and/or modify</span>
+<span class="s2">  it under the terms of the GNU General Public License as published by</span>
+<span class="s2">  the Free Software Foundation; either version 2 of the License, or</span>
+<span class="s2">  (at your option) any later version.</span>
+
+<span class="s2">  This program is distributed in the hope that it will be useful,</span>
+<span class="s2">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="s2">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="s2">  GNU General Public License for more details.</span>
+
+<span class="s2">  You should have received a copy of the GNU General Public License along</span>
+<span class="s2">  with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="s2">  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">groupby</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">construct</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Adapter</span><span class="p">,</span>
+    <span class="n">Array</span><span class="p">,</span>
+    <span class="n">BitsInteger</span><span class="p">,</span>
+    <span class="n">BitStruct</span><span class="p">,</span>
+    <span class="n">Bytes</span><span class="p">,</span>
+    <span class="n">Computed</span><span class="p">,</span>
+    <span class="n">Const</span><span class="p">,</span>
+    <span class="n">Construct</span><span class="p">,</span>
+    <span class="n">CString</span><span class="p">,</span>
+    <span class="n">Enum</span><span class="p">,</span>
+    <span class="n">IfThenElse</span><span class="p">,</span>
+    <span class="n">Int8ul</span><span class="p">,</span>
+    <span class="n">Int16ub</span><span class="p">,</span>
+    <span class="n">Int16ul</span><span class="p">,</span>
+    <span class="n">Int32sb</span><span class="p">,</span>
+    <span class="n">Int32sl</span><span class="p">,</span>
+    <span class="n">Int32ub</span><span class="p">,</span>
+    <span class="n">Int32ul</span><span class="p">,</span>
+    <span class="n">Int64sb</span><span class="p">,</span>
+    <span class="n">Int64sl</span><span class="p">,</span>
+    <span class="n">Int64ub</span><span class="p">,</span>
+    <span class="n">Int64ul</span><span class="p">,</span>
+    <span class="n">Padding</span><span class="p">,</span>
+    <span class="n">Pass</span><span class="p">,</span>
+    <span class="n">StreamError</span><span class="p">,</span>
+    <span class="n">Struct</span><span class="p">,</span>
+    <span class="n">Tell</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">singleton</span><span class="p">,</span>
+    <span class="n">this</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">func</span><span class="p">,</span> <span class="n">not_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">Section</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.elf</span><span class="w"> </span><span class="kn">import</span> <span class="n">defs</span><span class="p">,</span> <span class="n">model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.elf.arm</span><span class="w"> </span><span class="kn">import</span> <span class="n">attributes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_memorymapped_fileview</span>
+
+
+<span class="n">MAGIC</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">ELF&quot;</span>
+
+
+<span class="nd">@singleton</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pass2</span><span class="p">(</span><span class="n">Construct</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A do-nothing construct, useful as the default case for Switch. Returns None on parsing, puts nothing on building.</span>
+<span class="sd">    Example::</span>
+<span class="sd">        &gt;&gt;&gt; Pass.parse(b&quot;&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; Pass.build(None)</span>
+<span class="sd">        b&#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; Pass.sizeof()</span>
+<span class="sd">        0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flagbuildnone</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sizeof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+
+<span class="n">Test</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+    <span class="s2">&quot;ei_version&quot;</span>
+    <span class="o">/</span> <span class="n">Enum</span><span class="p">(</span>
+        <span class="n">Int8ul</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Pass</span><span class="p">,</span>
+        <span class="n">EV_NONE</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">EV_CURRENT</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="UTCTimeStampAdapter">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.UTCTimeStampAdapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UTCTimeStampAdapter</span><span class="p">(</span><span class="n">Adapter</span><span class="p">):</span>
+<div class="viewcode-block" id="UTCTimeStampAdapter._decode">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.UTCTimeStampAdapter._decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UTCTimeStampAdapter._encode">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.UTCTimeStampAdapter._encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">obj</span><span class="p">)))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UTCTimeStamp">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.UTCTimeStamp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">UTCTimeStamp</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">UTCTimeStampAdapter</span><span class="p">(</span><span class="n">name</span> <span class="o">/</span> <span class="n">Int32ul</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ListToBytesAdapter">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ListToBytesAdapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListToBytesAdapter</span><span class="p">(</span><span class="n">Adapter</span><span class="p">):</span>
+<div class="viewcode-block" id="ListToBytesAdapter._decode">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ListToBytesAdapter._decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ListToBytesAdapter._encode">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ListToBytesAdapter._encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PrintContext">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.PrintContext">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrintContext</span><span class="p">(</span><span class="n">Construct</span><span class="p">):</span>
+<div class="viewcode-block" id="PrintContext._parse">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.PrintContext._parse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CTX: </span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">kws</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CTX_END&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ElfFileStruct">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfFileStruct">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElfFileStruct</span><span class="p">(</span><span class="n">Struct</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElfFileStruct.elf32Addr">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfFileStruct.elf32Addr">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elf32Addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ElfFileStruct.setByteOrder">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfFileStruct.setByteOrder">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setByteOrder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*** </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">DebugInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;DebugInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;section image&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DBAPI">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.DBAPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DBAPI</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">session</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span></div>
+
+
+
+<div class="viewcode-block" id="SectionAPI">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SectionAPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SectionAPI</span><span class="p">(</span><span class="n">DBAPI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SectionAPI.get">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SectionAPI.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a single section.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        section_name: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span> <span class="o">==</span> <span class="n">section_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SectionAPI.fetch">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SectionAPI.fetch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sections</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">order_by_address</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name_pattern</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span><span class="p">,</span> <span class="n">name_pattern</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">order_by_address</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">sh_addr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+        <span class="c1"># query = query.order_by(model.Elf_Symbol.section_name)</span>
+
+        <span class="c1"># for key, value in groupby(query.all(), lambda s: s.section_name):</span>
+        <span class="c1">#    result[key] = list(value)</span>
+        <span class="c1"># return result</span>
+
+
+<div class="viewcode-block" id="SymbolAPI">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SymbolAPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymbolAPI</span><span class="p">(</span><span class="n">DBAPI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SymbolAPI.get">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SymbolAPI.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">section_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a single symbol.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        symbol_name: str or list of strings.</span>
+<span class="sd">            Symbol(s) to look for.</span>
+
+<span class="sd">        section_name: str</span>
+<span class="sd">            Consider only named section, else lookup all sections.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">section_name</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">section_name</span> <span class="o">==</span> <span class="n">section_name</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">==</span> <span class="n">symbol_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SymbolAPI.fetch">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SymbolAPI.fetch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sections</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bindings</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">access</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">types_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">order_by_value</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="n">sections</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ ,]&quot;</span><span class="p">,</span> <span class="n">sections</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="p">]</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">section_name</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">sections</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">access</span><span class="p">:</span>
+            <span class="n">access</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ ,]&quot;</span><span class="p">,</span> <span class="n">access</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">access</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">|=</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;w&quot;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">|=</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_WRITE</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">|=</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_EXECINSTR</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">bindings</span><span class="p">:</span>
+            <span class="n">bindings</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ ,]&quot;</span><span class="p">,</span> <span class="n">bindings</span><span class="p">)</span> <span class="k">if</span> <span class="n">b</span><span class="p">]</span>
+            <span class="n">flt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">bindings</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;g&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolBinding</span><span class="o">.</span><span class="n">STB_GLOBAL</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolBinding</span><span class="o">.</span><span class="n">STB_LOCAL</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;w&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolBinding</span><span class="o">.</span><span class="n">STB_WEAK</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_bind</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">flt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">types_str</span><span class="p">:</span>
+            <span class="n">types_arr</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ ,]&quot;</span><span class="p">,</span> <span class="n">types_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="p">]</span>
+            <span class="n">flt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">types_arr</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;notype&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_NOTYPE</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_OBJECT</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;func&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_FUNC</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;section&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_SECTION</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_FILE</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;common&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_COMMON</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;tls&quot;</span><span class="p">:</span>
+                    <span class="n">flt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_TLS</span><span class="p">)</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_type</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">flt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">name_pattern</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">name_pattern</span><span class="p">))</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">section_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order_by_value</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">symbol_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">section_name</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="SymbolAPI.fetch_gcc_special_symbols">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.SymbolAPI.fetch_gcc_special_symbols">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_gcc_special_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This is a GCC specific feature and will not work with other compilers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">syms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_shndx</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionName</span><span class="o">.</span><span class="n">SHN_ABS</span><span class="p">)</span>
+        <span class="n">syms</span> <span class="o">=</span> <span class="n">syms</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">syms</span> <span class="o">=</span> <span class="n">syms</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">symbol_name</span><span class="p">,</span> <span class="s2">&quot;_.*&quot;</span><span class="p">))</span>
+        <span class="n">syms</span> <span class="o">=</span> <span class="n">syms</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SymbolType</span><span class="o">.</span><span class="n">STT_NOTYPE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">syms</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="o">.</span><span class="n">st_value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="calculate_crypto_hash">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.calculate_crypto_hash">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_crypto_hash</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">sha</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha512</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sha</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ElfParser">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElfParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="n">EI_NIDENT</span> <span class="o">=</span> <span class="mi">16</span>
+
+    <span class="n">DATATYPES32</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Addr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32ul</span><span class="p">,</span> <span class="n">Int32ub</span><span class="p">),</span>  <span class="c1"># 4 - Unsigned program address</span>
+        <span class="s2">&quot;Half&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int16ul</span><span class="p">,</span> <span class="n">Int16ub</span><span class="p">),</span>  <span class="c1"># 2 - Unsigned medium integer</span>
+        <span class="s2">&quot;Off&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32ul</span><span class="p">,</span> <span class="n">Int32ub</span><span class="p">),</span>  <span class="c1"># 4 - Unsigned file offset</span>
+        <span class="s2">&quot;Sword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32sl</span><span class="p">,</span> <span class="n">Int32sb</span><span class="p">),</span>  <span class="c1"># 4 - Signed large integer</span>
+        <span class="s2">&quot;Word&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32ul</span><span class="p">,</span> <span class="n">Int32ub</span><span class="p">),</span>  <span class="c1"># 4 - Unsigned large integer</span>
+        <span class="s2">&quot;Xword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32ul</span><span class="p">,</span> <span class="n">Int32ub</span><span class="p">),</span>  <span class="c1"># 8 - Unsigned long integer</span>
+        <span class="s2">&quot;Sxword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>  <span class="c1"># 8 - Signed long integer</span>
+    <span class="p">}</span>
+
+    <span class="n">DATATYPES64</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Addr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int64ul</span><span class="p">,</span> <span class="n">Int64ub</span><span class="p">),</span>  <span class="c1"># 8 - Unsigned program address</span>
+        <span class="s2">&quot;Off&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int64ul</span><span class="p">,</span> <span class="n">Int64ub</span><span class="p">),</span>  <span class="c1"># 8 - Unsigned file offset</span>
+        <span class="s2">&quot;Half&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int16ul</span><span class="p">,</span> <span class="n">Int16ub</span><span class="p">),</span>  <span class="c1"># 2 - Unsigned medium integer</span>
+        <span class="s2">&quot;Word&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32ul</span><span class="p">,</span> <span class="n">Int32ub</span><span class="p">),</span>  <span class="c1"># 4 - Unsigned integer</span>
+        <span class="s2">&quot;Sword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int32sl</span><span class="p">,</span> <span class="n">Int32sb</span><span class="p">),</span>  <span class="c1"># 4 - Signed integer</span>
+        <span class="s2">&quot;Xword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int64ul</span><span class="p">,</span> <span class="n">Int64ub</span><span class="p">),</span>  <span class="c1"># 8 - Unsigned long integer</span>
+        <span class="s2">&quot;Sxword&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Int64sl</span><span class="p">,</span> <span class="n">Int64sb</span><span class="p">),</span>  <span class="c1"># 8 - Signed long integer</span>
+    <span class="p">}</span>
+
+    <span class="n">BasicHeader</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+        <span class="s2">&quot;header&quot;</span>
+        <span class="o">/</span> <span class="n">Union</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;fields&quot;</span>
+            <span class="o">/</span> <span class="n">Struct</span><span class="p">(</span>
+                <span class="n">Const</span><span class="p">(</span><span class="n">MAGIC</span><span class="p">),</span>
+                <span class="s2">&quot;ei_class&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;ei_data&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;ei_version&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;ei_osabi&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;ei_abiversion&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="n">Padding</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;bytes&quot;</span> <span class="o">/</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">EI_NIDENT</span><span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ElfParser.create_db_on_demand">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.create_db_on_demand">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_db_on_demand</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+        <span class="n">new_db</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">hash_value</span> <span class="o">=</span> <span class="n">calculate_crypto_hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">db_exists</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Meta</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="k">pass</span>
+                <span class="c1"># TODO: log.debug</span>
+                <span class="c1"># print(f&quot;Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}&quot;)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">hash_value</span> <span class="o">!=</span> <span class="n">meta</span><span class="o">.</span><span class="n">hash_value</span><span class="p">):</span>
+                <span class="n">new_db</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Validate schema compatibility (e.g., required columns exist)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">inspect</span> <span class="k">as</span> <span class="n">sa_inspect</span>
+
+                    <span class="n">inspector</span> <span class="o">=</span> <span class="n">sa_inspect</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">die_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">inspector</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="s2">&quot;debuginformationentry&quot;</span><span class="p">)]</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="n">die_cols</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dieattr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">inspector</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="s2">&quot;dieattribute&quot;</span><span class="p">)]</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="n">dieattr_cols</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">required_die_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;offset&quot;</span><span class="p">,</span> <span class="s2">&quot;parent_id&quot;</span><span class="p">}</span>
+                    <span class="n">required_dieattr_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entry_id&quot;</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">required_die_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">die_cols</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">required_dieattr_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">dieattr_cols</span><span class="p">))):</span>
+                        <span class="c1"># Invalidate outdated schema: rebuild database</span>
+                        <span class="n">new_db</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                        <span class="k">finally</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Close the preliminary connection before opening the main one to avoid file locking.</span>
+                        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># If inspection fails for any reason, rebuild to be safe</span>
+                    <span class="n">new_db</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">finally</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">session</span>
+        <span class="k">if</span> <span class="n">new_db</span><span class="p">:</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Meta</span><span class="p">(</span><span class="n">hash_value</span><span class="o">=</span><span class="n">hash_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Header</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_program_headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_ProgramHeaders</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.load_data">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.load_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">basic_header</span> <span class="o">=</span> <span class="n">ElfParser</span><span class="o">.</span><span class="n">BasicHeader</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">bh_fields</span> <span class="o">=</span> <span class="n">basic_header</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_data_types</span><span class="p">(</span><span class="n">bh_fields</span><span class="p">)</span>
+        <span class="n">eh_fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser_extended_header</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_Header</span><span class="p">(</span>
+            <span class="n">ei_class</span><span class="o">=</span><span class="n">bh_fields</span><span class="o">.</span><span class="n">ei_class</span><span class="p">,</span>
+            <span class="n">ei_data</span><span class="o">=</span><span class="n">bh_fields</span><span class="o">.</span><span class="n">ei_data</span><span class="p">,</span>
+            <span class="n">ei_version</span><span class="o">=</span><span class="n">bh_fields</span><span class="o">.</span><span class="n">ei_version</span><span class="p">,</span>
+            <span class="n">ei_osabi</span><span class="o">=</span><span class="n">bh_fields</span><span class="o">.</span><span class="n">ei_osabi</span><span class="p">,</span>
+            <span class="n">ei_abiversion</span><span class="o">=</span><span class="n">bh_fields</span><span class="o">.</span><span class="n">ei_abiversion</span><span class="p">,</span>
+            <span class="n">e_type</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_type</span><span class="p">,</span>
+            <span class="n">e_machine</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_machine</span><span class="p">,</span>
+            <span class="n">e_version</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_version</span><span class="p">,</span>
+            <span class="n">e_entry</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_entry</span><span class="p">,</span>
+            <span class="n">e_phoff</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_phoff</span><span class="p">,</span>
+            <span class="n">e_shoff</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_shoff</span><span class="p">,</span>
+            <span class="n">e_flags</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_flags</span><span class="p">,</span>
+            <span class="n">e_ehsize</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_ehsize</span><span class="p">,</span>
+            <span class="n">e_phentsize</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_phentsize</span><span class="p">,</span>
+            <span class="n">e_phnum</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_phnum</span><span class="p">,</span>
+            <span class="n">e_shentsize</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_shentsize</span><span class="p">,</span>
+            <span class="n">e_shnum</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_shnum</span><span class="p">,</span>
+            <span class="n">e_shstrndx</span><span class="o">=</span><span class="n">eh_fields</span><span class="o">.</span><span class="n">e_shstrndx</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_section_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_program_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_section_to_segment_mapping</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbol_sections</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_symbol_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">create_memorymapped_fileview</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">DB_EXTENSION</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_images</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections_by_name</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asciiCString</span> <span class="o">=</span> <span class="n">CString</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_db_on_demand</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="n">SymbolAPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">SectionAPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">md_class</span> <span class="o">=</span> <span class="n">defs</span><span class="o">.</span><span class="n">MACHINE_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_machine</span><span class="p">,</span> <span class="n">defs</span><span class="o">.</span><span class="n">MachineData</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_machine_data</span> <span class="o">=</span> <span class="n">md_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_flags</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElfParser.set_data_types">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.set_data_types">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b64</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">ei_class</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">ei_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Little-Endian</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">obj</span><span class="o">.</span><span class="n">ei_data</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># Big-Endian</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EI_DATA has an invalid value. Got: </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">ei_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endianess</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">ei_data</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
+        <span class="n">datatypes</span> <span class="o">=</span> <span class="n">ElfParser</span><span class="o">.</span><span class="n">DATATYPES64</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b64</span> <span class="k">else</span> <span class="n">ElfParser</span><span class="o">.</span><span class="n">DATATYPES32</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">datatypes</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="n">offset</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parser_extended_header">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parser_extended_header">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parser_extended_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ExtendedHeader</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+            <span class="s2">&quot;e_type&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Object file type</span>
+            <span class="s2">&quot;e_machine&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Machine type</span>
+            <span class="s2">&quot;e_version&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>  <span class="c1"># Object file version</span>
+            <span class="s2">&quot;e_entry&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>  <span class="c1"># Entry point address</span>
+            <span class="s2">&quot;e_phoff&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Off</span><span class="p">,</span>  <span class="c1"># Program header offset</span>
+            <span class="s2">&quot;e_shoff&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Off</span><span class="p">,</span>  <span class="c1"># Section header offset</span>
+            <span class="s2">&quot;e_flags&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>  <span class="c1"># Processor-specific flags</span>
+            <span class="s2">&quot;e_ehsize&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># ELF header size</span>
+            <span class="s2">&quot;e_phentsize&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Size of program header entry</span>
+            <span class="s2">&quot;e_phnum&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Number of program header entries</span>
+            <span class="s2">&quot;e_shentsize&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Size of section header entry</span>
+            <span class="s2">&quot;e_shnum&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Number of section header entries</span>
+            <span class="s2">&quot;e_shstrndx&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>  <span class="c1"># Section name string table index</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ExtendedHeader</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">EI_NIDENT</span> <span class="p">:])</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parse_section_headers">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parse_section_headers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_section_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">SectionHeaders</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+            <span class="s2">&quot;sections&quot;</span>
+            <span class="o">/</span> <span class="n">Array</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_shnum</span><span class="p">,</span>
+                <span class="s2">&quot;section&quot;</span>
+                <span class="o">/</span> <span class="n">Struct</span><span class="p">(</span>
+                    <span class="s2">&quot;sh_name&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_type&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_flags&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_addr&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_offset&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Off</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_size&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_link&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_info&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_addralign&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                    <span class="s2">&quot;sh_entsize&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                    <span class="s2">&quot;allocate&quot;</span> <span class="o">/</span> <span class="n">Computed</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">sh_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ctx</span><span class="o">.</span><span class="n">sh_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbol_sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;e_shnum&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_section_headers</span> <span class="o">=</span> <span class="n">SectionHeaders</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">e_shoff</span> <span class="p">:])</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section_headers</span><span class="o">.</span><span class="n">sections</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">allocate</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">[</span><span class="n">section</span><span class="o">.</span><span class="n">sh_offset</span> <span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">+</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_size</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_images</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span>
+                <span class="n">section</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section_headers</span><span class="o">.</span><span class="n">sections</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_shstrndx</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_name</span><span class="p">)</span>
+                <span class="n">section</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sections_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_images</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NOTE</span><span class="p">:</span>
+                    <span class="n">note_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_note</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">note_obj</span><span class="p">:</span>
+                        <span class="n">note</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_Note</span><span class="p">(</span>
+                            <span class="n">section_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="n">note_obj</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">note_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="n">desc</span><span class="o">=</span><span class="n">note_obj</span><span class="o">.</span><span class="n">desc</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_type</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_SYMTAB</span><span class="p">,</span>
+                    <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_DYNSYM</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_symbol_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;.comment&quot;</span><span class="p">:</span>
+                    <span class="n">cmt_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_comment</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">cmt_text</span><span class="p">:</span>
+                        <span class="n">comment</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_Comment</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">cmt_text</span><span class="p">)</span>
+                        <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+                <span class="n">db_sec</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">(</span>
+                    <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span>
+                    <span class="n">section_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">sh_name</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_name</span><span class="p">,</span>
+                    <span class="n">sh_type</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_type</span><span class="p">,</span>
+                    <span class="n">sh_flags</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_flags</span><span class="p">,</span>
+                    <span class="n">sh_addr</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_addr</span><span class="p">,</span>
+                    <span class="n">sh_offset</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_offset</span><span class="p">,</span>
+                    <span class="n">sh_size</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_size</span><span class="p">,</span>
+                    <span class="n">sh_link</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_link</span><span class="p">,</span>
+                    <span class="n">sh_info</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_info</span><span class="p">,</span>
+                    <span class="n">sh_addralign</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_addralign</span><span class="p">,</span>
+                    <span class="n">sh_entsize</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">sh_entsize</span><span class="p">,</span>
+                    <span class="n">section_image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_sec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">bulk_save_objects</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.get_string">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.get_string">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_index</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">entry</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_images</span><span class="p">[</span><span class="n">table_index</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asciiCString</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_images</span><span class="p">[</span><span class="n">table_index</span><span class="p">][</span><span class="n">entry</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parse_program_headers">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parse_program_headers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_program_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ProgramHeaders</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+            <span class="s2">&quot;segments&quot;</span>
+            <span class="o">/</span> <span class="n">Array</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_phnum</span><span class="p">,</span>
+                <span class="s2">&quot;segment&quot;</span>
+                <span class="o">/</span> <span class="n">IfThenElse</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">b64</span><span class="p">,</span>
+                    <span class="n">Struct</span><span class="p">(</span>
+                        <span class="s2">&quot;p_type&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_flags&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_offset&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Off</span><span class="p">,</span>
+                        <span class="s2">&quot;p_vaddr&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                        <span class="s2">&quot;p_paddr&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                        <span class="s2">&quot;p_filesz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                        <span class="s2">&quot;p_memsz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                        <span class="s2">&quot;p_align&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">Struct</span><span class="p">(</span>
+                        <span class="s2">&quot;p_type&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_offset&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Off</span><span class="p">,</span>
+                        <span class="s2">&quot;p_vaddr&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                        <span class="s2">&quot;p_paddr&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                        <span class="s2">&quot;p_filesz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_memsz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_flags&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                        <span class="s2">&quot;p_align&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;e_shnum&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_program_headers</span> <span class="o">=</span> <span class="n">ProgramHeaders</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">e_phoff</span> <span class="p">:])</span><span class="o">.</span><span class="n">segments</span>
+            <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_program_headers</span><span class="p">:</span>
+                <span class="n">header</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_ProgramHeaders</span><span class="p">(</span>
+                    <span class="n">p_type</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_type</span><span class="p">,</span>
+                    <span class="n">p_offset</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span><span class="p">,</span>
+                    <span class="n">p_vaddr</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span><span class="p">,</span>
+                    <span class="n">p_paddr</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_paddr</span><span class="p">,</span>
+                    <span class="n">p_filesz</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_filesz</span><span class="p">,</span>
+                    <span class="n">p_memsz</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_memsz</span><span class="p">,</span>
+                    <span class="n">p_flags</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_flags</span><span class="p">,</span>
+                    <span class="n">p_align</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">p_align</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">header</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parse_symbol_section">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parse_symbol_section">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_symbol_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="n">sh_link</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_link</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b64</span><span class="p">:</span>
+            <span class="n">Symbol</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+                <span class="s2">&quot;st_name&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                <span class="s2">&quot;st_info&quot;</span>
+                <span class="o">/</span> <span class="n">BitStruct</span><span class="p">(</span>
+                    <span class="s2">&quot;st_bind&quot;</span> <span class="o">/</span> <span class="n">BitsInteger</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                    <span class="s2">&quot;st_type&quot;</span> <span class="o">/</span> <span class="n">BitsInteger</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;st_other&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;st_shndx&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>
+                <span class="s2">&quot;st_value&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                <span class="s2">&quot;st_size&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xword</span><span class="p">,</span>
+                <span class="s2">&quot;symbol_name&quot;</span> <span class="o">/</span> <span class="n">Computed</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="n">sh_link</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">st_name</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Symbol</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+                <span class="s2">&quot;st_name&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                <span class="s2">&quot;st_value&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Addr</span><span class="p">,</span>
+                <span class="s2">&quot;st_size&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+                <span class="s2">&quot;st_info&quot;</span>
+                <span class="o">/</span> <span class="n">BitStruct</span><span class="p">(</span>
+                    <span class="s2">&quot;st_bind&quot;</span> <span class="o">/</span> <span class="n">BitsInteger</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                    <span class="s2">&quot;st_type&quot;</span> <span class="o">/</span> <span class="n">BitsInteger</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;st_other&quot;</span> <span class="o">/</span> <span class="n">Int8ul</span><span class="p">,</span>
+                <span class="s2">&quot;symbol_name&quot;</span> <span class="o">/</span> <span class="n">Computed</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ctx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="n">sh_link</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">st_name</span><span class="p">)),</span>
+                <span class="s2">&quot;st_shndx&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Half</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">symbol_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># num_symbols = len(section.image) // Symbol.sizeof()</span>
+        <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">image</span><span class="p">),</span> <span class="n">Symbol</span><span class="o">.</span><span class="n">sizeof</span><span class="p">()):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sym</span> <span class="o">=</span> <span class="n">Symbol</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">image</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">Symbol</span><span class="o">.</span><span class="n">sizeof</span><span class="p">()])</span>
+            <span class="k">except</span> <span class="n">StreamError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;parse symbol section: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">section_header</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span> <span class="ow">in</span> <span class="n">defs</span><span class="o">.</span><span class="n">SpecialSections</span><span class="p">:</span>
+                <span class="n">section_name</span> <span class="o">=</span> <span class="n">defs</span><span class="o">.</span><span class="n">special_section_name</span><span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">symbol_cache</span><span class="p">:</span>
+                    <span class="n">section_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">section_header</span><span class="p">:</span>
+                        <span class="n">section_name</span> <span class="o">=</span> <span class="n">section_header</span><span class="o">.</span><span class="n">section_name</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">section_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span><span class="p">)</span>
+            <span class="n">db_sym</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Elf_Symbol</span><span class="p">(</span>
+                <span class="n">st_name</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_name</span><span class="p">,</span>
+                <span class="n">st_value</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_value</span><span class="p">,</span>
+                <span class="n">st_size</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span>
+                <span class="n">st_bind</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_info</span><span class="o">.</span><span class="n">st_bind</span><span class="p">,</span>
+                <span class="n">st_type</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_info</span><span class="o">.</span><span class="n">st_type</span><span class="p">,</span>
+                <span class="n">st_other</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_other</span><span class="p">,</span>
+                <span class="n">st_shndx</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">st_shndx</span><span class="p">,</span>
+                <span class="n">symbol_name</span><span class="o">=</span><span class="n">sym</span><span class="o">.</span><span class="n">symbol_name</span><span class="p">,</span>
+                <span class="n">section_name</span><span class="o">=</span><span class="n">section_name</span><span class="p">,</span>
+                <span class="n">access</span><span class="o">=</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="k">if</span> <span class="n">section_header</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">symbols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_sym</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">bulk_save_objects</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parse_comment">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parse_comment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">Line</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;line&quot;</span> <span class="o">/</span> <span class="n">CString</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">),</span> <span class="s2">&quot;pos&quot;</span> <span class="o">/</span> <span class="n">Tell</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
+            <span class="c1"># print(&quot;*** LINE&quot;, data[i : ])</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">line</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">pos</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser._parse_note">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser._parse_note">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_note</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">Note</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span>
+            <span class="s2">&quot;namesz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+            <span class="s2">&quot;descsz&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">Word</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span> <span class="o">/</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">namesz</span><span class="p">),</span>
+            <span class="s2">&quot;desc&quot;</span> <span class="o">/</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">descsz</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Note</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_hex</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asciiCString</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.debug_sections">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.debug_sections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">fetch</span><span class="p">():</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">section_name</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.debug&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;.debug_abbrev&quot;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">DebugInfo</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">section_image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.section_in_segment1">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.section_in_segment1">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">section_in_segment1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">check_vma</span><span class="p">,</span> <span class="n">strict</span><span class="p">):</span>
+        <span class="n">has_offset</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">valid_segment</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">has_VMA</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">has_dynamic_size</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">valid_segment</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">((</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_TLS</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_TLS</span> <span class="ow">or</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_GNU_RELRO</span> <span class="ow">or</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_LOAD</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_TLS</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="ow">and</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_TLS</span>
+                <span class="ow">and</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_PHDR</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">has_offset</span> <span class="o">=</span> <span class="n">section_header</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NOBITS</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="n">section_header</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">&gt;=</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">strict</span> <span class="ow">or</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span> <span class="o">&lt;=</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_filesz</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="p">((</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_size</span><span class="p">(</span><span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">p_filesz</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">has_VMA</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">check_vma</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">section_header</span><span class="o">.</span><span class="n">sh_addr</span> <span class="o">&gt;=</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">strict</span> <span class="ow">or</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_addr</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span> <span class="o">&lt;=</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_memsz</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="p">((</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_addr</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_size</span><span class="p">(</span><span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_memsz</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">has_dynamic_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_DYNAMIC</span>
+            <span class="ow">or</span> <span class="n">section_header</span><span class="o">.</span><span class="n">sh_size</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_memsz</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">section_header</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NOBITS</span>
+                    <span class="ow">or</span> <span class="p">(</span>
+                        <span class="n">section_header</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">&gt;</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span>
+                        <span class="ow">and</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_offset</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_offset</span> <span class="o">&lt;</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_filesz</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="ow">or</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_addr</span> <span class="o">&gt;</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span> <span class="ow">and</span> <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_addr</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_vaddr</span> <span class="o">&lt;</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_memsz</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">valid_segment</span> <span class="ow">and</span> <span class="n">has_offset</span> <span class="ow">and</span> <span class="n">has_VMA</span> <span class="ow">and</span> <span class="n">has_dynamic_size</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.section_in_segment">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.section_in_segment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">section_in_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_in_segment1</span><span class="p">(</span><span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.section_in_segment_strict">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.section_in_segment_strict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">section_in_segment_strict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_in_segment1</span><span class="p">(</span><span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.create_section_to_segment_mapping">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.create_section_to_segment_mapping">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_section_to_segment_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_phnum</span><span class="p">):</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">##</span>
+        <span class="c1">##            for j in range(self.e_shnum):</span>
+        <span class="c1">##                section = self.sections[j]</span>
+        <span class="c1">##                if not self.tbss_special(section, segment) and self.section_in_segment_strict(section, segment):</span>
+        <span class="c1">##                    mapping[idx].append(j)</span>
+        <span class="c1">##</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections_to_segments</span> <span class="o">=</span> <span class="n">mapping</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections_to_segments</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.tbss_special">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.tbss_special">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tbss_special</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">section_header</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_TLS</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">section_header</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NOBITS</span>
+            <span class="ow">and</span> <span class="n">segment</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">defs</span><span class="o">.</span><span class="n">PT_TLS</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.section_size">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.section_size">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">section_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tbss_special</span><span class="p">(</span><span class="n">section_header</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span> <span class="k">else</span> <span class="n">section_header</span><span class="o">.</span><span class="n">sh_size</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.get_basic_header_field">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.get_basic_header_field">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_basic_header_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># return getattr(self._basic_header.header.fields, name)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ElfParser.get_extended_header_field">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.get_extended_header_field">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extended_header_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># return getattr(self._extended_header, name)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ei_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_header_field</span><span class="p">(</span><span class="s2">&quot;ei_class&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ei_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_header_field</span><span class="p">(</span><span class="s2">&quot;ei_data&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ei_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_header_field</span><span class="p">(</span><span class="s2">&quot;ei_version&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ei_osabi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_header_field</span><span class="p">(</span><span class="s2">&quot;ei_osabi&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ei_abiversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_basic_header_field</span><span class="p">(</span><span class="s2">&quot;ei_abiversion&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">header_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basic_header</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">bytes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_type&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_machine&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_version&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_entry&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_phoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_phoff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_shoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_shoff&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_flags&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_ehsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_ehsize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_phentsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_phentsize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_phnum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_phnum&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_shentsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_shentsize&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_shnum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_shnum&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_shstrndx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extended_header_field</span><span class="p">(</span><span class="s2">&quot;e_shstrndx&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">endianess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endianess</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_program_headers</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arm_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span> <span class="o">==</span> <span class="s2">&quot;.ARM.attributes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">attributes</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">section_image</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endianess</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">comment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Comment</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">comment</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">comment</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Note</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Note</span><span class="o">.</span><span class="n">section_name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">notes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">notes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">machine_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_machine_data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElfParser.create_image">
+<a class="viewcode-back" href="../../objutils.elf.html#objutils.elf.ElfParser.create_image">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">include_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">exclude_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        join: bool</span>
+<span class="sd">            Try to join/merge sections.</span>
+
+<span class="sd">        include_pattern: str</span>
+<span class="sd">            Include only sections matching a Python RegEx</span>
+
+<span class="sd">        exclude_pattern: str</span>
+<span class="sd">            Exclude sections matching a Python RegEx</span>
+
+<span class="sd">        callback: callable</span>
+<span class="sd">            Could be used to generate output for your command-line tools.</span>
+
+<span class="sd">            Called with:</span>
+<span class="sd">                - state: &quot;start&quot; | &quot;stop&quot; | &quot;section&quot;</span>
+<span class="sd">                - section -- current section (only applicable to state &quot;section&quot;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `objutils.Image`</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        `include_pattern` and `exclude_pattern` should be used mutually exclusive, unless you know what you are doing.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Look at `scripts/oj_elf_extract.py` to see `create_image()` in action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="p">)</span>
+        <span class="c1"># query = query.filter(</span>
+        <span class="c1">#    model.Elf_Section.flag_alloc is True,</span>
+        <span class="c1">#    model.Elf_Section.has_content is True,</span>
+        <span class="c1"># )</span>
+        <span class="c1"># defs.SectionFlags.SHF_ALLOC</span>
+        <span class="c1">#</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">sh_flags</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span><span class="p">)</span> <span class="o">==</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span><span class="p">)</span>
+
+        <span class="c1"># sections = self.query(model.Elf_Section).all()</span>
+        <span class="c1"># print(&quot;SECTIONS&quot;, sections)</span>
+
+        <span class="k">if</span> <span class="n">include_pattern</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span><span class="p">,</span> <span class="n">include_pattern</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">exclude_pattern</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">not_</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">section_name</span><span class="p">,</span> <span class="n">exclude_pattern</span><span class="p">)))</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Elf_Section</span><span class="o">.</span><span class="n">sh_addr</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">section</span><span class="o">.</span><span class="n">section_image</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">sh_flags</span> <span class="o">&amp;</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span><span class="p">)</span> <span class="o">!=</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionFlags</span><span class="o">.</span><span class="n">SHF_ALLOC</span>
+                <span class="ow">or</span> <span class="n">section</span><span class="o">.</span><span class="n">sh_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NOBITS</span><span class="p">,</span> <span class="n">defs</span><span class="o">.</span><span class="n">SectionType</span><span class="o">.</span><span class="n">SHT_NULL</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                <span class="n">callback</span><span class="p">(</span><span class="s2">&quot;section&quot;</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Section</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">sh_addr</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">section_image</span><span class="p">))</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

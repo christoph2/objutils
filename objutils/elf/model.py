@@ -214,13 +214,16 @@ class Elf_Section(Base, RidMixIn):
             (self.sh_size > 0),
         )
 
+    @hybrid_property
+    def progbits(self):
+        return self.sh_type == defs.SectionType.SHT_PROGBITS
+
     @hybrid_method
     def get_flags(self):
         return self.sh_flags
 
     @hybrid_method
     def test_flags(self, mask):
-        print("\ttest_flags", self.get_flags(), mask)
         return self.get_flags() & mask == mask
 
     @test_flags.expression

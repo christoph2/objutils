@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """Reader/Writer for plain binfiles."""
 
-__version__ = "0.1.1"
-
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -108,24 +106,32 @@ class BinZipWriter:
             fp.close()
 
     def dumps(self, image: Image, **kws):
+        """Serialize image to binary zip format.
+
+        Note: This format is experimental and not fully implemented yet.
+        """
         if hasattr(image, "sections") and not image.sections:
             return b""
         sections = sorted(image.sections, key=lambda x: x.start_address)
         manifest_buffer = io.StringIO()
         out_buffer = io.BytesIO()
-        # out_buffer = io.StringIO()
-        print("BUF", out_buffer)
+
         with closing(zipfile.ZipFile(out_buffer, mode="w")) as outFile:
-            print(outFile)
             for idx, section in enumerate(sections):
-                print(section.start_address, section.length)
-                # print("FN", BinZipWriter.SECTION_FILE_NAME.format(idx))
-                manifest_buffer.write(BinZipWriter.SECTION_FILE_NAME.format(idx))
+                section_name = BinZipWriter.SECTION_FILE_NAME.format(idx)
+                manifest_buffer.write(section_name)
                 manifest_buffer.write("\t")
                 manifest_buffer.write(str(section.start_address))
                 manifest_buffer.write("\t")
                 manifest_buffer.write(str(section.length))
                 manifest_buffer.write("\n")
-        manifest_buffer.seek(0)
-        print(manifest_buffer.read())
-        return ""
+
+                # Write section data to zip
+                outFile.writestr(section_name, bytes(section.data))
+
+            # Write manifest
+            manifest_buffer.seek(0)
+            outFile.writestr("MANIFEST", manifest_buffer.read())
+
+        out_buffer.seek(0)
+        return out_buffer.read()

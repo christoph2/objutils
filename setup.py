@@ -1,5 +1,4 @@
 import os
-import sys
 
 from setuptools import find_packages, setup
 
@@ -12,16 +11,11 @@ with open(os.path.join("objutils", "version.py")) as f:
 
 install_reqs = [
     "mako",
-    "six",
     "construct",
-    "attrs >= 19.3.0",
-    "sortedcontainers",
-    "SQLAlchemy",
-    "Rich",
+    "sqlalchemy",
+    "rich",
+    "numpy",
 ]
-
-if sys.version_info.major == 2 or (sys.version_info.major == 3 and sys.version_info.minor < 4):
-    install_reqs.extend(["enum34", "mock"])
 
 with open("docs/README.rst") as fh:
     long_description = fh.read()
@@ -47,6 +41,10 @@ setup(
             "oj-hex-info = objutils.scripts.oj_hex_info:main",
             "oj-elf-arm-attrs = objutils.scripts.oj_elf_arm_attrs:main",
             "oj-elf-extract = objutils.scripts.oj_elf_extract:main",
+            "oj-coff-info = objutils.scripts.oj_coff_info:main",
+            "oj-coff-syms = objutils.scripts.oj_coff_syms:main",
+            "oj-coff-extract = objutils.scripts.oj_coff_extract:main",
+            "oj-coff-import = objutils.scripts.oj_coff_import:main",
             #            'ticoff-dump = objutils.tools.ticoffdump:main'
         ],
     },

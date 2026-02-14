@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """ """
 
-__version__ = "0.1.0"
-
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -212,6 +210,7 @@ class Section:
 
     start_address: int = field(hash=True, compare=True, default=0)
     data: bytearray = field(default_factory=bytearray, compare=True, hash=True)
+    name: str = field(default="", compare=True, hash=True)
 
     def __post_init__(self):
         self.repr = reprlib.Repr()

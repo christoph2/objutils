@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """Dumps '.ARM.attributes' section in an ELF file."""
 
-__version__ = "0.1.0"
-
 __copyright__ = """
    objutils - Object file library for Python.
 

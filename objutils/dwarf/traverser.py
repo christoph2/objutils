@@ -4,6 +4,7 @@ from functools import lru_cache
 from itertools import groupby
 from typing import Any, Optional, Union
 
+from objutils import Image, Section
 from objutils.dwarf.constants import (
     Accessibility,
     AttributeEncoding,
@@ -72,6 +73,17 @@ class DIE:
     attributes: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class Variable:
+    name: str
+    section: Optional[str] = field(default=None)
+    elf_location: Optional[int] = field(default=None)
+    dwarf_location: Optional[str] = field(default=None)
+    static: bool = field(default=False)
+    type_desc: Optional[DIE] = field(default=None)
+    _allocated: bool = field(default=False, repr=False)
+
+
 DATA_REPRESENTATION = {
     "encoding": BaseTypeEncoding,
     "decimal_sign": DecimalSign,
@@ -86,7 +98,15 @@ DATA_REPRESENTATION = {
     "ordering": Ordering,
     "discr_list": DiscriminantDescriptor,
     "defaulted": Defaulted,
+    "byte_size": int,
+    "upper_bound": int,
+    "lower_bound": int,
+    "containing_type": int,
+    "object_pointer": int,
 }
+
+
+# 'data_member_location': b'#\x00',
 
 
 def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, str]) -> Union[int, str]:
@@ -164,10 +184,6 @@ class AttributeParser:
         "abstract_origin",
     }
 
-    # class Endianess(IntEnum):
-    #    Little = 0
-    #    Big = 1
-
     def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False, quiet: bool = True):
         """
         Create an AttributeParser.
@@ -205,7 +221,21 @@ class AttributeParser:
         self.type_stack: set[int] = set()
         self.parsed_types: dict = {}
         self.att_types: dict = defaultdict(set)
-
+        self.allocated_sections: frozenset[str] = frozenset(
+            s[0]
+            for s in self.session.query(model.Elf_Section.section_name)
+            .filter(model.Elf_Section.progbits, model.Elf_Section.flag_alloc)
+            .all()
+        )
+        sections = []
+        for item in (
+            self.session.query(model.Elf_Section.sh_addr, model.Elf_Section.section_image)
+            .filter(model.Elf_Section.progbits, model.Elf_Section.flag_alloc)
+            .all()
+        ):
+            if item[1] is not None:  # Check for section data.
+                sections.append(Section(*item))
+        self.image = Image(sections)
         debug_str_section = self.session.query(model.Elf_Section).filter_by(section_name=".debug_str").first()
         if debug_str_section:
             debug_str = debug_str_section.section_image
@@ -225,8 +255,24 @@ class AttributeParser:
             strings=debug_str,
             line_strings=debug_line_str,
         )
+        # BaseTypeEncoding
+        self.endianess = endianess
+        self.is_64bit = elf_header.is_64bit
         self.readers = factory.readers
+        postfix = "_le" if (endianess == Endianess.Little) else "_be"
         self.stack_machine = factory.stack_machine
+        self.section_readers = {
+            (BaseTypeEncoding.unsigned_char, 1): f"uint8{postfix}",
+            (BaseTypeEncoding.signed_char, 1): f"int8{postfix}",
+            (BaseTypeEncoding.unsigned, 2): f"uint16{postfix}",
+            (BaseTypeEncoding.unsigned, 4): f"uint32{postfix}",
+            (BaseTypeEncoding.unsigned, 8): f"uint64{postfix}",
+            (BaseTypeEncoding.signed, 2): f"int16{postfix}",
+            (BaseTypeEncoding.signed, 4): f"int32{postfix}",
+            (BaseTypeEncoding.signed, 8): f"int64{postfix}",
+            (BaseTypeEncoding.float, 4): f"float32{postfix}",
+            (BaseTypeEncoding.float, 8): f"float64{postfix}",
+        }
         self.dwarf_expression = factory.dwarf_expression
 
     @lru_cache(maxsize=64 * 1024)
@@ -246,6 +292,7 @@ class AttributeParser:
 
         Circular references are represented by CircularReference(tag, name).
         """
+        result = None
         # Case 1: already an absolute DIE offset
         if isinstance(obj, int):
             return self.parse_type(obj)
@@ -268,10 +315,369 @@ class AttributeParser:
             off = self._resolve_type_offset(type_attr, die)
             if off is None:
                 return {"tag": "<invalid>", "attrs": {}}
-            return self.parse_type(off)
+            result = self.parse_type(off)
+        return result
 
         # Fallback
         return {"tag": "<unsupported>", "attrs": {}}
+
+    def variable(self, obj: model.DebugInformationEntry) -> Variable:
+        name = self._attr_raw(obj, "name")
+        type_desc = self.type_tree(obj)
+        external = self._attr_raw(obj, "external")
+        if external is not None:
+            static = int(external) == 0
+        else:
+            static = False
+        sym = (
+            self.session.query(model.Elf_Symbol.section_name, model.Elf_Symbol.st_value)
+            .filter(model.Elf_Symbol.symbol_name == name)
+            .first()
+        )
+        if sym:
+            section_name, elf_location = sym
+        else:
+            section_name = None
+            elf_location = None
+        location = self._get_attr(obj, "location")
+        if location is not None:
+            dwarf_location = self.dwarf_expression(location.form, location.raw_value)
+        else:
+            dwarf_location = None
+        return Variable(
+            name=name,
+            static=static,
+            type_desc=type_desc,
+            section=section_name,
+            elf_location=elf_location,
+            dwarf_location=dwarf_location,
+            _allocated=section_name in self.allocated_sections,
+        )
+
+    def get_value(self, var: Variable) -> Optional[Any]:
+        if not var._allocated:
+            # No image for variable, i.e. .bss section and the like.
+            return None
+        # 1) Resolve address
+        addr: Optional[int] = None
+        if isinstance(var.elf_location, int):
+            addr = var.elf_location
+        elif var.dwarf_location is not None:
+            loc = var.dwarf_location
+            try:
+                if isinstance(loc, int):
+                    addr = int(loc)
+                elif isinstance(loc, str):
+                    s = loc.strip()
+                    if s.startswith("addr(") and s.endswith(")"):
+                        inner = s[s.find("(") + 1 : -1]
+                        addr = int(inner, 0)
+                    elif s.startswith("0x"):
+                        addr = int(s, 16)
+            except Exception:
+                addr = None
+
+        if addr is None:
+            return None
+
+        # 2a) Helpers to work with both dict-based and DIE-based nodes
+        def _get_tag(node: Any) -> Optional[str]:
+            if node is None:
+                return None
+            if isinstance(node, dict):
+                return node.get("tag")
+            if isinstance(node, DIE):
+                return node.tag
+            if isinstance(node, CircularReference):
+                return None
+            return None
+
+        def _get_attrs(node: Any) -> dict:
+            if node is None:
+                return {}
+            if isinstance(node, dict):
+                return node.get("attributes") or node.get("attrs") or {}
+            if isinstance(node, DIE):
+                return node.attributes or {}
+            return {}
+
+        def _get_children(node: Any) -> list[Any]:
+            if node is None:
+                return []
+            if isinstance(node, dict):
+                return node.get("children") or []
+            if isinstance(node, DIE):
+                return node.children or []
+            return []
+
+        def _get_nested_type(node: Any) -> Any:
+            attrs = _get_attrs(node)
+            return attrs.get("type")
+
+        # 2b) Unwrap qualifiers (typedef, const, etc.)
+        def _unwrap_qualifiers(node: Any) -> Any:
+            seen = 0
+            cur = node
+            while cur is not None and seen < 64:
+                seen += 1
+                tag = _get_tag(cur)
+                if tag in {"typedef", "const_type", "volatile_type", "restrict_type"}:
+                    cur = _get_nested_type(cur)
+                    continue
+                break
+            return cur
+
+        # 2c) Try to detect arrays first (do not unwrap past array_type)
+        def _unwrap_qualifiers_until_array(node: Any) -> Any:
+            seen = 0
+            cur = node
+            while cur is not None and seen < 64:
+                seen += 1
+                tag = _get_tag(cur)
+                if tag == "array_type":
+                    return cur
+                if tag in {"typedef", "const_type", "volatile_type", "restrict_type"}:
+                    cur = _get_nested_type(cur)
+                    continue
+                break
+            return cur
+
+        # 2d) Unwrap qualifiers all the way down to base_type
+        def unwrap_to_base(d: Optional[DIE | dict | CircularReference]) -> Optional[DIE]:
+            # Accept DIE or dict-like from older structures
+            seen = 0
+            current = d
+            while current is not None and seen < 32:
+                seen += 1
+                if isinstance(current, CircularReference):
+                    return None
+                tag = _get_tag(current)
+                attrs = _get_attrs(current)
+                if tag == "base_type":
+                    # Normalize into DIE for downstream code
+                    if isinstance(current, DIE):
+                        return current
+                    die = DIE("base_type")
+                    die.attributes.update(attrs)
+                    return die
+                # unwrap 'type' attribute if present
+                current = attrs.get("type")
+                continue
+                # Unknown node
+                break
+            return None
+
+        # 2e) If the type is an array, support nested arrays and arrays of composites
+        node0 = _unwrap_qualifiers_until_array(var.type_desc)
+        if _get_tag(node0) == "array_type":
+            # Gather dimensions across nested array_type nodes and return leaf element type
+            def _dims_and_leaf(node: Any) -> tuple[list[int], Any]:
+                dims: list[int] = []
+                cur = node
+                hop = 0
+                while cur is not None and hop < 64 and _get_tag(cur) == "array_type":
+                    hop += 1
+                    # compute dimension(s) on this level
+                    sr_children = [c for c in _get_children(cur) if _get_tag(c) == "subrange_type"]
+                    dim_this_level = 1
+                    found_any = False
+                    for sr in sr_children:
+                        if _get_tag(sr) != "subrange_type":
+                            continue
+                        sr_attrs = _get_attrs(sr)
+                        lb_attr = sr_attrs.get("lower_bound")
+                        try:
+                            lb = int(lb_attr) if lb_attr is not None else 0
+                        except Exception:
+                            lb = 0
+                        ub_attr = sr_attrs.get("upper_bound")
+                        if ub_attr is None:
+                            cnt = sr_attrs.get("count")
+                            if cnt is None:
+                                continue
+                            try:
+                                dim = int(cnt)
+                            except Exception:
+                                continue
+                        else:
+                            try:
+                                ub = int(ub_attr)
+                                dim = ub - lb + 1
+                            except Exception:
+                                continue
+                        if dim <= 0:
+                            continue
+                        dim_this_level *= dim
+                        found_any = True
+                    if not found_any:
+                        # No subrange info -> cannot proceed
+                        return [], None
+                    dims.append(dim_this_level)
+                    # advance to nested element type, unwrapping qualifiers between arrays
+                    cur = _get_nested_type(cur)
+                    while _get_tag(cur) in {"typedef", "const_type", "volatile_type", "restrict_type"}:
+                        cur = _get_nested_type(cur)
+                return dims, cur
+
+            def _reshape(flat: list[Any], dims: list[int]) -> list[Any]:
+                # Recursively reshape flat list into nested list according to dims
+                if not dims:
+                    return flat
+                if len(dims) == 1:
+                    return list(flat[: dims[0]])
+                size_per = 1
+                for d in dims[1:]:
+                    size_per *= d
+                out: list[Any] = []
+                for i in range(dims[0]):
+                    chunk = flat[i * size_per : (i + 1) * size_per]
+                    out.append(_reshape(chunk, dims[1:]))
+                return out
+
+            def _element_size(elem: Any) -> Optional[int]:
+                t = _get_tag(elem)
+                attrs = _get_attrs(elem)
+                if t in {"base_type", "pointer_type"}:
+                    try:
+                        return int(attrs.get("byte_size"))
+                    except Exception:
+                        return None
+                bsz = attrs.get("byte_size")
+                try:
+                    return int(bsz) if bsz is not None else None
+                except Exception:
+                    return None
+
+            dims, leaf = _dims_and_leaf(node0)
+            if not dims or leaf is None:
+                return None
+
+            # Try bulk read for numeric or pointer leaves
+            leaf_tag = _get_tag(leaf)
+            postfix = "_le" if (self.endianess == Endianess.Little) else "_be"
+            if leaf_tag == "base_type":
+                base = unwrap_to_base(leaf)
+                if base is not None:
+                    encoding = base.attributes.get("encoding")
+                    byte_size = base.attributes.get("byte_size")
+                    try:
+                        key = (encoding, int(byte_size))
+                    except Exception:
+                        key = None
+                    dtype = self.section_readers.get(key) if key is not None else None
+                    if dtype:
+                        total_len = 1
+                        for d in dims:
+                            total_len *= d
+                        try:
+                            flat_vals = list(self.image.read_numeric_array(addr, int(total_len), dtype))
+                            return _reshape(flat_vals, dims)
+                        except Exception:
+                            return None
+            elif leaf_tag == "pointer_type":
+                attrs = _get_attrs(leaf)
+                bsz = attrs.get("byte_size")
+                try:
+                    bits = int(bsz) * 8
+                    dtype = f"uint{bits}{postfix}"
+                except Exception:
+                    dtype = None
+                if dtype:
+                    total_len = 1
+                    for d in dims:
+                        total_len *= d
+                    try:
+                        flat_vals = list(self.image.read_numeric_array(addr, int(total_len), dtype))
+                        return _reshape(flat_vals, dims)
+                    except Exception:
+                        return None
+
+            # Fallback for composite element (e.g., struct/union or other non-numeric): iterate elements
+            esz = _element_size(leaf)
+            if esz is None or esz <= 0:
+                return None
+            total_len = 1
+            for d in dims:
+                total_len *= d
+            flat_results: list[Any] = []
+            for i in range(total_len):
+                elem_addr = addr + i * esz
+                elem_var = Variable(
+                    name=f"elem_{i}",
+                    static=False,
+                    type_desc=leaf,
+                    section=var.section,
+                    elf_location=elem_addr,
+                    dwarf_location=None,
+                    _allocated=var._allocated,
+                )
+                flat_results.append(self.get_value(elem_var))
+            return _reshape(flat_results, dims)
+
+        # 2f) Handle structure types
+        node1 = _unwrap_qualifiers(var.type_desc)
+        if _get_tag(node1) == "structure_type":
+            struct_dict = {}
+            for member in _get_children(node1):
+                if _get_tag(member) != "member":
+                    continue
+                member_attrs = _get_attrs(member)
+                member_name = member_attrs.get("name")
+                if not member_name:
+                    continue
+
+                member_loc_attr = member_attrs.get("data_member_location")
+                member_offset = 0
+                if isinstance(member_loc_attr, (str, bytes)):
+                    # Handle simple 'plus_uconst(offset)'
+                    loc_str = member_loc_attr.decode() if isinstance(member_loc_attr, bytes) else member_loc_attr
+                    if loc_str.startswith("plus_uconst(") and loc_str.endswith(")"):
+                        try:
+                            member_offset = int(loc_str[len("plus_uconst(") : -1], 0)
+                        except ValueError:
+                            pass  # Fallback to offset 0
+                elif isinstance(member_loc_attr, int):
+                    member_offset = member_loc_attr
+
+                member_addr = addr + member_offset
+                member_type = _get_nested_type(member)
+
+                # Create a temporary Variable-like object for the member to recursively get its value.
+                member_var = Variable(
+                    name=member_name,
+                    static=False,  # Not strictly correct, but sufficient for get_value
+                    type_desc=member_type,
+                    section=var.section,
+                    elf_location=member_addr,
+                    dwarf_location=None,
+                    _allocated=var._allocated,
+                )
+                struct_dict[member_name] = self.get_value(member_var)
+            return struct_dict
+
+        # 2g) Walk type description to base_type for scalars
+        base = unwrap_to_base(var.type_desc)
+        if base is None:
+            return None
+
+        # 3) Determine reader dtype from encoding and size
+        encoding = base.attributes.get("encoding")
+        byte_size = base.attributes.get("byte_size")
+        if encoding is None or byte_size is None:
+            return None
+        try:
+            key = (encoding, int(byte_size))
+        except Exception:
+            return None
+        dtype = self.section_readers.get(key)
+        if not dtype:
+            return None
+
+        # 4) Read and return the value
+        try:
+            return self.image.read_numeric(addr, dtype)
+        except Exception:
+            return None
 
     def _resolve_type_offset(
         self,
@@ -338,8 +744,8 @@ class AttributeParser:
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = self.stack_machine.evaluate(entry.attributes_map["location"].raw_value)
-            print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}]x [off=0x{entry.offset:08x}]")
+            location = self.dwarf_expression(entry.attributes_map["location"].form, entry.attributes_map["location"].raw_value)
+            print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
                 enumerator_value = int(entry.attributes_map["const_value"].raw_value)
@@ -432,6 +838,8 @@ class AttributeParser:
                 except Exception:
                     converted_value = attr_value
                 result[attr_name] = converted_value
+            elif attr_name in ("location", "data_member_location", "vtable_elem_location"):
+                result[attr_name] = self.dwarf_expression(attr.form, attr.raw_value)
             else:
                 result[attr_name] = attr.raw_value
         return result

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-__version__ = "0.1.1"
-
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -97,7 +95,7 @@ class Statistics:
     data_bytes: Counter[int] = field(default_factory=Counter)
 
 
-class Invalidrecord_typeError(Exception):
+class InvalidRecordTypeError(Exception):
     pass
 
 

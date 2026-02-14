@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """DWARF4 Parser."""
 
-__version__ = "0.1.0"
 __copyright__ = """
     objutils - Object file library for Python.
 
@@ -478,7 +477,6 @@ class DwarfProcessor:
             )
 
         hdr = LineNumberProgramHeader.parse_stream(image)
-        print("LineNumber", hdr)
         prg = LineNumberProgram(image)  # noqa: F841
 
     def do_mac_info(self):
@@ -817,7 +815,6 @@ class DwarfProcessor:
             while True:
                 entry = Entry.parse_stream(image)
                 offset += entry.stop - entry.start
-                print("ENTRY", entry)
                 if entry.offset == 0:
                     break
                 if entry.stop >= header.unit_length:

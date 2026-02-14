@@ -4,7 +4,7 @@
 __copyright__ = """
    objutils - Object file library for Python.
 
-  (C) 2010-2020 by Christoph Schueler <cpu12.gems@googlemail.com>
+  (C) 2025 by Christoph Schueler <cpu12.gems@googlemail.com>
 
   All Rights Reserved
 

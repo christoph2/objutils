@@ -1,0 +1,3022 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none"></div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.ihex.Reader._address_calculator">_address_calculator() (objutils.ihex.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Image._address_contained">_address_contained() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image._address_contained">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Reader._address_space">_address_space() (objutils.hexfile.Reader method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo._asdict">_asdict() (objutils.elf.DebugInfo method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr._asdict">(objutils.elf.defs.Elf32_Ehdr method)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr._asdict">(objutils.elf.defs.Elf_Shdr method)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec._asdict">(objutils.registry.Codec method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.NumberRange._asdict">(objutils.section.NumberRange method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.TypeInformation._asdict">(objutils.section.TypeInformation method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image._call_address_function">_call_address_function() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image._call_address_function">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.section._data_converter">_data_converter() (in module objutils.section)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ListToBytesAdapter._decode">_decode() (objutils.elf.ListToBytesAdapter method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.UTCTimeStampAdapter._decode">(objutils.elf.UTCTimeStampAdapter method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ListToBytesAdapter._encode">_encode() (objutils.elf.ListToBytesAdapter method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.UTCTimeStampAdapter._encode">(objutils.elf.UTCTimeStampAdapter method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo._field_defaults">_field_defaults (objutils.elf.DebugInfo attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr._field_defaults">(objutils.elf.defs.Elf32_Ehdr attribute)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr._field_defaults">(objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec._field_defaults">(objutils.registry.Codec attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.NumberRange._field_defaults">(objutils.section.NumberRange attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.TypeInformation._field_defaults">(objutils.section.TypeInformation attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo._fields">_fields (objutils.elf.DebugInfo attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr._fields">(objutils.elf.defs.Elf32_Ehdr attribute)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr._fields">(objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec._fields">(objutils.registry.Codec attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.NumberRange._fields">(objutils.section.NumberRange attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.TypeInformation._fields">(objutils.section.TypeInformation attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.registry.Registry._get_codecs">_get_codecs() (objutils.registry.Registry method)</a>
+</li>
+      <li><a href="objutils.html#objutils.registry.Registry._get_formats">_get_formats() (objutils.registry.Registry method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader._get_pos">_get_pos() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader._get_size">_get_size() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section._getformat">_getformat() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section._getformat">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.registry.Registry._instance">_instance (objutils.registry.Registry attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.SingletonBase._lock">_lock (objutils.utils.SingletonBase attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo._make">_make() (objutils.elf.DebugInfo class method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr._make">(objutils.elf.defs.Elf32_Ehdr class method)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr._make">(objutils.elf.defs.Elf_Shdr class method)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec._make">(objutils.registry.Codec class method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.NumberRange._make">(objutils.section.NumberRange class method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.TypeInformation._make">(objutils.section.TypeInformation class method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.utils.StructureWithEnums._map">_map (objutils.utils.StructureWithEnums attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.PrintContext._parse">_parse() (objutils.elf.PrintContext method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parse_comment">_parse_comment() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parse_note">_parse_note() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parse_program_headers">_parse_program_headers() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parse_section_headers">_parse_section_headers() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parse_symbol_section">_parse_symbol_section() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser._parser_extended_header">_parser_extended_header() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo._replace">_replace() (objutils.elf.DebugInfo method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr._replace">(objutils.elf.defs.Elf32_Ehdr method)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr._replace">(objutils.elf.defs.Elf_Shdr method)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec._replace">(objutils.registry.Codec method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.NumberRange._replace">(objutils.section.NumberRange method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.TypeInformation._replace">(objutils.section.TypeInformation method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader._set_pos">_set_pos() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.srec.Reader._strip_symbols">_strip_symbols() (objutils.srec.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.image._validate_sections">_validate_sections() (in module objutils.image)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section._verify_dtype">_verify_dtype() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section._verify_dtype">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.checksums.ADD11">ADD11() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ADD12">ADD12() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ADD14">ADD14() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ADD22">ADD22() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ADD24">ADD24() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ADD44">ADD44() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Container.add_processing_instruction">add_processing_instruction() (objutils.hexfile.Container method)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.adder">adder() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.MetaRecord.address">address (objutils.hexfile.MetaRecord attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.Section.address">(objutils.Section property)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.address">(objutils.section.Section property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.ash.Writer.ADDRESS_DESIGNATOR">ADDRESS_DESIGNATOR (objutils.ash.Writer attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.AddressRangeToLargeError">AddressRangeToLargeError</a>
+</li>
+      <li><a href="objutils.html#objutils.image.AddressSpace">AddressSpace (class in objutils.image)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.checksums.Algorithm">Algorithm (class in objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Reader.ALIGMENT">ALIGMENT (objutils.hexfile.Reader attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section.apply_bitmask">apply_bitmask() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.apply_bitmask">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.arm_attributes">arm_attributes (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ArmMachineData">ArmMachineData (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.html#objutils.image.AddressSpace.AS_16">AS_16 (objutils.image.AddressSpace attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.image.AddressSpace.AS_24">AS_24 (objutils.image.AddressSpace attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.image.AddressSpace.AS_32">AS_32 (objutils.image.AddressSpace attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.image.AddressSpace.AS_64">AS_64 (objutils.image.AddressSpace attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader">ASCIIHexReader (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.ASCIIHexWriter">ASCIIHexWriter (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.asciiz">asciiz() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AvrMachineData">AvrMachineData (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType">AVRMachineType (class in objutils.elf.defs)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.BaseType">BaseType (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.BasicHeader">BasicHeader (objutils.elf.ElfParser attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.BIG_ENDIAN">BIG_ENDIAN (objutils.readers.PlainBinaryReader attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.utils.bin_extractor">bin_extractor() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.binfile.BinZipReader">BinZipReader (class in objutils.binfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.binfile.BinZipWriter">BinZipWriter (class in objutils.binfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.TypeInformation.byte_order">byte_order (objutils.section.TypeInformation attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.Writer.calculate_address_bits">calculate_address_bits() (objutils.hexfile.Writer method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.calculate_crypto_hash">calculate_crypto_hash() (in module objutils.elf)</a>
+</li>
+      <li><a href="objutils.html#objutils.ihex.Reader.calculate_extended_address">calculate_extended_address() (objutils.ihex.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexdump.CanonicalDumper">CanonicalDumper (class in objutils.hexdump)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.check">check() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.cosmac.Reader.check_line">check_line() (objutils.cosmac.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.emon52.Reader.check_line">(objutils.emon52.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Reader.check_line">(objutils.etek.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Reader.check_line">(objutils.fpc.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.check_line">(objutils.hexfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Reader.check_line">(objutils.ihex.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Reader.check_line">(objutils.mostec.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Reader.check_line">(objutils.rca.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Reader.check_line">(objutils.sig.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.check_line">(objutils.srec.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Reader.check_line">(objutils.tek.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.ihex.Writer.checksum">checksum() (objutils.ihex.Writer static method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.srec.Writer.checksum">(objutils.srec.Writer static method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_11">CHK_ADD_11 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_12">CHK_ADD_12 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_14">CHK_ADD_14 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_22">CHK_ADD_22 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_24">CHK_ADD_24 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_44">CHK_ADD_44 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_16">CHK_CRC_16 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_16_CCITT">CHK_CRC_16_CCITT (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_32">CHK_CRC_32 (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Algorithm.CHK_USER_DEFINED">CHK_USER_DEFINED (objutils.checksums.Algorithm attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.MetaRecord.chunk">chunk (objutils.hexfile.MetaRecord attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Reader.classifyLine">classifyLine() (objutils.hexfile.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.emon52.Codec">Codec (class in objutils.emon52)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.registry.Codec">(class in objutils.registry)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.registry.CodecAlreadyExistError">CodecAlreadyExistError</a>
+</li>
+      <li><a href="objutils.html#objutils.registry.CodecDoesNotExistError">CodecDoesNotExistError</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Reader.codecName">codecName (objutils.ash.Reader attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.ash.Writer.codecName">(objutils.ash.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.BinZipReader.codecName">(objutils.binfile.BinZipReader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.BinZipWriter.codecName">(objutils.binfile.BinZipWriter attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.Reader.codecName">(objutils.binfile.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.Writer.codecName">(objutils.binfile.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.cosmac.Reader.codecName">(objutils.cosmac.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.cosmac.Writer.codecName">(objutils.cosmac.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.emon52.Reader.codecName">(objutils.emon52.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.emon52.Writer.codecName">(objutils.emon52.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Reader.codecName">(objutils.etek.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Writer.codecName">(objutils.etek.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Reader.codecName">(objutils.fpc.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Writer.codecName">(objutils.fpc.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Reader.codecName">(objutils.ihex.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Writer.codecName">(objutils.ihex.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Reader.codecName">(objutils.mostec.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Writer.codecName">(objutils.mostec.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Reader.codecName">(objutils.rca.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer.codecName">(objutils.rca.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Reader.codecName">(objutils.sig.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Writer.codecName">(objutils.sig.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.codecName">(objutils.srec.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.codecName">(objutils.srec.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Reader.codecName">(objutils.tek.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Writer.codecName">(objutils.tek.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.titxt.Reader.codecName">(objutils.titxt.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.titxt.Writer.codecName">(objutils.titxt.Writer attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.registry.Registry.codecs">codecs (objutils.registry.Registry property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.comment">comment (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Writer.compose_footer">compose_footer() (objutils.ash.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.fpc.Writer.compose_footer">(objutils.fpc.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Writer.compose_footer">(objutils.hexfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Writer.compose_footer">(objutils.ihex.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Writer.compose_footer">(objutils.mostec.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer.compose_footer">(objutils.rca.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Writer.compose_footer">(objutils.sig.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.compose_footer">(objutils.srec.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Writer.compose_footer">(objutils.tek.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.titxt.Writer.compose_footer">(objutils.titxt.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.ash.Writer.compose_header">compose_header() (objutils.ash.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.Writer.compose_header">(objutils.hexfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer.compose_header">(objutils.rca.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.compose_header">(objutils.srec.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.cosmac.Writer.compose_row">compose_row() (objutils.cosmac.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.emon52.Writer.compose_row">(objutils.emon52.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Writer.compose_row">(objutils.etek.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Writer.compose_row">(objutils.fpc.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexWriter.compose_row">(objutils.hexfile.ASCIIHexWriter method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Writer.compose_row">(objutils.hexfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Writer.compose_row">(objutils.ihex.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Writer.compose_row">(objutils.mostec.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer.compose_row">(objutils.rca.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Writer.compose_row">(objutils.sig.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.compose_row">(objutils.srec.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Writer.compose_row">(objutils.tek.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Container">Container (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.fpc.Reader.convert_quintuple">convert_quintuple() (objutils.fpc.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.fpc.Writer.convert_quintuple">(objutils.fpc.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.checksums.Crc16">Crc16 (class in objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.CRC32">CRC32() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.create_db_on_demand">create_db_on_demand() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.create_image">create_image() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.create_memorymapped_fileview">create_memorymapped_fileview() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.create_section_to_segment_mapping">create_section_to_segment_mapping() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.create_string_buffer">create_string_buffer() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.critical">critical() (objutils.logger.Logger method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.Curry">Curry (class in objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.cygpath_to_win">cygpath_to_win() (in module objutils.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Section.data">data (objutils.Section attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.data">(objutils.section.Section attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Statistics.data_bytes">data_bytes (objutils.hexfile.Statistics attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.emon52.Reader.DATA_SEPARATOR">DATA_SEPARATOR (objutils.emon52.Reader attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.Reader.DATA_SEPARATOR">(objutils.hexfile.Reader attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.DATATYPES32">DATATYPES32 (objutils.elf.ElfParser attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.DATATYPES64">DATATYPES64 (objutils.elf.ElfParser attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DBAPI">DBAPI (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.debug">debug() (objutils.hexfile.BaseType method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.logger.Logger.debug">(objutils.logger.Logger method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.debug_sections">debug_sections() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo">DebugInfo (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.html#objutils.fpc.Reader.decode">decode() (objutils.fpc.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Image.delete_section">delete_section() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.delete_section">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.registry.Codec.description">description (objutils.registry.Codec attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.dump">dump() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.BinZipWriter.dump">(objutils.binfile.BinZipWriter method)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.Writer.dump">(objutils.binfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Writer.dump">(objutils.hexfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.pickleif.PickleIF.dump">(objutils.pickleif.PickleIF method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexdump.Dumper.dump_data">dump_data() (objutils.hexdump.Dumper method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexdump.CanonicalDumper.dump_row">dump_row() (objutils.hexdump.CanonicalDumper method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexdump.Dumper">Dumper (class in objutils.hexdump)</a>
+</li>
+      <li><a href="objutils.html#objutils.dumps">dumps() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.BinZipWriter.dumps">(objutils.binfile.BinZipWriter method)</a>
+</li>
+        <li><a href="objutils.html#objutils.binfile.Writer.dumps">(objutils.binfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Writer.dumps">(objutils.hexfile.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.pickleif.PickleIF.dumps">(objutils.pickleif.PickleIF method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR1">E_AVR_MACH_AVR1 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR2">E_AVR_MACH_AVR2 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR25">E_AVR_MACH_AVR25 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR3">E_AVR_MACH_AVR3 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR31">E_AVR_MACH_AVR31 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR35">E_AVR_MACH_AVR35 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR4">E_AVR_MACH_AVR4 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR5">E_AVR_MACH_AVR5 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR51">E_AVR_MACH_AVR51 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVR6">E_AVR_MACH_AVR6 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_AVRTINY">E_AVR_MACH_AVRTINY (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA1">E_AVR_MACH_XMEGA1 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA2">E_AVR_MACH_XMEGA2 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA3">E_AVR_MACH_XMEGA3 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA4">E_AVR_MACH_XMEGA4 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA5">E_AVR_MACH_XMEGA5 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA6">E_AVR_MACH_XMEGA6 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.AVRMachineType.E_AVR_MACH_XMEGA7">E_AVR_MACH_XMEGA7 (objutils.elf.defs.AVRMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_ehsize">e_ehsize (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_ehsize">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_entry">e_entry (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_entry">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_flags">e_flags (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_flags">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_machine">e_machine (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_machine">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_phentsize">e_phentsize (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_phentsize">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_phnum">e_phnum (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_phnum">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_phoff">e_phoff (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_phoff">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_shentsize">e_shentsize (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_shentsize">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_shnum">e_shnum (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_shnum">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_shoff">e_shoff (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_shoff">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_shstrndx">e_shstrndx (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_shstrndx">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_type">e_type (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_type">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr.e_version">e_version (objutils.elf.defs.Elf32_Ehdr attribute)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.e_version">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.ei_abiversion">ei_abiversion (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.ei_class">ei_class (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.ei_data">ei_data (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.EI_NIDENT">EI_NIDENT (objutils.elf.ElfParser attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.ei_osabi">ei_osabi (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.ei_version">ei_version (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Ehdr">Elf32_Ehdr (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf32_Sym">Elf32_Sym (in module objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfFileStruct.elf32Addr">elf32Addr() (objutils.elf.ElfFileStruct method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf64_Sym">Elf64_Sym (in module objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr">Elf_Shdr (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType">ELFAbiType (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFClass">ELFClass (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFClass.ELFCLASS32">ELFCLASS32 (objutils.elf.defs.ELFClass attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFClass.ELFCLASS64">ELFCLASS64 (objutils.elf.defs.ELFClass attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFClass.ELFCLASSNONE">ELFCLASSNONE (objutils.elf.defs.ELFClass attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFDataEncoding.ELFDATA2LSB">ELFDATA2LSB (objutils.elf.defs.ELFDataEncoding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFDataEncoding.ELFDATA2MSB">ELFDATA2MSB (objutils.elf.defs.ELFDataEncoding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFDataEncoding">ELFDataEncoding (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFDataEncoding.ELFDATANONE">ELFDATANONE (objutils.elf.defs.ELFDataEncoding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfFileStruct">ElfFileStruct (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType">ELFMachineType (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_AIX">ELFOSABI_AIX (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_ARM">ELFOSABI_ARM (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_AROS">ELFOSABI_AROS (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_C6000_ELFABI">ELFOSABI_C6000_ELFABI (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_C6000_LINUX">ELFOSABI_C6000_LINUX (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_FENIXOS">ELFOSABI_FENIXOS (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_FREEBSD">ELFOSABI_FREEBSD (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_GNU">ELFOSABI_GNU (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_HPUX">ELFOSABI_HPUX (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_IRIX">ELFOSABI_IRIX (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_LINUX">ELFOSABI_LINUX (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_MODESTO">ELFOSABI_MODESTO (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_NETBSD">ELFOSABI_NETBSD (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_NONE">ELFOSABI_NONE (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_NSK">ELFOSABI_NSK (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_OPENBSD">ELFOSABI_OPENBSD (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_OPENVMS">ELFOSABI_OPENVMS (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_SOLARIS">ELFOSABI_SOLARIS (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_STANDALONE">ELFOSABI_STANDALONE (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFAbiType.ELFOSABI_TRU64">ELFOSABI_TRU64 (objutils.elf.defs.ELFAbiType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser">ElfParser (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType">ELFType (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_386">EM_386 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68HC05">EM_68HC05 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68HC08">EM_68HC08 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68HC11">EM_68HC11 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68HC12">EM_68HC12 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68HC16">EM_68HC16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_68K">EM_68K (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_860">EM_860 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_88K">EM_88K (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_960">EM_960 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_AARCH64">EM_AARCH64 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ADAPTEVA_EPIPHANY">EM_ADAPTEVA_EPIPHANY (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ALPHA">EM_ALPHA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ALPHA_NO_ABI">EM_ALPHA_NO_ABI (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ALTERA_NIOS2">EM_ALTERA_NIOS2 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ARC">EM_ARC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ARC_A5">EM_ARC_A5 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ARCA">EM_ARCA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ARM">EM_ARM (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_AVR">EM_AVR (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_AVR32">EM_AVR32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_AVR_OLD">EM_AVR_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_BLACKFIN">EM_BLACKFIN (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_C166">EM_C166 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CE">EM_CE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_COLDFIRE">EM_COLDFIRE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_COOLRISC_C816">EM_COOLRISC_C816 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CR">EM_CR (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CR16">EM_CR16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CRAYNV2">EM_CRAYNV2 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CRIS">EM_CRIS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CRX">EM_CRX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CUDA">EM_CUDA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_D10V">EM_CYGNUS_D10V (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_D30V">EM_CYGNUS_D30V (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_FR30">EM_CYGNUS_FR30 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_FRV">EM_CYGNUS_FRV (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_M32R">EM_CYGNUS_M32R (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_MEP">EM_CYGNUS_MEP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_MN10200">EM_CYGNUS_MN10200 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_MN10300">EM_CYGNUS_MN10300 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_POWERPC">EM_CYGNUS_POWERPC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYGNUS_V850">EM_CYGNUS_V850 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_CYPRESS_M8C">EM_CYPRESS_M8C (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_D10V">EM_D10V (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_D30V">EM_D30V (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_DLX">EM_DLX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_DSP24">EM_DSP24 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_DSPIC30F">EM_DSPIC30F (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_DXP">EM_DXP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ECOG1">EM_ECOG1 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ECOG16">EM_ECOG16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ECOG1X">EM_ECOG1X (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ECOG2">EM_ECOG2 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ETPU">EM_ETPU (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_EXCESS">EM_EXCESS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_F2MC16">EM_F2MC16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_FIREPATH">EM_FIREPATH (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_FR20">EM_FR20 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_FR30">EM_FR30 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_FX66">EM_FX66 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_H8_300">EM_H8_300 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_H8_300H">EM_H8_300H (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_H8_500">EM_H8_500 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_H8S">EM_H8S (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_HUANY">EM_HUANY (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_I8051">EM_I8051 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_IA_64">EM_IA_64 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_IP2K">EM_IP2K (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_IP2K_OLD">EM_IP2K_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_IQ2000">EM_IQ2000 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_JAVELIN">EM_JAVELIN (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_L1OM">EM_L1OM (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_LATTICEMICO32">EM_LATTICEMICO32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_M16C">EM_M16C (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_M32">EM_M32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_M32C">EM_M32C (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_M32C_OLD">EM_M32C_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_M32R">EM_M32R (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MANIK">EM_MANIK (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MAX">EM_MAX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MAXQ30">EM_MAXQ30 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MCST_ELBRUS">EM_MCST_ELBRUS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ME16">EM_ME16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_METAG">EM_METAG (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MICROBLAZE">EM_MICROBLAZE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MICROBLAZE_OLD">EM_MICROBLAZE_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MIPS">EM_MIPS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MIPS_RS3_LE">EM_MIPS_RS3_LE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MIPS_X">EM_MIPS_X (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MMA">EM_MMA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MMDSP_PLUS">EM_MMDSP_PLUS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MMIX">EM_MMIX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MN10200">EM_MN10200 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MN10300">EM_MN10300 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MOXIE">EM_MOXIE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MSP430">EM_MSP430 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MSP430_OLD">EM_MSP430_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_MT">EM_MT (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NCPU">EM_NCPU (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NDR1">EM_NDR1 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NDS32">EM_NDS32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NEC_V850">EM_NEC_V850 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NIOS32">EM_NIOS32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NONE">EM_NONE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_NS32K">EM_NS32K (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_OPENRISC">EM_OPENRISC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_OPENRISC_OLD">EM_OPENRISC_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_OR32">EM_OR32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PARISC">EM_PARISC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PCP">EM_PCP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PDP10">EM_PDP10 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PDP11">EM_PDP11 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PDSP">EM_PDSP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PJ">EM_PJ (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PPC">EM_PPC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PPC64">EM_PPC64 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_PRISM">EM_PRISM (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_QDSP6">EM_QDSP6 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_R32C">EM_R32C (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_RCE">EM_RCE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_RH32">EM_RH32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_RS08">EM_RS08 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_RX">EM_RX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_S370">EM_S370 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_S390">EM_S390 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_S390_OLD">EM_S390_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SCORE">EM_SCORE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SCORE7">EM_SCORE7 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SE_C17">EM_SE_C17 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SE_C33">EM_SE_C33 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SEP">EM_SEP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SH">EM_SH (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SLE9X">EM_SLE9X (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SNP1K">EM_SNP1K (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SPARC">EM_SPARC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SPARC32PLUS">EM_SPARC32PLUS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SPARCV9">EM_SPARCV9 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SPU">EM_SPU (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ST100">EM_ST100 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ST19">EM_ST19 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ST200">EM_ST200 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ST7">EM_ST7 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ST9PLUS">EM_ST9PLUS (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_STARCORE">EM_STARCORE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_STM8">EM_STM8 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_STXP7X">EM_STXP7X (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_SVX">EM_SVX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TI_ARP32">EM_TI_ARP32 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TI_C2000">EM_TI_C2000 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TI_C5500">EM_TI_C5500 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TI_C6000">EM_TI_C6000 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TI_PRU">EM_TI_PRU (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TILE64">EM_TILE64 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TILEGX">EM_TILEGX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TILEPRO">EM_TILEPRO (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TINYJ">EM_TINYJ (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TMM_GPP">EM_TMM_GPP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TPC">EM_TPC (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TRICORE">EM_TRICORE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TRIMEDIA">EM_TRIMEDIA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_TSK3000">EM_TSK3000 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_UNICORE">EM_UNICORE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_V800">EM_V800 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_V850">EM_V850 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_VAX">EM_VAX (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_VIDEOCORE">EM_VIDEOCORE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_VIDEOCORE3">EM_VIDEOCORE3 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_VPP500">EM_VPP500 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_X86_64">EM_X86_64 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XC16X">EM_XC16X (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XGATE">EM_XGATE (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XIMO16">EM_XIMO16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XSTORMY16">EM_XSTORMY16 (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XTENSA">EM_XTENSA (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_XTENSA_OLD">EM_XTENSA_OLD (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.EM_ZSP">EM_ZSP (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.endianess">endianess (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.enum_from_str">enum_from_str() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.error">error() (objutils.hexfile.BaseType method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.logger.Logger.error">(objutils.logger.Logger method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_CORE">ET_CORE (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_DYN">ET_DYN (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_EXEC">ET_EXEC (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_HIOS">ET_HIOS (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_HIPROC">ET_HIPROC (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_LOOS">ET_LOOS (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_LOPROC">ET_LOPROC (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_NONE">ET_NONE (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_NUM">ET_NUM (objutils.elf.defs.ELFType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFType.ET_REL">ET_REL (objutils.elf.defs.ELFType attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.exceptions.FeatureNotAvailableError">FeatureNotAvailableError</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.SectionAPI.fetch">fetch() (objutils.elf.SectionAPI method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.SymbolAPI.fetch">(objutils.elf.SymbolAPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.SymbolAPI.fetch_gcc_special_symbols">fetch_gcc_special_symbols() (objutils.elf.SymbolAPI method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.ffs">ffs() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.exceptions.FileCorruptedError">FileCorruptedError</a>
+</li>
+      <li><a href="objutils.html#objutils.section.filler">filler() (in module objutils.section)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section.find">find() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.find">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.logger.Logger.FORMAT">FORMAT (objutils.logger.Logger attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.cosmac.Reader.FORMAT_SPEC">FORMAT_SPEC (objutils.cosmac.Reader attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.emon52.Reader.FORMAT_SPEC">(objutils.emon52.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Reader.FORMAT_SPEC">(objutils.etek.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Reader.FORMAT_SPEC">(objutils.fpc.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader.FORMAT_SPEC">(objutils.hexfile.ASCIIHexReader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Reader.FORMAT_SPEC">(objutils.ihex.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Reader.FORMAT_SPEC">(objutils.mostec.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Reader.FORMAT_SPEC">(objutils.rca.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Reader.FORMAT_SPEC">(objutils.sig.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.FORMAT_SPEC">(objutils.srec.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Reader.FORMAT_SPEC">(objutils.tek.Reader attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.MetaRecord.format_type">format_type (objutils.hexfile.MetaRecord attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.FormatParser">FormatParser (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.html#objutils.registry.Registry.formats">formats (objutils.registry.Registry property)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.fortran_array_from_buffer">fortran_array_from_buffer() (in module objutils.section)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.fortran_array_to_buffer">fortran_array_to_buffer() (in module objutils.section)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.SectionAPI.get">get() (objutils.elf.SectionAPI method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.SymbolAPI.get">(objutils.elf.SymbolAPI method)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Registry.get">(objutils.registry.Registry method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.get_basic_header_field">get_basic_header_field() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.get_extended_header_field">get_extended_header_field() (objutils.elf.ElfParser method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Image.get_section">get_section() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.get_section">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.get_string">get_string() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader.getAddress">getAddress() (objutils.hexfile.ASCIIHexReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.getLastError">getLastError() (objutils.logger.Logger method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.header_bytes">header_bytes (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Writer.hex_bytes">hex_bytes() (objutils.hexfile.Writer static method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Image.hexdump">hexdump() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.hexdump">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.hexdump">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.hexdump">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Image">Image (class in objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image">(class in objutils.image)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo.image">image (objutils.elf.DebugInfo attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.info">info() (objutils.hexfile.BaseType method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.logger.Logger.info">(objutils.logger.Logger method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.insert_section">insert_section() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.insert_section">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.utils.int_to_array">int_to_array() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.exceptions.InvalidAddressError">InvalidAddressError</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Invalidrecord_typeError">Invalidrecord_typeError</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.InvalidRecordChecksumError">InvalidRecordChecksumError</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.InvalidRecordLengthError">InvalidRecordLengthError</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.cosmac.Reader.is_data_line">is_data_line() (objutils.cosmac.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.emon52.Reader.is_data_line">(objutils.emon52.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Reader.is_data_line">(objutils.etek.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Reader.is_data_line">(objutils.fpc.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.is_data_line">(objutils.hexfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Reader.is_data_line">(objutils.ihex.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Reader.is_data_line">(objutils.mostec.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Reader.is_data_line">(objutils.rca.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Reader.is_data_line">(objutils.sig.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.is_data_line">(objutils.srec.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Reader.is_data_line">(objutils.tek.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexdump.isprintable">isprintable() (in module objutils.hexdump)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.section.join_sections">join_sections() (in module objutils.section)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.Image.join_sections">(objutils.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.image.Image.join_sections">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Section.length">length (objutils.Section property)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.length">(objutils.section.Section property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexdump.CanonicalDumper.LINE_LENGTH">LINE_LENGTH (objutils.hexdump.CanonicalDumper attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexdump.Dumper.LINE_LENGTH">(objutils.hexdump.Dumper attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.ListToBytesAdapter">ListToBytesAdapter (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.LITTLE_ENDIAN">LITTLE_ENDIAN (objutils.readers.PlainBinaryReader attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.load">load() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.Reader.load">(objutils.binfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.load">(objutils.hexfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.pickleif.PickleIF.load">(objutils.pickleif.PickleIF method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.load">(objutils.srec.Reader method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.load_data">load_data() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.loads">loads() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.Reader.loads">(objutils.binfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.loads">(objutils.hexfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.pickleif.PickleIF.loads">(objutils.pickleif.PickleIF method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.logger.Logger.log">log() (objutils.logger.Logger method)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger">Logger (class in objutils.logger)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.logger">logger (objutils.hexfile.BaseType attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.LOGGER_BASE_NAME">LOGGER_BASE_NAME (objutils.logger.Logger attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.NumberRange.lower">lower (objutils.section.NumberRange attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.lrc">lrc() (in module objutils.checksums)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.machine_data">machine_data (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.MachineData.machine_name">machine_name (objutils.elf.defs.MachineData attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.MachineData">MachineData (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.make_list">make_list() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.binfile.BinZipWriter.MANIFEST_FILE_NAME">MANIFEST_FILE_NAME (objutils.binfile.BinZipWriter attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Writer.MAX_ADDRESS_BITS">MAX_ADDRESS_BITS (objutils.ash.Writer attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.cosmac.Writer.MAX_ADDRESS_BITS">(objutils.cosmac.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.emon52.Writer.MAX_ADDRESS_BITS">(objutils.emon52.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Writer.MAX_ADDRESS_BITS">(objutils.etek.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Writer.MAX_ADDRESS_BITS">(objutils.fpc.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexWriter.MAX_ADDRESS_BITS">(objutils.hexfile.ASCIIHexWriter attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Writer.MAX_ADDRESS_BITS">(objutils.ihex.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Writer.MAX_ADDRESS_BITS">(objutils.mostec.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer.MAX_ADDRESS_BITS">(objutils.rca.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Writer.MAX_ADDRESS_BITS">(objutils.sig.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.MAX_ADDRESS_BITS">(objutils.srec.Writer attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Writer.MAX_ADDRESS_BITS">(objutils.tek.Writer attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Reader.maybe_binary_file">maybe_binary_file() (objutils.hexfile.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.MetaRecord">MetaRecord (class in objutils.hexfile)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="objutils.html#module-objutils">objutils</a>
+</li>
+        <li><a href="objutils.html#module-objutils.ash">objutils.ash</a>
+</li>
+        <li><a href="objutils.html#module-objutils.binfile">objutils.binfile</a>
+</li>
+        <li><a href="objutils.html#module-objutils.checksums">objutils.checksums</a>
+</li>
+        <li><a href="objutils.html#module-objutils.cosmac">objutils.cosmac</a>
+</li>
+        <li><a href="objutils.elf.html#module-objutils.elf">objutils.elf</a>
+</li>
+        <li><a href="objutils.elf.html#module-objutils.elf.attributes">objutils.elf.attributes</a>
+</li>
+        <li><a href="objutils.elf.html#module-objutils.elf.defs">objutils.elf.defs</a>
+</li>
+        <li><a href="objutils.html#module-objutils.emon52">objutils.emon52</a>
+</li>
+        <li><a href="objutils.html#module-objutils.etek">objutils.etek</a>
+</li>
+        <li><a href="objutils.html#module-objutils.exceptions">objutils.exceptions</a>
+</li>
+        <li><a href="objutils.html#module-objutils.fpc">objutils.fpc</a>
+</li>
+        <li><a href="objutils.html#module-objutils.hexdump">objutils.hexdump</a>
+</li>
+        <li><a href="objutils.html#module-objutils.hexfile">objutils.hexfile</a>
+</li>
+        <li><a href="objutils.html#module-objutils.ihex">objutils.ihex</a>
+</li>
+        <li><a href="objutils.html#module-objutils.image">objutils.image</a>
+</li>
+        <li><a href="objutils.html#module-objutils.logger">objutils.logger</a>
+</li>
+        <li><a href="objutils.html#module-objutils.mostec">objutils.mostec</a>
+</li>
+        <li><a href="objutils.html#module-objutils.pickleif">objutils.pickleif</a>
+</li>
+        <li><a href="objutils.html#module-objutils.rca">objutils.rca</a>
+</li>
+        <li><a href="objutils.html#module-objutils.readers">objutils.readers</a>
+</li>
+        <li><a href="objutils.html#module-objutils.registry">objutils.registry</a>
+</li>
+        <li><a href="objutils.html#module-objutils.section">objutils.section</a>
+</li>
+        <li><a href="objutils.html#module-objutils.sig">objutils.sig</a>
+</li>
+        <li><a href="objutils.html#module-objutils.srec">objutils.srec</a>
+</li>
+        <li><a href="objutils.html#module-objutils.tek">objutils.tek</a>
+</li>
+        <li><a href="objutils.html#module-objutils.titxt">objutils.titxt</a>
+</li>
+        <li><a href="objutils.html#module-objutils.utils">objutils.utils</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.next_byte">next_byte() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.nibble_sum">nibble_sum() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.binfile.NoContiniousError">NoContiniousError</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader.nop">nop() (objutils.hexfile.ASCIIHexReader method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.notes">notes (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore">NoteSegmentDescriptorCore (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorObject">NoteSegmentDescriptorObject (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_386_IOPERM">NT_386_IOPERM (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_386_TLS">NT_386_TLS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_ASRS">NT_ASRS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_AUXV">NT_AUXV (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_FPREGSET">NT_FPREGSET (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_GWINDOWS">NT_GWINDOWS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_LWPSINFO">NT_LWPSINFO (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_LWPSTATUS">NT_LWPSTATUS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PLATFORM">NT_PLATFORM (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PPC_SPE">NT_PPC_SPE (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PPC_VMX">NT_PPC_VMX (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PPC_VSX">NT_PPC_VSX (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRCRED">NT_PRCRED (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRFPXREG">NT_PRFPXREG (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRPSINFO">NT_PRPSINFO (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRSTATUS">NT_PRSTATUS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRXFPREG">NT_PRXFPREG (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PRXREG">NT_PRXREG (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PSINFO">NT_PSINFO (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_PSTATUS">NT_PSTATUS (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_TASKSTRUCT">NT_TASKSTRUCT (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_UTSNAME">NT_UTSNAME (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorObject.NT_VERSION">NT_VERSION (objutils.elf.defs.NoteSegmentDescriptorObject attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore.NT_X86_XSTATE">NT_X86_XSTATE (objutils.elf.defs.NoteSegmentDescriptorCore attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.NumberRange">NumberRange (class in objutils.section)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    objutils
+
+      <ul>
+        <li><a href="objutils.html#module-objutils">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.ash
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.ash">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.binfile
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.binfile">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.checksums
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.checksums">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.cosmac
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.cosmac">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.elf
+
+      <ul>
+        <li><a href="objutils.elf.html#module-objutils.elf">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.elf.attributes
+
+      <ul>
+        <li><a href="objutils.elf.html#module-objutils.elf.attributes">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.elf.defs
+
+      <ul>
+        <li><a href="objutils.elf.html#module-objutils.elf.defs">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.emon52
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.emon52">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.etek
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.etek">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.exceptions
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.exceptions">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.fpc
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.fpc">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.hexdump
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.hexdump">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.hexfile
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.hexfile">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    objutils.ihex
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.ihex">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.image
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.image">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.logger
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.logger">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.mostec
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.mostec">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.pickleif
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.pickleif">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.rca
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.rca">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.readers
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.readers">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.registry
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.registry">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.section
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.section">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.sig
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.sig">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.srec
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.srec">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.tek
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.tek">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.titxt
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.titxt">module</a>
+</li>
+      </ul></li>
+      <li>
+    objutils.utils
+
+      <ul>
+        <li><a href="objutils.html#module-objutils.utils">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.FormatParser.parse">parse() (objutils.hexfile.FormatParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader.parse_line">parse_line() (objutils.hexfile.ASCIIHexReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.etek.Reader.parseData">parseData() (objutils.etek.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.Reader.parseData">(objutils.hexfile.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.pickleif.PickleIF">PickleIF (class in objutils.pickleif)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader">PlainBinaryReader (class in objutils.readers)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.pos">pos (objutils.readers.PlainBinaryReader property)</a>
+</li>
+      <li><a href="objutils.html#objutils.fpc.Writer.post_processing">post_processing() (objutils.fpc.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.Writer.post_processing">(objutils.hexfile.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Writer.pre_processing">pre_processing() (objutils.hexfile.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.ihex.Writer.pre_processing">(objutils.ihex.Writer method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.pre_processing">(objutils.srec.Writer method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.exceptions.PrematureEndOfFileError">PrematureEndOfFileError</a>
+</li>
+      <li><a href="objutils.html#objutils.cosmac.Reader.previous_address">previous_address (objutils.cosmac.Reader attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexWriter.previous_address">(objutils.hexfile.ASCIIHexWriter attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.cosmac.Reader.previous_length">previous_length (objutils.cosmac.Reader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.PrintContext">PrintContext (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexdump.CanonicalDumper.printhex_bytes">printhex_bytes() (objutils.hexdump.CanonicalDumper method)</a>
+</li>
+      <li><a href="objutils.html#objutils.probe">probe() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.fpc.Reader.probe">(objutils.fpc.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.probe">(objutils.hexfile.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.probes">probes() (in module objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.Reader.probes">(objutils.hexfile.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.program_header_flags_name">program_header_flags_name() (in module objutils.elf.defs)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.defs.program_header_name">program_header_name() (in module objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader">ProgramHeader (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_ARM_EXIDX">PT_ARM_EXIDX (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_DYNAMIC">PT_DYNAMIC (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_GNU_EH_FRAME">PT_GNU_EH_FRAME (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_GNU_PROPERTY">PT_GNU_PROPERTY (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_GNU_RELRO">PT_GNU_RELRO (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_GNU_STACK">PT_GNU_STACK (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_HIOS">PT_HIOS (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_HIPROC">PT_HIPROC (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_HISUNW">PT_HISUNW (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_INTERP">PT_INTERP (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_LOAD">PT_LOAD (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_LOOS">PT_LOOS (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_LOPROC">PT_LOPROC (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_LOSUNW">PT_LOSUNW (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_NOTE">PT_NOTE (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_NULL">PT_NULL (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_NUM">PT_NUM (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_PHDR">PT_PHDR (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_SHLIB">PT_SHLIB (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_SUNWBSS">PT_SUNWBSS (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_SUNWSTACK">PT_SUNWSTACK (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ProgramHeader.PT_TLS">PT_TLS (objutils.elf.defs.ProgramHeader attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.DBAPI.query">query (objutils.elf.DBAPI property)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.ElfParser.query">(objutils.elf.ElfParser property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.fpc.Reader.read">read() (objutils.fpc.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexReader.read">(objutils.hexfile.ASCIIHexReader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.read">(objutils.hexfile.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Image.read">(objutils.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.image.Image.read">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.read">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.read">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.read_ndarray">read_ndarray() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.read_ndarray">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.read_ndarray">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.read_ndarray">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.read_numeric">read_numeric() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.read_numeric">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.read_numeric">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.read_numeric">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.read_numeric_array">read_numeric_array() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.read_numeric_array">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.read_numeric_array">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.read_numeric_array">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.read_string">read_string() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.read_string">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.read_string">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.read_string">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.ash.Reader">Reader (class in objutils.ash)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.Reader">(class in objutils.binfile)</a>
+</li>
+        <li><a href="objutils.html#objutils.cosmac.Reader">(class in objutils.cosmac)</a>
+</li>
+        <li><a href="objutils.html#objutils.emon52.Reader">(class in objutils.emon52)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Reader">(class in objutils.etek)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Reader">(class in objutils.fpc)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader">(class in objutils.hexfile)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Reader">(class in objutils.ihex)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Reader">(class in objutils.mostec)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Reader">(class in objutils.rca)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Reader">(class in objutils.sig)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader">(class in objutils.srec)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Reader">(class in objutils.tek)</a>
+</li>
+        <li><a href="objutils.html#objutils.titxt.Reader">(class in objutils.titxt)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec.Reader">(objutils.registry.Codec attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.emon52.Codec.readlines">readlines() (objutils.emon52.Codec method)</a>
+</li>
+      <li><a href="objutils.html#objutils.srec.Writer.record_type">record_type (objutils.srec.Writer attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Statistics.record_types">record_types (objutils.hexfile.Statistics attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.reflect">reflect() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Crc16.reflectIn">reflectIn() (objutils.checksums.Crc16 method)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.Crc16.reflectOut">reflectOut() (objutils.checksums.Crc16 method)</a>
+</li>
+      <li><a href="objutils.html#objutils.registry.Registry.register">register() (objutils.registry.Registry method)</a>
+</li>
+      <li><a href="objutils.html#objutils.registry.Registry">Registry (class in objutils.registry)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ELFMachineType.RESERVED">RESERVED (objutils.elf.defs.ELFMachineType attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.reset">reset() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.rolb">rolb() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.rorb">rorb() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ROTATE_LEFT">ROTATE_LEFT() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.ROTATE_RIGHT">ROTATE_RIGHT() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.rotatedXOR">rotatedXOR() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Writer.row_callout">row_callout() (objutils.ash.Writer method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.hexfile.ASCIIHexWriter.row_callout">(objutils.hexfile.ASCIIHexWriter method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.s16">s16() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.s32">s32() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.srec.Writer.s5record">s5record (objutils.srec.Writer attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.s64">s64() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.s8">s8() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section">Section (class in objutils)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section">(class in objutils.section)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.DebugInfo.section">section (objutils.elf.DebugInfo attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.binfile.BinZipWriter.SECTION_FILE_NAME">SECTION_FILE_NAME (objutils.binfile.BinZipWriter attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.section_in_segment">section_in_segment() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.section_in_segment1">section_in_segment1() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.section_in_segment_strict">section_in_segment_strict() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.section_size">section_size() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.SectionAPI">SectionAPI (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags">SectionFlags (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName">SectionName (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.html#objutils.Image.sections">sections (objutils.Image property)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.sections">(objutils.image.Image property)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType">SectionType (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.segments">segments (objutils.elf.ElfParser property)</a>
+</li>
+      <li><a href="objutils.html#objutils.rca.Writer.SEPARATOR">SEPARATOR (objutils.rca.Writer attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.DBAPI.session">session (objutils.elf.DBAPI property)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.set_data_types">set_data_types() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Writer.set_parameters">set_parameters() (objutils.hexfile.Writer method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.ElfFileStruct.setByteOrder">setByteOrder() (objutils.elf.ElfFileStruct method)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.setLevel">setLevel() (objutils.logger.Logger method)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_addr">sh_addr (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_addralign">sh_addralign (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_entsize">sh_entsize (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_flags">sh_flags (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_info">sh_info (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_link">sh_link (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_name">sh_name (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_offset">sh_offset (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_size">sh_size (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.Elf_Shdr.sh_type">sh_type (objutils.elf.defs.Elf_Shdr attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_ALLOC">SHF_ALLOC (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_COMPRESSED">SHF_COMPRESSED (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_EXCLUDE">SHF_EXCLUDE (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_EXECINSTR">SHF_EXECINSTR (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_GROUP">SHF_GROUP (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_INFO_LINK">SHF_INFO_LINK (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_LINK_ORDER">SHF_LINK_ORDER (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_MASKOS">SHF_MASKOS (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_MASKPROC">SHF_MASKPROC (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_MERGE">SHF_MERGE (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_ORDERED">SHF_ORDERED (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_OS_NONCONFORMING">SHF_OS_NONCONFORMING (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_STRINGS">SHF_STRINGS (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_TLS">SHF_TLS (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionFlags.SHF_WRITE">SHF_WRITE (objutils.elf.defs.SectionFlags attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_ABS">SHN_ABS (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_AFTER">SHN_AFTER (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_BEFORE">SHN_BEFORE (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_COMMON">SHN_COMMON (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_HIOS">SHN_HIOS (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_HIPROC">SHN_HIPROC (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_HIRESERVE">SHN_HIRESERVE (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_IA_64_ANSI_COMMON">SHN_IA_64_ANSI_COMMON (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_LOOS">SHN_LOOS (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_LOPROC">SHN_LOPROC (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_LORESERVE">SHN_LORESERVE (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_UNDEF">SHN_UNDEF (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionName.SHN_XINDEX">SHN_XINDEX (objutils.elf.defs.SectionName attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_ARM_ATTRIBUTES">SHT_ARM_ATTRIBUTES (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_ARM_DEBUGOVERLAY">SHT_ARM_DEBUGOVERLAY (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_ARM_EXIDX">SHT_ARM_EXIDX (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_ARM_OVERLAYSECTION">SHT_ARM_OVERLAYSECTION (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_ARM_PREEMPTMAP">SHT_ARM_PREEMPTMAP (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_CHECKSUM">SHT_CHECKSUM (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_DYNAMIC">SHT_DYNAMIC (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_DYNSYM">SHT_DYNSYM (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_FINI_ARRAY">SHT_FINI_ARRAY (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_ATTRIBUTES">SHT_GNU_ATTRIBUTES (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_HASH">SHT_GNU_HASH (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_INCREMENTAL_INPUTS">SHT_GNU_INCREMENTAL_INPUTS (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_LIBLIST">SHT_GNU_LIBLIST (objutils.elf.defs.SectionType attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_verdef">SHT_GNU_verdef (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_verneed">SHT_GNU_verneed (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GNU_versym">SHT_GNU_versym (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_GROUP">SHT_GROUP (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_HASH">SHT_HASH (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_HIOS">SHT_HIOS (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_HIPROC">SHT_HIPROC (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_HISUNW">SHT_HISUNW (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_HIUSER">SHT_HIUSER (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_INIT_ARRAY">SHT_INIT_ARRAY (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_LOOS">SHT_LOOS (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_LOPROC">SHT_LOPROC (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_LOSUNW">SHT_LOSUNW (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_LOUSER">SHT_LOUSER (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_NOBITS">SHT_NOBITS (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_NOTE">SHT_NOTE (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_NULL">SHT_NULL (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_NUM">SHT_NUM (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_PREINIT_ARRAY">SHT_PREINIT_ARRAY (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_PROGBITS">SHT_PROGBITS (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_REL">SHT_REL (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_RELA">SHT_RELA (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SHLIB">SHT_SHLIB (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_STRTAB">SHT_STRTAB (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SUNW_COMDAT">SHT_SUNW_COMDAT (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SUNW_move">SHT_SUNW_move (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SUNW_syminfo">SHT_SUNW_syminfo (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SYMTAB">SHT_SYMTAB (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SectionType.SHT_SYMTAB_SHNDX">SHT_SYMTAB_SHNDX (objutils.elf.defs.SectionType attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.signed_range">signed_range() (in module objutils.section)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.silent">silent() (objutils.logger.Logger method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.SingletonBase">SingletonBase (class in objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.size">size (objutils.readers.PlainBinaryReader property)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.TypeInformation.size">(objutils.section.TypeInformation attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.sleb">sleb() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.slicer">slicer() (in module objutils.utils)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Reader.special_processing">special_processing() (objutils.hexfile.Reader method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.ihex.Reader.special_processing">(objutils.ihex.Reader method)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Reader.special_processing">(objutils.srec.Reader method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.special_section_name">special_section_name() (in module objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.ArmMachineData.specific">specific() (objutils.elf.defs.ArmMachineData method)</a>
+
+      <ul>
+        <li><a href="objutils.elf.html#objutils.elf.defs.AvrMachineData.specific">(objutils.elf.defs.AvrMachineData method)</a>
+</li>
+        <li><a href="objutils.elf.html#objutils.elf.defs.MachineData.specific">(objutils.elf.defs.MachineData method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.split">split() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.split">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.fpc.Reader.split_quintuples">split_quintuples() (objutils.fpc.Reader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.srec.Writer.srecord">srecord() (objutils.srec.Writer method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section.start_address">start_address (objutils.Section attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.start_address">(objutils.section.Section attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer.start_address">(objutils.srec.Writer attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.hexfile.Statistics">Statistics (class in objutils.hexfile)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_GLOBAL">STB_GLOBAL (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_GNU_UNIQUE">STB_GNU_UNIQUE (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_HIPROC">STB_HIPROC (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_LOCAL">STB_LOCAL (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_LOPROC">STB_LOPROC (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding.STB_WEAK">STB_WEAK (objutils.elf.defs.SymbolBinding attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.utils.StructureWithEnums">StructureWithEnums (class in objutils.utils)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_COMMON">STT_COMMON (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_FILE">STT_FILE (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_FUNC">STT_FUNC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_GNU_IFUNC">STT_GNU_IFUNC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_HIPROC">STT_HIPROC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_LOPROC">STT_LOPROC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_NOTYPE">STT_NOTYPE (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_OBJECT">STT_OBJECT (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_RELC">STT_RELC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_SECTION">STT_SECTION (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_SRELC">STT_SRELC (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType.STT_TLS">STT_TLS (objutils.elf.defs.SymbolType attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolVisibility.STV_DEFAULT">STV_DEFAULT (objutils.elf.defs.SymbolVisibility attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolVisibility.STV_HIDDEN">STV_HIDDEN (objutils.elf.defs.SymbolVisibility attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolVisibility.STV_INTERNAL">STV_INTERNAL (objutils.elf.defs.SymbolVisibility attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolVisibility.STV_PROTECTED">STV_PROTECTED (objutils.elf.defs.SymbolVisibility attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.SymbolAPI">SymbolAPI (class in objutils.elf)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolBinding">SymbolBinding (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolType">SymbolType (class in objutils.elf.defs)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.SymbolVisibility">SymbolVisibility (class in objutils.elf.defs)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.elf.html#objutils.elf.ElfParser.tbss_special">tbss_special() (objutils.elf.ElfParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.Section.tobytes">tobytes() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.tobytes">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Section.tolist">tolist() (objutils.Section method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.section.Section.tolist">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.FormatParser.translateFormat">translateFormat() (objutils.hexfile.FormatParser method)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.TypeInformation.type">type (objutils.section.TypeInformation attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.MachineData.type_name">type_name (objutils.elf.defs.MachineData attribute)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.defs.MachineData.type_value">type_value (objutils.elf.defs.MachineData attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.TypeInformation">TypeInformation (class in objutils.section)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.u16">u16() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.u32">u32() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.u64">u64() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.u8">u8() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.uleb">uleb() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.section.unsigned_range">unsigned_range() (in module objutils.section)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Image.update_section">update_section() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.update_section">(objutils.image.Image method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.section.NumberRange.upper">upper (objutils.section.NumberRange attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.userDefined">userDefined() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.UTCTimeStamp">UTCTimeStamp() (in module objutils.elf)</a>
+</li>
+      <li><a href="objutils.elf.html#objutils.elf.UTCTimeStampAdapter">UTCTimeStampAdapter (class in objutils.elf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.valid">valid (objutils.hexfile.BaseType attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Reader.VALID_CHARS">VALID_CHARS (objutils.ash.Reader attribute)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.etek.Reader.VALID_CHARS">(objutils.etek.Reader attribute)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Reader.VALID_CHARS">(objutils.hexfile.Reader attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.readers.PlainBinaryReader.value">value() (objutils.readers.PlainBinaryReader method)</a>
+</li>
+      <li><a href="objutils.html#objutils.logger.Logger.verbose">verbose() (objutils.logger.Logger method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.hexfile.BaseType.warn">warn() (objutils.hexfile.BaseType method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.logger.Logger.warn">(objutils.logger.Logger method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.checksums.Crc16.WIDTH">WIDTH (objutils.checksums.Crc16 attribute)</a>
+</li>
+      <li><a href="objutils.html#objutils.hexfile.Writer.word_to_bytes">word_to_bytes() (objutils.hexfile.Writer method)</a>
+</li>
+      <li><a href="objutils.html#objutils.checksums.wordSum">wordSum() (in module objutils.checksums)</a>
+</li>
+      <li><a href="objutils.html#objutils.Image.write">write() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.write">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.write">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.write">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.write_ndarray">write_ndarray() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.write_ndarray">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.write_ndarray">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.write_ndarray">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.write_numeric">write_numeric() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.write_numeric">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.write_numeric">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.write_numeric">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.Image.write_numeric_array">write_numeric_array() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.write_numeric_array">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.write_numeric_array">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.write_numeric_array">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.Image.write_string">write_string() (objutils.Image method)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.image.Image.write_string">(objutils.image.Image method)</a>
+</li>
+        <li><a href="objutils.html#objutils.Section.write_string">(objutils.Section method)</a>
+</li>
+        <li><a href="objutils.html#objutils.section.Section.write_string">(objutils.section.Section method)</a>
+</li>
+      </ul></li>
+      <li><a href="objutils.html#objutils.emon52.Codec.writelines">writelines() (objutils.emon52.Codec method)</a>
+</li>
+      <li><a href="objutils.html#objutils.ash.Writer">Writer (class in objutils.ash)</a>
+
+      <ul>
+        <li><a href="objutils.html#objutils.binfile.Writer">(class in objutils.binfile)</a>
+</li>
+        <li><a href="objutils.html#objutils.cosmac.Writer">(class in objutils.cosmac)</a>
+</li>
+        <li><a href="objutils.html#objutils.emon52.Writer">(class in objutils.emon52)</a>
+</li>
+        <li><a href="objutils.html#objutils.etek.Writer">(class in objutils.etek)</a>
+</li>
+        <li><a href="objutils.html#objutils.fpc.Writer">(class in objutils.fpc)</a>
+</li>
+        <li><a href="objutils.html#objutils.hexfile.Writer">(class in objutils.hexfile)</a>
+</li>
+        <li><a href="objutils.html#objutils.ihex.Writer">(class in objutils.ihex)</a>
+</li>
+        <li><a href="objutils.html#objutils.mostec.Writer">(class in objutils.mostec)</a>
+</li>
+        <li><a href="objutils.html#objutils.rca.Writer">(class in objutils.rca)</a>
+</li>
+        <li><a href="objutils.html#objutils.sig.Writer">(class in objutils.sig)</a>
+</li>
+        <li><a href="objutils.html#objutils.srec.Writer">(class in objutils.srec)</a>
+</li>
+        <li><a href="objutils.html#objutils.tek.Writer">(class in objutils.tek)</a>
+</li>
+        <li><a href="objutils.html#objutils.titxt.Writer">(class in objutils.titxt)</a>
+</li>
+        <li><a href="objutils.html#objutils.registry.Codec.Writer">(objutils.registry.Codec attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="objutils.html#objutils.checksums.xor">xor() (in module objutils.checksums)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

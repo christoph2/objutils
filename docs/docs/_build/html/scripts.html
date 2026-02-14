@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Scripts provided by objutils &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'scripts';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="objutils" href="modules.html" />
+    <link rel="prev" title="HOW-TOs" href="howto.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Scripts provided by objutils</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section id="scripts-provided-by-objutils">
+<h1>Scripts provided by objutils<a class="headerlink" href="#scripts-provided-by-objutils" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">objutils</span></code> contains some more or less useful scripts…</p>
+<section id="oj-elf-arm-attrs">
+<h2>oj_elf_arm_attrs<a class="headerlink" href="#oj-elf-arm-attrs" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>usage:<span class="w"> </span>oj-elf-arm-attrs<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span>elf_file
+
+Dump<span class="w"> </span><span class="s1">&#39;.ARM.attributes&#39;</span><span class="w"> </span>section.
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span>elf_file<span class="w">    </span>.elf<span class="w"> </span>file
+
+<span class="w">  </span>optional<span class="w"> </span>arguments:
+<span class="w">    </span>-h,<span class="w"> </span>--help<span class="w">  </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+</pre></div>
+</div>
+<p>You may run the following on your RaspberryPI:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>oj-elf-arm-attrs<span class="w"> </span>/usr/bin/gcc
+
+
+<span class="o">=====</span>
+<span class="nv">aeabi</span>
+<span class="o">=====</span>
+
+Name<span class="w">                           </span>Value
+Description
+-------------------------------------------------------------------------------
+Tag_CPU_name<span class="w">                   </span><span class="m">6</span>
+<span class="m">6</span>
+
+Tag_CPU_arch<span class="w">                   </span><span class="m">6</span>
+ARM<span class="w"> </span>v6
+
+Tag_ARM_ISA_use<span class="w">                </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>intended<span class="w"> </span>that<span class="w"> </span>this<span class="w"> </span>entity<span class="w"> </span>could<span class="w"> </span>use<span class="w"> </span>ARM<span class="w"> </span>instructions
+
+Tag_THUMB_ISA_use<span class="w">              </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>permitted<span class="w"> </span>this<span class="w"> </span>entity<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="m">16</span>-bit<span class="w"> </span>Thumb<span class="w"> </span>instructions<span class="w"> </span><span class="o">(</span>including<span class="w"> </span>BL<span class="o">)</span>
+
+Tag_FP_arch<span class="w">                    </span><span class="m">2</span>
+Use<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>v2<span class="w"> </span>FP<span class="w"> </span>ISA<span class="w"> </span>was<span class="w"> </span>permitted<span class="w"> </span><span class="o">(</span>implies<span class="w"> </span>use<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>v1<span class="w"> </span>FP<span class="w"> </span>ISA<span class="o">)</span>
+
+Tag_ABI_PCS_wchar_t<span class="w">            </span><span class="m">4</span>
+The<span class="w"> </span>user<span class="w"> </span>intended<span class="w"> </span>the<span class="w"> </span>size<span class="w"> </span>of<span class="w"> </span>wchar_t<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span><span class="m">4</span>
+
+Tag_ABI_FP_rounding<span class="w">            </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>permitted<span class="w"> </span>this<span class="w"> </span>code<span class="w"> </span>to<span class="w"> </span>choose<span class="w"> </span>the<span class="w"> </span>IEEE<span class="w"> </span><span class="m">754</span><span class="w"> </span>rounding<span class="w"> </span>mode<span class="w"> </span>at<span class="w"> </span>run<span class="w"> </span><span class="nb">time</span>
+
+Tag_ABI_FP_denormal<span class="w">            </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>permitted<span class="w"> </span>this<span class="w"> </span>code<span class="w"> </span>to<span class="w"> </span>choose<span class="w"> </span>the<span class="w"> </span>IEEE<span class="w"> </span><span class="m">754</span><span class="w"> </span>rounding<span class="w"> </span>mode<span class="w"> </span>at<span class="w"> </span>run<span class="w"> </span><span class="nb">time</span>
+
+Tag_ABI_FP_exceptions<span class="w">          </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>permitted<span class="w"> </span>this<span class="w"> </span>code<span class="w"> </span>to<span class="w"> </span>check<span class="w"> </span>the<span class="w"> </span>IEEE<span class="w"> </span><span class="m">754</span><span class="w"> </span>inexact<span class="w"> </span>exception
+
+Tag_ABI_FP_number_model<span class="w">        </span><span class="m">3</span>
+The<span class="w"> </span>user<span class="w"> </span>permitted<span class="w"> </span>this<span class="w"> </span>code<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span>all<span class="w"> </span>the<span class="w"> </span>IEEE<span class="w"> </span><span class="m">754</span>-defined<span class="w"> </span>FP<span class="w"> </span>encodings
+
+Tag_ABI_align_needed<span class="w">           </span><span class="m">1</span>
+Code<span class="w"> </span>was<span class="w"> </span>permitted<span class="w"> </span>to<span class="w"> </span>depend<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span><span class="m">8</span>-byte<span class="w"> </span>alignment<span class="w"> </span>of<span class="w"> </span><span class="m">8</span>-byte<span class="w"> </span>data<span class="w"> </span>items
+
+Tag_ABI_align8_preserved<span class="w">       </span><span class="m">1</span>
+Code<span class="w"> </span>was<span class="w"> </span>required<span class="w"> </span>to<span class="w"> </span>preserve<span class="w"> </span><span class="m">8</span>-byte<span class="w"> </span>alignment<span class="w"> </span>of<span class="w"> </span><span class="m">8</span>-byte<span class="w"> </span>data<span class="w"> </span>objects
+
+Tag_ABI_enum_size<span class="w">              </span><span class="m">2</span>
+The<span class="w"> </span>user<span class="w"> </span>intended<span class="w"> </span>Enum<span class="w"> </span>containers<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span><span class="m">32</span>-bit
+
+Tag_ABI_VFP_args<span class="w">               </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>intended<span class="w"> </span>FP<span class="w"> </span>parameter/result<span class="w"> </span>passing<span class="w"> </span>to<span class="w"> </span>conform<span class="w"> </span>to<span class="w"> </span>AAPCS,<span class="w"> </span>VFP<span class="w"> </span>variant
+
+Tag_CPU_unaligned_access<span class="w">       </span><span class="m">1</span>
+The<span class="w"> </span>user<span class="w"> </span>intended<span class="w"> </span>that<span class="w"> </span>this<span class="w"> </span>entity<span class="w"> </span>might<span class="w"> </span>make<span class="w"> </span>v6-style<span class="w"> </span>unaligned<span class="w"> </span>data<span class="w"> </span>accesses
+</pre></div>
+</div>
+</section>
+<section id="oj-elf-extract">
+<h2>oj_elf_extract<a class="headerlink" href="#oj-elf-extract" title="Link to this heading">#</a></h2>
+<p>Extract sections from <em>ELF</em> suitible for flashing;</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>Extract<span class="w"> </span>sections<span class="w"> </span>contributing<span class="w"> </span>to<span class="w"> </span>program<span class="w"> </span>image,<span class="w"> </span>e.g.<span class="w"> </span><span class="k">for</span><span class="w"> </span>flash<span class="w"> </span>programming
+applications.
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span>elf_file<span class="w">              </span>ELF<span class="w"> </span>file
+<span class="w">  </span>output_file_name<span class="w">      </span>Output<span class="w"> </span>filename.
+
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-j,<span class="w"> </span>--join<span class="w">            </span>Try<span class="w"> </span>to<span class="w"> </span>make<span class="w"> </span>continuous<span class="w"> </span>sections<span class="w"> </span><span class="o">(</span>merge<span class="w"> </span>adjacent<span class="w"> </span>ranges<span class="o">)</span>
+<span class="w">  </span>-t<span class="w"> </span><span class="o">{</span>ihex,shf,srec,titxt<span class="o">}</span>,<span class="w"> </span>--file-type<span class="w"> </span><span class="o">{</span>ihex,shf,srec,titxt<span class="o">}</span>
+<span class="w">                        </span>Type<span class="w"> </span>of<span class="w"> </span>output<span class="w"> </span>HEX<span class="w"> </span>file<span class="w"> </span><span class="o">(</span>default:<span class="w"> </span>ihex<span class="o">)</span>
+<span class="w">  </span>-e<span class="w"> </span>EXCLUDE,<span class="w"> </span>--exclude_pattern<span class="w"> </span>EXCLUDE
+<span class="w">                        </span>Exclude<span class="w"> </span>sections<span class="w"> </span>matching<span class="w"> </span>a<span class="w"> </span>Python<span class="w"> </span>regex
+<span class="w">  </span>-i<span class="w"> </span>INCLUDE,<span class="w"> </span>--include_pattern<span class="w"> </span>INCLUDE
+<span class="w">                        </span>Include<span class="w"> </span>only<span class="w"> </span>sections<span class="w"> </span>matching<span class="w"> </span>a<span class="w"> </span>Python<span class="w"> </span>regex
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>oj-elf-extract<span class="w"> </span>sample_proj.elf<span class="w"> </span>sample_proj.srec<span class="w"> </span>-t<span class="w"> </span>srec
+
+Extracting<span class="w"> </span>from...
+
+Section<span class="w">                   </span>Address<span class="w">    </span>Length
+---------------------------------------------
+.text<span class="w">                     </span>0x00000000<span class="w"> </span><span class="m">46652</span>
+.rodata<span class="w">                   </span>0x0000b640<span class="w"> </span><span class="m">2328</span>
+.data<span class="w">                     </span>0x40002000<span class="w"> </span><span class="m">1996</span>
+.sdata<span class="w">                    </span>0x400027cc<span class="w"> </span><span class="m">16</span>
+.eh_frame<span class="w">                 </span>0x400027dc<span class="w"> </span><span class="m">92</span>
+---------------------------------------------
+HEX<span class="w"> </span>image<span class="w"> </span>written<span class="w"> </span>to:<span class="w"> </span><span class="s1">&#39;sample_proj.srec&#39;</span><span class="w"> </span><span class="o">[</span><span class="m">51084</span><span class="w"> </span>total<span class="w"> </span>bytes<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="oj-elf-info">
+<h2>oj_elf_info<a class="headerlink" href="#oj-elf-info" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>usage:<span class="w"> </span>oj-elf-info<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-k<span class="o">]</span><span class="w"> </span><span class="o">[</span>-l<span class="w"> </span>LOGLEVEL<span class="o">]</span><span class="w"> </span><span class="o">[</span>-S<span class="o">]</span><span class="w"> </span><span class="o">[</span>-u<span class="o">]</span><span class="w"> </span>elf_file
+
+Display<span class="w"> </span>informations<span class="w"> </span>about<span class="w"> </span>ELF<span class="w"> </span>files.
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span>elf_file<span class="w">              </span>ELF<span class="w"> </span>file
+
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-k<span class="w">                    </span>keep<span class="w"> </span>directory<span class="p">;</span><span class="w"> </span>otherwise<span class="w"> </span>create<span class="w"> </span>db<span class="w"> </span><span class="k">in</span><span class="w"> </span>current<span class="w"> </span>directory
+<span class="w">  </span>-l<span class="w"> </span>LOGLEVEL<span class="w">           </span>loglevel<span class="w"> </span><span class="o">[</span>warn<span class="w"> </span><span class="p">|</span><span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>error<span class="w"> </span><span class="p">|</span><span class="w"> </span>debug<span class="o">]</span>
+<span class="w">  </span>-S,<span class="w"> </span>--sections,<span class="w"> </span>--section-headers
+<span class="w">                        </span>Display<span class="w"> </span>the<span class="w"> </span>sections<span class="err">&#39;</span><span class="w"> </span>headers.
+<span class="w">  </span>-u<span class="w">                    </span>Generate<span class="w"> </span>UTF-8<span class="w"> </span>encoded<span class="w"> </span>output<span class="w"> </span><span class="o">(</span>otherwise<span class="w"> </span>Latin-1<span class="o">)</span>.
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>oj-elf-info<span class="w"> </span>build/app.elf
+</pre></div>
+</div>
+<p>This prints ELF class, type, machine, byte-order, OS/ABI, followed by a sections table and common notes/comments when present.</p>
+</section>
+<section id="oj-elf-syms">
+<h2>oj_elf_syms<a class="headerlink" href="#oj-elf-syms" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>usage:<span class="w"> </span>oj-elf-syms<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-s<span class="w"> </span>SECTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>-p<span class="w"> </span>PATTERN<span class="o">]</span><span class="w"> </span><span class="o">[</span>-t<span class="w"> </span>TYPES<span class="o">]</span>
+<span class="w">                   </span><span class="o">[</span>-a<span class="w"> </span>ACCESS<span class="o">]</span><span class="w"> </span><span class="o">[</span>-b<span class="w"> </span>BINDINGS<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o<span class="w"> </span><span class="o">{</span>N,V<span class="o">}]</span><span class="w"> </span>elf_file
+
+Display<span class="w"> </span>ELF<span class="w"> </span>symbols.
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span>elf_file<span class="w">              </span>ELF<span class="w"> </span>file
+
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-s<span class="w"> </span>SECTIONS,<span class="w"> </span>--sections<span class="w"> </span>SECTIONS
+<span class="w">                        </span>Use<span class="w"> </span>only<span class="w"> </span>symbols<span class="w"> </span>from<span class="w"> </span>listed<span class="w"> </span>sections<span class="w"> </span><span class="o">(</span>comma-separated<span class="o">)</span>
+<span class="w">  </span>-p<span class="w"> </span>PATTERN,<span class="w"> </span>--pattern<span class="w"> </span>PATTERN
+<span class="w">                        </span>Only<span class="w"> </span>display<span class="w"> </span>symbols<span class="w"> </span>matching<span class="w"> </span>a<span class="w"> </span><span class="o">(</span>Python<span class="o">)</span><span class="w"> </span>regex
+<span class="w">  </span>-t<span class="w"> </span>TYPES,<span class="w"> </span>--types<span class="w"> </span>TYPES
+<span class="w">                        </span>Use<span class="w"> </span>only<span class="w"> </span>symbols<span class="w"> </span>with<span class="w"> </span>listed<span class="w"> </span>types<span class="w"> </span><span class="o">(</span>comma-separated<span class="o">)</span>
+<span class="w">  </span>-a<span class="w"> </span>ACCESS,<span class="w"> </span>--access<span class="w"> </span>ACCESS
+<span class="w">                        </span>Filter<span class="w"> </span>by<span class="w"> </span>access<span class="w"> </span>flags:<span class="w"> </span>A<span class="w"> </span><span class="o">(</span>allocate<span class="o">)</span>,<span class="w"> </span>W<span class="w"> </span><span class="o">(</span>write<span class="o">)</span>,<span class="w"> </span>X<span class="w"> </span><span class="o">(</span>execute<span class="o">)</span>
+<span class="w">  </span>-b<span class="w"> </span>BINDINGS,<span class="w"> </span>--bindings<span class="w"> </span>BINDINGS
+<span class="w">                        </span>Use<span class="w"> </span>only<span class="w"> </span>symbols<span class="w"> </span>with<span class="w"> </span>listed<span class="w"> </span>bindings<span class="w"> </span><span class="o">(</span>comma-separated<span class="o">)</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="o">{</span>N,V<span class="o">}</span>,<span class="w"> </span>--order-by<span class="w"> </span><span class="o">{</span>N,V<span class="o">}</span>
+<span class="w">                        </span>Order<span class="w"> </span>symbols<span class="w"> </span>by<span class="w"> </span>Name<span class="w"> </span>or<span class="w"> </span>Value<span class="w"> </span><span class="o">(</span>default:<span class="w"> </span>V<span class="o">)</span>
+</pre></div>
+</div>
+<p>Examples:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># All symbols ordered by address</span>
+oj-elf-syms<span class="w"> </span>build/app.elf<span class="w"> </span>-o<span class="w"> </span>V
+
+<span class="c1"># Only functions from .text, ordered by name</span>
+oj-elf-syms<span class="w"> </span>build/app.elf<span class="w"> </span>-s<span class="w"> </span>.text<span class="w"> </span>-t<span class="w"> </span>FUNC<span class="w"> </span>-o<span class="w"> </span>N
+
+<span class="c1"># Filter by regex and show only GLOBAL bindings that are executable</span>
+oj-elf-syms<span class="w"> </span>build/app.elf<span class="w"> </span>-p<span class="w"> </span><span class="s1">&#39;^(reset|_?start)$&#39;</span><span class="w"> </span>-b<span class="w"> </span>GLOBAL<span class="w"> </span>-a<span class="w"> </span>X
+</pre></div>
+</div>
+</section>
+<section id="oj-hex-info">
+<h2>oj_hex_info<a class="headerlink" href="#oj-hex-info" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>usage:<span class="w"> </span>oj-hex-info<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-d<span class="o">]</span>
+<span class="w">                  </span><span class="o">{</span>ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt<span class="o">}</span>
+<span class="w">                  </span>hex_file
+
+Displays<span class="w"> </span>informations<span class="w"> </span>about<span class="w"> </span>HEX<span class="w"> </span>files.
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span><span class="o">{</span>ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt<span class="o">}</span>
+<span class="w">                        </span>file<span class="w"> </span><span class="nb">type</span>
+<span class="w">  </span>hex_file<span class="w">              </span>HEX<span class="w"> </span>file
+
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-d,<span class="w"> </span>--dump<span class="w">            </span>hexdump<span class="w"> </span>contents
+</pre></div>
+</div>
+<p>Filetype is a required argument (no auto-probing yet).</p>
+<p>Run it as follows:</p>
+<p>Without any optional arguments just the addresses and lengths of the contained sections are shown:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>oj_hex_info<span class="w"> </span>srec<span class="w"> </span>sample.srec
+
+--------
+
+Num<span class="w">   </span>Address<span class="w">    </span>Length
+-------------------------------------------------------------------------------
+<span class="m">000</span><span class="w">   </span>0x00001000<span class="w"> </span><span class="m">16</span>
+<span class="m">001</span><span class="w">   </span>0x00002000<span class="w"> </span><span class="m">16</span>
+-------------------------------------------------------------------------------
+<span class="w">                 </span><span class="m">32</span><span class="w"> </span>total<span class="w"> </span>bytes
+</pre></div>
+</div>
+<p>If you also want to see the contents, add <em>-d</em> option:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>oj_hex_info<span class="w"> </span>srec<span class="w"> </span>sample.srec<span class="w"> </span>-d
+
+Sections
+--------
+
+Num<span class="w">   </span>Address<span class="w">    </span>Length
+-------------------------------------------------------------------------------
+<span class="m">000</span><span class="w">   </span>0x00001000<span class="w"> </span><span class="m">16</span>
+<span class="m">001</span><span class="w">   </span>0x00002000<span class="w"> </span><span class="m">16</span>
+-------------------------------------------------------------------------------
+<span class="w">                 </span><span class="m">32</span><span class="w"> </span>total<span class="w"> </span>bytes
+
+Section<span class="w"> </span><span class="c1">#0000</span>
+-------------
+<span class="m">00001000</span><span class="w">  </span><span class="m">48</span><span class="w"> </span><span class="m">65</span><span class="w"> </span>6c<span class="w"> </span>6c<span class="w"> </span>6f<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="m">48</span><span class="w"> </span><span class="m">45</span><span class="w"> </span><span class="m">58</span><span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="m">77</span><span class="w"> </span>6f<span class="w"> </span><span class="m">72</span><span class="w"> </span>6c<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">21</span><span class="w">  </span><span class="p">|</span>Hello<span class="w"> </span>HEX<span class="w"> </span>world!<span class="p">|</span>
+---------------
+<span class="w">       </span><span class="m">16</span><span class="w"> </span>bytes
+---------------
+
+Section<span class="w"> </span><span class="c1">#0001</span>
+-------------
+<span class="m">00002000</span><span class="w">  </span><span class="m">01</span><span class="w"> </span><span class="m">02</span><span class="w"> </span><span class="m">03</span><span class="w"> </span><span class="m">04</span><span class="w"> </span><span class="m">05</span><span class="w"> </span><span class="m">06</span><span class="w"> </span><span class="m">07</span><span class="w"> </span><span class="m">08</span><span class="w"> </span><span class="m">09</span><span class="w"> </span>0a<span class="w"> </span>0b<span class="w"> </span>0c<span class="w"> </span>0d<span class="w"> </span>0e<span class="w"> </span>0f<span class="w"> </span><span class="m">10</span><span class="w">  </span><span class="p">|</span>................<span class="p">|</span>
+---------------
+<span class="w">       </span><span class="m">16</span><span class="w"> </span>bytes
+---------------
+</pre></div>
+</div>
+</section>
+<section id="arduino-build-artifacts">
+<h2>arduino_build_artifacts<a class="headerlink" href="#arduino-build-artifacts" title="Link to this heading">#</a></h2>
+<p>Locate Arduino build artifacts (ELF/HEX/EEP/MAP) produced by the Arduino IDE for a given sketch.
+You can pass either the path to a .ino file or the sketch directory.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>usage:<span class="w"> </span>arduino-build-artifacts<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>--only<span class="w"> </span><span class="o">{</span>DIRECTORY,ELF,HEX,EEP,MAP<span class="o">}</span><span class="w"> </span>...<span class="o">]</span>
+<span class="w">                               </span><span class="o">[</span>--as-paths<span class="o">]</span><span class="w"> </span><span class="o">[</span>--missing-ok<span class="o">]</span><span class="w"> </span><span class="o">[</span>--quiet<span class="o">]</span>
+<span class="w">                               </span>sketch
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span>sketch<span class="w">                </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>sketch<span class="w"> </span>directory<span class="w"> </span>or<span class="w"> </span>.ino<span class="w"> </span>file
+
+options:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>--only<span class="w"> </span><span class="o">{</span>DIRECTORY,ELF,HEX,EEP,MAP<span class="o">}</span><span class="w"> </span>...
+<span class="w">                        </span>Limit<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>specific<span class="w"> </span>artifact<span class="w"> </span>types<span class="w"> </span><span class="o">(</span>may<span class="w"> </span>be<span class="w"> </span>given<span class="w"> </span>multiple<span class="w"> </span><span class="nb">times</span><span class="o">)</span>
+<span class="w">  </span>--as-paths<span class="w">            </span>Print<span class="w"> </span>only<span class="w"> </span>paths<span class="w"> </span><span class="o">(</span>one<span class="w"> </span>per<span class="w"> </span>line<span class="o">)</span><span class="w"> </span>without<span class="w"> </span>labels
+<span class="w">  </span>--missing-ok<span class="w">          </span>Do<span class="w"> </span>not<span class="w"> </span>treat<span class="w"> </span>missing<span class="w"> </span>artifacts<span class="w"> </span>as<span class="w"> </span>an<span class="w"> </span>error<span class="p">;</span><span class="w"> </span>just<span class="w"> </span>omit<span class="w"> </span>them<span class="w"> </span>from<span class="w"> </span>output
+<span class="w">  </span>-q,<span class="w"> </span>--quiet<span class="w">           </span>Suppress<span class="w"> </span>non-error<span class="w"> </span>output
+</pre></div>
+</div>
+<p>Examples:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show all available artifacts with labels</span>
+$<span class="w"> </span>arduino-build-artifacts<span class="w"> </span>MySketch/MySketch.ino
+DIRECTORY:<span class="w"> </span>C:<span class="se">\\</span>Users<span class="se">\\</span>&lt;you&gt;<span class="se">\\</span>AppData<span class="se">\\</span>Local<span class="se">\\</span>arduino<span class="se">\\</span>sketches<span class="se">\\</span>ABCD1234...
+ELF<span class="w">      </span>:<span class="w"> </span>C:<span class="se">\\</span>...<span class="se">\\</span>MySketch.ino.elf
+HEX<span class="w">      </span>:<span class="w"> </span>C:<span class="se">\\</span>...<span class="se">\\</span>MySketch.ino.hex
+MAP<span class="w">      </span>:<span class="w"> </span>C:<span class="se">\\</span>...<span class="se">\\</span>MySketch.ino.map
+
+<span class="c1"># Print only the ELF and HEX paths, one per line</span>
+$<span class="w"> </span>arduino-build-artifacts<span class="w"> </span>MySketch<span class="w"> </span>--only<span class="w"> </span>ELF<span class="w"> </span>HEX<span class="w"> </span>--as-paths
+C:<span class="se">\\</span>...<span class="se">\\</span>MySketch.ino.elf
+C:<span class="se">\\</span>...<span class="se">\\</span>MySketch.ino.hex
+
+<span class="c1"># Ignore missing artifacts (e.g., no EEP generated)</span>
+$<span class="w"> </span>arduino-build-artifacts<span class="w"> </span>MySketch<span class="w"> </span>--only<span class="w"> </span>ELF<span class="w"> </span>EEP<span class="w"> </span>--missing-ok
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="howto.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">HOW-TOs</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="modules.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">objutils</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oj-elf-arm-attrs">oj_elf_arm_attrs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oj-elf-extract">oj_elf_extract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oj-elf-info">oj_elf_info</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oj-elf-syms">oj_elf_syms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oj-hex-info">oj_hex_info</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arduino-build-artifacts">arduino_build_artifacts</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/scripts.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

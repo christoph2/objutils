@@ -1,0 +1,1495 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>objutils.elf.defs &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/objutils/elf/defs';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../../objutils.html" class="nav-link">objutils</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../elf.html" class="nav-link">objutils.elf</a></li>
+
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils.elf.defs</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <h1>Source code for objutils.elf.defs</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    objutils - Object file library for Python.</span>
+
+<span class="s2">   (C) 2010-2024 by Christoph Schueler &lt;cpu12.gems@googlemail.com&gt;</span>
+
+<span class="s2">   All Rights Reserved</span>
+
+<span class="s2">  This program is free software; you can redistribute it and/or modify</span>
+<span class="s2">  it under the terms of the GNU General Public License as published by</span>
+<span class="s2">  the Free Software Foundation; either version 2 of the License, or</span>
+<span class="s2">  (at your option) any later version.</span>
+
+<span class="s2">  This program is distributed in the hope that it will be useful,</span>
+<span class="s2">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="s2">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="s2">  GNU General Public License for more details.</span>
+
+<span class="s2">  You should have received a copy of the GNU General Public License along</span>
+<span class="s2">  with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="s2">  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+
+
+<span class="n">ELF_MAGIC</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x7f</span><span class="s2">ELF&quot;</span>
+
+<span class="n">EI_NIDENT</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># Size of e_ident[].</span>
+<span class="n">HDR_FMT32</span> <span class="o">=</span> <span class="s2">&quot;HHIIIIIHHHHHH&quot;</span>
+<span class="n">HDR_FMT64</span> <span class="o">=</span> <span class="s2">&quot;HHIQQQIHHHHHH&quot;</span>
+
+
+<span class="n">Elf32_Ehdr</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s2">&quot;Elf32_Ehdr&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;e_type e_machine e_version e_entry e_phoff e_shoff e_flags e_ehsize</span>
+<span class="sd">                        e_phentsize e_phnum e_shentsize e_shnum e_shstrndx&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="ELFType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ELFType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELFType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ET_NONE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="s2">&quot; No file type&quot;</span>
+    <span class="n">ET_REL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="s2">&quot; Relocatable file&quot;</span>
+    <span class="n">ET_EXEC</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="s2">&quot; Executable file&quot;</span>
+    <span class="n">ET_DYN</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="s2">&quot; Shared object file&quot;</span>
+    <span class="n">ET_CORE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="s2">&quot; Core file&quot;</span>
+    <span class="n">ET_NUM</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="s2">&quot;Number of defined types&quot;</span>
+    <span class="n">ET_LOOS</span> <span class="o">=</span> <span class="mh">0xFE00</span>
+    <span class="s2">&quot;Operating system-specific&quot;</span>
+    <span class="n">ET_HIOS</span> <span class="o">=</span> <span class="mh">0xFEFF</span>
+    <span class="s2">&quot;Operating system-specific&quot;</span>
+    <span class="n">ET_LOPROC</span> <span class="o">=</span> <span class="mh">0xFF00</span>
+    <span class="s2">&quot; Processor-specific&quot;</span>
+    <span class="n">ET_HIPROC</span> <span class="o">=</span> <span class="mh">0xFFFF</span>
+    <span class="s2">&quot;Processor-specific&quot;</span></div>
+
+
+
+<span class="n">ELF_TYPE_NAMES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFType</span><span class="o">.</span><span class="n">ET_NONE</span><span class="p">:</span> <span class="s2">&quot;No file type&quot;</span><span class="p">,</span>
+    <span class="n">ELFType</span><span class="o">.</span><span class="n">ET_REL</span><span class="p">:</span> <span class="s2">&quot;Relocatable file&quot;</span><span class="p">,</span>
+    <span class="n">ELFType</span><span class="o">.</span><span class="n">ET_EXEC</span><span class="p">:</span> <span class="s2">&quot;Executable file&quot;</span><span class="p">,</span>
+    <span class="n">ELFType</span><span class="o">.</span><span class="n">ET_DYN</span><span class="p">:</span> <span class="s2">&quot;Shared object file&quot;</span><span class="p">,</span>
+    <span class="n">ELFType</span><span class="o">.</span><span class="n">ET_CORE</span><span class="p">:</span> <span class="s2">&quot;Core file&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ELFMachineType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ELFMachineType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELFMachineType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">EM_NONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># No machine.</span>
+    <span class="n">EM_M32</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># AT&amp;T WE 32100.</span>
+    <span class="n">EM_SPARC</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># SPARC.</span>
+    <span class="n">EM_386</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Intel 80386.</span>
+    <span class="n">EM_68K</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Motorola 68000.</span>
+    <span class="n">EM_88K</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Motorola 88000.</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RESERVED 6 Reserved for future use</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">EM_860</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Intel 80860.</span>
+    <span class="n">EM_MIPS</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># MIPS I Architecture.</span>
+    <span class="n">EM_S370</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># IBM System/370 Processor.</span>
+    <span class="n">EM_MIPS_RS3_LE</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># MIPS RS3000 Little-endian.</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RESERVED 11-14 Reserved for future use</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">EM_PARISC</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># Hewlett-Packard PA-RISC.</span>
+    <span class="n">RESERVED</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># Reserved for future use.</span>
+    <span class="n">EM_VPP500</span> <span class="o">=</span> <span class="mi">17</span>  <span class="c1"># Fujitsu VPP500.</span>
+    <span class="n">EM_SPARC32PLUS</span> <span class="o">=</span> <span class="mi">18</span>  <span class="c1"># Enhanced instruction set SPARC.</span>
+    <span class="n">EM_960</span> <span class="o">=</span> <span class="mi">19</span>  <span class="c1"># Intel 80960.</span>
+    <span class="n">EM_PPC</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># PowerPC.</span>
+    <span class="n">EM_PPC64</span> <span class="o">=</span> <span class="mi">21</span>  <span class="c1"># 64-bit PowerPC.</span>
+    <span class="n">EM_S390</span> <span class="o">=</span> <span class="mi">22</span>  <span class="c1"># IBM S390.</span>
+    <span class="n">EM_SPU</span> <span class="o">=</span> <span class="mi">23</span>  <span class="c1"># Sony/Toshiba/IBM SPU.</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RESERVED 24-35 Reserved for future use</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">EM_V800</span> <span class="o">=</span> <span class="mi">36</span>  <span class="c1"># NEC V800.</span>
+    <span class="n">EM_FR20</span> <span class="o">=</span> <span class="mi">37</span>  <span class="c1"># Fujitsu FR20.</span>
+    <span class="n">EM_RH32</span> <span class="o">=</span> <span class="mi">38</span>  <span class="c1"># TRW RH-32.</span>
+    <span class="n">EM_RCE</span> <span class="o">=</span> <span class="mi">39</span>  <span class="c1"># Motorola RCE.</span>
+    <span class="n">EM_ARM</span> <span class="o">=</span> <span class="mi">40</span>  <span class="c1"># Advanced RISC Machines ARM.</span>
+    <span class="n">EM_ALPHA</span> <span class="o">=</span> <span class="mi">41</span>  <span class="c1"># Digital Alpha.</span>
+    <span class="n">EM_SH</span> <span class="o">=</span> <span class="mi">42</span>  <span class="c1"># Hitachi SH.</span>
+    <span class="n">EM_SPARCV9</span> <span class="o">=</span> <span class="mi">43</span>  <span class="c1"># SPARC Version 9.</span>
+    <span class="n">EM_TRICORE</span> <span class="o">=</span> <span class="mi">44</span>  <span class="c1"># Siemens Tricore embedded processor.</span>
+    <span class="n">EM_ARC</span> <span class="o">=</span> <span class="mi">45</span>  <span class="c1"># Argonaut RISC Core, Argonaut Technologies Inc.</span>
+    <span class="n">EM_H8_300</span> <span class="o">=</span> <span class="mi">46</span>  <span class="c1"># Hitachi H8/300.</span>
+    <span class="n">EM_H8_300H</span> <span class="o">=</span> <span class="mi">47</span>  <span class="c1"># Hitachi H8/300H.</span>
+    <span class="n">EM_H8S</span> <span class="o">=</span> <span class="mi">48</span>  <span class="c1"># Hitachi H8S.</span>
+    <span class="n">EM_H8_500</span> <span class="o">=</span> <span class="mi">49</span>  <span class="c1"># Hitachi H8/500.</span>
+    <span class="n">EM_IA_64</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># Intel IA-64 processor architecture.</span>
+    <span class="n">EM_MIPS_X</span> <span class="o">=</span> <span class="mi">51</span>  <span class="c1"># Stanford MIPS-X.</span>
+    <span class="n">EM_COLDFIRE</span> <span class="o">=</span> <span class="mi">52</span>  <span class="c1"># Motorola ColdFire.</span>
+    <span class="n">EM_68HC12</span> <span class="o">=</span> <span class="mi">53</span>  <span class="c1"># Motorola M68HC12.    # could also be 0x4D12 (s. HC12EABI)</span>
+    <span class="n">EM_MMA</span> <span class="o">=</span> <span class="mi">54</span>  <span class="c1"># Fujitsu MMA Multimedia Accelerator.</span>
+    <span class="n">EM_PCP</span> <span class="o">=</span> <span class="mi">55</span>  <span class="c1"># Siemens PCP.</span>
+    <span class="n">EM_NCPU</span> <span class="o">=</span> <span class="mi">56</span>  <span class="c1"># Sony nCPU embedded RISC processor.</span>
+    <span class="n">EM_NDR1</span> <span class="o">=</span> <span class="mi">57</span>  <span class="c1"># Denso NDR1 microprocessor.</span>
+    <span class="n">EM_STARCORE</span> <span class="o">=</span> <span class="mi">58</span>  <span class="c1"># Motorola Star*Core processor.</span>
+    <span class="n">EM_ME16</span> <span class="o">=</span> <span class="mi">59</span>  <span class="c1"># Toyota ME16 processor.</span>
+    <span class="n">EM_ST100</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># STMicroelectronics ST100 processor.</span>
+    <span class="n">EM_TINYJ</span> <span class="o">=</span> <span class="mi">61</span>  <span class="c1"># Advanced Logic Corp. TinyJ embedded processor family.</span>
+    <span class="n">EM_X86_64</span> <span class="o">=</span> <span class="mi">62</span>  <span class="c1"># Advanced Micro Devices X86-64.</span>
+    <span class="n">EM_PDSP</span> <span class="o">=</span> <span class="mi">63</span>  <span class="c1"># Sony DSP Processor.</span>
+    <span class="n">EM_PDP10</span> <span class="o">=</span> <span class="mi">64</span>  <span class="c1"># DEC PDP-10</span>
+    <span class="n">EM_PDP11</span> <span class="o">=</span> <span class="mi">65</span>  <span class="c1"># DEC PDP-11</span>
+    <span class="n">EM_FX66</span> <span class="o">=</span> <span class="mi">66</span>  <span class="c1"># Siemens FX66 microcontroller.</span>
+    <span class="n">EM_ST9PLUS</span> <span class="o">=</span> <span class="mi">67</span>  <span class="c1"># STMicroelectronics ST9+ 8/16 bit microcontroller.</span>
+    <span class="n">EM_ST7</span> <span class="o">=</span> <span class="mi">68</span>  <span class="c1"># STMicroelectronics ST7 8-bit microcontroller.</span>
+    <span class="n">EM_68HC16</span> <span class="o">=</span> <span class="mi">69</span>  <span class="c1"># Motorola MC68HC16 Microcontroller.</span>
+    <span class="n">EM_68HC11</span> <span class="o">=</span> <span class="mi">70</span>  <span class="c1"># Motorola MC68HC11 Microcontroller.</span>
+    <span class="n">EM_68HC08</span> <span class="o">=</span> <span class="mi">71</span>  <span class="c1"># Motorola MC68HC08 Microcontroller.</span>
+    <span class="n">EM_68HC05</span> <span class="o">=</span> <span class="mi">72</span>  <span class="c1"># Motorola MC68HC05 Microcontroller.</span>
+    <span class="n">EM_SVX</span> <span class="o">=</span> <span class="mi">73</span>  <span class="c1"># Silicon Graphics SVx.</span>
+    <span class="n">EM_ST19</span> <span class="o">=</span> <span class="mi">74</span>  <span class="c1"># STMicroelectronics ST19 8-bit microcontroller.</span>
+    <span class="n">EM_VAX</span> <span class="o">=</span> <span class="mi">75</span>  <span class="c1"># Digital VAX.</span>
+    <span class="n">EM_CRIS</span> <span class="o">=</span> <span class="mi">76</span>  <span class="c1"># Axis Communications 32-bit embedded processor.</span>
+    <span class="n">EM_JAVELIN</span> <span class="o">=</span> <span class="mi">77</span>  <span class="c1"># Infineon Technologies 32-bit embedded processor.</span>
+    <span class="n">EM_FIREPATH</span> <span class="o">=</span> <span class="mi">78</span>  <span class="c1"># Element 14 64-bit DSP Processor.</span>
+    <span class="n">EM_ZSP</span> <span class="o">=</span> <span class="mi">79</span>  <span class="c1"># LSI Logic 16-bit DSP Processor.</span>
+    <span class="n">EM_MMIX</span> <span class="o">=</span> <span class="mi">80</span>  <span class="c1"># Donald Knuth&#39;s educational 64-bit processor.</span>
+    <span class="n">EM_HUANY</span> <span class="o">=</span> <span class="mi">81</span>  <span class="c1"># Harvard University machine-independent object files .</span>
+    <span class="n">EM_PRISM</span> <span class="o">=</span> <span class="mi">82</span>  <span class="c1"># SiTera Prism.</span>
+    <span class="n">EM_AVR</span> <span class="o">=</span> <span class="mi">83</span>  <span class="c1"># Atmel AVR 8-bit microcontroller.</span>
+    <span class="n">EM_FR30</span> <span class="o">=</span> <span class="mi">84</span>  <span class="c1"># Fujitsu FR30.</span>
+    <span class="n">EM_D10V</span> <span class="o">=</span> <span class="mi">85</span>  <span class="c1"># Mitsubishi D10V.</span>
+    <span class="n">EM_D30V</span> <span class="o">=</span> <span class="mi">86</span>  <span class="c1"># Mitsubishi D30V.</span>
+    <span class="n">EM_V850</span> <span class="o">=</span> <span class="mi">87</span>  <span class="c1"># NEC v850.</span>
+    <span class="n">EM_M32R</span> <span class="o">=</span> <span class="mi">88</span>  <span class="c1"># Mitsubishi M32R.</span>
+    <span class="n">EM_MN10300</span> <span class="o">=</span> <span class="mi">89</span>  <span class="c1"># Matsushita MN10300.</span>
+    <span class="n">EM_MN10200</span> <span class="o">=</span> <span class="mi">90</span>  <span class="c1"># Matsushita MN10200.</span>
+    <span class="n">EM_PJ</span> <span class="o">=</span> <span class="mi">91</span>  <span class="c1"># picoJava.</span>
+    <span class="n">EM_OPENRISC</span> <span class="o">=</span> <span class="mi">92</span>  <span class="c1"># OpenRISC 32-bit embedded processor.</span>
+    <span class="n">EM_ARC_A5</span> <span class="o">=</span> <span class="mi">93</span>  <span class="c1"># ARC Cores Tangent-A5.</span>
+    <span class="n">EM_XTENSA</span> <span class="o">=</span> <span class="mi">94</span>  <span class="c1"># Tensilica Xtensa Architecture.</span>
+    <span class="n">EM_VIDEOCORE</span> <span class="o">=</span> <span class="mi">95</span>  <span class="c1"># Alphamosaic VideoCore processor.</span>
+    <span class="n">EM_TMM_GPP</span> <span class="o">=</span> <span class="mi">96</span>  <span class="c1"># Thompson Multimedia General Purpose Processor.</span>
+    <span class="n">EM_NS32K</span> <span class="o">=</span> <span class="mi">97</span>  <span class="c1"># National Semiconductor 32000 series.</span>
+    <span class="n">EM_TPC</span> <span class="o">=</span> <span class="mi">98</span>  <span class="c1"># Tenor Network TPC processor.</span>
+    <span class="n">EM_SNP1K</span> <span class="o">=</span> <span class="mi">99</span>  <span class="c1"># Trebia SNP 1000 processor.</span>
+    <span class="n">EM_ST200</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># STMicroelectronics ST200 microcontroller.</span>
+    <span class="n">EM_IP2K</span> <span class="o">=</span> <span class="mi">101</span>  <span class="c1"># Ubicom IP2022 micro controller.</span>
+    <span class="n">EM_MAX</span> <span class="o">=</span> <span class="mi">102</span>  <span class="c1"># MAX Processor.</span>
+    <span class="n">EM_CR</span> <span class="o">=</span> <span class="mi">103</span>  <span class="c1"># National Semiconductor CompactRISC.</span>
+    <span class="n">EM_F2MC16</span> <span class="o">=</span> <span class="mi">104</span>  <span class="c1"># Fujitsu F2MC16.</span>
+    <span class="n">EM_MSP430</span> <span class="o">=</span> <span class="mi">105</span>  <span class="c1"># TI msp430 micro controller.</span>
+    <span class="n">EM_BLACKFIN</span> <span class="o">=</span> <span class="mi">106</span>  <span class="c1"># ADI Blackfin.</span>
+    <span class="n">EM_SE_C33</span> <span class="o">=</span> <span class="mi">107</span>  <span class="c1"># S1C33 Family of Seiko Epson processors.</span>
+    <span class="n">EM_SEP</span> <span class="o">=</span> <span class="mi">108</span>  <span class="c1"># Sharp embedded microprocessor.</span>
+    <span class="n">EM_ARCA</span> <span class="o">=</span> <span class="mi">109</span>  <span class="c1"># Arca RISC Microprocessor.</span>
+    <span class="n">EM_UNICORE</span> <span class="o">=</span> <span class="mi">110</span>  <span class="c1"># Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University.</span>
+    <span class="n">EM_EXCESS</span> <span class="o">=</span> <span class="mi">111</span>  <span class="c1"># eXcess: 16/32/64-bit configurable embedded CPU.</span>
+    <span class="n">EM_DXP</span> <span class="o">=</span> <span class="mi">112</span>  <span class="c1"># Icera Semiconductor Inc. Deep Execution Processor.</span>
+    <span class="n">EM_ALTERA_NIOS2</span> <span class="o">=</span> <span class="mi">113</span>  <span class="c1"># Altera Nios II soft-core processor.</span>
+    <span class="n">EM_CRX</span> <span class="o">=</span> <span class="mi">114</span>  <span class="c1"># National Semiconductor CRX.</span>
+    <span class="n">EM_XGATE</span> <span class="o">=</span> <span class="mi">115</span>  <span class="c1"># Motorola XGATE embedded processor.</span>
+    <span class="n">EM_C166</span> <span class="o">=</span> <span class="mi">116</span>  <span class="c1"># Infineon C16x/XC16x processor.</span>
+    <span class="n">EM_M16C</span> <span class="o">=</span> <span class="mi">117</span>  <span class="c1"># Renesas M16C series microprocessors.</span>
+    <span class="n">EM_DSPIC30F</span> <span class="o">=</span> <span class="mi">118</span>  <span class="c1"># Microchip Technology dsPIC30F Digital Signal Controller.</span>
+    <span class="n">EM_CE</span> <span class="o">=</span> <span class="mi">119</span>  <span class="c1"># Freescale Communication Engine RISC core.</span>
+    <span class="n">EM_M32C</span> <span class="o">=</span> <span class="mi">120</span>  <span class="c1"># Renesas M32C series microprocessors.</span>
+    <span class="n">EM_TSK3000</span> <span class="o">=</span> <span class="mi">131</span>  <span class="c1"># Altium TSK3000 core.</span>
+    <span class="n">EM_RS08</span> <span class="o">=</span> <span class="mi">132</span>  <span class="c1"># Freescale RS08 embedded processor.</span>
+    <span class="n">EM_ECOG2</span> <span class="o">=</span> <span class="mi">134</span>  <span class="c1"># Cyan Technology eCOG2 microprocessor.</span>
+    <span class="n">EM_SCORE</span> <span class="o">=</span> <span class="mi">135</span>  <span class="c1"># Sunplus Score.</span>
+    <span class="n">EM_SCORE7</span> <span class="o">=</span> <span class="mi">135</span>  <span class="c1"># Sunplus S+core7 RISC processor.</span>
+    <span class="n">EM_DSP24</span> <span class="o">=</span> <span class="mi">136</span>  <span class="c1"># New Japan Radio (NJR) 24-bit DSP Processor.</span>
+    <span class="n">EM_VIDEOCORE3</span> <span class="o">=</span> <span class="mi">137</span>  <span class="c1"># Broadcom VideoCore III processor.</span>
+    <span class="n">EM_LATTICEMICO32</span> <span class="o">=</span> <span class="mi">138</span>  <span class="c1"># RISC processor for Lattice FPGA architecture.</span>
+    <span class="n">EM_SE_C17</span> <span class="o">=</span> <span class="mi">139</span>  <span class="c1"># Seiko Epson C17 family.</span>
+    <span class="n">EM_TI_C6000</span> <span class="o">=</span> <span class="mi">140</span>  <span class="c1"># Texas Instruments TMS320C6000 DSP family.</span>
+    <span class="n">EM_TI_C2000</span> <span class="o">=</span> <span class="mi">141</span>  <span class="c1"># Texas Instruments TMS320C2000 DSP family.</span>
+    <span class="n">EM_TI_C5500</span> <span class="o">=</span> <span class="mi">142</span>  <span class="c1"># Texas Instruments TMS320C55x DSP family.</span>
+    <span class="n">EM_TI_ARP32</span> <span class="o">=</span> <span class="mi">143</span>  <span class="c1"># Texas Instruments App. Specific RISC</span>
+    <span class="n">EM_TI_PRU</span> <span class="o">=</span> <span class="mi">144</span>  <span class="c1"># Texas Instruments PRU I/O processor</span>
+
+    <span class="n">EM_MMDSP_PLUS</span> <span class="o">=</span> <span class="mi">160</span>  <span class="c1"># STMicroelectronics 64bit VLIW Data Signal Processor.</span>
+    <span class="n">EM_CYPRESS_M8C</span> <span class="o">=</span> <span class="mi">161</span>  <span class="c1"># Cypress M8C microprocessor.</span>
+    <span class="n">EM_R32C</span> <span class="o">=</span> <span class="mi">162</span>  <span class="c1"># Renesas R32C series microprocessors.</span>
+    <span class="n">EM_TRIMEDIA</span> <span class="o">=</span> <span class="mi">163</span>  <span class="c1"># NXP Semiconductors TriMedia architecture family.</span>
+    <span class="n">EM_QDSP6</span> <span class="o">=</span> <span class="mi">164</span>  <span class="c1"># QUALCOMM DSP6 Processor.</span>
+    <span class="n">EM_I8051</span> <span class="o">=</span> <span class="mi">165</span>  <span class="c1"># Intel 8051 and variants.</span>
+    <span class="n">EM_STXP7X</span> <span class="o">=</span> <span class="mi">166</span>  <span class="c1"># STMicroelectronics STxP7x family.</span>
+    <span class="n">EM_NDS32</span> <span class="o">=</span> <span class="mi">167</span>  <span class="c1"># Andes Technology compact code size embedded RISC processor family.</span>
+    <span class="n">EM_ECOG1</span> <span class="o">=</span> <span class="mi">168</span>  <span class="c1"># Cyan Technology eCOG1X family.</span>
+    <span class="n">EM_ECOG1X</span> <span class="o">=</span> <span class="mi">168</span>  <span class="c1"># Cyan Technology eCOG1X family.</span>
+    <span class="n">EM_MAXQ30</span> <span class="o">=</span> <span class="mi">169</span>  <span class="c1"># Dallas Semiconductor MAXQ30 Core Micro-controllers.</span>
+    <span class="n">EM_XIMO16</span> <span class="o">=</span> <span class="mi">170</span>  <span class="c1"># New Japan Radio (NJR) 16-bit DSP Processor.</span>
+    <span class="n">EM_MANIK</span> <span class="o">=</span> <span class="mi">171</span>  <span class="c1"># M2000 Reconfigurable RISC Microprocessor.</span>
+    <span class="n">EM_CRAYNV2</span> <span class="o">=</span> <span class="mi">172</span>  <span class="c1"># Cray Inc. NV2 vector architecture.</span>
+    <span class="n">EM_RX</span> <span class="o">=</span> <span class="mi">173</span>  <span class="c1"># Renesas RX family.</span>
+    <span class="n">EM_METAG</span> <span class="o">=</span> <span class="mi">174</span>  <span class="c1"># Imagination Technologies META processor architecture.</span>
+    <span class="n">EM_MCST_ELBRUS</span> <span class="o">=</span> <span class="mi">175</span>  <span class="c1"># MCST Elbrus general purpose hardware architecture.</span>
+    <span class="n">EM_ECOG16</span> <span class="o">=</span> <span class="mi">176</span>  <span class="c1"># Cyan Technology eCOG16 family.</span>
+    <span class="n">EM_CR16</span> <span class="o">=</span> <span class="mi">177</span>  <span class="c1"># National Semiconductor CompactRISC 16-bit processor.</span>
+    <span class="n">EM_ETPU</span> <span class="o">=</span> <span class="mi">178</span>  <span class="c1"># Freescale Extended Time Processing Unit.</span>
+    <span class="n">EM_SLE9X</span> <span class="o">=</span> <span class="mi">179</span>  <span class="c1"># Infineon Technologies SLE9X core.</span>
+    <span class="n">EM_L1OM</span> <span class="o">=</span> <span class="mi">180</span>  <span class="c1"># Intel L1OM.</span>
+    <span class="n">EM_AARCH64</span> <span class="o">=</span> <span class="mi">183</span>
+    <span class="n">EM_AVR32</span> <span class="o">=</span> <span class="mi">185</span>  <span class="c1"># Atmel Corporation 32-bit microprocessor family.</span>
+    <span class="n">EM_STM8</span> <span class="o">=</span> <span class="mi">186</span>  <span class="c1"># STMicroeletronics STM8 8-bit microcontroller.</span>
+    <span class="n">EM_TILE64</span> <span class="o">=</span> <span class="mi">187</span>  <span class="c1"># Tilera TILE64 multicore architecture family.</span>
+    <span class="n">EM_TILEPRO</span> <span class="o">=</span> <span class="mi">188</span>  <span class="c1"># Tilera TILEPro multicore architecture family.</span>
+    <span class="n">EM_MICROBLAZE</span> <span class="o">=</span> <span class="mi">189</span>  <span class="c1"># Xilinx MicroBlaze 32-bit RISC soft processor core.</span>
+    <span class="n">EM_CUDA</span> <span class="o">=</span> <span class="mi">190</span>  <span class="c1"># NVIDIA CUDA architecture.</span>
+    <span class="n">EM_TILEGX</span> <span class="o">=</span> <span class="mi">191</span>  <span class="c1"># Tilera TILE-Gx</span>
+    <span class="n">EM_AVR_OLD</span> <span class="o">=</span> <span class="mh">0x1057</span>  <span class="c1"># AVR magic number.  Written in the absense of an ABI.</span>
+    <span class="n">EM_MSP430_OLD</span> <span class="o">=</span> <span class="mh">0x1059</span>  <span class="c1"># MSP430 magic number.  Written in the absense of everything.</span>
+    <span class="n">EM_MT</span> <span class="o">=</span> <span class="mh">0x2530</span>  <span class="c1"># Morpho MT.   Written in the absense of an ABI.</span>
+    <span class="n">EM_CYGNUS_FR30</span> <span class="o">=</span> <span class="mh">0x3330</span>  <span class="c1"># FR30 magic number - no EABI available.</span>
+    <span class="n">EM_OPENRISC_OLD</span> <span class="o">=</span> <span class="mh">0x3426</span>  <span class="c1"># OpenRISC magic number.  Written in the absense of an ABI.</span>
+    <span class="n">EM_DLX</span> <span class="o">=</span> <span class="mh">0x5AA5</span>  <span class="c1"># DLX magic number.  Written in the absense of an ABI.</span>
+    <span class="n">EM_CYGNUS_FRV</span> <span class="o">=</span> <span class="mh">0x5441</span>  <span class="c1"># FRV magic number - no EABI available??.</span>
+    <span class="n">EM_XC16X</span> <span class="o">=</span> <span class="mh">0x4688</span>  <span class="c1"># Infineon Technologies 16-bit microcontroller with C166-V2 core.</span>
+    <span class="n">EM_NEC_V850</span> <span class="o">=</span> <span class="mh">0x723E</span>  <span class="c1"># V850ES/FJ3 /w NEC compiler.</span>
+    <span class="n">EM_CYGNUS_D10V</span> <span class="o">=</span> <span class="mh">0x7650</span>  <span class="c1"># D10V backend magic number.  Written in the absence of an ABI.</span>
+    <span class="n">EM_CYGNUS_D30V</span> <span class="o">=</span> <span class="mh">0x7676</span>  <span class="c1"># D30V backend magic number.  Written in the absence of an ABI.</span>
+    <span class="n">EM_IP2K_OLD</span> <span class="o">=</span> <span class="mh">0x8217</span>  <span class="c1"># Ubicom IP2xxx;   Written in the absense of an ABI.</span>
+    <span class="n">EM_OR32</span> <span class="o">=</span> <span class="mh">0x8472</span>  <span class="c1"># (Deprecated) Temporary number for the OpenRISC processor.</span>
+    <span class="n">EM_CYGNUS_POWERPC</span> <span class="o">=</span> <span class="mh">0x9025</span>  <span class="c1"># Cygnus PowerPC ELF backend.  Written in the absence of an ABI.</span>
+    <span class="n">EM_ALPHA_NO_ABI</span> <span class="o">=</span> <span class="mh">0x9026</span>  <span class="c1"># Alpha backend magic number.  Written in the absence of an ABI.</span>
+    <span class="n">EM_CYGNUS_M32R</span> <span class="o">=</span> <span class="mh">0x9041</span>  <span class="c1"># Cygnus M32R ELF backend.  Written in the absence of an ABI.</span>
+    <span class="n">EM_CYGNUS_V850</span> <span class="o">=</span> <span class="mh">0x9080</span>  <span class="c1"># V850 backend magic number.  Written in the absense of an ABI.</span>
+    <span class="n">EM_S390_OLD</span> <span class="o">=</span> <span class="mh">0xA390</span>  <span class="c1"># old S/390 backend magic number. Written in the absence of an ABI.</span>
+    <span class="n">EM_XTENSA_OLD</span> <span class="o">=</span> <span class="mh">0xABC7</span>  <span class="c1"># Old, unofficial value for Xtensa.</span>
+    <span class="n">EM_XSTORMY16</span> <span class="o">=</span> <span class="mh">0xAD45</span>
+    <span class="n">EM_CYGNUS_MN10300</span> <span class="o">=</span> <span class="mh">0xBEEF</span>  <span class="c1"># mn10200 and mn10300 backend magic numbers. Written in the absense of an ABI.</span>
+    <span class="n">EM_COOLRISC_C816</span> <span class="o">=</span> <span class="mh">0xC816</span>  <span class="c1"># Raisonance CoolRISC C816.</span>
+    <span class="n">EM_CYGNUS_MN10200</span> <span class="o">=</span> <span class="mh">0xDEAD</span>
+    <span class="n">EM_M32C_OLD</span> <span class="o">=</span> <span class="mh">0xFEB0</span>  <span class="c1"># Renesas M32C and M16C.</span>
+    <span class="n">EM_IQ2000</span> <span class="o">=</span> <span class="mh">0xFEBA</span>  <span class="c1"># Vitesse IQ2000.</span>
+    <span class="n">EM_NIOS32</span> <span class="o">=</span> <span class="mh">0xFEBB</span>  <span class="c1"># NIOS magic number - no EABI available.</span>
+    <span class="n">EM_CYGNUS_MEP</span> <span class="o">=</span> <span class="mh">0xF00D</span>  <span class="c1"># Toshiba MeP</span>
+    <span class="n">EM_MOXIE</span> <span class="o">=</span> <span class="mh">0xFEED</span>  <span class="c1"># Moxie</span>
+    <span class="n">EM_MICROBLAZE_OLD</span> <span class="o">=</span> <span class="mh">0xBAAB</span>  <span class="c1"># Old MicroBlaze</span>
+    <span class="n">EM_ADAPTEVA_EPIPHANY</span> <span class="o">=</span> <span class="mh">0x1223</span>  <span class="c1"># Adapteva&#39;s Epiphany architecture.</span></div>
+
+
+
+<span class="n">ELF_MACHINE_NAMES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NONE</span><span class="p">:</span> <span class="s2">&quot;No machine&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_M32</span><span class="p">:</span> <span class="s2">&quot;AT&amp;T WE 32100&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SPARC</span><span class="p">:</span> <span class="s2">&quot;SPARC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_386</span><span class="p">:</span> <span class="s2">&quot;Intel 80386&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68K</span><span class="p">:</span> <span class="s2">&quot;Motorola 68000&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_88K</span><span class="p">:</span> <span class="s2">&quot;Motorola 88000&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_860</span><span class="p">:</span> <span class="s2">&quot;Intel 80860&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MIPS</span><span class="p">:</span> <span class="s2">&quot;MIPS I Architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_S370</span><span class="p">:</span> <span class="s2">&quot;IBM System/370 Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MIPS_RS3_LE</span><span class="p">:</span> <span class="s2">&quot;MIPS RS3000 Little-endian&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PARISC</span><span class="p">:</span> <span class="s2">&quot;Hewlett-Packard PA-RISC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">RESERVED</span><span class="p">:</span> <span class="s2">&quot;Reserved for future use&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_VPP500</span><span class="p">:</span> <span class="s2">&quot;Fujitsu VPP500&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SPARC32PLUS</span><span class="p">:</span> <span class="s2">&quot;Enhanced instruction set SPARC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_960</span><span class="p">:</span> <span class="s2">&quot;Intel 80960&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PPC</span><span class="p">:</span> <span class="s2">&quot;PowerPC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PPC64</span><span class="p">:</span> <span class="s2">&quot;PowerPC64&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_S390</span><span class="p">:</span> <span class="s2">&quot;IBM S390&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SPU</span><span class="p">:</span> <span class="s2">&quot;Sony/Toshiba/IBM SPU&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_V800</span><span class="p">:</span> <span class="s2">&quot;Renesas V850 (using RH850 ABI)&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_FR20</span><span class="p">:</span> <span class="s2">&quot;Fujitsu FR20&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_RH32</span><span class="p">:</span> <span class="s2">&quot;TRW RH-32&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_RCE</span><span class="p">:</span> <span class="s2">&quot;Motorola RCE&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ARM</span><span class="p">:</span> <span class="s2">&quot;ARM&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ALPHA</span><span class="p">:</span> <span class="s2">&quot;Digital Alpha&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SH</span><span class="p">:</span> <span class="s2">&quot;Hitachi SH&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SPARCV9</span><span class="p">:</span> <span class="s2">&quot;SPARC Version 9&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TRICORE</span><span class="p">:</span> <span class="s2">&quot;Siemens Tricore embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ARC</span><span class="p">:</span> <span class="s2">&quot;Argonaut RISC Core, Argonaut Technologies Inc&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_H8_300</span><span class="p">:</span> <span class="s2">&quot;Hitachi H8/300&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_H8_300H</span><span class="p">:</span> <span class="s2">&quot;Hitachi H8/300H&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_H8S</span><span class="p">:</span> <span class="s2">&quot;Hitachi H8S&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_H8_500</span><span class="p">:</span> <span class="s2">&quot;Hitachi H8/500&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_IA_64</span><span class="p">:</span> <span class="s2">&quot;Intel IA-64 processor architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MIPS_X</span><span class="p">:</span> <span class="s2">&quot;Stanford MIPS-X&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_COLDFIRE</span><span class="p">:</span> <span class="s2">&quot;Motorola ColdFire&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68HC12</span><span class="p">:</span> <span class="s2">&quot;Motorola MC68HC12 Microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MMA</span><span class="p">:</span> <span class="s2">&quot;Fujitsu MMA Multimedia Accelerator&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PCP</span><span class="p">:</span> <span class="s2">&quot;Siemens PCP&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NCPU</span><span class="p">:</span> <span class="s2">&quot;Sony nCPU embedded RISC processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NDR1</span><span class="p">:</span> <span class="s2">&quot;Denso NDR1 microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_STARCORE</span><span class="p">:</span> <span class="s2">&quot;Motorola Star*Core processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ME16</span><span class="p">:</span> <span class="s2">&quot;Toyota ME16 processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ST100</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics ST100 processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TINYJ</span><span class="p">:</span> <span class="s2">&quot;Advanced Logic Corp. TinyJ embedded processor family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_X86_64</span><span class="p">:</span> <span class="s2">&quot;Advanced Micro Devices X86-64&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PDSP</span><span class="p">:</span> <span class="s2">&quot;Sony DSP Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PDP10</span><span class="p">:</span> <span class="s2">&quot;DEC PDP-10&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PDP11</span><span class="p">:</span> <span class="s2">&quot;DEC PDP-11&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_FX66</span><span class="p">:</span> <span class="s2">&quot;Siemens FX66 microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ST9PLUS</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics ST9+ 8/16 bit microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ST7</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics ST7 8-bit microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68HC16</span><span class="p">:</span> <span class="s2">&quot;Motorola MC68HC16 Microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68HC11</span><span class="p">:</span> <span class="s2">&quot;Motorola MC68HC11 Microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68HC08</span><span class="p">:</span> <span class="s2">&quot;Motorola MC68HC08 Microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_68HC05</span><span class="p">:</span> <span class="s2">&quot;Motorola MC68HC05 Microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SVX</span><span class="p">:</span> <span class="s2">&quot;Silicon Graphics SVx&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ST19</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics ST19 8-bit microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_VAX</span><span class="p">:</span> <span class="s2">&quot;Digital VAX&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CRIS</span><span class="p">:</span> <span class="s2">&quot;Axis Communications 32-bit embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_JAVELIN</span><span class="p">:</span> <span class="s2">&quot;Infineon Technologies 32-bit embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_FIREPATH</span><span class="p">:</span> <span class="s2">&quot;Element 14 64-bit DSP Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ZSP</span><span class="p">:</span> <span class="s2">&quot;LSI Logic 16-bit DSP Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MMIX</span><span class="p">:</span> <span class="s2">&quot;Donald Knuth&#39;s educational 64-bit processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_HUANY</span><span class="p">:</span> <span class="s2">&quot;Harvard University machine-independent object files&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PRISM</span><span class="p">:</span> <span class="s2">&quot;SiTera Prism&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_AVR</span><span class="p">:</span> <span class="s2">&quot;Atmel AVR 8-bit microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_FR30</span><span class="p">:</span> <span class="s2">&quot;Fujitsu FR30&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_D10V</span><span class="p">:</span> <span class="s2">&quot;Mitsubishi D10V&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_D30V</span><span class="p">:</span> <span class="s2">&quot;Mitsubishi D30V&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_V850</span><span class="p">:</span> <span class="s2">&quot;NEC v850&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_M32R</span><span class="p">:</span> <span class="s2">&quot;Mitsubishi M32R&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MN10300</span><span class="p">:</span> <span class="s2">&quot;Matsushita MN10300&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MN10200</span><span class="p">:</span> <span class="s2">&quot;Matsushita MN10200&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_PJ</span><span class="p">:</span> <span class="s2">&quot;picoJava&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_OPENRISC</span><span class="p">:</span> <span class="s2">&quot;OpenRISC 32-bit embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ARC_A5</span><span class="p">:</span> <span class="s2">&quot;ARC Cores Tangent-A5&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XTENSA</span><span class="p">:</span> <span class="s2">&quot;Tensilica Xtensa Architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_VIDEOCORE</span><span class="p">:</span> <span class="s2">&quot;Alphamosaic VideoCore processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TMM_GPP</span><span class="p">:</span> <span class="s2">&quot;Thompson Multimedia General Purpose Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NS32K</span><span class="p">:</span> <span class="s2">&quot;National Semiconductor 32000 series&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TPC</span><span class="p">:</span> <span class="s2">&quot;Tenor Network TPC processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SNP1K</span><span class="p">:</span> <span class="s2">&quot;Trebia SNP 1000 processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ST200</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics ST200 microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_IP2K</span><span class="p">:</span> <span class="s2">&quot;Ubicom IP2022 micro controller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MAX</span><span class="p">:</span> <span class="s2">&quot;MAX Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CR</span><span class="p">:</span> <span class="s2">&quot;National Semiconductor CompactRISC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_F2MC16</span><span class="p">:</span> <span class="s2">&quot;Fujitsu F2MC16&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MSP430</span><span class="p">:</span> <span class="s2">&quot;TI msp430 micro controller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_BLACKFIN</span><span class="p">:</span> <span class="s2">&quot;ADI Blackfin&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SE_C33</span><span class="p">:</span> <span class="s2">&quot;S1C33 Family of Seiko Epson processors&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SEP</span><span class="p">:</span> <span class="s2">&quot;Sharp embedded microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ARCA</span><span class="p">:</span> <span class="s2">&quot;Arca RISC Microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_UNICORE</span><span class="p">:</span> <span class="s2">&quot;Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_EXCESS</span><span class="p">:</span> <span class="s2">&quot;eXcess: 16/32/64-bit configurable embedded CPU&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_DXP</span><span class="p">:</span> <span class="s2">&quot;Icera Semiconductor Inc. Deep Execution Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ALTERA_NIOS2</span><span class="p">:</span> <span class="s2">&quot;Altera Nios II soft-core processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CRX</span><span class="p">:</span> <span class="s2">&quot;National Semiconductor CRX&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XGATE</span><span class="p">:</span> <span class="s2">&quot;Motorola XGATE embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_C166</span><span class="p">:</span> <span class="s2">&quot;Infineon Technologies xc16x&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_M16C</span><span class="p">:</span> <span class="s2">&quot;Renesas M16C series microprocessors&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_DSPIC30F</span><span class="p">:</span> <span class="s2">&quot;Microchip Technology dsPIC30F Digital Signal Controller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CE</span><span class="p">:</span> <span class="s2">&quot;Freescale Communication Engine RISC core&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_M32C</span><span class="p">:</span> <span class="s2">&quot;Renesas M32C series microprocessors&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TSK3000</span><span class="p">:</span> <span class="s2">&quot;Altium TSK3000 core&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_RS08</span><span class="p">:</span> <span class="s2">&quot;Freescale RS08 embedded processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ECOG2</span><span class="p">:</span> <span class="s2">&quot;Cyan Technology eCOG2 microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SCORE</span><span class="p">:</span> <span class="s2">&quot;Sunplus Score&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SCORE7</span><span class="p">:</span> <span class="s2">&quot;Sunplus S+core7 RISC processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_DSP24</span><span class="p">:</span> <span class="s2">&quot;New Japan Radio (NJR) 24-bit DSP Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_VIDEOCORE3</span><span class="p">:</span> <span class="s2">&quot;Broadcom VideoCore III processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_LATTICEMICO32</span><span class="p">:</span> <span class="s2">&quot;RISC processor for Lattice FPGA architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SE_C17</span><span class="p">:</span> <span class="s2">&quot;Seiko Epson C17 family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TI_C6000</span><span class="p">:</span> <span class="s2">&quot;Texas Instruments TMS320C6000 DSP family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TI_C2000</span><span class="p">:</span> <span class="s2">&quot;Texas Instruments TMS320C2000 DSP family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TI_C5500</span><span class="p">:</span> <span class="s2">&quot;Texas Instruments TMS320C55x DSP family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TI_ARP32</span><span class="p">:</span> <span class="s2">&quot;Texas Instruments App. Specific RISC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TI_PRU</span><span class="p">:</span> <span class="s2">&quot;Texas Instruments PRU I/O processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MMDSP_PLUS</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics 64bit VLIW Data Signal Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYPRESS_M8C</span><span class="p">:</span> <span class="s2">&quot;Cypress M8C microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_R32C</span><span class="p">:</span> <span class="s2">&quot;Renesas R32C series microprocessors&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TRIMEDIA</span><span class="p">:</span> <span class="s2">&quot;NXP Semiconductors TriMedia architecture family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_QDSP6</span><span class="p">:</span> <span class="s2">&quot;QUALCOMM DSP6 Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_I8051</span><span class="p">:</span> <span class="s2">&quot;Intel 8051 and variants&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_STXP7X</span><span class="p">:</span> <span class="s2">&quot;STMicroelectronics STxP7x family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NDS32</span><span class="p">:</span> <span class="s2">&quot;Andes Technology compact code size embedded RISC processor family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ECOG1</span><span class="p">:</span> <span class="s2">&quot;Cyan Technology eCOG1X family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ECOG1X</span><span class="p">:</span> <span class="s2">&quot;Cyan Technology eCOG1X family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MAXQ30</span><span class="p">:</span> <span class="s2">&quot;Dallas Semiconductor MAXQ30 Core Micro-controllers&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XIMO16</span><span class="p">:</span> <span class="s2">&quot;New Japan Radio (NJR) 16-bit DSP Processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MANIK</span><span class="p">:</span> <span class="s2">&quot;M2000 Reconfigurable RISC Microprocessor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CRAYNV2</span><span class="p">:</span> <span class="s2">&quot;Cray Inc. NV2 vector architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_RX</span><span class="p">:</span> <span class="s2">&quot;Renesas RX family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_METAG</span><span class="p">:</span> <span class="s2">&quot;Imagination Technologies META processor architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MCST_ELBRUS</span><span class="p">:</span> <span class="s2">&quot;MCST Elbrus general purpose hardware architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ECOG16</span><span class="p">:</span> <span class="s2">&quot;Cyan Technology eCOG16 family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CR16</span><span class="p">:</span> <span class="s2">&quot;National Semiconductor CompactRISC 16-bit processor&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ETPU</span><span class="p">:</span> <span class="s2">&quot;Freescale Extended Time Processing Unit&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_SLE9X</span><span class="p">:</span> <span class="s2">&quot;Infineon Technologies SLE9X core&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_L1OM</span><span class="p">:</span> <span class="s2">&quot;Intel L1OM&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_AARCH64</span><span class="p">:</span> <span class="s2">&quot;AArch64&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_AVR32</span><span class="p">:</span> <span class="s2">&quot;Atmel Corporation 32-bit microprocessor family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_STM8</span><span class="p">:</span> <span class="s2">&quot;STMicroeletronics STM8 8-bit microcontroller&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TILE64</span><span class="p">:</span> <span class="s2">&quot;Tilera TILE64 multicore architecture family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TILEPRO</span><span class="p">:</span> <span class="s2">&quot;Tilera TILEPro multicore architecture family&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MICROBLAZE</span><span class="p">:</span> <span class="s2">&quot;Xilinx MicroBlaze 32-bit RISC soft processor core&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_TILEGX</span><span class="p">:</span> <span class="s2">&quot;Tilera TILE-Gx&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CUDA</span><span class="p">:</span> <span class="s2">&quot;NVIDIA CUDA architecture&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_AVR_OLD</span><span class="p">:</span> <span class="s2">&quot;AVR&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MSP430_OLD</span><span class="p">:</span> <span class="s2">&quot;MSP430&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MT</span><span class="p">:</span> <span class="s2">&quot;Morpho MT&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_FR30</span><span class="p">:</span> <span class="s2">&quot;Cygnus FR30&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_OPENRISC_OLD</span><span class="p">:</span> <span class="s2">&quot;OpenRISC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_DLX</span><span class="p">:</span> <span class="s2">&quot;DLX&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_FRV</span><span class="p">:</span> <span class="s2">&quot;Cygnus FRV&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XC16X</span><span class="p">:</span> <span class="s2">&quot;Infineon C166-V2 core&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NEC_V850</span><span class="p">:</span> <span class="s2">&quot;V850ES/FJ3 (NEC compiler)&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_D10V</span><span class="p">:</span> <span class="s2">&quot;Cygnus D10V&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_D30V</span><span class="p">:</span> <span class="s2">&quot;Cygnus D30V&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_IP2K_OLD</span><span class="p">:</span> <span class="s2">&quot;Ubicom IP2xxx&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_OR32</span><span class="p">:</span> <span class="s2">&quot;OpenRISC 32&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_POWERPC</span><span class="p">:</span> <span class="s2">&quot;Cygnus PowerPC&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ALPHA_NO_ABI</span><span class="p">:</span> <span class="s2">&quot;Alpha&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_M32R</span><span class="p">:</span> <span class="s2">&quot;Cygnus M32R&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_V850</span><span class="p">:</span> <span class="s2">&quot;Cygnus V850&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_S390_OLD</span><span class="p">:</span> <span class="s2">&quot;S/390&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XTENSA_OLD</span><span class="p">:</span> <span class="s2">&quot;Xtensa&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_XSTORMY16</span><span class="p">:</span> <span class="s2">&quot;Xstormy16&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_MN10300</span><span class="p">:</span> <span class="s2">&quot;Cygnus mn10200 or mn10300&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_COOLRISC_C816</span><span class="p">:</span> <span class="s2">&quot;CoolRISC C816&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_MN10200</span><span class="p">:</span> <span class="s2">&quot;Cygnus mn10200&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_M32C_OLD</span><span class="p">:</span> <span class="s2">&quot;Renesas M32C or M16C.&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_IQ2000</span><span class="p">:</span> <span class="s2">&quot;Vitesse IQ2000.&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_NIOS32</span><span class="p">:</span> <span class="s2">&quot;NIOS&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_CYGNUS_MEP</span><span class="p">:</span> <span class="s2">&quot;Toshiba MeP&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MOXIE</span><span class="p">:</span> <span class="s2">&quot;Moxie&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_MICROBLAZE_OLD</span><span class="p">:</span> <span class="s2">&quot;Old MicroBlaze&quot;</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ADAPTEVA_EPIPHANY</span><span class="p">:</span> <span class="s2">&quot;Adapteva Epiphany&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="AVRMachineType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.AVRMachineType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AVRMachineType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">E_AVR_MACH_AVR1</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">E_AVR_MACH_AVR2</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">E_AVR_MACH_AVR3</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">E_AVR_MACH_AVR4</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">E_AVR_MACH_AVR5</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">E_AVR_MACH_AVR6</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">E_AVR_MACH_AVR25</span> <span class="o">=</span> <span class="mi">25</span>
+    <span class="n">E_AVR_MACH_AVR31</span> <span class="o">=</span> <span class="mi">31</span>
+    <span class="n">E_AVR_MACH_AVR35</span> <span class="o">=</span> <span class="mi">35</span>
+    <span class="n">E_AVR_MACH_AVR51</span> <span class="o">=</span> <span class="mi">51</span>
+    <span class="n">E_AVR_MACH_AVRTINY</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">E_AVR_MACH_XMEGA1</span> <span class="o">=</span> <span class="mi">101</span>
+    <span class="n">E_AVR_MACH_XMEGA2</span> <span class="o">=</span> <span class="mi">102</span>
+    <span class="n">E_AVR_MACH_XMEGA3</span> <span class="o">=</span> <span class="mi">103</span>
+    <span class="n">E_AVR_MACH_XMEGA4</span> <span class="o">=</span> <span class="mi">104</span>
+    <span class="n">E_AVR_MACH_XMEGA5</span> <span class="o">=</span> <span class="mi">105</span>
+    <span class="n">E_AVR_MACH_XMEGA6</span> <span class="o">=</span> <span class="mi">106</span>
+    <span class="n">E_AVR_MACH_XMEGA7</span> <span class="o">=</span> <span class="mi">107</span></div>
+
+
+
+<span class="n">AVRMachineTypeNames</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR1</span><span class="p">:</span> <span class="s2">&quot;avr:1&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR2</span><span class="p">:</span> <span class="s2">&quot;avr:2&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR3</span><span class="p">:</span> <span class="s2">&quot;avr:3&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR4</span><span class="p">:</span> <span class="s2">&quot;avr:4&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR5</span><span class="p">:</span> <span class="s2">&quot;avr:5&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR6</span><span class="p">:</span> <span class="s2">&quot;avr:6&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR25</span><span class="p">:</span> <span class="s2">&quot;avr:25&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR31</span><span class="p">:</span> <span class="s2">&quot;avr:31&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR35</span><span class="p">:</span> <span class="s2">&quot;avr:35&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVR51</span><span class="p">:</span> <span class="s2">&quot;avr:51&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_AVRTINY</span><span class="p">:</span> <span class="s2">&quot;avr:100&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA1</span><span class="p">:</span> <span class="s2">&quot;avr:101&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA2</span><span class="p">:</span> <span class="s2">&quot;avr:102&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA3</span><span class="p">:</span> <span class="s2">&quot;avr:103&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA4</span><span class="p">:</span> <span class="s2">&quot;avr:104&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA5</span><span class="p">:</span> <span class="s2">&quot;avr:105&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA6</span><span class="p">:</span> <span class="s2">&quot;avr:106&quot;</span><span class="p">,</span>
+    <span class="n">AVRMachineType</span><span class="o">.</span><span class="n">E_AVR_MACH_XMEGA7</span><span class="p">:</span> <span class="s2">&quot;avr:107&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">EF_AVR_MACH</span> <span class="o">=</span> <span class="mh">0x7F</span>
+<span class="n">EF_AVR_LINKRELAX_PREPARED</span> <span class="o">=</span> <span class="mh">0x80</span>
+
+<span class="c1"># Old ABI (ie GNU pre EABI).  These are deprecated.</span>
+<span class="n">EF_ARM_RELEXEC</span> <span class="o">=</span> <span class="mh">0x01</span>
+<span class="n">EF_ARM_INTERWORK</span> <span class="o">=</span> <span class="mh">0x04</span>
+<span class="n">EF_ARM_APCS_26</span> <span class="o">=</span> <span class="mh">0x08</span>
+<span class="n">EF_ARM_APCS_FLOAT</span> <span class="o">=</span> <span class="mh">0x10</span>
+<span class="n">EF_ARM_PIC</span> <span class="o">=</span> <span class="mh">0x20</span>
+<span class="n">EF_ARM_ALIGN8</span> <span class="o">=</span> <span class="mh">0x40</span>  <span class="c1"># 8-bit structure alignment is in use.</span>
+<span class="n">EF_ARM_NEW_ABI</span> <span class="o">=</span> <span class="mh">0x80</span>
+<span class="n">EF_ARM_OLD_ABI</span> <span class="o">=</span> <span class="mh">0x100</span>
+<span class="n">EF_ARM_SOFT_FLOAT</span> <span class="o">=</span> <span class="mh">0x200</span>
+<span class="n">EF_ARM_VFP_FLOAT</span> <span class="o">=</span> <span class="mh">0x400</span>
+<span class="n">EF_ARM_MAVERICK_FLOAT</span> <span class="o">=</span> <span class="mh">0x800</span>
+
+<span class="c1"># Old ARM ELF spec. version B-01.  Mostly deprecated.</span>
+<span class="n">EF_ARM_SYMSARESORTED</span> <span class="o">=</span> <span class="mh">0x04</span>  <span class="c1"># NB conflicts with EF_INTERWORK.</span>
+<span class="n">EF_ARM_DYNSYMSUSESEGIDX</span> <span class="o">=</span> <span class="mh">0x08</span>  <span class="c1"># NB conflicts with EF_APCS26.</span>
+<span class="n">EF_ARM_MAPSYMSFIRST</span> <span class="o">=</span> <span class="mh">0x10</span>  <span class="c1"># NB conflicts with EF_APCS_FLOAT.</span>
+
+<span class="c1"># New constants defined in the ARM ELF spec. version XXX (AAELF).</span>
+<span class="c1"># Only valid in conjunction with EF_ARM_EABI_VER5.</span>
+<span class="n">EF_ARM_ABI_FLOAT_SOFT</span> <span class="o">=</span> <span class="mh">0x200</span>  <span class="c1"># NB conflicts with EF_ARM_SOFT_FLOAT.</span>
+<span class="n">EF_ARM_ABI_FLOAT_HARD</span> <span class="o">=</span> <span class="mh">0x400</span>  <span class="c1"># NB conflicts with EF_ARM_VFP_FLOAT.</span>
+
+<span class="c1"># Constants defined in AAELF.</span>
+<span class="n">EF_ARM_BE8</span> <span class="o">=</span> <span class="mh">0x00800000</span>
+<span class="n">EF_ARM_LE8</span> <span class="o">=</span> <span class="mh">0x00400000</span>
+
+<span class="n">EF_ARM_EABIMASK</span> <span class="o">=</span> <span class="mh">0xFF000000</span>
+<span class="n">EF_ARM_EABIMASK_COM</span> <span class="o">=</span> <span class="mh">0x00FFFFFF</span>
+
+<span class="n">EF_ARM_EABI_UNKNOWN</span> <span class="o">=</span> <span class="mh">0x00000000</span>
+<span class="n">EF_ARM_EABI_VER1</span> <span class="o">=</span> <span class="mh">0x01000000</span>
+<span class="n">EF_ARM_EABI_VER2</span> <span class="o">=</span> <span class="mh">0x02000000</span>
+<span class="n">EF_ARM_EABI_VER3</span> <span class="o">=</span> <span class="mh">0x03000000</span>
+<span class="n">EF_ARM_EABI_VER4</span> <span class="o">=</span> <span class="mh">0x04000000</span>
+<span class="n">EF_ARM_EABI_VER5</span> <span class="o">=</span> <span class="mh">0x05000000</span>
+
+
+<div class="viewcode-block" id="MachineData">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.MachineData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MachineData</span><span class="p">:</span>
+
+    <span class="n">type_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;???&quot;</span>
+    <span class="n">type_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">machine_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;unknown&gt;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ELFMachineType</span><span class="p">(</span><span class="n">machine_code</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_name</span> <span class="o">=</span> <span class="s2">&quot;???&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="s2">&quot;&lt;unknown&gt;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">machine</span> <span class="o">=</span> <span class="n">ELFMachineType</span><span class="p">(</span><span class="n">machine_code</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_name</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>  <span class="c1"># get rid of &#39;EM_&#39;.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_value</span> <span class="o">=</span> <span class="n">machine</span><span class="o">.</span><span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">ELF_MACHINE_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_value</span><span class="p">,</span> <span class="s2">&quot;&lt;unknown&gt;&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MachineData.specific">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.MachineData.specific">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">specific</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specific</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type_name</span><span class="si">!s}</span><span class="s1"> [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="si">!s}</span><span class="s1">] [</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="si">}</span><span class="s1">]&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type_name</span><span class="si">!s}</span><span class="s2"> [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="si">!s}</span><span class="s2">]&quot;</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+
+<div class="viewcode-block" id="AvrMachineData">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.AvrMachineData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AvrMachineData</span><span class="p">(</span><span class="n">MachineData</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AvrMachineData.specific">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.AvrMachineData.specific">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">specific</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">flags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_AVR_MACH</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">flags</span> <span class="ow">in</span> <span class="n">AVRMachineTypeNames</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AVRMachineTypeNames</span><span class="p">[</span><span class="n">flags</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;avr:&lt;unknown&gt;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_AVR_LINKRELAX_PREPARED</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;link-relax&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ArmMachineData">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ArmMachineData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArmMachineData</span><span class="p">(</span><span class="n">MachineData</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ArmMachineData.specific">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ArmMachineData.specific">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">specific</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">eabi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_ARM_EABIMASK</span>
+        <span class="n">flags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_ARM_EABIMASK_COM</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ARM&quot;</span><span class="p">,</span> <span class="nb">hex</span><span class="p">(</span><span class="n">eabi</span><span class="p">),</span> <span class="nb">hex</span><span class="p">(</span><span class="n">flags</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_ARM_RELEXEC</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;relocatable executable&quot;</span><span class="p">)</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">EF_ARM_RELEXEC</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="n">EF_ARM_PIC</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;position independent&quot;</span><span class="p">)</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">EF_ARM_PIC</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+
+<span class="n">MACHINE_DATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_AVR</span><span class="p">:</span> <span class="n">AvrMachineData</span><span class="p">,</span>
+    <span class="n">ELFMachineType</span><span class="o">.</span><span class="n">EM_ARM</span><span class="p">:</span> <span class="n">ArmMachineData</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">EV_NONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Invalid version.</span>
+<span class="n">EV_CURRENT</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Current version.</span>
+
+
+<span class="c1">##</span>
+<span class="c1">## Offsets into file header.</span>
+<span class="c1">##</span>
+<span class="n">EI_MAG0</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># File identification.</span>
+<span class="n">EI_MAG1</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># File identification.</span>
+<span class="n">EI_MAG2</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># File identification.</span>
+<span class="n">EI_MAG3</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># File identification.</span>
+<span class="n">EI_CLASS</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># File class.</span>
+<span class="n">EI_DATA</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Data encoding.</span>
+<span class="n">EI_VERSION</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># File version.</span>
+<span class="n">EI_PAD</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Start of padding bytes.</span>
+<span class="n">EI_OSABI</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Operating system/ABI identification.</span>
+<span class="n">EI_ABIVERSION</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># ABI version.</span>
+<span class="c1"># EI_NIDENT       = 16     # Size of e_ident[] - defined above.</span>
+
+
+<div class="viewcode-block" id="ELFClass">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ELFClass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELFClass</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ELFCLASSNONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Invalid class.</span>
+    <span class="n">ELFCLASS32</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># 32-bit objects.</span>
+    <span class="n">ELFCLASS64</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># 64-bit objects.</span></div>
+
+
+
+<span class="n">ELF_CLASS_NAMES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFClass</span><span class="o">.</span><span class="n">ELFCLASSNONE</span><span class="p">:</span> <span class="s2">&quot;Invalid class&quot;</span><span class="p">,</span>
+    <span class="n">ELFClass</span><span class="o">.</span><span class="n">ELFCLASS32</span><span class="p">:</span> <span class="s2">&quot;32-bit objects&quot;</span><span class="p">,</span>
+    <span class="n">ELFClass</span><span class="o">.</span><span class="n">ELFCLASS64</span><span class="p">:</span> <span class="s2">&quot;64-bit objects&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ELFDataEncoding">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ELFDataEncoding">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELFDataEncoding</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ELFDATANONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Invalid data encoding.</span>
+    <span class="n">ELFDATA2LSB</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Little-Endian.</span>
+    <span class="n">ELFDATA2MSB</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Big-Endian.</span></div>
+
+
+
+<span class="n">ELF_BYTE_ORDER_NAMES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFDataEncoding</span><span class="o">.</span><span class="n">ELFDATANONE</span><span class="p">:</span> <span class="s2">&quot;Invalid data encoding&quot;</span><span class="p">,</span>
+    <span class="n">ELFDataEncoding</span><span class="o">.</span><span class="n">ELFDATA2LSB</span><span class="p">:</span> <span class="s2">&quot;Little-Endian&quot;</span><span class="p">,</span>
+    <span class="n">ELFDataEncoding</span><span class="o">.</span><span class="n">ELFDATA2MSB</span><span class="p">:</span> <span class="s2">&quot;Big-Endian&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ELFAbiType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ELFAbiType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ELFAbiType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ELFOSABI_NONE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># UNIX System V ABI</span>
+    <span class="n">ELFOSABI_HPUX</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># HP-UX operating system</span>
+    <span class="n">ELFOSABI_NETBSD</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># NetBSD</span>
+    <span class="n">ELFOSABI_GNU</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># GNU</span>
+    <span class="n">ELFOSABI_LINUX</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Alias for ELFOSABI_GNU</span>
+    <span class="n">ELFOSABI_SOLARIS</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># Solaris</span>
+    <span class="n">ELFOSABI_AIX</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># AIX</span>
+    <span class="n">ELFOSABI_IRIX</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># IRIX</span>
+    <span class="n">ELFOSABI_FREEBSD</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># FreeBSD</span>
+    <span class="n">ELFOSABI_TRU64</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># TRU64 UNIX</span>
+    <span class="n">ELFOSABI_MODESTO</span> <span class="o">=</span> <span class="mi">11</span>  <span class="c1"># Novell Modesto</span>
+    <span class="n">ELFOSABI_OPENBSD</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># OpenBSD</span>
+    <span class="n">ELFOSABI_OPENVMS</span> <span class="o">=</span> <span class="mi">13</span>  <span class="c1"># OpenVMS</span>
+    <span class="n">ELFOSABI_NSK</span> <span class="o">=</span> <span class="mi">14</span>  <span class="c1"># Hewlett-Packard Non-Stop Kernel</span>
+    <span class="n">ELFOSABI_AROS</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># AROS</span>
+    <span class="n">ELFOSABI_FENIXOS</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># FenixOS</span>
+    <span class="n">ELFOSABI_C6000_ELFABI</span> <span class="o">=</span> <span class="mi">64</span>  <span class="c1"># Bare-metal TMS320C6000; alt:  ELFOSABI_ARM_AEABI</span>
+    <span class="n">ELFOSABI_C6000_LINUX</span> <span class="o">=</span> <span class="mi">65</span>  <span class="c1"># Linux TMS320C6000</span>
+    <span class="n">ELFOSABI_ARM</span> <span class="o">=</span> <span class="mi">97</span>  <span class="c1"># ARM</span>
+    <span class="n">ELFOSABI_STANDALONE</span> <span class="o">=</span> <span class="mi">255</span>  <span class="c1"># Standalone (embedded) application</span></div>
+
+
+
+<span class="c1">##</span>
+<span class="c1">##</span>
+<span class="c1">##   ELF Sections.</span>
+<span class="c1">##</span>
+<span class="c1">##</span>
+
+<span class="n">SEC_FMT32</span> <span class="o">=</span> <span class="s2">&quot;IIIIIIIIII&quot;</span>
+<span class="n">ELF_SECTION_SIZE32</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">SEC_FMT32</span><span class="p">)</span>
+
+<span class="n">SEC_FMT64</span> <span class="o">=</span> <span class="s2">&quot;IIQQQQIIQQ&quot;</span>
+<span class="n">ELF_SECTION_SIZE64</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">SEC_FMT64</span><span class="p">)</span>
+
+<span class="n">Elf_Shdr</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s2">&quot;Elf_Shdr&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;sh_name sh_type sh_flags sh_addr sh_offset sh_size</span>
+<span class="sd">    sh_link sh_info sh_addralign sh_entsize&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="SectionName">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SectionName">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SectionName</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">SHN_UNDEF</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># SHN_UNDEF This value marks an undefined, missing, irrelevant, or otherwise</span>
+    <span class="c1"># meaningless section reference. For example, a symbol &quot;defined&#39;&#39; relative to</span>
+    <span class="c1"># section number SHN_UNDEF is an undefined symbol.</span>
+
+    <span class="n">SHN_LORESERVE</span> <span class="o">=</span> <span class="mh">0xFF00</span>
+    <span class="c1"># This value specifies the lower bound of the range of reserved indexes</span>
+    <span class="n">SHN_LOPROC</span> <span class="o">=</span> <span class="mh">0xFF00</span>
+    <span class="n">SHN_BEFORE</span> <span class="o">=</span> <span class="mh">0xFF00</span>
+    <span class="c1"># Order section before all others (Solaris).</span>
+    <span class="n">SHN_AFTER</span> <span class="o">=</span> <span class="mh">0xFF01</span>
+    <span class="c1"># Order section after all others (Solaris).</span>
+    <span class="n">SHN_HIPROC</span> <span class="o">=</span> <span class="mh">0xFF1F</span>
+    <span class="c1"># SHN_LOPROC through SHN_HIPROC: Values in this inclusive range are reserved for</span>
+    <span class="c1"># processor-specific semantics.</span>
+    <span class="n">SHN_LOOS</span> <span class="o">=</span> <span class="mh">0xFF20</span>
+    <span class="c1"># Start of OS-specific</span>
+    <span class="n">SHN_HIOS</span> <span class="o">=</span> <span class="mh">0xFF3F</span>
+    <span class="c1"># End of OS-specific</span>
+    <span class="n">SHN_ABS</span> <span class="o">=</span> <span class="mh">0xFFF1</span>
+    <span class="c1"># SHN_ABS This value specifies absolute values for the corresponding reference. For</span>
+    <span class="c1"># example, symbols defined relative to section number SHN_ABS have</span>
+    <span class="c1"># absolute values and are not affected by relocation.</span>
+    <span class="n">SHN_COMMON</span> <span class="o">=</span> <span class="mh">0xFFF2</span>
+    <span class="c1"># SHN_COMMON Symbols defined relative to this section are common symbols, such as</span>
+    <span class="c1"># FORTRAN COMMON or unallocated C external variables.</span>
+    <span class="n">SHN_XINDEX</span> <span class="o">=</span> <span class="mh">0xFFFF</span>
+    <span class="c1"># Index is in extra table.</span>
+    <span class="n">SHN_HIRESERVE</span> <span class="o">=</span> <span class="mh">0xFFFF</span>
+    <span class="c1"># SHN_HIRESERVE This value specifies the upper bound of the range of reserved indexes.</span>
+    <span class="c1"># The system reserves indexes between SHN_LORESERVE and SHN_HIRESERVE, inclusive;</span>
+    <span class="c1"># the values do not reference the section header table.That is, the section header</span>
+    <span class="c1"># table does not contain entries for the  reserved indexes.</span>
+
+    <span class="n">SHN_IA_64_ANSI_COMMON</span> <span class="o">=</span> <span class="mh">0xFF00</span></div>
+
+    <span class="c1"># This section only used by HP-UX, The HP linker gives weak symbols</span>
+    <span class="c1"># precedence over regular common symbols.  We want common to override</span>
+    <span class="c1"># weak.  Using this common instead of SHN_COMMON does that.</span>
+
+
+<span class="n">SpecialSections</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">SectionName</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<div class="viewcode-block" id="special_section_name">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.special_section_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">special_section_name</span><span class="p">(</span><span class="n">ndx</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="n">SpecialSections</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SectionName</span><span class="p">(</span><span class="n">ndx</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ndx</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SectionType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SectionType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SectionType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="n">SHT_NULL</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Section header table entry unused.</span>
+    <span class="n">SHT_PROGBITS</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Program data.</span>
+    <span class="n">SHT_SYMTAB</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Symbol table.</span>
+    <span class="n">SHT_STRTAB</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># String table.</span>
+    <span class="n">SHT_RELA</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Relocation entries with addends.</span>
+    <span class="n">SHT_HASH</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Symbol hash table.</span>
+    <span class="n">SHT_DYNAMIC</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># Dynamic linking information.</span>
+    <span class="n">SHT_NOTE</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Notes.</span>
+    <span class="n">SHT_NOBITS</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Program space with no data (bss).</span>
+    <span class="n">SHT_REL</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># Relocation entries, no addends.</span>
+    <span class="n">SHT_SHLIB</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Reserved.</span>
+    <span class="n">SHT_DYNSYM</span> <span class="o">=</span> <span class="mi">11</span>  <span class="c1"># Dynamic linker symbol table.</span>
+    <span class="n">SHT_INIT_ARRAY</span> <span class="o">=</span> <span class="mi">14</span>  <span class="c1"># Array of constructors.</span>
+    <span class="n">SHT_FINI_ARRAY</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># Array of destructors.</span>
+    <span class="n">SHT_PREINIT_ARRAY</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># Array of pre-constructors.</span>
+    <span class="n">SHT_GROUP</span> <span class="o">=</span> <span class="mi">17</span>  <span class="c1"># Section group.</span>
+    <span class="n">SHT_SYMTAB_SHNDX</span> <span class="o">=</span> <span class="mi">18</span>  <span class="c1"># Extended section indeces.</span>
+    <span class="n">SHT_NUM</span> <span class="o">=</span> <span class="mi">19</span>  <span class="c1"># Number of defined types.</span>
+    <span class="n">SHT_LOOS</span> <span class="o">=</span> <span class="mh">0x60000000</span>  <span class="c1"># Start OS-specific.</span>
+    <span class="n">SHT_GNU_INCREMENTAL_INPUTS</span> <span class="o">=</span> <span class="mh">0x6FFF4700</span>  <span class="c1"># incremental build data</span>
+    <span class="n">SHT_GNU_ATTRIBUTES</span> <span class="o">=</span> <span class="mh">0x6FFFFFF5</span>  <span class="c1"># Object attributes.</span>
+    <span class="n">SHT_GNU_HASH</span> <span class="o">=</span> <span class="mh">0x6FFFFFF6</span>  <span class="c1"># GNU-style hash table.</span>
+    <span class="n">SHT_GNU_LIBLIST</span> <span class="o">=</span> <span class="mh">0x6FFFFFF7</span>  <span class="c1"># Prelink library list</span>
+    <span class="n">SHT_CHECKSUM</span> <span class="o">=</span> <span class="mh">0x6FFFFFF8</span>  <span class="c1"># Checksum for DSO content.</span>
+    <span class="n">SHT_LOSUNW</span> <span class="o">=</span> <span class="mh">0x6FFFFFFA</span>  <span class="c1"># Sun-specific low bound.</span>
+    <span class="n">SHT_SUNW_move</span> <span class="o">=</span> <span class="mh">0x6FFFFFFA</span>
+    <span class="n">SHT_SUNW_COMDAT</span> <span class="o">=</span> <span class="mh">0x6FFFFFFB</span>
+    <span class="n">SHT_SUNW_syminfo</span> <span class="o">=</span> <span class="mh">0x6FFFFFFC</span>
+    <span class="n">SHT_GNU_verdef</span> <span class="o">=</span> <span class="mh">0x6FFFFFFD</span>  <span class="c1"># Version definition section.</span>
+    <span class="n">SHT_GNU_verneed</span> <span class="o">=</span> <span class="mh">0x6FFFFFFE</span>  <span class="c1"># Version needs section.</span>
+    <span class="n">SHT_GNU_versym</span> <span class="o">=</span> <span class="mh">0x6FFFFFFF</span>  <span class="c1"># Version symbol table.</span>
+    <span class="n">SHT_HISUNW</span> <span class="o">=</span> <span class="mh">0x6FFFFFFF</span>  <span class="c1"># Sun-specific high bound.</span>
+    <span class="n">SHT_HIOS</span> <span class="o">=</span> <span class="mh">0x6FFFFFFF</span>  <span class="c1"># End OS-specific type.</span>
+    <span class="n">SHT_LOPROC</span> <span class="o">=</span> <span class="mh">0x70000000</span>  <span class="c1"># Start of processor-specific.</span>
+
+    <span class="n">SHT_ARM_EXIDX</span> <span class="o">=</span> <span class="mh">0x70000001</span>  <span class="c1"># Section holds ARM unwind info.</span>
+    <span class="n">SHT_ARM_PREEMPTMAP</span> <span class="o">=</span> <span class="mh">0x70000002</span>  <span class="c1"># Section pre-emption details.</span>
+    <span class="n">SHT_ARM_ATTRIBUTES</span> <span class="o">=</span> <span class="mh">0x70000003</span>  <span class="c1"># Section holds attributes.</span>
+    <span class="n">SHT_ARM_DEBUGOVERLAY</span> <span class="o">=</span> <span class="mh">0x70000004</span>  <span class="c1"># Section holds overlay debug info.</span>
+    <span class="n">SHT_ARM_OVERLAYSECTION</span> <span class="o">=</span> <span class="mh">0x70000005</span>  <span class="c1"># Section holds GDB and overlay integration info.</span>
+
+    <span class="n">SHT_HIPROC</span> <span class="o">=</span> <span class="mh">0x7FFFFFFF</span>  <span class="c1"># End of processor-specific.</span>
+    <span class="n">SHT_LOUSER</span> <span class="o">=</span> <span class="mh">0x80000000</span>  <span class="c1"># Start of application-specific.</span>
+    <span class="n">SHT_HIUSER</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>  <span class="c1"># End of application-specific.</span></div>
+
+
+
+<div class="viewcode-block" id="SectionFlags">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SectionFlags">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SectionFlags</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">SHF_WRITE</span> <span class="o">=</span> <span class="mh">0x1</span>  <span class="c1"># Writeable.</span>
+    <span class="n">SHF_ALLOC</span> <span class="o">=</span> <span class="mh">0x2</span>  <span class="c1"># Occupies memory during execution</span>
+    <span class="n">SHF_EXECINSTR</span> <span class="o">=</span> <span class="mh">0x4</span>  <span class="c1"># Executable.</span>
+
+    <span class="n">SHF_MERGE</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># Might be merged</span>
+    <span class="n">SHF_STRINGS</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1"># Contains nul-terminated strings</span>
+    <span class="n">SHF_INFO_LINK</span> <span class="o">=</span> <span class="mi">64</span>  <span class="c1"># `sh_info&#39; contains SHT index</span>
+    <span class="n">SHF_LINK_ORDER</span> <span class="o">=</span> <span class="mi">128</span>  <span class="c1"># Preserve order after combining</span>
+    <span class="n">SHF_OS_NONCONFORMING</span> <span class="o">=</span> <span class="mi">256</span>  <span class="c1"># Non-standard OS specific handling required</span>
+    <span class="n">SHF_GROUP</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># Section is member of a group.</span>
+    <span class="n">SHF_TLS</span> <span class="o">=</span> <span class="mi">1024</span>  <span class="c1"># Section hold thread-local data.</span>
+    <span class="n">SHF_COMPRESSED</span> <span class="o">=</span> <span class="mi">2048</span>  <span class="c1"># Section with compressed data.</span>
+
+    <span class="n">SHF_MASKOS</span> <span class="o">=</span> <span class="mh">0x0FF00000</span>  <span class="c1"># OS-specific.</span>
+    <span class="n">SHF_MASKPROC</span> <span class="o">=</span> <span class="mh">0xF0000000</span>  <span class="c1"># Processor-specific.</span>
+
+    <span class="n">SHF_ORDERED</span> <span class="o">=</span> <span class="mi">1073741824</span>  <span class="c1"># Special ordering requirement (Solaris).</span>
+    <span class="n">SHF_EXCLUDE</span> <span class="o">=</span> <span class="mi">2147483648</span>  <span class="c1"># Section is excluded unless referenced or allocated (Solaris).</span></div>
+
+
+
+<span class="c1">##</span>
+<span class="c1">##</span>
+<span class="c1">##   ELF Symbol Table.</span>
+<span class="c1">##</span>
+<span class="c1">##</span>
+
+<span class="n">SYMTAB_FMT32</span> <span class="o">=</span> <span class="s2">&quot;IIIBBH&quot;</span>
+<span class="n">SYMTAB_FMT64</span> <span class="o">=</span> <span class="s2">&quot;IBBHQQ&quot;</span>
+
+<span class="n">Elf32_Sym</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Elf_Sym&quot;</span><span class="p">,</span> <span class="s2">&quot;st_name st_value st_size st_info st_other st_shndx&quot;</span><span class="p">)</span>
+<span class="n">Elf64_Sym</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Elf_Sym&quot;</span><span class="p">,</span> <span class="s2">&quot;st_name st_info st_other st_shndx st_value st_size&quot;</span><span class="p">)</span>
+
+<span class="n">ELF32_SYM_TABLE_SIZE</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">SYMTAB_FMT32</span><span class="p">)</span>
+<span class="n">ELF64_SYM_TABLE_SIZE</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">SYMTAB_FMT64</span><span class="p">)</span>
+
+<span class="n">STN_UNDEF</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<div class="viewcode-block" id="SymbolBinding">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SymbolBinding">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymbolBinding</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">STB_LOCAL</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># i.e. `static`</span>
+    <span class="n">STB_GLOBAL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">STB_WEAK</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">STB_GNU_UNIQUE</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Symbol is unique in namespace.</span>
+
+    <span class="n">STB_LOPROC</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">STB_HIPROC</span> <span class="o">=</span> <span class="mi">15</span></div>
+
+
+
+<div class="viewcode-block" id="SymbolType">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SymbolType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymbolType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">STT_NOTYPE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">STT_OBJECT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">STT_FUNC</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">STT_SECTION</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">STT_FILE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">STT_COMMON</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">STT_TLS</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">STT_RELC</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Complex relocation expression.</span>
+    <span class="n">STT_SRELC</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># Signed Complex relocation expression.</span>
+    <span class="n">STT_GNU_IFUNC</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Symbol is an indirect code object.</span>
+    <span class="n">STT_LOPROC</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">STT_HIPROC</span> <span class="o">=</span> <span class="mi">15</span></div>
+
+
+
+<div class="viewcode-block" id="SymbolVisibility">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.SymbolVisibility">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymbolVisibility</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Symbol visibility specification encoded in the st_other field.&quot;&quot;&quot;</span>
+
+    <span class="n">STV_DEFAULT</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Default symbol visibility rules</span>
+    <span class="n">STV_INTERNAL</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Processor specific hidden class</span>
+    <span class="n">STV_HIDDEN</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Sym unavailable in other modules</span>
+    <span class="n">STV_PROTECTED</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Not preemptible, not exported</span></div>
+
+
+
+<span class="c1">##</span>
+<span class="c1">##</span>
+<span class="c1">##   ELF Program Header</span>
+<span class="c1">##</span>
+<div class="viewcode-block" id="ProgramHeader">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.ProgramHeader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgramHeader</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">PT_NULL</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Program header table entry unused.</span>
+    <span class="n">PT_LOAD</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Loadable program segment.</span>
+    <span class="n">PT_DYNAMIC</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Dynamic linking information.</span>
+    <span class="n">PT_INTERP</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Program interpreter.</span>
+    <span class="n">PT_NOTE</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Auxiliary information.</span>
+    <span class="n">PT_SHLIB</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Reserved.</span>
+    <span class="n">PT_PHDR</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># Entry for header table itself.</span>
+    <span class="n">PT_TLS</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Thread-local storage segment</span>
+    <span class="n">PT_NUM</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Number of defined types</span>
+    <span class="n">PT_LOOS</span> <span class="o">=</span> <span class="mh">0x60000000</span>  <span class="c1"># Start of OS-specific</span>
+    <span class="n">PT_GNU_EH_FRAME</span> <span class="o">=</span> <span class="mh">0x6474E550</span>  <span class="c1"># GCC .eh_frame_hdr segment</span>
+    <span class="n">PT_GNU_STACK</span> <span class="o">=</span> <span class="mh">0x6474E551</span>  <span class="c1"># Indicates stack executability</span>
+    <span class="n">PT_GNU_RELRO</span> <span class="o">=</span> <span class="mh">0x6474E552</span>  <span class="c1"># Read-only after relocation</span>
+    <span class="n">PT_GNU_PROPERTY</span> <span class="o">=</span> <span class="mh">0x6474E553</span>  <span class="c1"># GNU property</span>
+
+    <span class="n">PT_LOSUNW</span> <span class="o">=</span> <span class="mh">0x6FFFFFFA</span>
+    <span class="n">PT_SUNWBSS</span> <span class="o">=</span> <span class="mh">0x6FFFFFFA</span>  <span class="c1"># Sun Specific segment</span>
+    <span class="n">PT_SUNWSTACK</span> <span class="o">=</span> <span class="mh">0x6FFFFFFB</span>  <span class="c1"># Stack segment</span>
+    <span class="n">PT_HISUNW</span> <span class="o">=</span> <span class="mh">0x6FFFFFFF</span>
+    <span class="n">PT_HIOS</span> <span class="o">=</span> <span class="mh">0x6FFFFFFF</span>  <span class="c1"># End of OS-specific</span>
+    <span class="n">PT_LOPROC</span> <span class="o">=</span> <span class="mh">0x70000000</span>  <span class="c1"># Start of processor-specific.</span>
+    <span class="n">PT_ARM_EXIDX</span> <span class="o">=</span> <span class="n">PT_LOPROC</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># Frame unwind information</span>
+    <span class="n">PT_HIPROC</span> <span class="o">=</span> <span class="mh">0x7FFFFFFF</span>  <span class="c1"># End of processor-specific</span></div>
+
+
+
+<div class="viewcode-block" id="program_header_name">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.program_header_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">program_header_name</span><span class="p">(</span><span class="n">tp</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ProgramHeader</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span></div>
+
+
+
+<span class="n">PF_X</span> <span class="o">=</span> <span class="mh">0x1</span>  <span class="c1"># Execute.</span>
+<span class="n">PF_W</span> <span class="o">=</span> <span class="mh">0x2</span>  <span class="c1"># Write.</span>
+<span class="n">PF_R</span> <span class="o">=</span> <span class="mh">0x4</span>  <span class="c1"># Read.</span>
+<span class="n">PF_MASKPROC</span> <span class="o">=</span> <span class="mh">0xF0000000</span>  <span class="c1"># Unspecified.</span>
+
+<span class="n">PN_XNUM</span> <span class="o">=</span> <span class="mh">0xFFFF</span>  <span class="c1"># Extended numbering.</span>
+
+
+<div class="viewcode-block" id="program_header_flags_name">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.program_header_flags_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">program_header_flags_name</span><span class="p">(</span><span class="n">flg</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">flg</span> <span class="o">&amp;</span> <span class="n">PF_R</span> <span class="o">==</span> <span class="n">PF_R</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flg</span> <span class="o">&amp;</span> <span class="n">PF_W</span> <span class="o">==</span> <span class="n">PF_W</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flg</span> <span class="o">&amp;</span> <span class="n">PF_X</span> <span class="o">==</span> <span class="n">PF_X</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="NoteSegmentDescriptorCore">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorCore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoteSegmentDescriptorCore</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Legal values for note segment descriptor types for core files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NT_PRSTATUS</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># prstatus struct.</span>
+    <span class="n">NT_FPREGSET</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># fpregset struct.</span>
+    <span class="n">NT_PRPSINFO</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># prpsinfo struct.</span>
+    <span class="n">NT_PRXREG</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># prxregset struct.</span>
+    <span class="n">NT_TASKSTRUCT</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># task structure.</span>
+    <span class="n">NT_PLATFORM</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># String from sysinfo(SI_PLATFORM).</span>
+    <span class="n">NT_AUXV</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># auxv array.</span>
+    <span class="n">NT_GWINDOWS</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># gwindows struct.</span>
+    <span class="n">NT_ASRS</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># asrset struct.</span>
+    <span class="n">NT_PSTATUS</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># pstatus struct.</span>
+    <span class="n">NT_PSINFO</span> <span class="o">=</span> <span class="mi">13</span>  <span class="c1"># psinfo struct.</span>
+    <span class="n">NT_PRCRED</span> <span class="o">=</span> <span class="mi">14</span>  <span class="c1"># prcred struct.</span>
+    <span class="n">NT_UTSNAME</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># utsname struct.</span>
+    <span class="n">NT_LWPSTATUS</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># lwpstatus struct.</span>
+    <span class="n">NT_LWPSINFO</span> <span class="o">=</span> <span class="mi">17</span>  <span class="c1"># lwpinfo struct.</span>
+    <span class="n">NT_PRFPXREG</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># fprxregset struct.</span>
+    <span class="n">NT_PRXFPREG</span> <span class="o">=</span> <span class="mh">0x46E62B7F</span>  <span class="c1"># user_fxsr_struct.</span>
+    <span class="n">NT_PPC_VMX</span> <span class="o">=</span> <span class="mh">0x100</span>  <span class="c1"># PowerPC Altivec/VMX registers.</span>
+    <span class="n">NT_PPC_SPE</span> <span class="o">=</span> <span class="mh">0x101</span>  <span class="c1"># PowerPC SPE/EVR registers.</span>
+    <span class="n">NT_PPC_VSX</span> <span class="o">=</span> <span class="mh">0x102</span>  <span class="c1"># PowerPC VSX registers.</span>
+    <span class="n">NT_386_TLS</span> <span class="o">=</span> <span class="mh">0x200</span>  <span class="c1"># i386 TLS slots (struct user_desc).</span>
+    <span class="n">NT_386_IOPERM</span> <span class="o">=</span> <span class="mh">0x201</span>  <span class="c1"># x86 io permission bitmap (1=deny).</span>
+    <span class="n">NT_X86_XSTATE</span> <span class="o">=</span> <span class="mh">0x202</span>  <span class="c1"># x86 extended state using xsave.</span></div>
+
+
+
+<div class="viewcode-block" id="NoteSegmentDescriptorObject">
+<a class="viewcode-back" href="../../../objutils.elf.html#objutils.elf.defs.NoteSegmentDescriptorObject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoteSegmentDescriptorObject</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Legal values for the note segment descriptor types for object files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NT_VERSION</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Contains a version string.</span></div>
+
+
+
+<span class="n">BYTEORDER_PREFIX</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ELFDataEncoding</span><span class="o">.</span><span class="n">ELFDATA2LSB</span><span class="p">:</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>  <span class="c1"># Little-Endian.</span>
+    <span class="n">ELFDataEncoding</span><span class="o">.</span><span class="n">ELFDATA2MSB</span><span class="p">:</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>  <span class="c1"># Big-Endian.</span>
+<span class="p">}</span>
+</pre></div>
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

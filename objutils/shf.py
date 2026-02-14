@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """Reader/Writer S Hexdump Format (rfc4149)."""
 
-__version__ = "0.1.1"
-
 __copyright__ = """
     objutils - Object file library for Python.
 

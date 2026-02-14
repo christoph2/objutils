@@ -1,0 +1,986 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>objutils.section &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/objutils/section';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../objutils.html" class="nav-link">objutils</a></li>
+
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils.section</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <h1>Source code for objutils.section</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    objutils - Object file library for Python.</span>
+
+<span class="s2">   (C) 2010-2025 by Christoph Schueler &lt;github.com/Christoph2,</span>
+<span class="s2">                                        cpu12.gems@googlemail.com&gt;</span>
+
+<span class="s2">   All Rights Reserved</span>
+
+<span class="s2">  This program is free software; you can redistribute it and/or modify</span>
+<span class="s2">  it under the terms of the GNU General Public License as published by</span>
+<span class="s2">  the Free Software Foundation; either version 2 of the License, or</span>
+<span class="s2">  (at your option) any later version.</span>
+
+<span class="s2">  This program is distributed in the hope that it will be useful,</span>
+<span class="s2">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="s2">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="s2">  GNU General Public License for more details.</span>
+
+<span class="s2">  You should have received a copy of the GNU General Public License along</span>
+<span class="s2">  with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="s2">  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">reprlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">array</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">attrgetter</span><span class="p">,</span> <span class="n">mul</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">objutils.hexdump</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hexdump</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidAddressError</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.hexfiles_ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceMatcher</span>  <span class="c1"># noqa: F401</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: cannot import `SequenceMatcher` from C++-extension, falling back to `difflib`&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">difflib</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceMatcher</span>  <span class="c1"># noqa: F401</span>
+
+
+<span class="c1">##</span>
+<span class="c1">## todo: find/search methode(n) mit slice funktion!</span>
+<span class="c1">## Basic patch-interface: (addr (plus ext!), datatype (endianess)) - readAs()/writeAs()</span>
+<span class="c1">## API to change start_address (but not length!) /w check for overlapps.</span>
+<span class="c1">## split (for some reason) contingous regions into separate segments (splitAt [addresses], splitInto [n pieces]) inplace or new object.</span>
+<span class="c1">## cut/copy/paste/delete</span>
+<span class="c1">##</span>
+
+<span class="n">FORMATS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;uint8&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;int8&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;uint16&quot;</span><span class="p">:</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;int16&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;uint32&quot;</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;int32&quot;</span><span class="p">:</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;uint64&quot;</span><span class="p">:</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;float32&quot;</span><span class="p">:</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;float64&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">TYPE_SIZES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;uint8&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;int8&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;uint16&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;int16&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;uint32&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;int32&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;uint64&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="s2">&quot;float32&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;float64&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">BYTEORDER</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;le&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;be&quot;</span><span class="p">:</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">TypeInformation</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;TypeInformation&quot;</span><span class="p">,</span> <span class="s2">&quot;type byte_order size&quot;</span><span class="p">)</span>
+
+<span class="n">DTYPE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      (?:(?P&lt;uns&gt;u)?int(?P&lt;len&gt;8 | 16 | 32 | 64)(?P&lt;sep&gt;[-/_:])(?P&lt;end&gt; be | le))</span>
+<span class="sd">    | (?P&lt;byte&gt;byte)</span>
+<span class="sd">    | (?P&lt;flt&gt;float)(?P&lt;flen&gt;32 | 64)&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">NumberRange</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;NumberRange&quot;</span><span class="p">,</span> <span class="s2">&quot;lower upper&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="signed_range">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.signed_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">signed_range</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumberRange</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">NumberRange</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">int</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="unsigned_range">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.unsigned_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unsigned_range</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumberRange</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">NumberRange</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span></div>
+
+
+
+<span class="n">INT8_RANGE</span> <span class="o">=</span> <span class="n">signed_range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">INT16_RANGE</span> <span class="o">=</span> <span class="n">signed_range</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">INT32_RANGE</span> <span class="o">=</span> <span class="n">signed_range</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">INT64_RANGE</span> <span class="o">=</span> <span class="n">signed_range</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">UINT8_RANGE</span> <span class="o">=</span> <span class="n">unsigned_range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">UINT16_RANGE</span> <span class="o">=</span> <span class="n">unsigned_range</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">UINT32_RANGE</span> <span class="o">=</span> <span class="n">unsigned_range</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">UINT64_RANGE</span> <span class="o">=</span> <span class="n">unsigned_range</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
+
+<span class="n">RANGES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;byte&quot;</span><span class="p">:</span> <span class="n">UINT8_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;uint8&quot;</span><span class="p">:</span> <span class="n">UINT8_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;int8&quot;</span><span class="p">:</span> <span class="n">INT8_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;uint16&quot;</span><span class="p">:</span> <span class="n">UINT16_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;int16&quot;</span><span class="p">:</span> <span class="n">INT16_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;uint32&quot;</span><span class="p">:</span> <span class="n">UINT32_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;int32&quot;</span><span class="p">:</span> <span class="n">INT32_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;uint64&quot;</span><span class="p">:</span> <span class="n">UINT64_RANGE</span><span class="p">,</span>
+    <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="n">INT64_RANGE</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="filler">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.filler">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filler</span><span class="p">(</span><span class="n">ch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an bytearray consisting of `n` `ch`s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ch: int (0 &lt;= ch &lt;= 255)</span>
+<span class="sd">        fill char</span>
+<span class="sd">    n: int</span>
+<span class="sd">        repetition count</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bytearray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ch must be of type int&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">ch</span> <span class="o">&lt;</span> <span class="mi">256</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ch must be between 0 and 255&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;n must be of type int&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n must be &gt;= 1&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">bytearray</span><span class="p">([</span><span class="n">ch</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_data_converter">
+<a class="viewcode-back" href="../../objutils.html#objutils.section._data_converter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_data_converter</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># no conversion needed.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;single int not permitted&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">typecode</span> <span class="o">!=</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Section</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># just copy data from other section.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cannot convert </span><span class="si">{</span><span class="n">data</span><span class="si">!r}</span><span class="s2"> to bytearray()&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="fortran_array_from_buffer">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.fortran_array_from_buffer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fortran_array_from_buffer</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># shape = list(reversed(shape))</span>
+    <span class="n">lhs</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">num_slices</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">rhs</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">slice_len</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_slices</span><span class="p">):</span>
+        <span class="n">ddx</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">slice_len</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">ddx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="nb">reversed</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">buf</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">slice_len</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="n">slice_len</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fortran_array_to_buffer">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.fortran_array_to_buffer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fortran_array_to_buffer</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">array</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">num_slices</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">slice_len</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">rs_arr</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_slices</span><span class="p">,</span> <span class="o">*</span><span class="n">rhs</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_slices</span><span class="p">):</span>
+            <span class="nb">slice</span> <span class="o">=</span> <span class="n">rs_arr</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">slice_len</span><span class="p">]</span> <span class="o">=</span> <span class="nb">slice</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="n">slice_len</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="Section">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Section</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manage sections.</span>
+
+<span class="sd">    A section is a continuous block of bytes, with a start-address and known length.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">start_address</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">bytearray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">bytearray</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repr</span> <span class="o">=</span> <span class="n">reprlib</span><span class="o">.</span><span class="n">Repr</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repr</span><span class="o">.</span><span class="n">maxstring</span> <span class="o">=</span> <span class="mi">64</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repr</span><span class="o">.</span><span class="n">maxother</span> <span class="o">=</span> <span class="mi">64</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_data_converter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="Section.hexdump">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.hexdump">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hexdump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="n">dumper</span> <span class="o">=</span> <span class="n">hexdump</span><span class="o">.</span><span class="n">CanonicalDumper</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">dumper</span><span class="o">.</span><span class="n">dump_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.tobytes">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.tobytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tobytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Section.tolist">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.tolist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tolist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Section._verify_dtype">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section._verify_dtype">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_verify_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;byte&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="s2">&quot;le&quot;</span>  <span class="c1"># Completly arbitrary,</span>
+        <span class="k">if</span> <span class="s2">&quot;_&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dtype</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dtype</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_le&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dtype</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_be&quot;</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DTYPE:&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;dtype must be suffixed with &#39;_be&#39; or &#39;_le&#39;&quot;</span><span class="p">)</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid datatype </span><span class="si">{</span><span class="n">dtype</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section._getformat">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section._getformat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getformat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">fmt</span><span class="p">,</span> <span class="n">bo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BYTEORDER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bo</span><span class="p">)</span><span class="si">}{</span><span class="n">length</span><span class="si">}{</span><span class="n">FORMATS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BYTEORDER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bo</span><span class="p">)</span><span class="si">}{</span><span class="n">FORMATS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="Section.read">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        addr: int</span>
+
+<span class="sd">        length: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Section.write">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        addr: int</span>
+
+<span class="sd">        length: int</span>
+
+<span class="sd">        data: array-like</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Section.read_numeric">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.read_numeric">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_numeric(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getformat</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_numeric(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;bit_mask&quot;</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">:</span>
+            <span class="n">bit_mask</span> <span class="o">=</span> <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bit_mask&quot;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_bitmask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">bit_mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Section.apply_bitmask">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.apply_bitmask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_bitmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bit_mask</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">dtype</span><span class="p">,</span> <span class="n">byteorder</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="n">byteorder</span> <span class="o">=</span> <span class="s2">&quot;little&quot;</span> <span class="k">if</span> <span class="n">byteorder</span> <span class="o">==</span> <span class="s2">&quot;le&quot;</span> <span class="k">else</span> <span class="s2">&quot;big&quot;</span>
+        <span class="c1"># type_size = TYPE_SIZES.get(dtype)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">&amp;=</span> <span class="n">bit_mask</span>
+        <span class="k">return</span> <span class="n">tmp</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">data_size</span><span class="p">,</span> <span class="n">byteorder</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.write_numeric">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.write_numeric">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_numeric(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getformat</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_numeric(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;bit_mask&quot;</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">:</span>
+            <span class="n">bit_mask</span> <span class="o">=</span> <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bit_mask&quot;</span><span class="p">)</span>  <span class="c1"># noqa: F841</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.read_numeric_array">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.read_numeric_array">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_numeric_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_numeric_array(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getformat</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_numeric_array(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.write_numeric_array">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.write_numeric_array">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_numeric_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data must be iterable&quot;</span><span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_numeric_array(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getformat</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_numeric_array(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.read_string">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.read_string">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;latin1&quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_string(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unterminated String!!!&quot;</span><span class="p">)</span>  <span class="c1"># TODO: Testcase.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">pos</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.write_string">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.write_string">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;latin1&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_string(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Section.write_ndarray">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.write_ndarray">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_ndarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_ndarray(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;array must be of type numpy.ndarray.&quot;</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">nbytes</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;write_ndarray(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">order</span> <span class="o">==</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">fortran_array_to_buffer</span><span class="p">(</span><span class="n">array</span><span class="o">=</span><span class="n">array</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">data_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Section.read_ndarray">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.read_ndarray">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_ndarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_ndarray(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidAddressError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;read_ndarray(0x</span><span class="si">{</span><span class="n">addr</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">) access out of bounds.&quot;</span><span class="p">)</span>
+        <span class="n">type_</span><span class="p">,</span> <span class="n">byte_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">newbyteorder</span><span class="p">(</span><span class="n">BYTEORDER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">byte_order</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">order</span> <span class="o">==</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">fortran_array_from_buffer</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    def write_timestamp():</span>
+<span class="sd">        pass</span>
+
+<span class="sd">    def read_timestamp():</span>
+<span class="sd">        pass</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Section.find">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.Section.find">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">expr</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_address</span> <span class="o">+</span> <span class="n">item</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span> <span class="n">item</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="o">-</span> <span class="n">item</span><span class="o">.</span><span class="n">start</span><span class="p">())</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Section(address = 0X</span><span class="si">{:08X}</span><span class="s2">, length = </span><span class="si">{:d}</span><span class="s2">, data = </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repr</span><span class="o">.</span><span class="n">repr</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span> <span class="o">&lt;=</span> <span class="n">addr</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_address</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">address</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>  <span class="c1"># Alias</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_address</span></div>
+
+
+
+<div class="viewcode-block" id="join_sections">
+<a class="viewcode-back" href="../../objutils.html#objutils.section.join_sections">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">join_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Section</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Section</span><span class="p">]:</span>
+    <span class="n">result_sections</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sections</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">&quot;start_address&quot;</span><span class="p">))</span>
+    <span class="n">prev_section</span> <span class="o">=</span> <span class="n">Section</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">Section</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; is not a &#39;Section&#39; instance&quot;</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">start_address</span> <span class="o">==</span> <span class="n">prev_section</span><span class="o">.</span><span class="n">start_address</span> <span class="o">+</span> <span class="n">prev_section</span><span class="o">.</span><span class="n">length</span> <span class="ow">and</span> <span class="n">result_sections</span><span class="p">:</span>
+            <span class="n">last_segment</span> <span class="o">=</span> <span class="n">result_sections</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">last_segment</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Create a new section.</span>
+            <span class="n">result_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Section</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">start_address</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">prev_section</span> <span class="o">=</span> <span class="n">section</span>
+    <span class="k">if</span> <span class="n">result_sections</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result_sections</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+</pre></div>
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

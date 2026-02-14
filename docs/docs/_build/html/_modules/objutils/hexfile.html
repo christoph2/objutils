@@ -1,0 +1,1159 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>objutils.hexfile &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/objutils/hexfile';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../objutils.html" class="nav-link">objutils</a></li>
+
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils.hexfile</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <h1>Source code for objutils.hexfile</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1.1&quot;</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    objutils - Object file library for Python.</span>
+
+<span class="s2">   (C) 2010-2025 by Christoph Schueler &lt;cpu12.gems@googlemail.com&gt;</span>
+
+<span class="s2">   All Rights Reserved</span>
+
+<span class="s2">  This program is free software; you can redistribute it and/or modify</span>
+<span class="s2">  it under the terms of the GNU General Public License as published by</span>
+<span class="s2">  the Free Software Foundation; either version 2 of the License, or</span>
+<span class="s2">  (at your option) any later version.</span>
+
+<span class="s2">  This program is distributed in the hope that it will be useful,</span>
+<span class="s2">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="s2">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="s2">  GNU General Public License for more details.</span>
+
+<span class="s2">  You should have received a copy of the GNU General Public License along</span>
+<span class="s2">  with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="s2">  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.image</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.section</span><span class="w"> </span><span class="kn">import</span> <span class="n">Section</span><span class="p">,</span> <span class="n">join_sections</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">objutils.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_string_buffer</span><span class="p">,</span> <span class="n">slicer</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">MemoryBlocks</span>
+<span class="sd">------------</span>
+<span class="sd">Segment-Types: generic,code,const,bss,... (s. ELF!?)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO:   Create a base class for Reader/Writer common functionality.</span>
+<span class="sd">        FactoryMethods ???</span>
+<span class="sd">        Parameter [&#39;exceptionsOnErrors&#39;].</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">SIXTEEN_BITS</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">TWENTY_BITS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">TWENTYFOUR_BITS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">THIRTYTWO_BITS</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">START</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">LENGTH</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">TYPE</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">ADDRESS</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">DATA</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">UNPARSED</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">CHECKSUM</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">ADDR_CHECKSUM</span> <span class="o">=</span> <span class="mi">7</span>
+
+<span class="n">MAP_GROUP_TO_REGEX</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">LENGTH</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;length&gt;[0-9a-zA-Z]{</span><span class="si">%d</span><span class="s2">})&quot;</span><span class="p">,</span>
+    <span class="n">TYPE</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;type&gt;\d{</span><span class="si">%d</span><span class="s2">})&quot;</span><span class="p">,</span>
+    <span class="n">ADDRESS</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;address&gt;[0-9a-zA-Z]{</span><span class="si">%d</span><span class="s2">})&quot;</span><span class="p">,</span>
+    <span class="n">DATA</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;chunk&gt;[0-9a-zA-Z]+)&quot;</span><span class="p">,</span>
+    <span class="n">UNPARSED</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;chunk&gt;.*)&quot;</span><span class="p">,</span>
+    <span class="n">CHECKSUM</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;checksum&gt;[0-9a-zA-Z]{</span><span class="si">%d</span><span class="s2">})&quot;</span><span class="p">,</span>
+    <span class="n">ADDR_CHECKSUM</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;addrChecksum&gt;[0-9a-zA-Z]{</span><span class="si">%d</span><span class="s2">})&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">MAP_CHAR_TO_GROUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="n">LENGTH</span><span class="p">,</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">TYPE</span><span class="p">,</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">ADDRESS</span><span class="p">,</span>
+    <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="n">DATA</span><span class="p">,</span>
+    <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="n">UNPARSED</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">CHECKSUM</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">ADDR_CHECKSUM</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">TYPE_FROM_RECORD</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">atoi</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Statistics">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Statistics">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Statistics</span><span class="p">:</span>
+    <span class="n">record_types</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Counter</span><span class="p">)</span>
+    <span class="n">data_bytes</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Counter</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Invalidrecord_typeError">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Invalidrecord_typeError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Invalidrecord_typeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="InvalidRecordLengthError">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.InvalidRecordLengthError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InvalidRecordLengthError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="InvalidRecordChecksumError">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.InvalidRecordChecksumError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InvalidRecordChecksumError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AddressRangeToLargeError">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.AddressRangeToLargeError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AddressRangeToLargeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="MetaRecord">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.MetaRecord">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetaRecord</span><span class="p">:</span>
+    <span class="n">format_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">chunk</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytearray</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="FormatParser">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.FormatParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormatParser</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_separator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">fmt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translated_format</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_separator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_separator</span>
+
+<div class="viewcode-block" id="FormatParser.parse">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.FormatParser.parse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">prevCh</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">!=</span> <span class="n">prevCh</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">group</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">translateFormat</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+                    <span class="n">group</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">group</span> <span class="o">+=</span> <span class="n">ch</span>
+            <span class="n">prevCh</span> <span class="o">=</span> <span class="n">ch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translateFormat</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translated_format</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;(?P&lt;junk&gt;(.*?))$&quot;</span><span class="p">))</span>  <span class="c1"># ??</span>
+        <span class="n">ft</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">translated_format</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">ft</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FormatParser.translateFormat">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.FormatParser.translateFormat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">translateFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">group_number</span> <span class="o">=</span> <span class="n">MAP_CHAR_TO_GROUP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_number</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Handle invariants (i.e. fixed chars).</span>
+            <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;\s</span><span class="se">{{</span><span class="si">{</span><span class="n">length</span><span class="si">!s}</span><span class="se">}}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="n">MAP_GROUP_TO_REGEX</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_number</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_number</span> <span class="o">==</span> <span class="n">START</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startSign</span><span class="p">,)</span>
+            <span class="k">elif</span> <span class="n">group_number</span> <span class="o">==</span> <span class="n">DATA</span><span class="p">:</span>
+                <span class="sa">r</span><span class="s2">&quot;(?P&lt;chunk&gt;[0-9a-zA-Z]*)&quot;</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_separator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">expr</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;(?P&lt;chunk&gt;[0-9a-zA-Z</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_separator</span><span class="si">!s}</span><span class="s2">]*)&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">group_number</span> <span class="o">==</span> <span class="n">UNPARSED</span><span class="p">:</span>
+                <span class="c1"># print expr</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span> <span class="o">%</span> <span class="p">(</span><span class="n">length</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translated_format</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">group_number</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">expr</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Container">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Container">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Container</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_instructions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Container.add_processing_instruction">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Container.add_processing_instruction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_processing_instruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pi</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseType">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.BaseType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseType</span><span class="p">:</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span>
+    <span class="n">valid</span><span class="p">:</span> <span class="nb">bool</span>
+
+<div class="viewcode-block" id="BaseType.error">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.BaseType.error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="BaseType.warn">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.BaseType.warn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseType.info">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.BaseType.info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseType.debug">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.BaseType.debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Reader">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Reader</span><span class="p">(</span><span class="n">BaseType</span><span class="p">):</span>
+    <span class="n">ALIGMENT</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># 2**n</span>
+    <span class="n">DATA_SEPARATOR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">VALID_CHARS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-fA-F0-9 :/;,%\n\r!?S]*$&quot;</span><span class="p">)</span>  <span class="c1"># General case, fits most formats.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="s2">&quot;Reader&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">Statistics</span><span class="p">()</span>
+        <span class="c1"># formats is a list of (format_type, compiled_pattern)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT_SPEC</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">FormatParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT_SPEC</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_SEPARATOR</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">())]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT_SPEC</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formats</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">format_type</span><span class="p">,</span> <span class="nb">format</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">FORMAT_SPEC</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">format_type</span><span class="p">,</span> <span class="n">FormatParser</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_SEPARATOR</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">formats</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Reader.load">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kws</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>  <span class="c1"># .decode()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">):</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Reader.loads">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.loads">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">],</span> <span class="o">**</span><span class="n">kws</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;ascii&quot;</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Reader.read">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">meta_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">format_type</span><span class="p">,</span> <span class="nb">format</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">container</span> <span class="o">=</span> <span class="n">Container</span><span class="p">()</span>
+                    <span class="n">container</span><span class="o">.</span><span class="n">line_number</span> <span class="o">=</span> <span class="n">line_number</span>
+                    <span class="n">dict_</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">dict_</span> <span class="o">!=</span> <span class="p">{}:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">record_types</span><span class="p">[</span><span class="n">format_type</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="c1"># Handle scalar values.</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;chunk&quot;</span><span class="p">,</span> <span class="s2">&quot;junk&quot;</span><span class="p">):</span>
+                                <span class="nb">setattr</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">atoi</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;junk&quot;</span><span class="p">:</span>
+                                <span class="nb">setattr</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="s2">&quot;chunk&quot;</span> <span class="ow">in</span> <span class="n">dict_</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parseData</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">format_type</span><span class="p">):</span>
+                                <span class="n">chunk</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">dict_</span><span class="p">[</span><span class="s2">&quot;chunk&quot;</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># don&#39;t convert/parse stuff like symbols.</span>
+                                <span class="n">chunk</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="s2">&quot;chunk&quot;</span><span class="p">]</span>
+                            <span class="n">dict_</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;chunk&quot;</span><span class="p">)</span>
+                            <span class="n">container</span><span class="o">.</span><span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span>  <span class="c1"># setattr(container, &quot;chunk&quot;, chunk)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">data_bytes</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">check_line</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">format_type</span><span class="p">)</span>
+                        <span class="c1"># this is to handle esoteric stuff like Intel seg:offs addressing and symbols.</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">special_processing</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">format_type</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_data_line</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">format_type</span><span class="p">):</span>
+                            <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Section</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">container</span><span class="o">.</span><span class="n">chunk</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">chunk</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">chunk</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s2">&quot;chunk&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                            <span class="n">address</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">address</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                            <span class="n">meta_data</span><span class="p">[</span><span class="n">format_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetaRecord</span><span class="p">(</span><span class="n">format_type</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">chunk</span><span class="p">))</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring garbage line #</span><span class="si">{</span><span class="n">line_number</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Image</span><span class="p">(</span><span class="n">sections</span><span class="o">=</span><span class="n">join_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">),</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;File seems to be invalid.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Image</span><span class="p">([],</span> <span class="n">valid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Reader._address_space">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader._address_space">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_address_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SIXTEEN_BITS</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">20</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TWENTY_BITS</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">24</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TWENTYFOUR_BITS</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">THIRTYTWO_BITS</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported Addressspace size.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Reader.maybe_binary_file">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.maybe_binary_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maybe_binary_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hdr</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">hdr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_CHARS</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">hdr</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="Reader.probe">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.probe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">probe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if object is likely valid for this codec.</span>
+
+<span class="sd">        Strategy (robust, production-grade):</span>
+<span class="sd">        - Quickly reject binary-looking content.</span>
+<span class="sd">        - Sample up to 50 non-empty lines (or 8KB), decoding safely.</span>
+<span class="sd">        - Count how many lines match this codec&#39;s patterns.</span>
+<span class="sd">        - Accept when we see sufficient evidence (&gt;= 2 matches), or when</span>
+<span class="sd">          there&#39;s exactly one non-empty sampled line and it matches (tiny files).</span>
+<span class="sd">        - Always restore the file pointer to the beginning before returning.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Always start from beginning</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maybe_binary_file</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">matched_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">examined</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_lines</span> <span class="o">=</span> <span class="mi">50</span>
+        <span class="n">max_bytes</span> <span class="o">=</span> <span class="mi">8192</span>
+        <span class="n">consumed</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Iterate lines safely, up to limits</span>
+        <span class="k">for</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">raw</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">raw</span>
+
+            <span class="n">consumed</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">consumed</span> <span class="o">&gt;</span> <span class="n">max_bytes</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># skip empty/blank lines</span>
+
+            <span class="n">examined</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># If the line has clearly invalid characters for ASCII-hex records, reject fast.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALID_CHARS</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Try all known formats for this codec</span>
+            <span class="n">this_line_matched</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">_format_type</span><span class="p">,</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+                    <span class="n">this_line_matched</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">this_line_matched</span><span class="p">:</span>
+                <span class="n">matched_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">matched_count</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">break</span>  <span class="c1"># strong signal; no need to continue</span>
+            <span class="k">if</span> <span class="n">examined</span> <span class="o">&gt;=</span> <span class="n">max_lines</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="c1"># Reset file pointer before returning</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">matched_count</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Allow tiny one-line files (headers or footers) when it&#39;s the only sampled line</span>
+        <span class="k">if</span> <span class="n">matched_count</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">examined</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Reader.probes">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.probes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">probes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe</span><span class="p">(</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;ascii&quot;</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe</span><span class="p">(</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="n">image</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Reader.check_line">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.check_line">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Reader.is_data_line">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.is_data_line">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_data_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Reader.classifyLine">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.classifyLine">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">classifyLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Reader.special_processing">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.special_processing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">special_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Reader.parseData">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Reader.parseData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parseData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Writer">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Writer</span><span class="p">(</span><span class="n">BaseType</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="s2">&quot;Writer&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Writer.dump">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.dump">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">,</span> <span class="n">row_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># TODO: rename to bytesPerRow!</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">row_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">):</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Writer.dumps">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.dumps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">,</span> <span class="n">row_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row_length</span> <span class="o">=</span> <span class="n">row_length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;sections&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">image</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_address_bits</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_ADDRESS_BITS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AddressRangeToLargeError</span><span class="p">(</span><span class="s2">&quot;could not encode image.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_processing</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compose_header</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">meta</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">image</span><span class="p">:</span>
+            <span class="n">address</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">start_address</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">slicer</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compose_row</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+                <span class="n">address</span> <span class="o">+=</span> <span class="n">row_length</span>
+        <span class="n">footer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compose_footer</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">meta</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">footer</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">footer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="s2">&quot;ascii&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Writer.calculate_address_bits">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.calculate_address_bits">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_address_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;sections&quot;</span><span class="p">):</span>
+            <span class="n">last_segment</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">start_address</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">last_segment</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="n">highest_address</span> <span class="o">=</span> <span class="n">last_segment</span><span class="o">.</span><span class="n">start_address</span> <span class="o">+</span> <span class="n">last_segment</span><span class="o">.</span><span class="n">length</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">highest_address</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="Writer.post_processing">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.post_processing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">+=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Writer.pre_processing">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.pre_processing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Writer.set_parameters">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.set_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kws</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid keyword argument </span><span class="si">{</span><span class="n">k</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Writer.compose_row">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.compose_row">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Writer.compose_header">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.compose_header">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Writer.compose_footer">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.compose_footer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose_footer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Writer.word_to_bytes">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.word_to_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">word_to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+        <span class="n">hi</span> <span class="o">=</span> <span class="p">(</span><span class="n">word</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+        <span class="n">lo</span> <span class="o">=</span> <span class="n">word</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span>
+        <span class="k">return</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span></div>
+
+
+<div class="viewcode-block" id="Writer.hex_bytes">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.Writer.hex_bytes">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hex_bytes</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">spaced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="k">if</span> <span class="n">spaced</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spacer</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ASCIIHexReader">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexReader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ASCIIHexReader</span><span class="p">(</span><span class="n">Reader</span><span class="p">):</span>
+    <span class="n">FORMAT_SPEC</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">etx_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">separators</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separators</span> <span class="o">=</span> <span class="n">separators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA_PATTERN</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">data_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">separators</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_PATTERN</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">address_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ETX_PATTERN</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">etx_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">separators</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_PATTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAddress</span><span class="p">),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_PATTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_line</span><span class="p">),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ETX_PATTERN</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nop</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_PATTERN</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_PATTERN</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ETX_PATTERN</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ASCIIHexReader.getAddress">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexReader.getAddress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getAddress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Match</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;address&quot;</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ASCIIHexReader.nop">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexReader.nop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Match</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ASCIIHexReader.parse_line">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexReader.parse_line">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Match</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+            <span class="nb">bytearray</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">line</span><span class="p">))]),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ASCIIHexReader.read">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexReader.read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">breakRequest</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">action</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
+                        <span class="n">breakRequest</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">breakRequest</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">Image</span><span class="p">(</span><span class="n">join_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ASCIIHexWriter">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexWriter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ASCIIHexWriter</span><span class="p">(</span><span class="n">Writer</span><span class="p">):</span>
+    <span class="n">MAX_ADDRESS_BITS</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">previous_address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address_designator</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">separator</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_designator</span> <span class="o">=</span> <span class="n">address_designator</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ASCIIHexWriter.compose_row">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexWriter.compose_row">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">prepend_address</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">address</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_address</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">+</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="n">prepend_address</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">address_designator</span><span class="si">}{</span><span class="n">address</span><span class="si">:</span><span class="s2">04X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">separator</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">02X</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row_callout</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">line</span></div>
+
+
+<div class="viewcode-block" id="ASCIIHexWriter.row_callout">
+<a class="viewcode-back" href="../../objutils.html#objutils.hexfile.ASCIIHexWriter.row_callout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">row_callout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

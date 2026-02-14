@@ -1,0 +1,825 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>objutils &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'README';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation and Getting Started" href="installation.html" />
+    <link rel="prev" title="Welcome to objutils" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section id="objutils">
+<h1>objutils<a class="headerlink" href="#objutils" title="Link to this heading">#</a></h1>
+<a class="reference internal image-reference" href="_images/objutils_basic.png"><img alt="_images/objutils_basic.png" class="align-center" src="_images/objutils_basic.png" style="width: 256.0px; height: 256.0px;" />
+</a>
+<a class="reference external image-reference" href="https://codeclimate.com/github/christoph2/objutils"><img alt="https://codeclimate.com/github/christoph2/objutils/badges/gpa.svg" src="https://codeclimate.com/github/christoph2/objutils/badges/gpa.svg" />
+</a>
+<a class="reference external image-reference" href="https://coveralls.io/github/christoph2/objutils?branch=master"><img alt="https://coveralls.io/repos/github/christoph2/objutils/badge.svg?branch=master" src="https://coveralls.io/repos/github/christoph2/objutils/badge.svg?branch=master" />
+</a>
+<a class="reference external image-reference" href="https://github.com/christoph2/objutils"><img alt="https://github.com/christoph2/objutils/workflows/objutils/badge.svg" src="https://github.com/christoph2/objutils/workflows/objutils/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://ci.appveyor.com/project/christoph2/objutils"><img alt="https://ci.appveyor.com/api/projects/status/owpi324b6wbwocq9?svg=true" src="https://ci.appveyor.com/api/projects/status/owpi324b6wbwocq9?svg=true" />
+</a>
+<a class="reference external image-reference" href="https://results.pre-commit.ci/latest/github/christoph2/objutils/master"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/christoph2/objutils/master.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/psf/black"><img alt="https://img.shields.io/badge/code%20style-black-000000.svg" src="https://img.shields.io/badge/code%20style-black-000000.svg" />
+</a>
+<a class="reference external image-reference" href="http://opensource.org/licenses/GPL-2.0"><img alt="http://img.shields.io/badge/license-GPL-blue.svg" src="http://img.shields.io/badge/license-GPL-blue.svg" />
+</a>
+<p>Binary data stored in hex-files is in widespread use especially in embedded systems applications.
+<code class="docutils literal notranslate"><span class="pre">objutils</span></code> gives you programmatic access to a wide array of formats and offers an practical API
+to work with such data.</p>
+<p>Get the latest version from <a class="reference external" href="https://github.com/christoph2/objutils">Github</a></p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>objutils
+</pre></div>
+</div>
+<p>or run</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>develop
+</pre></div>
+</div>
+<p>on your local installation.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Python &gt;= 3.4</p></li>
+</ul>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>ELF files could read, including symbols.</p></li>
+<li><p>Typified access (scalar and arrays) to binaray data.</p></li>
+</ul>
+<section id="supported-hex-formats">
+<h3>Supported HEX formats<a class="headerlink" href="#supported-hex-formats" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">objutils</span></code> supports a bunch of HEX formats…</p>
+<section id="current">
+<h4>Current<a class="headerlink" href="#current" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>codec / format name</p></li>
+</ul>
+<ul class="simple">
+<li><p>ihex (Intel HEX)</p></li>
+<li><p>shf (S Hexdump (<a class="reference external" href="https://tools.ietf.org/html/rfc4194">rfc4194</a>))</p></li>
+<li><p>srec (Motorola S-Records)</p></li>
+<li><p>titxt (Texas Instruments Text)</p></li>
+</ul>
+</section>
+<section id="historical">
+<h4>Historical<a class="headerlink" href="#historical" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>codec / format name</p></li>
+</ul>
+<ul class="simple">
+<li><p>ash (ASCII Space Hex)</p></li>
+<li><p>cosmac (RCA Cosmac)</p></li>
+<li><p>emon52 (Elektor EMON52)</p></li>
+<li><p>etek (Tektronix Extended Hexadecimal)</p></li>
+<li><p>fpc (Four Packed Code)</p></li>
+<li><p>mostec (MOS Technology)</p></li>
+<li><p>rca (RCA)</p></li>
+<li><p>sig (Signetics)</p></li>
+<li><p>tek (Tektronix Hexadecimal)</p></li>
+</ul>
+<p><strong>codec</strong> is the first parameter to dump() / load() functions, e.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">objutils</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;ihex&quot;</span><span class="p">,</span> <span class="s2">&quot;myHexFile.hex&quot;</span><span class="p">)</span>     <span class="c1"># Load an Intel HEX file...</span>
+<span class="n">objutils</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s2">&quot;srec&quot;</span><span class="p">,</span> <span class="s2">&quot;mySRecFile.srec&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>    <span class="c1"># and save it as S-Records.</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="first-steps">
+<h2>First steps<a class="headerlink" href="#first-steps" title="Link to this heading">#</a></h2>
+<p>If you are interested, what <code class="docutils literal notranslate"><span class="pre">objutils</span></code> provides to you out-of-the-box, refer to <a class="reference external" href="scripts.rst">Scripts</a> documentation.</p>
+<p>In any case, you should work through the following tutorial:</p>
+<p>First import all classes and functions used in this tutorial.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">objutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">Section</span><span class="p">,</span> <span class="n">dump</span><span class="p">,</span> <span class="n">dumps</span><span class="p">,</span> <span class="n">load</span><span class="p">,</span> <span class="n">loads</span>
+</pre></div>
+</div>
+<p>Everything starts with hello world…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sec0</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="n">start_address</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;Hello HEX world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The constructor parameters to <cite>Section</cite> reflect what they are about:
+A continuous area of memory with an start address.</p>
+<p><strong>data</strong> is not necessarily a string, <strong>array.array**s, **byte</strong>, <strong>bytearray</strong> will also do,
+or from an internal point of view: everything that is convertible to <strong>bytearray</strong> could be used.</p>
+<p>Note: <strong>start_address</strong> and <strong>data</strong> are positional arguments, so there is no need to use them as keywords (just for the sake of illustration).</p>
+<p>Now let’s inspect our section.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sec0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="mi">00001000</span>  <span class="mi">48</span> <span class="mi">65</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">6</span><span class="n">f</span> <span class="mi">20</span> <span class="mi">48</span> <span class="mi">45</span> <span class="mi">58</span> <span class="mi">20</span> <span class="mi">77</span> <span class="mi">6</span><span class="n">f</span> <span class="mi">72</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">64</span> <span class="mi">21</span>  <span class="o">|</span><span class="n">Hello</span> <span class="n">HEX</span> <span class="n">world</span><span class="err">!</span><span class="o">|</span>
+<span class="o">---------------</span>
+       <span class="mi">16</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p><strong>hexdump()</strong> gives us, what in the world of hackers is known as a canonical hexdump.</p>
+<p>HEX files usually consist of more than one section, so let’s create another one.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sec1</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="mh">0x2000</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+<span class="n">sec1</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="mi">00002000</span>  <span class="mi">01</span> <span class="mi">02</span> <span class="mi">03</span> <span class="mi">04</span> <span class="mi">05</span> <span class="mi">06</span> <span class="mi">07</span> <span class="mi">08</span> <span class="mi">09</span> <span class="mi">0</span><span class="n">a</span> <span class="mi">0</span><span class="n">b</span> <span class="mi">0</span><span class="n">c</span> <span class="mi">0</span><span class="n">d</span> <span class="mi">0</span><span class="n">e</span> <span class="mi">0</span><span class="n">f</span> <span class="mi">10</span>  <span class="o">|................|</span>
+<span class="o">---------------</span>
+       <span class="mi">16</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>Now, let’s glue together our sections.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">sec0</span><span class="p">,</span> <span class="n">sec1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img0</span><span class="p">)</span>
+
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00001000</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Hello HEX world!&#39;</span><span class="p">)</span>
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00002000</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Images are obviously a container for sections, and they are always involved if you are interacting with disk based HEX files.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dump</span><span class="p">(</span><span class="s2">&quot;srec&quot;</span><span class="p">,</span> <span class="s2">&quot;example0.srec&quot;</span><span class="p">,</span> <span class="n">img0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting file could be inspected from command line.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cat<span class="w"> </span>example0.srec
+S113100048656C6C6F2048455820776F726C64217A
+S11320000102030405060708090A0B0C0D0E0F1044
+</pre></div>
+</div>
+<p>And loaded again…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img1</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;srec&quot;</span><span class="p">,</span> <span class="s2">&quot;example0.srec&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
+
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00001000</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Hello HEX world!&#39;</span><span class="p">)</span>
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00002000</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This leads to the conversion idiom.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img1</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;srec&quot;</span><span class="p">,</span> <span class="s2">&quot;example0.srec&quot;</span><span class="p">)</span>
+<span class="n">dump</span><span class="p">(</span><span class="s2">&quot;ihex&quot;</span><span class="p">,</span> <span class="s2">&quot;example0.hex&quot;</span><span class="p">,</span> <span class="n">img1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note: the formats above listed as historical are for one good reason historical: they are only 16bit wide, so if you want to convert,
+say a <strong>srec</strong> file for a 32bit MCU to them, you’re out of luck.</p>
+<p>OK, we’re starting another session.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sec0</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="mh">0x100</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">sec1</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="mh">0x108</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+<span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">sec0</span><span class="p">,</span> <span class="n">sec1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img0</span><span class="p">)</span>
+
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00000100</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00000100</span>  <span class="mi">01</span> <span class="mi">02</span> <span class="mi">03</span> <span class="mi">04</span> <span class="mi">05</span> <span class="mi">06</span> <span class="mi">07</span> <span class="mi">08</span> <span class="mi">09</span> <span class="mi">0</span><span class="n">a</span> <span class="mi">0</span><span class="n">b</span> <span class="mi">0</span><span class="n">c</span> <span class="mi">0</span><span class="n">d</span> <span class="mi">0</span><span class="n">e</span> <span class="mi">0</span><span class="n">f</span> <span class="mi">10</span>  <span class="o">|................|</span>
+<span class="o">---------------</span>
+       <span class="mi">16</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>Two sections with consecutive address ranges concatenated to one, this may or may not what you are expected.</p>
+<p>For this reason <strong>Image</strong> has a <strong>join</strong> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sec0</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="mh">0x100</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">sec1</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="mh">0x108</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+<span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">sec0</span><span class="p">,</span> <span class="n">sec1</span><span class="p">],</span> <span class="n">join</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img0</span><span class="p">)</span>
+
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00000100</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x01\x02\x03\x04\x05\x06\x07\x08</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00000108</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t\n\x0b\x0c\r\x0e\x0f\x10</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00000100</span>  <span class="mi">01</span> <span class="mi">02</span> <span class="mi">03</span> <span class="mi">04</span> <span class="mi">05</span> <span class="mi">06</span> <span class="mi">07</span> <span class="mi">08</span>                          <span class="o">|........</span>        <span class="o">|</span>
+<span class="o">---------------</span>
+        <span class="mi">8</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+
+<span class="n">Section</span> <span class="c1">#0001</span>
+<span class="o">-------------</span>
+<span class="mi">00000108</span>  <span class="mi">09</span> <span class="mi">0</span><span class="n">a</span> <span class="mi">0</span><span class="n">b</span> <span class="mi">0</span><span class="n">c</span> <span class="mi">0</span><span class="n">d</span> <span class="mi">0</span><span class="n">e</span> <span class="mi">0</span><span class="n">f</span> <span class="mi">10</span>                          <span class="o">|........</span>        <span class="o">|</span>
+<span class="o">---------------</span>
+        <span class="mi">8</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>One feature that sets <strong>objutils</strong> apart from other libraries of this breed is typified access.</p>
+<p>We are starting with a new image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">Section</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">img0</span><span class="p">)</span>
+
+<span class="n">Section</span><span class="p">(</span><span class="n">address</span> <span class="o">=</span> <span class="mh">0X00001000</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">...00</span><span class="se">\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We are now writing a string to our image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">Section</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))])</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mh">0x1010</span><span class="p">,</span> <span class="p">[</span><span class="mh">0xff</span><span class="p">])</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00001000</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="mi">00001010</span>  <span class="n">ff</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="mi">00001020</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="mi">00001030</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+
+<span class="n">img0</span><span class="o">.</span><span class="n">write_string</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="s2">&quot;Hello HEX world!&quot;</span><span class="p">)</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00001000</span>  <span class="mi">48</span> <span class="mi">65</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">6</span><span class="n">f</span> <span class="mi">20</span> <span class="mi">48</span> <span class="mi">45</span> <span class="mi">58</span> <span class="mi">20</span> <span class="mi">77</span> <span class="mi">6</span><span class="n">f</span> <span class="mi">72</span> <span class="mi">6</span><span class="n">c</span> <span class="mi">64</span> <span class="mi">21</span>  <span class="o">|</span><span class="n">Hello</span> <span class="n">HEX</span> <span class="n">world</span><span class="err">!</span><span class="o">|</span>
+<span class="mi">00001010</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+          <span class="o">*</span>
+<span class="mi">00001030</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="o">---------------</span>
+       <span class="mi">64</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>Notice the difference? In our <strong>Section</strong> example above, the string passed as a <strong>data</strong> parameter
+was just a bunch of bytes, but now it is a “real” C-string (there is a opposite function, <strong>read_string</strong>,
+that scans for a terminating <strong>NULL</strong> character).</p>
+<p>Use <strong>write()</strong> and <strong>read()</strong> functions, if you want to access plain bytes.</p>
+<p>But there is also support for numerical types.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">Section</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))])</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">write_numeric</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="mh">0x10203040</span><span class="p">,</span> <span class="s2">&quot;uint32_be&quot;</span><span class="p">)</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">write_numeric</span><span class="p">(</span><span class="mh">0x1004</span><span class="p">,</span> <span class="mh">0x50607080</span><span class="p">,</span> <span class="s2">&quot;uint32_le&quot;</span><span class="p">)</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00001000</span>  <span class="mi">10</span> <span class="mi">20</span> <span class="mi">30</span> <span class="mi">40</span> <span class="mi">80</span> <span class="mi">70</span> <span class="mi">60</span> <span class="mi">50</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|.</span> <span class="mi">0</span><span class="o">@.</span><span class="n">p</span><span class="err">`</span><span class="n">P</span><span class="o">........|</span>
+<span class="mi">00001010</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+          <span class="o">*</span>
+<span class="mi">00001030</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="o">---------------</span>
+       <span class="mi">64</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>The folling types are supported:</p>
+<ul class="simple">
+<li><p>uint8</p></li>
+<li><p>int8</p></li>
+<li><p>uint16</p></li>
+<li><p>int16</p></li>
+<li><p>uint32</p></li>
+<li><p>int32</p></li>
+<li><p>uint64</p></li>
+<li><p>int64</p></li>
+<li><p>float32</p></li>
+<li><p>float64</p></li>
+</ul>
+<p>In any case, endianess suffixes <strong>_be</strong> or <strong>_le</strong> are required.</p>
+<p>Arrays are also supported.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img0</span> <span class="o">=</span> <span class="n">Image</span><span class="p">([</span><span class="n">Section</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="mi">64</span><span class="p">))])</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">write_numeric_array</span><span class="p">(</span><span class="mh">0x1000</span><span class="p">,</span> <span class="p">[</span><span class="mh">0x1000</span><span class="p">,</span> <span class="mh">0x2000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">,</span> <span class="mh">0x4000</span><span class="p">,</span> <span class="mh">0x5000</span><span class="p">,</span> <span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x7000</span><span class="p">,</span> <span class="mh">0x8000</span><span class="p">],</span> <span class="s2">&quot;uint16_le&quot;</span><span class="p">)</span>
+<span class="n">img0</span><span class="o">.</span><span class="n">hexdump</span><span class="p">()</span>
+
+<span class="n">Section</span> <span class="c1">#0000</span>
+<span class="o">-------------</span>
+<span class="mi">00001000</span>  <span class="mi">00</span> <span class="mi">10</span> <span class="mi">00</span> <span class="mi">20</span> <span class="mi">00</span> <span class="mi">30</span> <span class="mi">00</span> <span class="mi">40</span> <span class="mi">00</span> <span class="mi">50</span> <span class="mi">00</span> <span class="mi">60</span> <span class="mi">00</span> <span class="mi">70</span> <span class="mi">00</span> <span class="mi">80</span>  <span class="o">|...</span> <span class="mf">.0</span><span class="o">.@.</span><span class="n">P</span><span class="o">.</span><span class="err">`</span><span class="o">.</span><span class="n">p</span><span class="o">..|</span>
+<span class="mi">00001010</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+          <span class="o">*</span>
+<span class="mi">00001030</span>  <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>  <span class="o">|................|</span>
+<span class="o">---------------</span>
+       <span class="mi">64</span> <span class="nb">bytes</span>
+<span class="o">---------------</span>
+</pre></div>
+</div>
+<p>This concludes our tutorial for now, but there is more stuff to follow…</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>For full documentation, including installation, tutorials and PDF documents, please see <a class="reference external" href="https://objutils.rtfd.org">Readthedocs</a></p>
+</section>
+<section id="bugs-requests">
+<h2>Bugs/Requests<a class="headerlink" href="#bugs-requests" title="Link to this heading">#</a></h2>
+<p>Please use the <a class="reference external" href="https://github.com/christoph2/objutils/issues">GitHub issue tracker</a> to submit bugs or request features</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://github.com/christoph2/objutils/blob/master/docs/Data_Formats.pdf">Here</a> is an overview of some of the classic hex-file formats.</p>
+</section>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="mailto:cpu12&#46;gems&#37;&#52;&#48;googlemail&#46;com">Christoph Schueler</a> - Initial work and project lead.</p></li>
+</ul>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>This project is licensed under the GNU General Public License v2.0</p>
+</section>
+<section id="contribution">
+<h2>Contribution<a class="headerlink" href="#contribution" title="Link to this heading">#</a></h2>
+<p>If you contribute code to this project, you are implicitly allowing your code to be distributed under the GNU General Public License v2.0. You are also implicitly verifying that all code is your original work.</p>
+</section>
+</section>
+
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Welcome to objutils</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="installation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installation and Getting Started</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-hex-formats">Supported HEX formats</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#current">Current</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#historical">Historical</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#first-steps">First steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bugs-requests">Bugs/Requests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#authors">Authors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">License</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contribution">Contribution</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/README.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

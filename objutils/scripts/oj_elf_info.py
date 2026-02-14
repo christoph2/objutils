@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """while the basic option are the same it is currently not intended to be another readelf clone."""
 
-__version__ = "0.1.0"
-
 __copyright__ = """
    objutils - Object file library for Python.
 

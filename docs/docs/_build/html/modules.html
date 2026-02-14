@@ -1,0 +1,1171 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>objutils &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="objutils package" href="objutils.html" />
+    <link rel="prev" title="Scripts provided by objutils" href="scripts.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="objutils.html">objutils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="objutils.elf.html">objutils.elf package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section id="objutils">
+<h1>objutils<a class="headerlink" href="#objutils" title="Link to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="objutils.html">objutils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.elf.html">objutils.elf package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#module-objutils.elf.attributes">objutils.elf.attributes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#module-objutils.elf.defs">objutils.elf.defs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#objutils-elf-elfcons-module">objutils.elf.elfcons module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#objutils-elf-relocs-module">objutils.elf.relocs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#objutils-elf-testblocks-module">objutils.elf.testblocks module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.elf.html#module-objutils.elf">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.ash">objutils.ash module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.ash.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Reader.VALID_CHARS"><code class="docutils literal notranslate"><span class="pre">Reader.VALID_CHARS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.ash.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.ADDRESS_DESIGNATOR"><code class="docutils literal notranslate"><span class="pre">Writer.ADDRESS_DESIGNATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.compose_header"><code class="docutils literal notranslate"><span class="pre">Writer.compose_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ash.Writer.row_callout"><code class="docutils literal notranslate"><span class="pre">Writer.row_callout()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.binfile">objutils.binfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipReader"><code class="docutils literal notranslate"><span class="pre">BinZipReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipReader.codecName"><code class="docutils literal notranslate"><span class="pre">BinZipReader.codecName</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter"><code class="docutils literal notranslate"><span class="pre">BinZipWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter.MANIFEST_FILE_NAME"><code class="docutils literal notranslate"><span class="pre">BinZipWriter.MANIFEST_FILE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter.SECTION_FILE_NAME"><code class="docutils literal notranslate"><span class="pre">BinZipWriter.SECTION_FILE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter.codecName"><code class="docutils literal notranslate"><span class="pre">BinZipWriter.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter.dump"><code class="docutils literal notranslate"><span class="pre">BinZipWriter.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.BinZipWriter.dumps"><code class="docutils literal notranslate"><span class="pre">BinZipWriter.dumps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.binfile.NoContiniousError"><code class="docutils literal notranslate"><span class="pre">NoContiniousError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.binfile.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Reader.load"><code class="docutils literal notranslate"><span class="pre">Reader.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Reader.loads"><code class="docutils literal notranslate"><span class="pre">Reader.loads()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.binfile.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Writer.dump"><code class="docutils literal notranslate"><span class="pre">Writer.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.binfile.Writer.dumps"><code class="docutils literal notranslate"><span class="pre">Writer.dumps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#objutils-cc2vmc-module">objutils.cc2vmc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.checksums">objutils.checksums module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD11"><code class="docutils literal notranslate"><span class="pre">ADD11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD12"><code class="docutils literal notranslate"><span class="pre">ADD12()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD14"><code class="docutils literal notranslate"><span class="pre">ADD14()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD22"><code class="docutils literal notranslate"><span class="pre">ADD22()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD24"><code class="docutils literal notranslate"><span class="pre">ADD24()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ADD44"><code class="docutils literal notranslate"><span class="pre">ADD44()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm"><code class="docutils literal notranslate"><span class="pre">Algorithm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_11"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_12"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_12</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_14"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_14</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_22"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_22</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_24"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_24</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_ADD_44"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_ADD_44</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_16"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_CRC_16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_16_CCITT"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_CRC_16_CCITT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_CRC_32"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_CRC_32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Algorithm.CHK_USER_DEFINED"><code class="docutils literal notranslate"><span class="pre">Algorithm.CHK_USER_DEFINED</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.CRC32"><code class="docutils literal notranslate"><span class="pre">CRC32()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.Crc16"><code class="docutils literal notranslate"><span class="pre">Crc16</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Crc16.WIDTH"><code class="docutils literal notranslate"><span class="pre">Crc16.WIDTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Crc16.reflectIn"><code class="docutils literal notranslate"><span class="pre">Crc16.reflectIn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.checksums.Crc16.reflectOut"><code class="docutils literal notranslate"><span class="pre">Crc16.reflectOut()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ROTATE_LEFT"><code class="docutils literal notranslate"><span class="pre">ROTATE_LEFT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.ROTATE_RIGHT"><code class="docutils literal notranslate"><span class="pre">ROTATE_RIGHT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.adder"><code class="docutils literal notranslate"><span class="pre">adder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.check"><code class="docutils literal notranslate"><span class="pre">check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.lrc"><code class="docutils literal notranslate"><span class="pre">lrc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.nibble_sum"><code class="docutils literal notranslate"><span class="pre">nibble_sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.reflect"><code class="docutils literal notranslate"><span class="pre">reflect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.rolb"><code class="docutils literal notranslate"><span class="pre">rolb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.rorb"><code class="docutils literal notranslate"><span class="pre">rorb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.rotatedXOR"><code class="docutils literal notranslate"><span class="pre">rotatedXOR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.userDefined"><code class="docutils literal notranslate"><span class="pre">userDefined()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.wordSum"><code class="docutils literal notranslate"><span class="pre">wordSum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.checksums.xor"><code class="docutils literal notranslate"><span class="pre">xor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.cosmac">objutils.cosmac module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.previous_address"><code class="docutils literal notranslate"><span class="pre">Reader.previous_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Reader.previous_length"><code class="docutils literal notranslate"><span class="pre">Reader.previous_length</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.cosmac.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.cosmac.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.emon52">objutils.emon52 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.emon52.Codec"><code class="docutils literal notranslate"><span class="pre">Codec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Codec.readlines"><code class="docutils literal notranslate"><span class="pre">Codec.readlines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Codec.writelines"><code class="docutils literal notranslate"><span class="pre">Codec.writelines()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.emon52.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Reader.DATA_SEPARATOR"><code class="docutils literal notranslate"><span class="pre">Reader.DATA_SEPARATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.emon52.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.emon52.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.etek">objutils.etek module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.etek.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.VALID_CHARS"><code class="docutils literal notranslate"><span class="pre">Reader.VALID_CHARS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Reader.parseData"><code class="docutils literal notranslate"><span class="pre">Reader.parseData()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.etek.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.etek.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.exceptions">objutils.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.exceptions.FeatureNotAvailableError"><code class="docutils literal notranslate"><span class="pre">FeatureNotAvailableError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.exceptions.FileCorruptedError"><code class="docutils literal notranslate"><span class="pre">FileCorruptedError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.exceptions.InvalidAddressError"><code class="docutils literal notranslate"><span class="pre">InvalidAddressError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.exceptions.PrematureEndOfFileError"><code class="docutils literal notranslate"><span class="pre">PrematureEndOfFileError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.fpc">objutils.fpc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.fpc.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.convert_quintuple"><code class="docutils literal notranslate"><span class="pre">Reader.convert_quintuple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.decode"><code class="docutils literal notranslate"><span class="pre">Reader.decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.probe"><code class="docutils literal notranslate"><span class="pre">Reader.probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.read"><code class="docutils literal notranslate"><span class="pre">Reader.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Reader.split_quintuples"><code class="docutils literal notranslate"><span class="pre">Reader.split_quintuples()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.fpc.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.convert_quintuple"><code class="docutils literal notranslate"><span class="pre">Writer.convert_quintuple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.fpc.Writer.post_processing"><code class="docutils literal notranslate"><span class="pre">Writer.post_processing()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#objutils-hexdiff-module">objutils.hexdiff module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.hexdump">objutils.hexdump module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexdump.CanonicalDumper"><code class="docutils literal notranslate"><span class="pre">CanonicalDumper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexdump.CanonicalDumper.LINE_LENGTH"><code class="docutils literal notranslate"><span class="pre">CanonicalDumper.LINE_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexdump.CanonicalDumper.dump_row"><code class="docutils literal notranslate"><span class="pre">CanonicalDumper.dump_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexdump.CanonicalDumper.printhex_bytes"><code class="docutils literal notranslate"><span class="pre">CanonicalDumper.printhex_bytes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexdump.Dumper"><code class="docutils literal notranslate"><span class="pre">Dumper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexdump.Dumper.LINE_LENGTH"><code class="docutils literal notranslate"><span class="pre">Dumper.LINE_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexdump.Dumper.dump_data"><code class="docutils literal notranslate"><span class="pre">Dumper.dump_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexdump.isprintable"><code class="docutils literal notranslate"><span class="pre">isprintable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.hexfile">objutils.hexfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader.getAddress"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader.getAddress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader.nop"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader.nop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader.parse_line"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader.parse_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexReader.read"><code class="docutils literal notranslate"><span class="pre">ASCIIHexReader.read()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexWriter"><code class="docutils literal notranslate"><span class="pre">ASCIIHexWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexWriter.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">ASCIIHexWriter.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexWriter.compose_row"><code class="docutils literal notranslate"><span class="pre">ASCIIHexWriter.compose_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexWriter.previous_address"><code class="docutils literal notranslate"><span class="pre">ASCIIHexWriter.previous_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.ASCIIHexWriter.row_callout"><code class="docutils literal notranslate"><span class="pre">ASCIIHexWriter.row_callout()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.AddressRangeToLargeError"><code class="docutils literal notranslate"><span class="pre">AddressRangeToLargeError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType"><code class="docutils literal notranslate"><span class="pre">BaseType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.debug"><code class="docutils literal notranslate"><span class="pre">BaseType.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.error"><code class="docutils literal notranslate"><span class="pre">BaseType.error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.info"><code class="docutils literal notranslate"><span class="pre">BaseType.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.logger"><code class="docutils literal notranslate"><span class="pre">BaseType.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.valid"><code class="docutils literal notranslate"><span class="pre">BaseType.valid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.BaseType.warn"><code class="docutils literal notranslate"><span class="pre">BaseType.warn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.Container"><code class="docutils literal notranslate"><span class="pre">Container</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Container.add_processing_instruction"><code class="docutils literal notranslate"><span class="pre">Container.add_processing_instruction()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.FormatParser"><code class="docutils literal notranslate"><span class="pre">FormatParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.FormatParser.parse"><code class="docutils literal notranslate"><span class="pre">FormatParser.parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.FormatParser.translateFormat"><code class="docutils literal notranslate"><span class="pre">FormatParser.translateFormat()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.InvalidRecordChecksumError"><code class="docutils literal notranslate"><span class="pre">InvalidRecordChecksumError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.InvalidRecordLengthError"><code class="docutils literal notranslate"><span class="pre">InvalidRecordLengthError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.Invalidrecord_typeError"><code class="docutils literal notranslate"><span class="pre">Invalidrecord_typeError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.MetaRecord"><code class="docutils literal notranslate"><span class="pre">MetaRecord</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.MetaRecord.address"><code class="docutils literal notranslate"><span class="pre">MetaRecord.address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.MetaRecord.chunk"><code class="docutils literal notranslate"><span class="pre">MetaRecord.chunk</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.MetaRecord.format_type"><code class="docutils literal notranslate"><span class="pre">MetaRecord.format_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.ALIGMENT"><code class="docutils literal notranslate"><span class="pre">Reader.ALIGMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.DATA_SEPARATOR"><code class="docutils literal notranslate"><span class="pre">Reader.DATA_SEPARATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.VALID_CHARS"><code class="docutils literal notranslate"><span class="pre">Reader.VALID_CHARS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader._address_space"><code class="docutils literal notranslate"><span class="pre">Reader._address_space()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.classifyLine"><code class="docutils literal notranslate"><span class="pre">Reader.classifyLine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.load"><code class="docutils literal notranslate"><span class="pre">Reader.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.loads"><code class="docutils literal notranslate"><span class="pre">Reader.loads()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.maybe_binary_file"><code class="docutils literal notranslate"><span class="pre">Reader.maybe_binary_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.parseData"><code class="docutils literal notranslate"><span class="pre">Reader.parseData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.probe"><code class="docutils literal notranslate"><span class="pre">Reader.probe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.probes"><code class="docutils literal notranslate"><span class="pre">Reader.probes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.read"><code class="docutils literal notranslate"><span class="pre">Reader.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Reader.special_processing"><code class="docutils literal notranslate"><span class="pre">Reader.special_processing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.Statistics"><code class="docutils literal notranslate"><span class="pre">Statistics</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Statistics.data_bytes"><code class="docutils literal notranslate"><span class="pre">Statistics.data_bytes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Statistics.record_types"><code class="docutils literal notranslate"><span class="pre">Statistics.record_types</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.calculate_address_bits"><code class="docutils literal notranslate"><span class="pre">Writer.calculate_address_bits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.compose_header"><code class="docutils literal notranslate"><span class="pre">Writer.compose_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.dump"><code class="docutils literal notranslate"><span class="pre">Writer.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.dumps"><code class="docutils literal notranslate"><span class="pre">Writer.dumps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.hex_bytes"><code class="docutils literal notranslate"><span class="pre">Writer.hex_bytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.post_processing"><code class="docutils literal notranslate"><span class="pre">Writer.post_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.pre_processing"><code class="docutils literal notranslate"><span class="pre">Writer.pre_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.set_parameters"><code class="docutils literal notranslate"><span class="pre">Writer.set_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.hexfile.Writer.word_to_bytes"><code class="docutils literal notranslate"><span class="pre">Writer.word_to_bytes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.ihex">objutils.ihex module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.ihex.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader._address_calculator"><code class="docutils literal notranslate"><span class="pre">Reader._address_calculator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.calculate_extended_address"><code class="docutils literal notranslate"><span class="pre">Reader.calculate_extended_address()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Reader.special_processing"><code class="docutils literal notranslate"><span class="pre">Reader.special_processing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.ihex.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.checksum"><code class="docutils literal notranslate"><span class="pre">Writer.checksum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.ihex.Writer.pre_processing"><code class="docutils literal notranslate"><span class="pre">Writer.pre_processing()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.image">objutils.image module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.image.AddressSpace"><code class="docutils literal notranslate"><span class="pre">AddressSpace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.AddressSpace.AS_16"><code class="docutils literal notranslate"><span class="pre">AddressSpace.AS_16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.AddressSpace.AS_24"><code class="docutils literal notranslate"><span class="pre">AddressSpace.AS_24</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.AddressSpace.AS_32"><code class="docutils literal notranslate"><span class="pre">AddressSpace.AS_32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.AddressSpace.AS_64"><code class="docutils literal notranslate"><span class="pre">AddressSpace.AS_64</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.image.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image._address_contained"><code class="docutils literal notranslate"><span class="pre">Image._address_contained()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image._call_address_function"><code class="docutils literal notranslate"><span class="pre">Image._call_address_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.delete_section"><code class="docutils literal notranslate"><span class="pre">Image.delete_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.get_section"><code class="docutils literal notranslate"><span class="pre">Image.get_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.hexdump"><code class="docutils literal notranslate"><span class="pre">Image.hexdump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.insert_section"><code class="docutils literal notranslate"><span class="pre">Image.insert_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.join_sections"><code class="docutils literal notranslate"><span class="pre">Image.join_sections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.read"><code class="docutils literal notranslate"><span class="pre">Image.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.read_ndarray"><code class="docutils literal notranslate"><span class="pre">Image.read_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.read_numeric"><code class="docutils literal notranslate"><span class="pre">Image.read_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.read_numeric_array"><code class="docutils literal notranslate"><span class="pre">Image.read_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.read_string"><code class="docutils literal notranslate"><span class="pre">Image.read_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.sections"><code class="docutils literal notranslate"><span class="pre">Image.sections</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.split"><code class="docutils literal notranslate"><span class="pre">Image.split()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.update_section"><code class="docutils literal notranslate"><span class="pre">Image.update_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.write"><code class="docutils literal notranslate"><span class="pre">Image.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.write_ndarray"><code class="docutils literal notranslate"><span class="pre">Image.write_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.write_numeric"><code class="docutils literal notranslate"><span class="pre">Image.write_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.write_numeric_array"><code class="docutils literal notranslate"><span class="pre">Image.write_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.image.Image.write_string"><code class="docutils literal notranslate"><span class="pre">Image.write_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.image._validate_sections"><code class="docutils literal notranslate"><span class="pre">_validate_sections()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.logger">objutils.logger module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.logger.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.FORMAT"><code class="docutils literal notranslate"><span class="pre">Logger.FORMAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.LOGGER_BASE_NAME"><code class="docutils literal notranslate"><span class="pre">Logger.LOGGER_BASE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.critical"><code class="docutils literal notranslate"><span class="pre">Logger.critical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.debug"><code class="docutils literal notranslate"><span class="pre">Logger.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.error"><code class="docutils literal notranslate"><span class="pre">Logger.error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.getLastError"><code class="docutils literal notranslate"><span class="pre">Logger.getLastError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.info"><code class="docutils literal notranslate"><span class="pre">Logger.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.log"><code class="docutils literal notranslate"><span class="pre">Logger.log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.setLevel"><code class="docutils literal notranslate"><span class="pre">Logger.setLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.silent"><code class="docutils literal notranslate"><span class="pre">Logger.silent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.verbose"><code class="docutils literal notranslate"><span class="pre">Logger.verbose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.logger.Logger.warn"><code class="docutils literal notranslate"><span class="pre">Logger.warn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.mostec">objutils.mostec module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.mostec.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.mostec.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.mostec.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.pickleif">objutils.pickleif module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.pickleif.PickleIF"><code class="docutils literal notranslate"><span class="pre">PickleIF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.pickleif.PickleIF.dump"><code class="docutils literal notranslate"><span class="pre">PickleIF.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.pickleif.PickleIF.dumps"><code class="docutils literal notranslate"><span class="pre">PickleIF.dumps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.pickleif.PickleIF.load"><code class="docutils literal notranslate"><span class="pre">PickleIF.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.pickleif.PickleIF.loads"><code class="docutils literal notranslate"><span class="pre">PickleIF.loads()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.rca">objutils.rca module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.rca.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.rca.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.SEPARATOR"><code class="docutils literal notranslate"><span class="pre">Writer.SEPARATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.compose_header"><code class="docutils literal notranslate"><span class="pre">Writer.compose_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.rca.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.readers">objutils.readers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.BIG_ENDIAN"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.BIG_ENDIAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.LITTLE_ENDIAN"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.LITTLE_ENDIAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader._get_pos"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader._get_pos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader._get_size"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader._get_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader._set_pos"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader._set_pos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.asciiz"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.asciiz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.next_byte"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.next_byte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.pos"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.pos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.reset"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.s16"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.s16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.s32"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.s32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.s64"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.s64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.s8"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.s8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.size"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.sleb"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.sleb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.u16"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.u16()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.u32"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.u32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.u64"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.u64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.u8"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.u8()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.uleb"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.uleb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.readers.PlainBinaryReader.value"><code class="docutils literal notranslate"><span class="pre">PlainBinaryReader.value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.registry">objutils.registry module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.registry.Codec"><code class="docutils literal notranslate"><span class="pre">Codec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec.Reader"><code class="docutils literal notranslate"><span class="pre">Codec.Reader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec.Writer"><code class="docutils literal notranslate"><span class="pre">Codec.Writer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec._asdict"><code class="docutils literal notranslate"><span class="pre">Codec._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec._field_defaults"><code class="docutils literal notranslate"><span class="pre">Codec._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec._fields"><code class="docutils literal notranslate"><span class="pre">Codec._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec._make"><code class="docutils literal notranslate"><span class="pre">Codec._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec._replace"><code class="docutils literal notranslate"><span class="pre">Codec._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Codec.description"><code class="docutils literal notranslate"><span class="pre">Codec.description</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.registry.CodecAlreadyExistError"><code class="docutils literal notranslate"><span class="pre">CodecAlreadyExistError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.registry.CodecDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">CodecDoesNotExistError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.registry.Registry"><code class="docutils literal notranslate"><span class="pre">Registry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry._get_codecs"><code class="docutils literal notranslate"><span class="pre">Registry._get_codecs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry._get_formats"><code class="docutils literal notranslate"><span class="pre">Registry._get_formats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry._instance"><code class="docutils literal notranslate"><span class="pre">Registry._instance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry.codecs"><code class="docutils literal notranslate"><span class="pre">Registry.codecs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry.formats"><code class="docutils literal notranslate"><span class="pre">Registry.formats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry.get"><code class="docutils literal notranslate"><span class="pre">Registry.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.registry.Registry.register"><code class="docutils literal notranslate"><span class="pre">Registry.register()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.section">objutils.section module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.NumberRange"><code class="docutils literal notranslate"><span class="pre">NumberRange</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange._asdict"><code class="docutils literal notranslate"><span class="pre">NumberRange._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange._field_defaults"><code class="docutils literal notranslate"><span class="pre">NumberRange._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange._fields"><code class="docutils literal notranslate"><span class="pre">NumberRange._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange._make"><code class="docutils literal notranslate"><span class="pre">NumberRange._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange._replace"><code class="docutils literal notranslate"><span class="pre">NumberRange._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange.lower"><code class="docutils literal notranslate"><span class="pre">NumberRange.lower</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.NumberRange.upper"><code class="docutils literal notranslate"><span class="pre">NumberRange.upper</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.Section"><code class="docutils literal notranslate"><span class="pre">Section</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section._getformat"><code class="docutils literal notranslate"><span class="pre">Section._getformat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section._verify_dtype"><code class="docutils literal notranslate"><span class="pre">Section._verify_dtype()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.address"><code class="docutils literal notranslate"><span class="pre">Section.address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.apply_bitmask"><code class="docutils literal notranslate"><span class="pre">Section.apply_bitmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.data"><code class="docutils literal notranslate"><span class="pre">Section.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.find"><code class="docutils literal notranslate"><span class="pre">Section.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.hexdump"><code class="docutils literal notranslate"><span class="pre">Section.hexdump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.length"><code class="docutils literal notranslate"><span class="pre">Section.length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.read"><code class="docutils literal notranslate"><span class="pre">Section.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.read_ndarray"><code class="docutils literal notranslate"><span class="pre">Section.read_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.read_numeric"><code class="docutils literal notranslate"><span class="pre">Section.read_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.read_numeric_array"><code class="docutils literal notranslate"><span class="pre">Section.read_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.read_string"><code class="docutils literal notranslate"><span class="pre">Section.read_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.start_address"><code class="docutils literal notranslate"><span class="pre">Section.start_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.tobytes"><code class="docutils literal notranslate"><span class="pre">Section.tobytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.tolist"><code class="docutils literal notranslate"><span class="pre">Section.tolist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.write"><code class="docutils literal notranslate"><span class="pre">Section.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.write_ndarray"><code class="docutils literal notranslate"><span class="pre">Section.write_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.write_numeric"><code class="docutils literal notranslate"><span class="pre">Section.write_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.write_numeric_array"><code class="docutils literal notranslate"><span class="pre">Section.write_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.Section.write_string"><code class="docutils literal notranslate"><span class="pre">Section.write_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation"><code class="docutils literal notranslate"><span class="pre">TypeInformation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation._asdict"><code class="docutils literal notranslate"><span class="pre">TypeInformation._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation._field_defaults"><code class="docutils literal notranslate"><span class="pre">TypeInformation._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation._fields"><code class="docutils literal notranslate"><span class="pre">TypeInformation._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation._make"><code class="docutils literal notranslate"><span class="pre">TypeInformation._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation._replace"><code class="docutils literal notranslate"><span class="pre">TypeInformation._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation.byte_order"><code class="docutils literal notranslate"><span class="pre">TypeInformation.byte_order</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation.size"><code class="docutils literal notranslate"><span class="pre">TypeInformation.size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.section.TypeInformation.type"><code class="docutils literal notranslate"><span class="pre">TypeInformation.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section._data_converter"><code class="docutils literal notranslate"><span class="pre">_data_converter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.filler"><code class="docutils literal notranslate"><span class="pre">filler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.fortran_array_from_buffer"><code class="docutils literal notranslate"><span class="pre">fortran_array_from_buffer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.fortran_array_to_buffer"><code class="docutils literal notranslate"><span class="pre">fortran_array_to_buffer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.join_sections"><code class="docutils literal notranslate"><span class="pre">join_sections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.signed_range"><code class="docutils literal notranslate"><span class="pre">signed_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.section.unsigned_range"><code class="docutils literal notranslate"><span class="pre">unsigned_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.sig">objutils.sig module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.sig.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.sig.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.sig.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.srec">objutils.srec module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.srec.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader._strip_symbols"><code class="docutils literal notranslate"><span class="pre">Reader._strip_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.load"><code class="docutils literal notranslate"><span class="pre">Reader.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Reader.special_processing"><code class="docutils literal notranslate"><span class="pre">Reader.special_processing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.srec.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.checksum"><code class="docutils literal notranslate"><span class="pre">Writer.checksum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.compose_header"><code class="docutils literal notranslate"><span class="pre">Writer.compose_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.pre_processing"><code class="docutils literal notranslate"><span class="pre">Writer.pre_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.record_type"><code class="docutils literal notranslate"><span class="pre">Writer.record_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.s5record"><code class="docutils literal notranslate"><span class="pre">Writer.s5record</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.srecord"><code class="docutils literal notranslate"><span class="pre">Writer.srecord()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.srec.Writer.start_address"><code class="docutils literal notranslate"><span class="pre">Writer.start_address</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.tek">objutils.tek module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.tek.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Reader.FORMAT_SPEC"><code class="docutils literal notranslate"><span class="pre">Reader.FORMAT_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Reader.check_line"><code class="docutils literal notranslate"><span class="pre">Reader.check_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Reader.is_data_line"><code class="docutils literal notranslate"><span class="pre">Reader.is_data_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.tek.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Writer.MAX_ADDRESS_BITS"><code class="docutils literal notranslate"><span class="pre">Writer.MAX_ADDRESS_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.tek.Writer.compose_row"><code class="docutils literal notranslate"><span class="pre">Writer.compose_row()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.titxt">objutils.titxt module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.titxt.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.titxt.Reader.codecName"><code class="docutils literal notranslate"><span class="pre">Reader.codecName</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.titxt.Writer"><code class="docutils literal notranslate"><span class="pre">Writer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.titxt.Writer.codecName"><code class="docutils literal notranslate"><span class="pre">Writer.codecName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.titxt.Writer.compose_footer"><code class="docutils literal notranslate"><span class="pre">Writer.compose_footer()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils.utils">objutils.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.Curry"><code class="docutils literal notranslate"><span class="pre">Curry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.SingletonBase"><code class="docutils literal notranslate"><span class="pre">SingletonBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.utils.SingletonBase._lock"><code class="docutils literal notranslate"><span class="pre">SingletonBase._lock</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.StructureWithEnums"><code class="docutils literal notranslate"><span class="pre">StructureWithEnums</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.utils.StructureWithEnums._map"><code class="docutils literal notranslate"><span class="pre">StructureWithEnums._map</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.bin_extractor"><code class="docutils literal notranslate"><span class="pre">bin_extractor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.create_memorymapped_fileview"><code class="docutils literal notranslate"><span class="pre">create_memorymapped_fileview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.create_string_buffer"><code class="docutils literal notranslate"><span class="pre">create_string_buffer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.cygpath_to_win"><code class="docutils literal notranslate"><span class="pre">cygpath_to_win()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.enum_from_str"><code class="docutils literal notranslate"><span class="pre">enum_from_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.ffs"><code class="docutils literal notranslate"><span class="pre">ffs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.int_to_array"><code class="docutils literal notranslate"><span class="pre">int_to_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.make_list"><code class="docutils literal notranslate"><span class="pre">make_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.utils.slicer"><code class="docutils literal notranslate"><span class="pre">slicer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="objutils.html#module-objutils">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image._address_contained"><code class="docutils literal notranslate"><span class="pre">Image._address_contained()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image._call_address_function"><code class="docutils literal notranslate"><span class="pre">Image._call_address_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.delete_section"><code class="docutils literal notranslate"><span class="pre">Image.delete_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.get_section"><code class="docutils literal notranslate"><span class="pre">Image.get_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.hexdump"><code class="docutils literal notranslate"><span class="pre">Image.hexdump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.insert_section"><code class="docutils literal notranslate"><span class="pre">Image.insert_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.join_sections"><code class="docutils literal notranslate"><span class="pre">Image.join_sections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.read"><code class="docutils literal notranslate"><span class="pre">Image.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.read_ndarray"><code class="docutils literal notranslate"><span class="pre">Image.read_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.read_numeric"><code class="docutils literal notranslate"><span class="pre">Image.read_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.read_numeric_array"><code class="docutils literal notranslate"><span class="pre">Image.read_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.read_string"><code class="docutils literal notranslate"><span class="pre">Image.read_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.sections"><code class="docutils literal notranslate"><span class="pre">Image.sections</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.split"><code class="docutils literal notranslate"><span class="pre">Image.split()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.update_section"><code class="docutils literal notranslate"><span class="pre">Image.update_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.write"><code class="docutils literal notranslate"><span class="pre">Image.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.write_ndarray"><code class="docutils literal notranslate"><span class="pre">Image.write_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.write_numeric"><code class="docutils literal notranslate"><span class="pre">Image.write_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.write_numeric_array"><code class="docutils literal notranslate"><span class="pre">Image.write_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Image.write_string"><code class="docutils literal notranslate"><span class="pre">Image.write_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.Section"><code class="docutils literal notranslate"><span class="pre">Section</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section._getformat"><code class="docutils literal notranslate"><span class="pre">Section._getformat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section._verify_dtype"><code class="docutils literal notranslate"><span class="pre">Section._verify_dtype()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.address"><code class="docutils literal notranslate"><span class="pre">Section.address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.apply_bitmask"><code class="docutils literal notranslate"><span class="pre">Section.apply_bitmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.data"><code class="docutils literal notranslate"><span class="pre">Section.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.find"><code class="docutils literal notranslate"><span class="pre">Section.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.hexdump"><code class="docutils literal notranslate"><span class="pre">Section.hexdump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.length"><code class="docutils literal notranslate"><span class="pre">Section.length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.read"><code class="docutils literal notranslate"><span class="pre">Section.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.read_ndarray"><code class="docutils literal notranslate"><span class="pre">Section.read_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.read_numeric"><code class="docutils literal notranslate"><span class="pre">Section.read_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.read_numeric_array"><code class="docutils literal notranslate"><span class="pre">Section.read_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.read_string"><code class="docutils literal notranslate"><span class="pre">Section.read_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.start_address"><code class="docutils literal notranslate"><span class="pre">Section.start_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.tobytes"><code class="docutils literal notranslate"><span class="pre">Section.tobytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.tolist"><code class="docutils literal notranslate"><span class="pre">Section.tolist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.write"><code class="docutils literal notranslate"><span class="pre">Section.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.write_ndarray"><code class="docutils literal notranslate"><span class="pre">Section.write_ndarray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.write_numeric"><code class="docutils literal notranslate"><span class="pre">Section.write_numeric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.write_numeric_array"><code class="docutils literal notranslate"><span class="pre">Section.write_numeric_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="objutils.html#objutils.Section.write_string"><code class="docutils literal notranslate"><span class="pre">Section.write_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.dump"><code class="docutils literal notranslate"><span class="pre">dump()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.dumps"><code class="docutils literal notranslate"><span class="pre">dumps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.loads"><code class="docutils literal notranslate"><span class="pre">loads()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.probe"><code class="docutils literal notranslate"><span class="pre">probe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="objutils.html#objutils.probes"><code class="docutils literal notranslate"><span class="pre">probes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="scripts.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Scripts provided by objutils</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="objutils.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">objutils package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1306 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>objutils.checksums &#8212; objutils 0.8.1 documentation</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=ec16d22d"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/objutils/checksums';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+
+  <dialog id="pst-search-dialog">
+
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+
+
+  <div class="col-lg-3 navbar-header-items__start">
+
+      <div class="navbar-item">
+
+
+
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+
+
+
+
+
+    <p class="title logo__title">objutils 0.8.1 documentation</p>
+
+</a></div>
+
+  </div>
+
+  <div class="col-lg-9 navbar-header-items">
+
+    <div class="me-auto navbar-header-items__center">
+
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+                </ul>
+            </li>
+
+  </ul>
+</nav></div>
+
+    </div>
+
+
+    <div class="navbar-header-items__end">
+
+        <div class="navbar-item navbar-persistent--container">
+
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+
+
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+    </div>
+
+  </div>
+
+
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+
+
+
+</div>
+
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+
+
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+      <div class="sidebar-header-items__center">
+
+
+
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../README.html">
+    objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation and Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../howto.html">
+    HOW-TOs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../scripts.html">
+    Scripts provided by objutils
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../modules.html">
+    objutils
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+
+
+      </div>
+
+
+
+      <div class="sidebar-header-items__end">
+
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+
+      </div>
+
+  </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main" role="main">
+
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+
+
+    <li class="breadcrumb-item"><a href="../objutils.html" class="nav-link">objutils</a></li>
+
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">objutils.checksums</span></li>
+  </ul>
+</nav>
+</div>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <h1>Source code for objutils.checksums</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    objutils - Object file library for Python.</span>
+
+<span class="s2">   (C) 2010-2019 by Christoph Schueler &lt;cpu12.gems@googlemail.com&gt;</span>
+
+<span class="s2">   All Rights Reserved</span>
+
+<span class="s2">  This program is free software; you can redistribute it and/or modify</span>
+<span class="s2">  it under the terms of the GNU General Public License as published by</span>
+<span class="s2">  the Free Software Foundation; either version 2 of the License, or</span>
+<span class="s2">  (at your option) any later version.</span>
+
+<span class="s2">  This program is distributed in the hope that it will be useful,</span>
+<span class="s2">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="s2">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="s2">  GNU General Public License for more details.</span>
+
+<span class="s2">  You should have received a copy of the GNU General Public License along</span>
+<span class="s2">  with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="s2">  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
+
+
+<span class="n">COMPLEMENT_NONE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">COMPLEMENT_ONES</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">COMPLEMENT_TWOS</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="lrc">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.lrc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lrc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="n">COMPLEMENT_NONE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Longitudinal redundancy check.&quot;&quot;&quot;</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">width</span>
+
+    <span class="n">cs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">%</span> <span class="n">mask</span>
+
+    <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="n">COMPLEMENT_NONE</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="n">COMPLEMENT_ONES</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">^=</span> <span class="n">mask</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="n">COMPLEMENT_TWOS</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="p">((</span><span class="n">cs</span> <span class="o">^</span> <span class="p">(</span><span class="n">mask</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">mask</span>
+
+    <span class="k">return</span> <span class="n">cs</span></div>
+
+
+
+<div class="viewcode-block" id="rolb">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.rolb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rolb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate byte left.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">&amp;=</span> <span class="mh">0xFF</span>
+    <span class="n">carry</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">==</span> <span class="mh">0x80</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+    <span class="n">value</span> <span class="o">|=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">carry</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="rorb">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.rorb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rorb</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate byte right.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">&amp;=</span> <span class="mh">0xFF</span>
+    <span class="n">carry</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">&amp;</span> <span class="mh">0x01</span><span class="p">)</span> <span class="o">==</span> <span class="mh">0x01</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+    <span class="n">value</span> <span class="o">|=</span> <span class="mh">0x80</span> <span class="k">if</span> <span class="n">carry</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+
+
+
+<div class="viewcode-block" id="xor">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.xor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">xor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="mh">0xFF</span> <span class="k">if</span> <span class="n">invert</span> <span class="k">else</span> <span class="mh">0x00</span><span class="p">)</span></div>
+
+
+
+<span class="n">ROTATE_LEFT</span> <span class="o">=</span> <span class="n">rolb</span>
+<span class="n">ROTATE_RIGHT</span> <span class="o">=</span> <span class="n">rorb</span>
+
+
+<div class="viewcode-block" id="rotatedXOR">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.rotatedXOR">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rotatedXOR</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">rotator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotated XOR cipher.&quot;&quot;&quot;</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">^=</span> <span class="n">value</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">rotator</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cs</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">width</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="nibble_sum">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.nibble_sum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nibble_sum</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">hn</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span> <span class="o">&amp;</span> <span class="mh">0xF0</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span>
+        <span class="n">ln</span> <span class="o">=</span> <span class="n">d</span> <span class="o">&amp;</span> <span class="mh">0x0F</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">hn</span> <span class="o">+</span> <span class="n">ln</span>
+    <span class="k">return</span> <span class="n">result</span> <span class="o">%</span> <span class="mi">256</span></div>
+
+
+
+<span class="c1">##</span>
+<span class="c1">##</span>
+<span class="c1">##</span>
+<div class="viewcode-block" id="Algorithm">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.Algorithm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Algorithm</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumerates available checksum algorithms&quot;&quot;&quot;</span>
+
+    <span class="n">CHK_ADD_11</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">CHK_ADD_12</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">CHK_ADD_14</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">CHK_ADD_22</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">CHK_ADD_24</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">CHK_ADD_44</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">CHK_CRC_16</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">CHK_CRC_16_CCITT</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">CHK_CRC_32</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">CHK_USER_DEFINED</span> <span class="o">=</span> <span class="mi">10</span></div>
+
+
+
+<span class="n">CRC16</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mh">0x0000</span><span class="p">,</span>
+    <span class="mh">0x8005</span><span class="p">,</span>
+    <span class="mh">0x800F</span><span class="p">,</span>
+    <span class="mh">0x000A</span><span class="p">,</span>
+    <span class="mh">0x801B</span><span class="p">,</span>
+    <span class="mh">0x001E</span><span class="p">,</span>
+    <span class="mh">0x0014</span><span class="p">,</span>
+    <span class="mh">0x8011</span><span class="p">,</span>
+    <span class="mh">0x8033</span><span class="p">,</span>
+    <span class="mh">0x0036</span><span class="p">,</span>
+    <span class="mh">0x003C</span><span class="p">,</span>
+    <span class="mh">0x8039</span><span class="p">,</span>
+    <span class="mh">0x0028</span><span class="p">,</span>
+    <span class="mh">0x802D</span><span class="p">,</span>
+    <span class="mh">0x8027</span><span class="p">,</span>
+    <span class="mh">0x0022</span><span class="p">,</span>
+    <span class="mh">0x8063</span><span class="p">,</span>
+    <span class="mh">0x0066</span><span class="p">,</span>
+    <span class="mh">0x006C</span><span class="p">,</span>
+    <span class="mh">0x8069</span><span class="p">,</span>
+    <span class="mh">0x0078</span><span class="p">,</span>
+    <span class="mh">0x807D</span><span class="p">,</span>
+    <span class="mh">0x8077</span><span class="p">,</span>
+    <span class="mh">0x0072</span><span class="p">,</span>
+    <span class="mh">0x0050</span><span class="p">,</span>
+    <span class="mh">0x8055</span><span class="p">,</span>
+    <span class="mh">0x805F</span><span class="p">,</span>
+    <span class="mh">0x005A</span><span class="p">,</span>
+    <span class="mh">0x804B</span><span class="p">,</span>
+    <span class="mh">0x004E</span><span class="p">,</span>
+    <span class="mh">0x0044</span><span class="p">,</span>
+    <span class="mh">0x8041</span><span class="p">,</span>
+    <span class="mh">0x80C3</span><span class="p">,</span>
+    <span class="mh">0x00C6</span><span class="p">,</span>
+    <span class="mh">0x00CC</span><span class="p">,</span>
+    <span class="mh">0x80C9</span><span class="p">,</span>
+    <span class="mh">0x00D8</span><span class="p">,</span>
+    <span class="mh">0x80DD</span><span class="p">,</span>
+    <span class="mh">0x80D7</span><span class="p">,</span>
+    <span class="mh">0x00D2</span><span class="p">,</span>
+    <span class="mh">0x00F0</span><span class="p">,</span>
+    <span class="mh">0x80F5</span><span class="p">,</span>
+    <span class="mh">0x80FF</span><span class="p">,</span>
+    <span class="mh">0x00FA</span><span class="p">,</span>
+    <span class="mh">0x80EB</span><span class="p">,</span>
+    <span class="mh">0x00EE</span><span class="p">,</span>
+    <span class="mh">0x00E4</span><span class="p">,</span>
+    <span class="mh">0x80E1</span><span class="p">,</span>
+    <span class="mh">0x00A0</span><span class="p">,</span>
+    <span class="mh">0x80A5</span><span class="p">,</span>
+    <span class="mh">0x80AF</span><span class="p">,</span>
+    <span class="mh">0x00AA</span><span class="p">,</span>
+    <span class="mh">0x80BB</span><span class="p">,</span>
+    <span class="mh">0x00BE</span><span class="p">,</span>
+    <span class="mh">0x00B4</span><span class="p">,</span>
+    <span class="mh">0x80B1</span><span class="p">,</span>
+    <span class="mh">0x8093</span><span class="p">,</span>
+    <span class="mh">0x0096</span><span class="p">,</span>
+    <span class="mh">0x009C</span><span class="p">,</span>
+    <span class="mh">0x8099</span><span class="p">,</span>
+    <span class="mh">0x0088</span><span class="p">,</span>
+    <span class="mh">0x808D</span><span class="p">,</span>
+    <span class="mh">0x8087</span><span class="p">,</span>
+    <span class="mh">0x0082</span><span class="p">,</span>
+    <span class="mh">0x8183</span><span class="p">,</span>
+    <span class="mh">0x0186</span><span class="p">,</span>
+    <span class="mh">0x018C</span><span class="p">,</span>
+    <span class="mh">0x8189</span><span class="p">,</span>
+    <span class="mh">0x0198</span><span class="p">,</span>
+    <span class="mh">0x819D</span><span class="p">,</span>
+    <span class="mh">0x8197</span><span class="p">,</span>
+    <span class="mh">0x0192</span><span class="p">,</span>
+    <span class="mh">0x01B0</span><span class="p">,</span>
+    <span class="mh">0x81B5</span><span class="p">,</span>
+    <span class="mh">0x81BF</span><span class="p">,</span>
+    <span class="mh">0x01BA</span><span class="p">,</span>
+    <span class="mh">0x81AB</span><span class="p">,</span>
+    <span class="mh">0x01AE</span><span class="p">,</span>
+    <span class="mh">0x01A4</span><span class="p">,</span>
+    <span class="mh">0x81A1</span><span class="p">,</span>
+    <span class="mh">0x01E0</span><span class="p">,</span>
+    <span class="mh">0x81E5</span><span class="p">,</span>
+    <span class="mh">0x81EF</span><span class="p">,</span>
+    <span class="mh">0x01EA</span><span class="p">,</span>
+    <span class="mh">0x81FB</span><span class="p">,</span>
+    <span class="mh">0x01FE</span><span class="p">,</span>
+    <span class="mh">0x01F4</span><span class="p">,</span>
+    <span class="mh">0x81F1</span><span class="p">,</span>
+    <span class="mh">0x81D3</span><span class="p">,</span>
+    <span class="mh">0x01D6</span><span class="p">,</span>
+    <span class="mh">0x01DC</span><span class="p">,</span>
+    <span class="mh">0x81D9</span><span class="p">,</span>
+    <span class="mh">0x01C8</span><span class="p">,</span>
+    <span class="mh">0x81CD</span><span class="p">,</span>
+    <span class="mh">0x81C7</span><span class="p">,</span>
+    <span class="mh">0x01C2</span><span class="p">,</span>
+    <span class="mh">0x0140</span><span class="p">,</span>
+    <span class="mh">0x8145</span><span class="p">,</span>
+    <span class="mh">0x814F</span><span class="p">,</span>
+    <span class="mh">0x014A</span><span class="p">,</span>
+    <span class="mh">0x815B</span><span class="p">,</span>
+    <span class="mh">0x015E</span><span class="p">,</span>
+    <span class="mh">0x0154</span><span class="p">,</span>
+    <span class="mh">0x8151</span><span class="p">,</span>
+    <span class="mh">0x8173</span><span class="p">,</span>
+    <span class="mh">0x0176</span><span class="p">,</span>
+    <span class="mh">0x017C</span><span class="p">,</span>
+    <span class="mh">0x8179</span><span class="p">,</span>
+    <span class="mh">0x0168</span><span class="p">,</span>
+    <span class="mh">0x816D</span><span class="p">,</span>
+    <span class="mh">0x8167</span><span class="p">,</span>
+    <span class="mh">0x0162</span><span class="p">,</span>
+    <span class="mh">0x8123</span><span class="p">,</span>
+    <span class="mh">0x0126</span><span class="p">,</span>
+    <span class="mh">0x012C</span><span class="p">,</span>
+    <span class="mh">0x8129</span><span class="p">,</span>
+    <span class="mh">0x0138</span><span class="p">,</span>
+    <span class="mh">0x813D</span><span class="p">,</span>
+    <span class="mh">0x8137</span><span class="p">,</span>
+    <span class="mh">0x0132</span><span class="p">,</span>
+    <span class="mh">0x0110</span><span class="p">,</span>
+    <span class="mh">0x8115</span><span class="p">,</span>
+    <span class="mh">0x811F</span><span class="p">,</span>
+    <span class="mh">0x011A</span><span class="p">,</span>
+    <span class="mh">0x810B</span><span class="p">,</span>
+    <span class="mh">0x010E</span><span class="p">,</span>
+    <span class="mh">0x0104</span><span class="p">,</span>
+    <span class="mh">0x8101</span><span class="p">,</span>
+    <span class="mh">0x8303</span><span class="p">,</span>
+    <span class="mh">0x0306</span><span class="p">,</span>
+    <span class="mh">0x030C</span><span class="p">,</span>
+    <span class="mh">0x8309</span><span class="p">,</span>
+    <span class="mh">0x0318</span><span class="p">,</span>
+    <span class="mh">0x831D</span><span class="p">,</span>
+    <span class="mh">0x8317</span><span class="p">,</span>
+    <span class="mh">0x0312</span><span class="p">,</span>
+    <span class="mh">0x0330</span><span class="p">,</span>
+    <span class="mh">0x8335</span><span class="p">,</span>
+    <span class="mh">0x833F</span><span class="p">,</span>
+    <span class="mh">0x033A</span><span class="p">,</span>
+    <span class="mh">0x832B</span><span class="p">,</span>
+    <span class="mh">0x032E</span><span class="p">,</span>
+    <span class="mh">0x0324</span><span class="p">,</span>
+    <span class="mh">0x8321</span><span class="p">,</span>
+    <span class="mh">0x0360</span><span class="p">,</span>
+    <span class="mh">0x8365</span><span class="p">,</span>
+    <span class="mh">0x836F</span><span class="p">,</span>
+    <span class="mh">0x036A</span><span class="p">,</span>
+    <span class="mh">0x837B</span><span class="p">,</span>
+    <span class="mh">0x037E</span><span class="p">,</span>
+    <span class="mh">0x0374</span><span class="p">,</span>
+    <span class="mh">0x8371</span><span class="p">,</span>
+    <span class="mh">0x8353</span><span class="p">,</span>
+    <span class="mh">0x0356</span><span class="p">,</span>
+    <span class="mh">0x035C</span><span class="p">,</span>
+    <span class="mh">0x8359</span><span class="p">,</span>
+    <span class="mh">0x0348</span><span class="p">,</span>
+    <span class="mh">0x834D</span><span class="p">,</span>
+    <span class="mh">0x8347</span><span class="p">,</span>
+    <span class="mh">0x0342</span><span class="p">,</span>
+    <span class="mh">0x03C0</span><span class="p">,</span>
+    <span class="mh">0x83C5</span><span class="p">,</span>
+    <span class="mh">0x83CF</span><span class="p">,</span>
+    <span class="mh">0x03CA</span><span class="p">,</span>
+    <span class="mh">0x83DB</span><span class="p">,</span>
+    <span class="mh">0x03DE</span><span class="p">,</span>
+    <span class="mh">0x03D4</span><span class="p">,</span>
+    <span class="mh">0x83D1</span><span class="p">,</span>
+    <span class="mh">0x83F3</span><span class="p">,</span>
+    <span class="mh">0x03F6</span><span class="p">,</span>
+    <span class="mh">0x03FC</span><span class="p">,</span>
+    <span class="mh">0x83F9</span><span class="p">,</span>
+    <span class="mh">0x03E8</span><span class="p">,</span>
+    <span class="mh">0x83ED</span><span class="p">,</span>
+    <span class="mh">0x83E7</span><span class="p">,</span>
+    <span class="mh">0x03E2</span><span class="p">,</span>
+    <span class="mh">0x83A3</span><span class="p">,</span>
+    <span class="mh">0x03A6</span><span class="p">,</span>
+    <span class="mh">0x03AC</span><span class="p">,</span>
+    <span class="mh">0x83A9</span><span class="p">,</span>
+    <span class="mh">0x03B8</span><span class="p">,</span>
+    <span class="mh">0x83BD</span><span class="p">,</span>
+    <span class="mh">0x83B7</span><span class="p">,</span>
+    <span class="mh">0x03B2</span><span class="p">,</span>
+    <span class="mh">0x0390</span><span class="p">,</span>
+    <span class="mh">0x8395</span><span class="p">,</span>
+    <span class="mh">0x839F</span><span class="p">,</span>
+    <span class="mh">0x039A</span><span class="p">,</span>
+    <span class="mh">0x838B</span><span class="p">,</span>
+    <span class="mh">0x038E</span><span class="p">,</span>
+    <span class="mh">0x0384</span><span class="p">,</span>
+    <span class="mh">0x8381</span><span class="p">,</span>
+    <span class="mh">0x0280</span><span class="p">,</span>
+    <span class="mh">0x8285</span><span class="p">,</span>
+    <span class="mh">0x828F</span><span class="p">,</span>
+    <span class="mh">0x028A</span><span class="p">,</span>
+    <span class="mh">0x829B</span><span class="p">,</span>
+    <span class="mh">0x029E</span><span class="p">,</span>
+    <span class="mh">0x0294</span><span class="p">,</span>
+    <span class="mh">0x8291</span><span class="p">,</span>
+    <span class="mh">0x82B3</span><span class="p">,</span>
+    <span class="mh">0x02B6</span><span class="p">,</span>
+    <span class="mh">0x02BC</span><span class="p">,</span>
+    <span class="mh">0x82B9</span><span class="p">,</span>
+    <span class="mh">0x02A8</span><span class="p">,</span>
+    <span class="mh">0x82AD</span><span class="p">,</span>
+    <span class="mh">0x82A7</span><span class="p">,</span>
+    <span class="mh">0x02A2</span><span class="p">,</span>
+    <span class="mh">0x82E3</span><span class="p">,</span>
+    <span class="mh">0x02E6</span><span class="p">,</span>
+    <span class="mh">0x02EC</span><span class="p">,</span>
+    <span class="mh">0x82E9</span><span class="p">,</span>
+    <span class="mh">0x02F8</span><span class="p">,</span>
+    <span class="mh">0x82FD</span><span class="p">,</span>
+    <span class="mh">0x82F7</span><span class="p">,</span>
+    <span class="mh">0x02F2</span><span class="p">,</span>
+    <span class="mh">0x02D0</span><span class="p">,</span>
+    <span class="mh">0x82D5</span><span class="p">,</span>
+    <span class="mh">0x82DF</span><span class="p">,</span>
+    <span class="mh">0x02DA</span><span class="p">,</span>
+    <span class="mh">0x82CB</span><span class="p">,</span>
+    <span class="mh">0x02CE</span><span class="p">,</span>
+    <span class="mh">0x02C4</span><span class="p">,</span>
+    <span class="mh">0x82C1</span><span class="p">,</span>
+    <span class="mh">0x8243</span><span class="p">,</span>
+    <span class="mh">0x0246</span><span class="p">,</span>
+    <span class="mh">0x024C</span><span class="p">,</span>
+    <span class="mh">0x8249</span><span class="p">,</span>
+    <span class="mh">0x0258</span><span class="p">,</span>
+    <span class="mh">0x825D</span><span class="p">,</span>
+    <span class="mh">0x8257</span><span class="p">,</span>
+    <span class="mh">0x0252</span><span class="p">,</span>
+    <span class="mh">0x0270</span><span class="p">,</span>
+    <span class="mh">0x8275</span><span class="p">,</span>
+    <span class="mh">0x827F</span><span class="p">,</span>
+    <span class="mh">0x027A</span><span class="p">,</span>
+    <span class="mh">0x826B</span><span class="p">,</span>
+    <span class="mh">0x026E</span><span class="p">,</span>
+    <span class="mh">0x0264</span><span class="p">,</span>
+    <span class="mh">0x8261</span><span class="p">,</span>
+    <span class="mh">0x0220</span><span class="p">,</span>
+    <span class="mh">0x8225</span><span class="p">,</span>
+    <span class="mh">0x822F</span><span class="p">,</span>
+    <span class="mh">0x022A</span><span class="p">,</span>
+    <span class="mh">0x823B</span><span class="p">,</span>
+    <span class="mh">0x023E</span><span class="p">,</span>
+    <span class="mh">0x0234</span><span class="p">,</span>
+    <span class="mh">0x8231</span><span class="p">,</span>
+    <span class="mh">0x8213</span><span class="p">,</span>
+    <span class="mh">0x0216</span><span class="p">,</span>
+    <span class="mh">0x021C</span><span class="p">,</span>
+    <span class="mh">0x8219</span><span class="p">,</span>
+    <span class="mh">0x0208</span><span class="p">,</span>
+    <span class="mh">0x820D</span><span class="p">,</span>
+    <span class="mh">0x8207</span><span class="p">,</span>
+    <span class="mh">0x0202</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">CRC16_CCITT</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mh">0x0000</span><span class="p">,</span>
+    <span class="mh">0x1021</span><span class="p">,</span>
+    <span class="mh">0x2042</span><span class="p">,</span>
+    <span class="mh">0x3063</span><span class="p">,</span>
+    <span class="mh">0x4084</span><span class="p">,</span>
+    <span class="mh">0x50A5</span><span class="p">,</span>
+    <span class="mh">0x60C6</span><span class="p">,</span>
+    <span class="mh">0x70E7</span><span class="p">,</span>
+    <span class="mh">0x8108</span><span class="p">,</span>
+    <span class="mh">0x9129</span><span class="p">,</span>
+    <span class="mh">0xA14A</span><span class="p">,</span>
+    <span class="mh">0xB16B</span><span class="p">,</span>
+    <span class="mh">0xC18C</span><span class="p">,</span>
+    <span class="mh">0xD1AD</span><span class="p">,</span>
+    <span class="mh">0xE1CE</span><span class="p">,</span>
+    <span class="mh">0xF1EF</span><span class="p">,</span>
+    <span class="mh">0x1231</span><span class="p">,</span>
+    <span class="mh">0x0210</span><span class="p">,</span>
+    <span class="mh">0x3273</span><span class="p">,</span>
+    <span class="mh">0x2252</span><span class="p">,</span>
+    <span class="mh">0x52B5</span><span class="p">,</span>
+    <span class="mh">0x4294</span><span class="p">,</span>
+    <span class="mh">0x72F7</span><span class="p">,</span>
+    <span class="mh">0x62D6</span><span class="p">,</span>
+    <span class="mh">0x9339</span><span class="p">,</span>
+    <span class="mh">0x8318</span><span class="p">,</span>
+    <span class="mh">0xB37B</span><span class="p">,</span>
+    <span class="mh">0xA35A</span><span class="p">,</span>
+    <span class="mh">0xD3BD</span><span class="p">,</span>
+    <span class="mh">0xC39C</span><span class="p">,</span>
+    <span class="mh">0xF3FF</span><span class="p">,</span>
+    <span class="mh">0xE3DE</span><span class="p">,</span>
+    <span class="mh">0x2462</span><span class="p">,</span>
+    <span class="mh">0x3443</span><span class="p">,</span>
+    <span class="mh">0x0420</span><span class="p">,</span>
+    <span class="mh">0x1401</span><span class="p">,</span>
+    <span class="mh">0x64E6</span><span class="p">,</span>
+    <span class="mh">0x74C7</span><span class="p">,</span>
+    <span class="mh">0x44A4</span><span class="p">,</span>
+    <span class="mh">0x5485</span><span class="p">,</span>
+    <span class="mh">0xA56A</span><span class="p">,</span>
+    <span class="mh">0xB54B</span><span class="p">,</span>
+    <span class="mh">0x8528</span><span class="p">,</span>
+    <span class="mh">0x9509</span><span class="p">,</span>
+    <span class="mh">0xE5EE</span><span class="p">,</span>
+    <span class="mh">0xF5CF</span><span class="p">,</span>
+    <span class="mh">0xC5AC</span><span class="p">,</span>
+    <span class="mh">0xD58D</span><span class="p">,</span>
+    <span class="mh">0x3653</span><span class="p">,</span>
+    <span class="mh">0x2672</span><span class="p">,</span>
+    <span class="mh">0x1611</span><span class="p">,</span>
+    <span class="mh">0x0630</span><span class="p">,</span>
+    <span class="mh">0x76D7</span><span class="p">,</span>
+    <span class="mh">0x66F6</span><span class="p">,</span>
+    <span class="mh">0x5695</span><span class="p">,</span>
+    <span class="mh">0x46B4</span><span class="p">,</span>
+    <span class="mh">0xB75B</span><span class="p">,</span>
+    <span class="mh">0xA77A</span><span class="p">,</span>
+    <span class="mh">0x9719</span><span class="p">,</span>
+    <span class="mh">0x8738</span><span class="p">,</span>
+    <span class="mh">0xF7DF</span><span class="p">,</span>
+    <span class="mh">0xE7FE</span><span class="p">,</span>
+    <span class="mh">0xD79D</span><span class="p">,</span>
+    <span class="mh">0xC7BC</span><span class="p">,</span>
+    <span class="mh">0x48C4</span><span class="p">,</span>
+    <span class="mh">0x58E5</span><span class="p">,</span>
+    <span class="mh">0x6886</span><span class="p">,</span>
+    <span class="mh">0x78A7</span><span class="p">,</span>
+    <span class="mh">0x0840</span><span class="p">,</span>
+    <span class="mh">0x1861</span><span class="p">,</span>
+    <span class="mh">0x2802</span><span class="p">,</span>
+    <span class="mh">0x3823</span><span class="p">,</span>
+    <span class="mh">0xC9CC</span><span class="p">,</span>
+    <span class="mh">0xD9ED</span><span class="p">,</span>
+    <span class="mh">0xE98E</span><span class="p">,</span>
+    <span class="mh">0xF9AF</span><span class="p">,</span>
+    <span class="mh">0x8948</span><span class="p">,</span>
+    <span class="mh">0x9969</span><span class="p">,</span>
+    <span class="mh">0xA90A</span><span class="p">,</span>
+    <span class="mh">0xB92B</span><span class="p">,</span>
+    <span class="mh">0x5AF5</span><span class="p">,</span>
+    <span class="mh">0x4AD4</span><span class="p">,</span>
+    <span class="mh">0x7AB7</span><span class="p">,</span>
+    <span class="mh">0x6A96</span><span class="p">,</span>
+    <span class="mh">0x1A71</span><span class="p">,</span>
+    <span class="mh">0x0A50</span><span class="p">,</span>
+    <span class="mh">0x3A33</span><span class="p">,</span>
+    <span class="mh">0x2A12</span><span class="p">,</span>
+    <span class="mh">0xDBFD</span><span class="p">,</span>
+    <span class="mh">0xCBDC</span><span class="p">,</span>
+    <span class="mh">0xFBBF</span><span class="p">,</span>
+    <span class="mh">0xEB9E</span><span class="p">,</span>
+    <span class="mh">0x9B79</span><span class="p">,</span>
+    <span class="mh">0x8B58</span><span class="p">,</span>
+    <span class="mh">0xBB3B</span><span class="p">,</span>
+    <span class="mh">0xAB1A</span><span class="p">,</span>
+    <span class="mh">0x6CA6</span><span class="p">,</span>
+    <span class="mh">0x7C87</span><span class="p">,</span>
+    <span class="mh">0x4CE4</span><span class="p">,</span>
+    <span class="mh">0x5CC5</span><span class="p">,</span>
+    <span class="mh">0x2C22</span><span class="p">,</span>
+    <span class="mh">0x3C03</span><span class="p">,</span>
+    <span class="mh">0x0C60</span><span class="p">,</span>
+    <span class="mh">0x1C41</span><span class="p">,</span>
+    <span class="mh">0xEDAE</span><span class="p">,</span>
+    <span class="mh">0xFD8F</span><span class="p">,</span>
+    <span class="mh">0xCDEC</span><span class="p">,</span>
+    <span class="mh">0xDDCD</span><span class="p">,</span>
+    <span class="mh">0xAD2A</span><span class="p">,</span>
+    <span class="mh">0xBD0B</span><span class="p">,</span>
+    <span class="mh">0x8D68</span><span class="p">,</span>
+    <span class="mh">0x9D49</span><span class="p">,</span>
+    <span class="mh">0x7E97</span><span class="p">,</span>
+    <span class="mh">0x6EB6</span><span class="p">,</span>
+    <span class="mh">0x5ED5</span><span class="p">,</span>
+    <span class="mh">0x4EF4</span><span class="p">,</span>
+    <span class="mh">0x3E13</span><span class="p">,</span>
+    <span class="mh">0x2E32</span><span class="p">,</span>
+    <span class="mh">0x1E51</span><span class="p">,</span>
+    <span class="mh">0x0E70</span><span class="p">,</span>
+    <span class="mh">0xFF9F</span><span class="p">,</span>
+    <span class="mh">0xEFBE</span><span class="p">,</span>
+    <span class="mh">0xDFDD</span><span class="p">,</span>
+    <span class="mh">0xCFFC</span><span class="p">,</span>
+    <span class="mh">0xBF1B</span><span class="p">,</span>
+    <span class="mh">0xAF3A</span><span class="p">,</span>
+    <span class="mh">0x9F59</span><span class="p">,</span>
+    <span class="mh">0x8F78</span><span class="p">,</span>
+    <span class="mh">0x9188</span><span class="p">,</span>
+    <span class="mh">0x81A9</span><span class="p">,</span>
+    <span class="mh">0xB1CA</span><span class="p">,</span>
+    <span class="mh">0xA1EB</span><span class="p">,</span>
+    <span class="mh">0xD10C</span><span class="p">,</span>
+    <span class="mh">0xC12D</span><span class="p">,</span>
+    <span class="mh">0xF14E</span><span class="p">,</span>
+    <span class="mh">0xE16F</span><span class="p">,</span>
+    <span class="mh">0x1080</span><span class="p">,</span>
+    <span class="mh">0x00A1</span><span class="p">,</span>
+    <span class="mh">0x30C2</span><span class="p">,</span>
+    <span class="mh">0x20E3</span><span class="p">,</span>
+    <span class="mh">0x5004</span><span class="p">,</span>
+    <span class="mh">0x4025</span><span class="p">,</span>
+    <span class="mh">0x7046</span><span class="p">,</span>
+    <span class="mh">0x6067</span><span class="p">,</span>
+    <span class="mh">0x83B9</span><span class="p">,</span>
+    <span class="mh">0x9398</span><span class="p">,</span>
+    <span class="mh">0xA3FB</span><span class="p">,</span>
+    <span class="mh">0xB3DA</span><span class="p">,</span>
+    <span class="mh">0xC33D</span><span class="p">,</span>
+    <span class="mh">0xD31C</span><span class="p">,</span>
+    <span class="mh">0xE37F</span><span class="p">,</span>
+    <span class="mh">0xF35E</span><span class="p">,</span>
+    <span class="mh">0x02B1</span><span class="p">,</span>
+    <span class="mh">0x1290</span><span class="p">,</span>
+    <span class="mh">0x22F3</span><span class="p">,</span>
+    <span class="mh">0x32D2</span><span class="p">,</span>
+    <span class="mh">0x4235</span><span class="p">,</span>
+    <span class="mh">0x5214</span><span class="p">,</span>
+    <span class="mh">0x6277</span><span class="p">,</span>
+    <span class="mh">0x7256</span><span class="p">,</span>
+    <span class="mh">0xB5EA</span><span class="p">,</span>
+    <span class="mh">0xA5CB</span><span class="p">,</span>
+    <span class="mh">0x95A8</span><span class="p">,</span>
+    <span class="mh">0x8589</span><span class="p">,</span>
+    <span class="mh">0xF56E</span><span class="p">,</span>
+    <span class="mh">0xE54F</span><span class="p">,</span>
+    <span class="mh">0xD52C</span><span class="p">,</span>
+    <span class="mh">0xC50D</span><span class="p">,</span>
+    <span class="mh">0x34E2</span><span class="p">,</span>
+    <span class="mh">0x24C3</span><span class="p">,</span>
+    <span class="mh">0x14A0</span><span class="p">,</span>
+    <span class="mh">0x0481</span><span class="p">,</span>
+    <span class="mh">0x7466</span><span class="p">,</span>
+    <span class="mh">0x6447</span><span class="p">,</span>
+    <span class="mh">0x5424</span><span class="p">,</span>
+    <span class="mh">0x4405</span><span class="p">,</span>
+    <span class="mh">0xA7DB</span><span class="p">,</span>
+    <span class="mh">0xB7FA</span><span class="p">,</span>
+    <span class="mh">0x8799</span><span class="p">,</span>
+    <span class="mh">0x97B8</span><span class="p">,</span>
+    <span class="mh">0xE75F</span><span class="p">,</span>
+    <span class="mh">0xF77E</span><span class="p">,</span>
+    <span class="mh">0xC71D</span><span class="p">,</span>
+    <span class="mh">0xD73C</span><span class="p">,</span>
+    <span class="mh">0x26D3</span><span class="p">,</span>
+    <span class="mh">0x36F2</span><span class="p">,</span>
+    <span class="mh">0x0691</span><span class="p">,</span>
+    <span class="mh">0x16B0</span><span class="p">,</span>
+    <span class="mh">0x6657</span><span class="p">,</span>
+    <span class="mh">0x7676</span><span class="p">,</span>
+    <span class="mh">0x4615</span><span class="p">,</span>
+    <span class="mh">0x5634</span><span class="p">,</span>
+    <span class="mh">0xD94C</span><span class="p">,</span>
+    <span class="mh">0xC96D</span><span class="p">,</span>
+    <span class="mh">0xF90E</span><span class="p">,</span>
+    <span class="mh">0xE92F</span><span class="p">,</span>
+    <span class="mh">0x99C8</span><span class="p">,</span>
+    <span class="mh">0x89E9</span><span class="p">,</span>
+    <span class="mh">0xB98A</span><span class="p">,</span>
+    <span class="mh">0xA9AB</span><span class="p">,</span>
+    <span class="mh">0x5844</span><span class="p">,</span>
+    <span class="mh">0x4865</span><span class="p">,</span>
+    <span class="mh">0x7806</span><span class="p">,</span>
+    <span class="mh">0x6827</span><span class="p">,</span>
+    <span class="mh">0x18C0</span><span class="p">,</span>
+    <span class="mh">0x08E1</span><span class="p">,</span>
+    <span class="mh">0x3882</span><span class="p">,</span>
+    <span class="mh">0x28A3</span><span class="p">,</span>
+    <span class="mh">0xCB7D</span><span class="p">,</span>
+    <span class="mh">0xDB5C</span><span class="p">,</span>
+    <span class="mh">0xEB3F</span><span class="p">,</span>
+    <span class="mh">0xFB1E</span><span class="p">,</span>
+    <span class="mh">0x8BF9</span><span class="p">,</span>
+    <span class="mh">0x9BD8</span><span class="p">,</span>
+    <span class="mh">0xABBB</span><span class="p">,</span>
+    <span class="mh">0xBB9A</span><span class="p">,</span>
+    <span class="mh">0x4A75</span><span class="p">,</span>
+    <span class="mh">0x5A54</span><span class="p">,</span>
+    <span class="mh">0x6A37</span><span class="p">,</span>
+    <span class="mh">0x7A16</span><span class="p">,</span>
+    <span class="mh">0x0AF1</span><span class="p">,</span>
+    <span class="mh">0x1AD0</span><span class="p">,</span>
+    <span class="mh">0x2AB3</span><span class="p">,</span>
+    <span class="mh">0x3A92</span><span class="p">,</span>
+    <span class="mh">0xFD2E</span><span class="p">,</span>
+    <span class="mh">0xED0F</span><span class="p">,</span>
+    <span class="mh">0xDD6C</span><span class="p">,</span>
+    <span class="mh">0xCD4D</span><span class="p">,</span>
+    <span class="mh">0xBDAA</span><span class="p">,</span>
+    <span class="mh">0xAD8B</span><span class="p">,</span>
+    <span class="mh">0x9DE8</span><span class="p">,</span>
+    <span class="mh">0x8DC9</span><span class="p">,</span>
+    <span class="mh">0x7C26</span><span class="p">,</span>
+    <span class="mh">0x6C07</span><span class="p">,</span>
+    <span class="mh">0x5C64</span><span class="p">,</span>
+    <span class="mh">0x4C45</span><span class="p">,</span>
+    <span class="mh">0x3CA2</span><span class="p">,</span>
+    <span class="mh">0x2C83</span><span class="p">,</span>
+    <span class="mh">0x1CE0</span><span class="p">,</span>
+    <span class="mh">0x0CC1</span><span class="p">,</span>
+    <span class="mh">0xEF1F</span><span class="p">,</span>
+    <span class="mh">0xFF3E</span><span class="p">,</span>
+    <span class="mh">0xCF5D</span><span class="p">,</span>
+    <span class="mh">0xDF7C</span><span class="p">,</span>
+    <span class="mh">0xAF9B</span><span class="p">,</span>
+    <span class="mh">0xBFBA</span><span class="p">,</span>
+    <span class="mh">0x8FD9</span><span class="p">,</span>
+    <span class="mh">0x9FF8</span><span class="p">,</span>
+    <span class="mh">0x6E17</span><span class="p">,</span>
+    <span class="mh">0x7E36</span><span class="p">,</span>
+    <span class="mh">0x4E55</span><span class="p">,</span>
+    <span class="mh">0x5E74</span><span class="p">,</span>
+    <span class="mh">0x2E93</span><span class="p">,</span>
+    <span class="mh">0x3EB2</span><span class="p">,</span>
+    <span class="mh">0x0ED1</span><span class="p">,</span>
+    <span class="mh">0x1EF0</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="reflect">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.reflect">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reflect</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nBits</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reflect data, i.e. reverse bit order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : int</span>
+<span class="sd">    nBits : int</span>
+<span class="sd">        width in bits of `data`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reflection</span> <span class="o">=</span> <span class="mh">0x00000000</span>
+    <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nBits</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">&amp;</span> <span class="mh">0x01</span><span class="p">:</span>
+            <span class="n">reflection</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">((</span><span class="n">nBits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">bit</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">reflection</span></div>
+
+
+
+<div class="viewcode-block" id="Crc16">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.Crc16">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Crc16</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate CRC (16-bit)</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    table: list-like</span>
+<span class="sd">        lookup table for CRC calculation</span>
+<span class="sd">    initalRemainder : int</span>
+<span class="sd">        value to start with</span>
+<span class="sd">    finalXorValue : int</span>
+<span class="sd">        final XOR value</span>
+<span class="sd">    reflectData : bool</span>
+<span class="sd">        reflect input data</span>
+<span class="sd">    reflectRemainder : bool</span>
+<span class="sd">        reflect output data</span>
+
+<span class="sd">    .. [1] A PAINLESS GUIDE TO CRC ERROR DETECTION ALGORITHMS</span>
+<span class="sd">           http://www.ross.net/crc/download/crc_v3.txt</span>
+<span class="sd">    .. [2] Understanding and implementing CRC (Cyclic Redundancy Check)</span>
+<span class="sd">           calculation</span>
+<span class="sd">           http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html</span>
+<span class="sd">    .. [3] Online CRC calculator</span>
+<span class="sd">           http://zorc.breitbandkatze.de/crc.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">16</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">initalRemainder</span><span class="p">,</span> <span class="n">finalXorValue</span><span class="p">,</span> <span class="n">reflectData</span><span class="p">,</span> <span class="n">reflectRemainder</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initalRemainder</span> <span class="o">=</span> <span class="n">initalRemainder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finalXorValue</span> <span class="o">=</span> <span class="n">finalXorValue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reflectData</span> <span class="o">=</span> <span class="n">reflectData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reflectRemainder</span> <span class="o">=</span> <span class="n">reflectRemainder</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="n">remainder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initalRemainder</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reflectIn</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">remainder</span><span class="p">)</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">data</span><span class="p">]</span> <span class="o">^</span> <span class="p">(</span><span class="n">remainder</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xFFFF</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reflectOut</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Crc16.reflectIn">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.Crc16.reflectIn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reflectIn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">remainder</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reflectData</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">reflect</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">remainder</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)))</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">ch</span> <span class="o">^</span> <span class="p">(</span><span class="n">remainder</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)))</span> <span class="o">&amp;</span> <span class="mh">0xFF</span></div>
+
+
+<div class="viewcode-block" id="Crc16.reflectOut">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.Crc16.reflectOut">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reflectOut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remainder</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reflectRemainder</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reflect</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">finalXorValue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">remainder</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">finalXorValue</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="adder">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.adder">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">adder</span><span class="p">(</span><span class="n">modulus</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for modulus adders</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modulus : int</span>
+<span class="sd">        modulus to use</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    function</span>
+<span class="sd">        adder function</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; a256=adder(256)</span>
+<span class="sd">    &gt;&gt;&gt; a256([11, 22, 33, 44, 55, 66, 77, 88, 99])</span>
+<span class="sd">    239</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span>
+
+    <span class="k">return</span> <span class="n">add</span></div>
+
+
+
+<div class="viewcode-block" id="wordSum">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.wordSum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wordSum</span><span class="p">(</span><span class="n">modulus</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for (double-)word modulus sums</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modulus : int</span>
+<span class="sd">    step : [2, 4]</span>
+<span class="sd">        2 - word wise</span>
+<span class="sd">        4 - double-word wise</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    function</span>
+<span class="sd">        summation function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="s2">&quot;&lt;H&quot;</span>
+        <span class="k">elif</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="s2">&quot;&lt;I&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only WORDs or DWORDs are supported.&quot;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">frame</span><span class="p">[</span><span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">step</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">),</span> <span class="n">step</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span>
+
+    <span class="k">return</span> <span class="n">add</span></div>
+
+
+
+<span class="n">ADD11</span> <span class="o">=</span> <span class="n">adder</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ADD12</span> <span class="o">=</span> <span class="n">adder</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">ADD14</span> <span class="o">=</span> <span class="n">adder</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">ADD22</span> <span class="o">=</span> <span class="n">wordSum</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ADD24</span> <span class="o">=</span> <span class="n">wordSum</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">32</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ADD44</span> <span class="o">=</span> <span class="n">wordSum</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">32</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">CRC16</span> <span class="o">=</span> <span class="n">Crc16</span><span class="p">(</span><span class="n">CRC16</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">CRC16_CCITT</span> <span class="o">=</span> <span class="n">Crc16</span><span class="p">(</span><span class="n">CRC16_CCITT</span><span class="p">,</span> <span class="mh">0xFFFF</span><span class="p">,</span> <span class="mh">0x0000</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CRC32">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.CRC32">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">CRC32</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">zlib</span><span class="o">.</span><span class="n">crc32</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span></div>
+
+
+
+<div class="viewcode-block" id="userDefined">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.userDefined">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">userDefined</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User defined algorithms are not supported yet.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Checksum method &#39;CHK_USER_DEFINED&#39; not supported yet.&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="n">ALGO</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;CHK_ADD_11&quot;</span><span class="p">:</span> <span class="n">ADD11</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_ADD_12&quot;</span><span class="p">:</span> <span class="n">ADD12</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_ADD_14&quot;</span><span class="p">:</span> <span class="n">ADD14</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_ADD_22&quot;</span><span class="p">:</span> <span class="n">ADD22</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_ADD_24&quot;</span><span class="p">:</span> <span class="n">ADD24</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_ADD_44&quot;</span><span class="p">:</span> <span class="n">ADD44</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_CRC_16&quot;</span><span class="p">:</span> <span class="n">CRC16</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_CRC_16_CCITT&quot;</span><span class="p">:</span> <span class="n">CRC16_CCITT</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_CRC_32&quot;</span><span class="p">:</span> <span class="n">CRC32</span><span class="p">,</span>
+    <span class="s2">&quot;CHK_USER_DEFINED&quot;</span><span class="p">:</span> <span class="n">userDefined</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="check">
+<a class="viewcode-back" href="../../objutils.html#objutils.checksums.check">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">algo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate checksum using given algorithm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame : list of integers</span>
+<span class="sd">    algo : `ALGO`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fun</span> <span class="o">=</span> <span class="n">ALGO</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">algo</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fun</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid algorithm &#39;</span><span class="si">{</span><span class="n">algo</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+
+
+
+
+
+                <footer class="prev-next-footer d-print-none">
+
+<div class="prev-next-area">
+</div>
+                </footer>
+
+            </div>
+
+
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+          </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+
+    <div class="footer-items__start">
+
+        <div class="footer-item">
+
+  <p class="copyright">
+
+      © Copyright 2025, Christoph Schueler.
+      <br/>
+
+  </p>
+</div>
+
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+
+    </div>
+
+
+
+    <div class="footer-items__end">
+
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+
+    </div>
+
+</div>
+
+  </footer>
+  </body>
+</html>
