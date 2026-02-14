@@ -1,9 +1,46 @@
 #!/usr/bin/env python
 
+"""ARM EABI Build Attributes Parser.
+
+This module implements parsing for ARM Embedded Application Binary Interface (EABI)
+build attributes as defined in the "Addenda to, and Errata in, the ABI for the
+ARM Architecture" specification.
+
+ARM EABI attributes provide metadata about object files, describing:
+- Target CPU architecture and instruction set capabilities (ARM, Thumb, NEON, etc.)
+- Floating-point architecture and calling conventions
+- ABI compliance and toolchain-specific conventions
+- Alignment requirements and data access patterns
+- Optimization goals and compatibility information
+
+The attributes are stored in special ELF sections (typically .ARM.attributes) and
+are organized hierarchically by vendor name, with file-level, section-level, and
+symbol-level scopes.
+
+Key Components:
+    - Reader: Enum defining parameter types (INT32, CSTRING, ULEB)
+    - ATTRIBUTES: Mapping of tag numbers to their descriptions
+    - Attribute: Class representing a parsed attribute
+    - parse(): Main parser function for attribute sections
+
+Example:
+    >>> with open('firmware.elf', 'rb') as f:
+    ...     arm_attrs_data = extract_arm_attributes_section(f)
+    ...     attributes = parse(arm_attrs_data, byteorder='<')
+    >>> for vendor, attrs in attributes.items():
+    ...     print(f"Vendor: {vendor}")
+    ...     for attr in attrs:
+    ...         print(f"  {attr.tag_name}: {attr.description}")
+
+References:
+    - ARM IHI 0045F: ABI for the ARM Architecture (build attributes)
+    - ELF for the ARM Architecture specification
+"""
+
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2020 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2025 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -47,7 +84,13 @@ AttributeDescription = namedtuple("AttributeDescription", "tag value parameterTy
 
 
 class Reader(IntEnum):
-    """ """
+    """Parameter type identifiers for ARM EABI attribute values.
+    
+    These define how attribute values are encoded in the binary format:
+    - INT32: 32-bit integer (endianness depends on target)
+    - CSTRING: Null-terminated ASCII string
+    - ULEB: Unsigned LEB128 variable-length integer
+    """
 
     INT32 = 1
     CSTRING = 2
@@ -390,34 +433,84 @@ WRS         Wind River Systems.
 
 
 class Attribute:
-    def __init__(self, tag, tag_name, value, description=None):
+    """Represents a parsed ARM EABI build attribute.
+    
+    Attributes store metadata about compiled code, including architecture
+    requirements, ABI compliance, and toolchain settings.
+    
+    Attributes:
+        tag: Numeric identifier for the attribute type.
+        tag_name: Human-readable name of the attribute.
+        value: Raw value of the attribute (type depends on attribute).
+        description: Human-readable description/interpretation of the value.
+    """
+
+    def __init__(
+        self,
+        tag: int,
+        tag_name: str,
+        value: int | str,
+        description: str | None = None,
+    ) -> None:
+        """Initialize an Attribute instance.
+        
+        Args:
+            tag: Numeric tag identifier.
+            tag_name: Name of the attribute tag.
+            value: Value of the attribute (int or str).
+            description: Optional human-readable description of the value.
+                        If None, defaults to the value itself.
+        """
         self.tag = tag
         self.tag_name = tag_name
         self.value = value
         if description is None:
             self.description = value
+        else:
+            self.description = description
 
-    def __repr__(self):
-        return "Attribute(tag = {}, tag_name = {}, value = {}, description = {})".format(
-            self.tag, self.tag_name, self.value, self.description
+    def __repr__(self) -> str:
+        """Return a detailed string representation of the attribute.
+        
+        Returns:
+            String representation showing all attribute fields.
+        """
+        return (
+            f"Attribute(tag = {self.tag}, tag_name = {self.tag_name}, "
+            f"value = {self.value}, description = {self.description})"
         )
 
 
-def parse(buffer, byteorder="<"):
-    """
-    Parameters
-    ----------
-    buffer: bytes-like
-
-    byteorder: char
-        "<": Little-endian
-        ">": Big-endian
-
-    Returns
-    -------
-    dict
-        key: Vendor name
-        values: list of attributes
+def parse(buffer: bytes, byteorder: str = "<") -> dict[str, list[Attribute]]:
+    """Parse ARM EABI build attributes from a binary buffer.
+    
+    Parses the .ARM.attributes section format, which consists of:
+    - Format version byte (always 'A' = 0x41)
+    - Vendor subsections containing attribute tag-value pairs
+    - Hierarchical organization (file/section/symbol scopes)
+    
+    The parser handles multiple vendor subsections and extracts all attributes
+    with their human-readable descriptions based on the ARM EABI specification.
+    
+    Args:
+        buffer: Raw bytes from the .ARM.attributes ELF section.
+        byteorder: Byte order indicator:
+            - "<": Little-endian (default, most ARM targets)
+            - ">": Big-endian (legacy ARM systems)
+    
+    Returns:
+        Dictionary mapping vendor names (e.g., "aeabi") to lists of Attribute
+        objects. Each Attribute contains the tag, name, value, and description.
+    
+    Raises:
+        KeyError: If an unknown attribute tag is encountered.
+        ConstructError: If the binary format is invalid or corrupted.
+    
+    Example:
+        >>> data = b'A\\x00\\x00\\x00\\x2f\\x61\\x65\\x61\\x62\\x69...'
+        >>> attrs = parse(data)
+        >>> print(attrs['aeabi'][0].tag_name)
+        'Tag_CPU_arch'
     """
     Integer = Int32ul if byteorder == "<" else Int32ub
     Section = Struct(
@@ -451,7 +544,7 @@ def parse(buffer, byteorder="<"):
     )
     i = 1
     length = len(buffer)
-    result = {}
+    result: dict[str, list[Attribute]] = {}
     while True:
         section = Section.parse(buffer[i:])
         if section.vendor not in result:
