@@ -66,11 +66,11 @@ from objutils.dwarf.sm import StackMachine
 @dataclass
 class Readers:
     """Container for DWARF data readers.
-    
+
     A simple dataclass whose attributes are dynamically populated with Construct
     parsers for different DWARF encoding formats. Attributes are set based on
     architecture endianness and address size.
-    
+
     Typical attributes include:
         u8, s8, u16, s16, u32, s32, u64, s64: Fixed-width integer readers.
         uleb, sleb: Variable-length integer readers.
@@ -79,15 +79,16 @@ class Readers:
         cstring_ascii, cstring_utf8: Null-terminated string readers.
         strp, line_strp: String pointer readers.
     """
+
     pass
 
 
 class DwarfReaders:
     """High-Level DWARF Data Reader Interface.
-    
+
     Provides architecture-aware readers for parsing DWARF debug information.
     Selects appropriate binary encodings based on target endianness and address size.
-    
+
     Attributes:
         readers: Readers container with encoding-specific parser instances.
         stack_machine: StackMachine for evaluating DWARF expressions.
@@ -103,7 +104,7 @@ class DwarfReaders:
         enable_debug_log: bool = False,
     ) -> None:
         """Initialize DWARF readers for specific target architecture.
-        
+
         Args:
             endianess: Target byte order (Endianess.Little or Endianess.Big).
             address_size: Address width in bytes (1, 2, 4, or 8).
@@ -164,17 +165,17 @@ class DwarfReaders:
     @lru_cache(maxsize=64 * 1024)
     def dwarf_expression(self, form: constants.AttributeForm, expr: bytes) -> str:
         """Evaluate DWARF expression or location description.
-        
+
         Interprets DWARF expressions (DW_OP_* operations) and converts them to
         human-readable format. Handles both location descriptions and constant values.
-        
+
         Args:
             form: Attribute form identifying the expression type.
             expr: Raw expression bytes to evaluate.
-            
+
         Returns:
             String representation of the expression or value.
-            
+
         Raises:
             NotImplementedError: If form type is unsupported.
         """

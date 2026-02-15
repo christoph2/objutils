@@ -55,15 +55,15 @@ from enum import IntEnum
 
 class EnumBase(IntEnum):
     """Base class for DWARF enumerations with enhanced functionality.
-    
+
     Extends IntEnum to provide custom membership testing and graceful handling of
     unknown values. This allows safe interaction with DWARF constants from various
     compiler vendors and DWARF extensions.
-    
+
     The __contains__ method enables efficient testing of whether a value corresponds
     to an enum member. Unknown values are handled by _missing_ classmethod rather than
     raising exceptions.
-    
+
     Example:
         >>> tag = Tag.compile_unit
         >>> 0x11 in tag.__class__  # Check if value 0x11 is a valid Tag
@@ -73,14 +73,14 @@ class EnumBase(IntEnum):
 
     def __contains__(self, value: int) -> bool:
         """Check if a value is a member of this enumeration.
-        
+
         Performs membership testing against all enum member values (not names).
         This differs from standard enum behavior and enables safe handling of
         enum values without requiring try/except blocks.
-        
+
         Args:
             value: Integer value to test for membership in this enum.
-            
+
         Returns:
             True if the value corresponds to an enum member, False otherwise.
         """
@@ -89,13 +89,14 @@ class EnumBase(IntEnum):
 
 class Tag(EnumBase):
     """DWARF Debugging Information Entry Tags.
-    
+
     Defines all possible DW_TAG_* constants that identify the type of debugging
     information contained in a DIE (Debugging Information Entry). Tags specify
     what kind of entity a DIE describes (e.g., compile_unit, subprogram, variable).
-    
+
     Includes standard DWARF4 tags, GNU extensions, and vendor-specific extensions.
     """
+
     padding = 0x0
     array_type = 0x1
     class_type = 0x2
@@ -198,29 +199,31 @@ class Tag(EnumBase):
 
 class Children(EnumBase):
     """DWARF DIE Children Indicators.
-    
+
     Specifies whether a Debugging Information Entry (DIE) has child DIEs.
     This two-value enum is used in DIE abbreviations to indicate the presence
     of child DIEs that provide additional details about the parent DIE.
-    
+
     Attributes:
         DW_CHILDREN_no (0x00): DIE has no children.
         DW_CHILDREN_yes (0x01): DIE may have children.
     """
+
     DW_CHILDREN_no = 0x00
     DW_CHILDREN_yes = 0x01
 
 
 class AttributeEncoding(EnumBase):
     """DWARF Attribute Name Encodings.
-    
+
     Defines all possible DW_AT_* attribute names that can appear in DIEs.
     These attributes describe properties of the entity represented by a DIE
     (e.g., name, type, location, byte size).
-    
+
     Includes standard DWARF4 attributes and vendor-specific extensions
     (GNU, MIPS, HP, SUN, Apple, LLVM, etc.).
     """
+
     sibling = 0x1
     location = 0x2
     name = 0x3
@@ -554,15 +557,15 @@ class AttributeEncoding(EnumBase):
 
 class FakeEncoding:
     """Placeholder for unknown attribute encoding values.
-    
+
     Used when an unknown DW_AT_* value is encountered to provide a consistent
     interface that can be treated like an AttributeEncoding enum member.
     This allows graceful handling of vendor-specific or future DWARF extensions.
     """
-    
+
     def __init__(self, value: int) -> None:
         """Initialize FakeEncoding with an integer value.
-        
+
         Args:
             value: The unknown attribute encoding value.
         """
@@ -585,14 +588,15 @@ class FakeEncoding:
 
 class AttributeForm(EnumBase):
     """DWARF Attribute Form Encodings.
-    
+
     Defines all possible DW_FORM_* constants that specify how attribute values
     are encoded in a DIE. Forms determine the binary representation of attribute data
     (e.g., address, block, string, constant values). The form is essential for
     correctly parsing attribute values during debug information processing.
-    
+
     Includes standard DWARF4 forms and DWARF5 extensions.
     """
+
     # MAP = FORM_MAP
     ##
     ## Attribute form encodings.
@@ -644,11 +648,11 @@ class AttributeForm(EnumBase):
 
 class UnitHeader(EnumBase):
     """DWARF Unit Header Type Encodings.
-    
+
     Defines DW_UT_* constants that specify the type of compilation unit in DWARF5.
     Each unit type indicates the purpose and structure of the compilation unit data
     (e.g., compile_unit, type_unit, partial_unit).
-    
+
     Attributes:
         DW_UT_compile (0x01): Standard compilation unit.
         DW_UT_type (0x02): Type unit for shared type definitions.
@@ -657,6 +661,7 @@ class UnitHeader(EnumBase):
         DW_UT_split_compile (0x05): Split compilation unit.
         DW_UT_split_type (0x06): Split type unit.
     """
+
     DW_UT_compile = 0x01
     DW_UT_type = 0x02
     DW_UT_partial = 0x03
@@ -669,15 +674,15 @@ class UnitHeader(EnumBase):
 
 class Operation(EnumBase):
     """DWARF Expression Location List Opcodes.
-    
+
     Defines DW_OP_* constants that represent operations in DWARF expressions and
     location descriptions. These opcodes form a stack-based language for specifying
     how to compute values (e.g., variable locations, register contents).
-    
+
     Includes standard DWARF4 operations, GNU extensions, LLVM extensions, and WASM support.
     Operations manipulate a stack of values and include arithmetic, logical, comparison,
     memory access, and control flow operations.
-    
+
     Categories:
         - Literals: Push values onto stack (lit0-lit31, const1u/s, etc.)
         - Registers: Push register values (reg0-reg31, regx, etc.)
@@ -688,6 +693,7 @@ class Operation(EnumBase):
         - Control: Branch, skip, etc.
         - Specialized: TLS, CFA, CFI, etc.
     """
+
     addr = 0x3
     deref = 0x6
     const1u = 0x8
@@ -888,16 +894,17 @@ class Operation(EnumBase):
 
 class BaseTypeEncoding(EnumBase):
     """DWARF Base Type Encodings.
-    
+
     Defines DW_ATE_* constants that specify the encoding of base types. These values
     describe the fundamental type classification (e.g., signed integer, floating-point,
     boolean) used in type information.
-    
+
     Includes standard DWARF4 encodings, HP floating-point extensions, and more.
-    
+
     Attributes:
         void, address, boolean, complex_float, float, signed, unsigned, etc.
     """
+
     void = 0x0
     address = 0x1
     boolean = 0x2
@@ -939,10 +946,11 @@ class BaseTypeEncoding(EnumBase):
 
 class DecimalSign(EnumBase):
     """DWARF Decimal Sign Encodings.
-    
+
     Defines DW_DS_* constants that specify how signs are represented in decimal types.
     Used in numeric type information for languages like COBOL and Fortran.
     """
+
     unsigned = 0x01
     leading_overpunch = 0x02
     trailing_overpunch = 0x03
@@ -952,15 +960,16 @@ class DecimalSign(EnumBase):
 
 class Endianity(EnumBase):
     """DWARF Endianness Encodings.
-    
+
     Defines DW_END_* constants that specify the endianness (byte order) of data types.
     Controls how multi-byte values are interpreted in memory.
-    
+
     Attributes:
         default (0x00): Use default machine endianness.
         big (0x01): Big-endian byte order.
         little (0x02): Little-endian byte order.
     """
+
     default = 0x00
     big = 0x01
     little = 0x02
@@ -970,15 +979,16 @@ class Endianity(EnumBase):
 
 class Accessibility(EnumBase):
     """DWARF Member Accessibility Encodings.
-    
+
     Defines DW_ACCESS_* constants that specify the accessibility level of class/structure
     members (e.g., public, protected, private).
-    
+
     Attributes:
         public (0x01): Public member, accessible to all.
         protected (0x02): Protected member, accessible to derived classes.
         private (0x03): Private member, accessible only within the class.
     """
+
     public = 0x01
     protected = 0x02
     private = 0x03
@@ -986,15 +996,16 @@ class Accessibility(EnumBase):
 
 class Visibility(EnumBase):
     """DWARF Symbol Visibility Encodings.
-    
+
     Defines DW_VIS_* constants that control the scope and visibility of symbols.
     Determines whether a symbol is visible across translation units.
-    
+
     Attributes:
         local (0x01): Local visibility, restricted scope.
         exported (0x02): Exported visibility, visible externally.
         qualified (0x03): Qualified visibility.
     """
+
     local = 0x01
     exported = 0x02
     qualified = 0x03
@@ -1002,15 +1013,16 @@ class Visibility(EnumBase):
 
 class Virtuality(EnumBase):
     """DWARF Member Function Virtuality Encodings.
-    
+
     Defines DW_VIRTUALITY_* constants that specify whether a member function
     is virtual, pure virtual, or non-virtual.
-    
+
     Attributes:
         none (0x00): Non-virtual function.
         virtual (0x01): Virtual function, can be overridden.
         pure_virtual (0x02): Pure virtual function, must be overridden.
     """
+
     none = 0x00
     virtual = 0x01
     pure_virtual = 0x02
@@ -1025,18 +1037,19 @@ class IdentifierCase(EnumBase):
 
 class CallingConvention(EnumBase):
     """DWARF Function Calling Convention Encodings.
-    
+
     Defines DW_CC_* constants that specify the calling convention used by functions.
     Determines how arguments are passed, return values handled, and stack cleanup.
-    
+
     Includes standard conventions (normal, program) and architecture-specific conventions
     (Renesas SH, Borland fastcall, Intel thiscall, etc.).
-    
+
     Attributes:
         normal (0x01): Standard calling convention.
         program (0x02): Program calling convention.
         nocall (0x03): No call convention.
     """
+
     normal = 0x01
     program = 0x02
     nocall = 0x03
@@ -1049,16 +1062,17 @@ class CallingConvention(EnumBase):
 
 class Inline(EnumBase):
     """DWARF Function Inlining Encodings.
-    
+
     Defines DW_INL_* constants that control whether a function is inlined by the compiler.
     Describes the inlining status of a subprogram.
-    
+
     Attributes:
         not_inlined (0x00): Function is not inlined.
         inlined (0x01): Function has been inlined.
         declared_not_inlined (0x02): Function declared as not to be inlined.
         declared_inlined (0x03): Function declared to be inlined.
     """
+
     not_inlined = 0x00
     inlined = 0x01
     declared_not_inlined = 0x02
@@ -1067,39 +1081,42 @@ class Inline(EnumBase):
 
 class Ordering(EnumBase):
     """DWARF Array Ordering Encodings.
-    
+
     Defines DW_ORD_* constants that specify the storage order of array dimensions.
     Determines whether arrays are stored in row-major or column-major order.
-    
+
     Attributes:
         row_major (0x00): Row-major array layout (C-style).
         col_major (0x01): Column-major array layout (Fortran-style).
     """
+
     row_major = 0x00
     col_major = 0x01
 
 
 class DiscriminantDescriptor(EnumBase):
     """DWARF Discriminant Descriptor Encodings.
-    
+
     Defines DW_DSC_* constants that describe how discriminant values are specified
     in variant type records (typically for Ada types).
     """
+
     label = 0x00
     range = 0x01
 
 
 class Defaulted(EnumBase):
     """DWARF Defaulted Function Encodings.
-    
+
     Defines DW_DEFAULTED_* constants that specify whether C++ member functions are
     explicitly or implicitly defaulted.
-    
+
     Attributes:
         no (0x00): Function is user-provided or deleted.
         in_class (0x01): Function is defaulted inside the class definition.
         out_of_class (0x02): Function is defaulted outside the class definition.
     """
+
     no = 0x00
     in_class = 0x01
     out_of_class = 0x02
@@ -1107,12 +1124,13 @@ class Defaulted(EnumBase):
 
 class LineNumberStandard(EnumBase):
     """DWARF Line Number Program Standard Opcodes.
-    
+
     Defines DW_LNS_* constants for standard opcodes in the line number program.
     These opcodes control the state machine that generates line number information.
-    
+
     Standard opcodes execute unconditionally and are followed by operands as needed.
     """
+
     DW_LNS_copy = 0x01
     DW_LNS_advance_pc = 0x02
     DW_LNS_advance_line = 0x03
@@ -1129,16 +1147,17 @@ class LineNumberStandard(EnumBase):
 
 class LineNumberExtended(EnumBase):
     """DWARF Line Number Program Extended Opcodes.
-    
+
     Defines DW_LNE_* constants for extended opcodes in the line number program.
     Extended opcodes are identified by opcode value 0 followed by a length and opcode.
-    
+
     Attributes:
         DW_LNE_end_sequence (0x01): End of line number sequence.
         DW_LNE_set_address (0x02): Set program counter address.
         DW_LNE_define_file (0x03): Define source file entry.
         DW_LNE_set_discriminator (0x04): Set discriminator value.
     """
+
     DW_LNE_end_sequence = 0x01
     DW_LNE_set_address = 0x02
     DW_LNE_define_file = 0x03
@@ -1149,10 +1168,11 @@ class LineNumberExtended(EnumBase):
 
 class MacroInformation(EnumBase):
     """DWARF Macro Information Encodings.
-    
+
     Defines DW_MACINFO_* constants that describe macro definition and inclusion
     entries in the .debug_macinfo section (DWARF4) or .debug_macro section (DWARF5).
     """
+
     DW_MACINFO_define = 0x01
     DW_MACINFO_undef = 0x02
     DW_MACINFO_start_file = 0x03
@@ -1176,12 +1196,13 @@ DW_ADDR_far32 = 0x05
 
 class ExceptionHeaderEncoding(EnumBase):
     """DWARF Exception Header Encoding (EH Frame).
-    
+
     Defines DW_EH_PE_* constants used in the .eh_frame and .eh_frame_hdr sections
     to describe exception handling data representation. Linux-specific per LSB standard.
-    
+
     Encodes both the encoding type (absolute, relative, etc.) and size format.
     """
+
     DW_EH_PE_absptr = 0x00
     DW_EH_PE_uleb128 = 0x01
     DW_EH_PE_udata2 = 0x02
@@ -1200,23 +1221,25 @@ class ExceptionHeaderEncoding(EnumBase):
 
 class CFIExtensions(EnumBase):
     """DWARF Call Frame Information Extensions.
-    
+
     Defines DW_CFA_* constants for GNU-specific call frame information operations.
     Used in .debug_frame and .eh_frame sections for unwinding information.
     """
+
     DW_CFA_GNU_args_size = 0x2E
     DW_CFA_GNU_negative_offset_extended = 0x2F
 
 
 class Languages(EnumBase):
     """DWARF Source Language Encodings.
-    
+
     Defines DW_LANG_* constants that identify the source language of compiled code.
     Enables debuggers to apply language-specific formatting and semantics.
-    
+
     Includes standard languages (C, C++, Fortran, Ada, etc.) and modern languages
     (Rust, Go, Swift, etc.) along with vendor-specific language extensions.
     """
+
     C89 = 0x0001
     C = 0x0002
     Ada83 = 0x0003

@@ -41,25 +41,25 @@ from functools import partial
 
 class LineNumberProgram:
     """DWARF Line Number Program Parser (Stub).
-    
+
     Parses a DWARF line number program and generates source location information.
     This is a placeholder implementation that demonstrates basic iteration through
     program opcodes.
-    
+
     The state machine maintains:
         - Current address (pc)
         - Current file index
         - Current line number
         - Current column number
         - Current state flags (stmt, block, prologue_end, epilogue_begin)
-    
+
     Attributes:
         image: Binary data containing the line number program.
     """
 
     def __init__(self, image: bytes) -> None:
         """Initialize line number program parser.
-        
+
         Args:
             image: Complete line number program binary data.
         """

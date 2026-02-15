@@ -22,13 +22,13 @@ Design Goals:
 
 Architecture:
     The generator operates in two phases:
-    
+
     1. **Declaration Collection** (generate_declarations):
        - Walks DIE tree recursively
        - Normalizes each DIE into a dict structure suitable for templates
        - Groups declarations by category (typedefs, enums, records, unions, etc.)
        - Caches results per DIE offset to avoid redundant processing
-    
+
     2. **Code Rendering** (generate_header):
        - Applies Mako templates to normalized declarations
        - Handles include guards and formatting
@@ -58,7 +58,7 @@ Usage Example:
     root = session.query(DebugInformationEntry).first()
     gen = CGenerator(session)
     code = gen.generate_header(root, "firmware.h")
-    
+
     # Write to file
     with open("generated.h", "w") as f:
         f.write(code)
@@ -76,7 +76,7 @@ Advanced Usage:
         header_guard="MY_CUSTOM_GUARD_H"
     )
     gen = CGenerator(session, options=opts)
-    
+
     # Generate with custom AttributeParser
     from objutils.dwarf.traverser import AttributeParser
     ap = AttributeParser(session)
@@ -184,11 +184,11 @@ class CGenerator:
         # Basic usage
         gen = CGenerator(session)
         code = gen.generate_header(root_die, "my_types.h")
-        
+
         # With custom options
         opts = RenderOptions(indent="  ", header_guard="CUSTOM_H")
         gen = CGenerator(session, options=opts)
-        
+
         # With pre-existing AttributeParser
         ap = AttributeParser(session)
         gen = CGenerator(session, attribute_parser=ap)
@@ -480,7 +480,7 @@ class CGenerator:
             # For "int arr[10][20]"
             head, suffix = gen._render_head_suffix(type_dict)
             # head = "int", suffix = "[10][20]"
-            
+
             # For "const char *"
             head, suffix = gen._render_head_suffix(type_dict)
             # head = "const char *", suffix = ""
