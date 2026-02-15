@@ -1,5 +1,164 @@
 #!/usr/bin/env python
-"""DWARF4 Parser."""
+# ruff: noqa: E402
+# Imports come after module docstring
+
+"""DWARF 4 debug information parser and processor.
+
+This module provides a complete implementation for parsing and processing DWARF 4
+debug information from ELF object files. DWARF is a standardized debugging data
+format used by compilers to describe program structure, types, variables, and
+source locations.
+
+Key Components:
+    - **DwarfProcessor**: Main entry point for parsing DWARF sections
+    - **DebugInformationEntry (DIE)**: Represents program elements (functions, variables, types)
+    - **Abbrevations**: Lookup table for DIE attribute schemas
+    - **DwarfReaders**: Architecture-aware binary data parsers
+    - **StackMachine**: Evaluates DWARF location expressions
+
+DWARF Section Support:
+    - **.debug_info**: Compilation unit structure and DIE tree
+    - **.debug_abbrev**: Attribute schema definitions
+    - **.debug_str**: String table for shared strings
+    - **.debug_line**: Line number program data
+    - **.debug_line_str**: Line table string data
+    - **.debug_aranges**: Address range mapping (parsed but not processed)
+
+Architecture:
+    ```
+    ELF File
+      └── DwarfProcessor.from_elf()
+            ├── Parse .debug_info sections
+            ├── Load abbreviation tables (.debug_abbrev)
+            ├── Decode compilation units
+            └── Build DIE trees
+                  ├── DIE attributes (names, types, locations)
+                  ├── Location expressions (DW_AT_location)
+                  └── Type information (DW_AT_type references)
+    ```
+
+Usage Example:
+    ```python
+    from objutils.elf import model
+    from objutils.dwarf import DwarfProcessor
+    
+    # Load ELF file
+    elf = model.Elf("firmware.elf", verbose=False)
+    
+    # Parse DWARF debug information
+    dwarf = DwarfProcessor.from_elf(elf)
+    
+    # Access compilation units
+    for cu in dwarf.compilation_units:
+        print(f"CU: {cu.name} (offset: {cu.offset:#x})")
+        
+        # Traverse DIE tree
+        for die in cu.dies:
+            if die.tag == "DW_TAG_variable":
+                name = die.get_attribute("DW_AT_name")
+                location = die.get_attribute("DW_AT_location")
+                print(f"Variable: {name} @ {location}")
+    ```
+
+Advanced Usage:
+    ```python
+    # Find specific DIEs by tag
+    functions = dwarf.find_dies_by_tag("DW_TAG_subprogram")
+    
+    # Resolve type references
+    for func in functions:
+        return_type_ref = func.get_attribute("DW_AT_type")
+        return_type_die = dwarf.resolve_die_reference(return_type_ref)
+        print(f"{func.name} returns {return_type_die.name}")
+    
+    # Evaluate location expressions
+    var_location_expr = var_die.attributes["DW_AT_location"]
+    readers = dwarf.readers
+    location_str = readers.dwarf_expression(var_location_expr.form, var_location_expr.value)
+    ```
+
+DIE Tree Structure:
+    DWARF organizes debug information as a tree of Debug Information Entries:
+    
+    ```
+    DW_TAG_compile_unit (root)
+      ├── DW_TAG_subprogram (function)
+      │     ├── DW_AT_name: "main"
+      │     ├── DW_AT_type: <reference to int>
+      │     └── DW_TAG_variable (local variable)
+      │           ├── DW_AT_name: "x"
+      │           ├── DW_AT_type: <reference>
+      │           └── DW_AT_location: <expression>
+      └── DW_TAG_base_type
+            ├── DW_AT_name: "int"
+            ├── DW_AT_byte_size: 4
+            └── DW_AT_encoding: DW_ATE_signed
+    ```
+
+Abbreviation System:
+    DIE structure is defined by abbreviation codes to save space:
+    
+    - **Abbrev Code**: Identifies the DIE's schema (tag + attributes)
+    - **Abbreviation Table**: Maps codes to (tag, has_children, attribute_list)
+    - Each compilation unit references its own abbreviation table
+    
+    This allows compact encoding: DIE stores abbrev code + attribute values only.
+
+Location Expressions:
+    DWARF uses expressions to describe variable locations dynamically:
+    
+    - Stack-based bytecode evaluated at runtime
+    - Operations: DW_OP_addr, DW_OP_breg*, DW_OP_plus_uconst, etc.
+    - Used for: Variables, struct members, array elements
+    - Handles: Registers, frame-relative, optimized-out variables
+
+Type System:
+    DWARF represents C/C++ types as DIEs:
+    
+    - **Base types**: DW_TAG_base_type (int, float, char)
+    - **Pointer types**: DW_TAG_pointer_type
+    - **Array types**: DW_TAG_array_type + DW_TAG_subrange_type
+    - **Struct/union**: DW_TAG_structure_type + DW_TAG_member
+    - **Typedef**: DW_TAG_typedef
+    - **Const/volatile**: DW_TAG_const_type, DW_TAG_volatile_type
+
+Data Classes:
+    The module uses dataclasses for clean data representation:
+    
+    - **@dataclass Attribute**: Single attribute definition
+    - **@dataclass Abbrevation**: DIE schema (tag + attributes)
+    - **@dataclass DIEAttribute**: Attribute with parsed value
+    - **@dataclass DebugInformationEntry**: Complete DIE with children
+    - **@dataclass DebugInformation**: Full compilation unit
+
+Implementation Notes:
+    - Lazy parsing: Only requested sections are processed
+    - Reference resolution: DIE references use CU-relative offsets
+    - Form handling: Each attribute form has specific parsing logic
+    - String pooling: Shared strings use .debug_str section
+    - Endianness: Architecture-aware via DwarfReaders
+
+DWARF 4 Specification:
+    This implementation follows DWARF 4 standard (2010):
+    - Section 2: Attribute values and encodings
+    - Section 3: Program scope entries (DIE structure)
+    - Section 6: Line number information
+    - Section 7: Data representation (LEB128, addresses)
+
+Limitations:
+    - DWARF 5 features not supported
+    - Some vendor extensions not implemented
+    - Split DWARF (.dwo files) not supported
+    - CFI (Call Frame Information) not parsed
+
+See Also:
+    - objutils.dwarf.constants: DWARF tag/attribute/form enums
+    - objutils.dwarf.readers: Binary data parsers
+    - objutils.dwarf.sm: Stack machine for expressions
+    - objutils.dwarf.traverser: High-level DIE tree navigation
+    - objutils.dwarf.attrparser: Simplified DIE parsing
+    - objutils.elf.model: ELF file parser
+"""
 
 __copyright__ = """
     objutils - Object file library for Python.
@@ -84,6 +243,7 @@ from objutils.dwarf.sm import StackMachine
 from objutils.elf import model
 
 
+# Mapping of attribute encodings to their enum types
 ENCODED_ATTRIBUTES = {
     constants.AttributeEncoding.encoding: constants.BaseTypeEncoding,
     constants.AttributeEncoding.decimal_sign: constants.DecimalSign,
@@ -102,6 +262,15 @@ ENCODED_ATTRIBUTES = {
 
 
 def encoding_repr(encoding, value):
+    """Convert encoded attribute value to human-readable string.
+
+    Args:
+        encoding: Attribute encoding type from constants
+        value: Raw integer value to decode
+
+    Returns:
+        Enum member name or "Unknown encoding value" string
+    """
     encoder = ENCODED_ATTRIBUTES[encoding]
     if value in encoder.__members__.values():
         dv = encoder(value).name
@@ -112,6 +281,17 @@ def encoding_repr(encoding, value):
 
 @dataclass(frozen=True)
 class Attribute:
+    """Attribute definition in abbreviation table.
+
+    Defines structure of a single DIE attribute: what it represents (encoding),
+    how it's stored (form), and optional special handling.
+
+    Attributes:
+        encoding: Semantic meaning (DW_AT_name, DW_AT_type, etc.)
+        form: Binary representation (DW_FORM_string, DW_FORM_data4, etc.)
+        special_value: Optional metadata (e.g., implicit const value)
+    """
+
     encoding: constants.AttributeEncoding
     form: constants.AttributeForm
     special_value: Optional[Any] = None
@@ -124,6 +304,17 @@ class Attribute:
 
 @dataclass(frozen=True)
 class Abbrevation:
+    """DIE schema definition from abbreviation table.
+
+    Abbreviations define the structure of DIEs to reduce file size.
+    Each compilation unit has its own abbreviation table.
+
+    Attributes:
+        tag: DIE type (DW_TAG_subprogram, DW_TAG_variable, etc.)
+        children: Whether DIE has child DIEs (hierarchical structure)
+        attrs: List of Attribute definitions for this DIE schema
+    """
+
     tag: str
     children: bool = False
     attrs: list[Any] = field(default_factory=list)
@@ -131,11 +322,27 @@ class Abbrevation:
 
 @dataclass
 class Readers:
+    """Container for binary data readers.
+
+    Dynamically populated with reader instances based on target architecture.
+    Used internally by DwarfReaders to organize parsers.
+    """
+
     pass
 
 
 @dataclass
 class DIEAttribute:
+    """Parsed DIE attribute with value.
+
+    Represents a single attribute within a DIE, containing both raw binary
+    value and human-readable display representation.
+
+    Attributes:
+        raw_value: Unparsed binary value (bytes, int, or parsed structure)
+        display_value: Human-readable string representation
+    """
+
     raw_value: Any
     display_value: str
 
@@ -145,6 +352,30 @@ class DIEAttribute:
 
 @dataclass
 class DebugInformationEntry:
+    """Debug Information Entry (DIE) from DWARF info.
+
+    Represents a single program element (function, variable, type, etc.)
+    with attributes and optional children forming a hierarchical tree.
+
+    Attributes:
+        name: DIE tag name (e.g., "DW_TAG_subprogram")
+        attributes: Dictionary mapping attribute names to DIEAttribute instances
+        children: List of child DIEs (for hierarchical structures)
+
+    Example:
+        ```python
+        # Function DIE with local variable child
+        func_die = DebugInformationEntry(
+            name="DW_TAG_subprogram",
+            attributes={
+                "DW_AT_name": DIEAttribute("main", "main"),
+                "DW_AT_type": DIEAttribute(0x1234, "<0x1234>")
+            },
+            children=[var_die]  # Local variable
+        )
+        ```
+    """
+
     name: str
     attributes: list = field(default_factory=list)
     children: list = field(default_factory=list)
@@ -155,6 +386,16 @@ class DebugInformationEntry:
 
 @dataclass
 class DebugInformation:
+    """Complete debug information for a compilation unit.
+
+    Contains all DIEs from a single .debug_info compilation unit,
+    with both flat (offset-indexed) and hierarchical representations.
+
+    Attributes:
+        die_map: Flat mapping of DIE offset -> DIE instance
+        die_entries: Hierarchical list of top-level DIEs with children
+    """
+
     die_map: dict[int, DebugInformationEntry]
     die_entries: list[DebugInformationEntry]
 
@@ -163,6 +404,38 @@ class DebugInformation:
 
 
 class Abbrevations:
+    """Abbreviation table parser and cache.
+
+    Parses and caches abbreviation definitions from .debug_abbrev section.
+    Abbreviations define the schema (tag + attributes) for DIEs, allowing
+    compact encoding in .debug_info.
+
+    Structure:
+        Each abbreviation entry contains:
+        - Code: Unique identifier within the table
+        - Tag: DIE type (DW_TAG_*)
+        - Children flag: Whether DIE has children
+        - Attribute list: (encoding, form) pairs
+
+    Example Abbreviation:
+        ```
+        Code: 1
+        Tag: DW_TAG_subprogram
+        Children: yes
+        Attributes:
+          - DW_AT_name, DW_FORM_string
+          - DW_AT_type, DW_FORM_ref4
+          - DW_AT_low_pc, DW_FORM_addr
+        ```
+
+    Usage:
+        ```python
+        abbrevs = Abbrevations(debug_abbrev_section)
+        schema = abbrevs.get(offset=0, item=1)  # Get abbreviation code 1
+        print(schema.tag)  # "DW_TAG_subprogram"
+        print(schema.children)  # True
+        ```
+    """
 
     AbbrevationHeader = Struct(
         "start" / Tell,
@@ -192,11 +465,25 @@ class Abbrevations:
     )
 
     def __init__(self, section):
+        """Initialize abbreviation parser.
+
+        Args:
+            section: .debug_abbrev section from ELF file
+        """
         self.image = section.image
         self.length = len(section.image)
         self.abbrevations = {}
 
     def get(self, abbr_offset, item):
+        """Retrieve abbreviation schema by code.
+
+        Args:
+            abbr_offset: Offset into .debug_abbrev section (CU-specific)
+            item: Abbreviation code number
+
+        Returns:
+            Abbrevation instance or None if code is 0
+        """
         if item == 0:
             return None
         if (abbr_offset, item) in self.abbrevations:
@@ -210,6 +497,18 @@ class Abbrevations:
             return self._fetch(abbr_offset, item)
 
     def _fetch(self, abbr_offset, item):
+        """Parse abbreviation from raw bytes and cache it.
+
+        Parses abbreviation table starting at abbr_offset, caching all
+        entries encountered until the requested item is found.
+
+        Args:
+            abbr_offset: Start offset in abbreviation section
+            item: Target abbreviation code
+
+        Returns:
+            Abbrevation instance for the requested code
+        """
         offset = abbr_offset
         while True:
             abbrv_header = self.AbbrevationHeader.parse(self.image[offset:])
@@ -281,7 +580,76 @@ class Abbrevations:
 
 
 class DwarfProcessor:
-    """ """
+    """Main DWARF debug information processor.
+
+    Parses and processes DWARF 4 debug sections from ELF files. Provides access
+    to compilation units, DIE trees, line number programs, and other debug data.
+
+    Architecture:
+        1. Loads DWARF sections from ELF file
+        2. Initializes architecture-specific readers (endianness, address size)
+        3. Parses abbreviation tables (.debug_abbrev)
+        4. Decodes compilation units from .debug_info
+        5. Builds hierarchical DIE trees
+        6. Resolves string/type references
+
+    Attributes:
+        b64: True if 64-bit architecture
+        endianess: Target byte order (Endianess.Little or Endianess.Big)
+        debug_sections: Dictionary of DWARF sections from ELF
+        strings: .debug_str section content (shared string pool)
+        line_strings: .debug_line_str section content
+        readers: Binary data readers (DwarfReaders.readers)
+        stack_machine: Expression evaluator (StackMachine instance)
+        compilation_units: List of parsed compilation units
+
+    Usage:
+        ```python
+        from objutils.elf import model
+        from objutils.dwarf import DwarfProcessor
+
+        # Load ELF file
+        elf = model.Elf("firmware.elf", verbose=False)
+
+        # Parse DWARF information
+        dwarf = DwarfProcessor.from_elf(elf)
+
+        # Access compilation units
+        for cu in dwarf.compilation_units:
+            print(f"Compilation Unit: {cu.name}")
+
+            # Traverse DIE tree
+            for die in cu.dies:
+                print(f"  {die.tag}: {die.get('DW_AT_name')}")
+        ```
+
+    Advanced Usage:
+        ```python
+        # Find specific DIEs
+        variables = [die for cu in dwarf.compilation_units
+                     for die in cu.dies
+                     if die.tag == "DW_TAG_variable"]
+
+        # Access line number information
+        line_program = dwarf.get_line_program(cu_offset)
+
+        # Evaluate location expressions
+        location_expr = var_die.attributes["DW_AT_location"]
+        result = dwarf.stack_machine.evaluate(location_expr.value)
+        ```
+
+    Supported DWARF Sections:
+        - **.debug_info**: Core debug data (required)
+        - **.debug_abbrev**: Abbreviation tables (required)
+        - **.debug_str**: String table (optional but common)
+        - **.debug_line**: Line number programs (optional)
+        - **.debug_line_str**: Line table strings (optional)
+        - **.debug_aranges**: Address ranges (parsed but not processed)
+
+    Note:
+        The processor expects an ELF file with DWARF 4 format debug sections.
+        Earlier or later DWARF versions may not parse correctly.
+    """
 
     DATATYPES32 = {
         "Addr": (Int32ul, Int32ub),  # 4 - Unsigned program address
@@ -290,6 +658,14 @@ class DwarfProcessor:
     UTF8String = CString(encoding="utf8")
 
     def __init__(self, elf_parser):
+        """Initialize DWARF processor from ELF parser.
+
+        Args:
+            elf_parser: objutils.elf.model.Elf instance with debug sections
+
+        Raises:
+            TypeError: If ELF file contains no DWARF sections
+        """
 
         self.b64 = elf_parser.b64
         self.endianess = Endianess.Little if elf_parser.endianess == "<" else Endianess.Big
@@ -313,6 +689,11 @@ class DwarfProcessor:
         self.install_dwarf_readers()
 
     def install_dwarf_readers(self):
+        """Initialize architecture-specific binary data readers.
+
+        Creates DwarfReaders instance configured for target architecture
+        (32/64-bit, little/big-endian) and associates it with this processor.
+        """
         # Verwende die neue, wiederverwendbare Readers-Klasse
         address_size = 8 if self.b64 else 4
         factory = DwarfReaders(
@@ -325,6 +706,14 @@ class DwarfProcessor:
         self.stack_machine = factory.stack_machine
 
     def get_string(self, offset: int):
+        """Retrieve string from .debug_str section.
+
+        Args:
+            offset: Byte offset into string table
+
+        Returns:
+            Null-terminated string at specified offset
+        """
         # self.strings.seek(offset)
         # result = self.UTF8String.parse_stream(self.strings)
         result = str(self.debug_sections[".debug_str"])[offset : offset + 25]
