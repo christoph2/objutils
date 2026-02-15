@@ -1,33 +1,125 @@
-"""
-C/C++ Code Generator from DWARF DIEs using Mako templates.
+"""C/C++ code generator from DWARF debugging information.
 
-This module builds on top of AttributeParser to reconstruct enough structure
-information to render C/C++ declarations for:
-- typedefs
-- enums
-- structs/classes/unions (with members and inheritance where available)
-- variables
-- function prototypes (subprogram/formal_parameter)
+This module generates C/C++ header files from DWARF DIE (Debug Information Entry)
+trees, reconstructing type declarations, variable declarations, and function prototypes.
+Uses Mako templates for flexible rendering.
 
-Design goals
-- Keep logic and caching local to this module (and AttributeParser).
-- Avoid modifying core parsers or DB schema.
-- Use simple inline Mako templates to minimize repository churn.
+The generator builds on AttributeParser to extract structured type information and
+render it as valid C/C++ syntax. It handles:
+    - **Typedefs**: Type aliases
+    - **Enumerations**: Named integer constants with optional explicit values
+    - **Structures/Classes**: Composite types with members and optional inheritance
+    - **Unions**: Overlapping member storage
+    - **Variables**: Global/static variable declarations (extern)
+    - **Functions**: Function prototypes with typed parameters
 
-Usage (example):
+Design Goals:
+    - Keep caching and logic localized (no schema modifications)
+    - Use inline Mako templates (minimize file churn)
+    - Support anonymous inline types (unnamed struct/union/enum members)
+    - Handle complex type specifications (pointers, arrays, qualifiers)
+    - Generate valid, compilable C code
+
+Architecture:
+    The generator operates in two phases:
+    
+    1. **Declaration Collection** (generate_declarations):
+       - Walks DIE tree recursively
+       - Normalizes each DIE into a dict structure suitable for templates
+       - Groups declarations by category (typedefs, enums, records, unions, etc.)
+       - Caches results per DIE offset to avoid redundant processing
+    
+    2. **Code Rendering** (generate_header):
+       - Applies Mako templates to normalized declarations
+       - Handles include guards and formatting
+       - Produces complete C header file
+
+Type Rendering:
+    Complex types are rendered with special attention to:
+    - **Pointers**: `int *`, `void *`, `const char *`
+    - **Arrays**: Single and multi-dimensional with explicit sizes
+    - **Qualifiers**: `const`, `volatile`, `restrict`
+    - **References**: C++ `&` and `&&` references
+    - **Anonymous types**: Inline struct/union/enum definitions
+
+Usage Example:
+    ```python
     from objutils.elf import ElfParser
     from objutils.dwarf import DwarfProcessor
     from objutils.dwarf.c_generator import CGenerator
 
-    ep = ElfParser("file.elf")
+    # Parse ELF and import DWARF
+    ep = ElfParser("firmware.elf")
     dp = DwarfProcessor(ep)
     dp.do_dbg_info()
 
+    # Generate C header
     session = ep.session
-    start_die = session.query(model.DebugInformationEntry).first()
+    root = session.query(DebugInformationEntry).first()
     gen = CGenerator(session)
-    code = gen.generate_header(start_die)
-    print(code)
+    code = gen.generate_header(root, "firmware.h")
+    
+    # Write to file
+    with open("generated.h", "w") as f:
+        f.write(code)
+    ```
+
+Advanced Usage:
+    ```python
+    from objutils.dwarf.c_generator import CGenerator, RenderOptions
+
+    # Custom rendering options
+    opts = RenderOptions(
+        language="c",
+        indent="  ",  # 2 spaces instead of 4
+        include_guards=True,
+        header_guard="MY_CUSTOM_GUARD_H"
+    )
+    gen = CGenerator(session, options=opts)
+    
+    # Generate with custom AttributeParser
+    from objutils.dwarf.traverser import AttributeParser
+    ap = AttributeParser(session)
+    gen = CGenerator(session, attribute_parser=ap, options=opts)
+    ```
+
+Template Variables:
+    The Mako template receives these variables:
+    - **guard**: Include guard macro name (or None)
+    - **typedefs**: List of typedef dicts with 'name' and 'target'
+    - **enums**: List of enum dicts with 'name' and 'items' [(name, value), ...]
+    - **records**: List of struct/class dicts with 'name' and 'members'
+    - **unions**: List of union dicts with 'name' and 'members'
+    - **variables**: List of variable dicts with 'name' and 'type'
+    - **functions**: List of function dicts with 'name', 'returns', and 'params'
+    - **opt**: RenderOptions instance
+
+Member Dict Structure:
+    Each member dict contains:
+    - **name**: Member name (str)
+    - **type**: Full type string (e.g., "const int *")
+    - **type_head**: Type without array dimensions (e.g., "const int *")
+    - **type_suffix**: Array dimensions (e.g., "[10][20]")
+    - **inline**: True if this is an anonymous inline type
+    - **inline_kind**: "struct", "union", or "enum" (if inline)
+    - **inline_members**: List of nested member dicts (if struct/union)
+    - **inline_items**: List of (name, value) tuples (if enum)
+
+Performance Considerations:
+    - DIE offset-based caching prevents redundant processing
+    - LRU cache on _split_type_desc (16K entries)
+    - AttributeParser caching reused for type resolution
+
+Limitations:
+    - C++ features (inheritance, templates, namespaces) are simplified
+    - Bitfield members are not yet supported
+    - Function pointer types may need manual adjustment
+    - Inline assembly and compiler attributes are omitted
+
+See Also:
+    - objutils.dwarf.traverser: AttributeParser for type resolution
+    - objutils.dwarf.attrparser: Alternative DIE traverser
+    - Mako Templates: https://www.makotemplates.org/
 """
 
 from __future__ import annotations
@@ -44,6 +136,26 @@ from objutils.elf import model
 
 @dataclass
 class RenderOptions:
+    """Configuration options for C code generation.
+
+    Attributes:
+        language: Target language ("c" or "c++", reserved for future)
+        indent: Indentation string (default: 4 spaces)
+        include_guards: Whether to generate include guards
+        header_guard: Custom include guard macro name (auto-generated if None)
+
+    Example:
+        ```python
+        opts = RenderOptions(
+            language="c",
+            indent="  ",  # 2 spaces
+            include_guards=True,
+            header_guard="MY_HEADER_H"
+        )
+        gen = CGenerator(session, options=opts)
+        ```
+    """
+
     language: str = "c"  # or "c++" (reserved for future)
     indent: str = "    "
     include_guards: bool = True
@@ -51,7 +163,50 @@ class RenderOptions:
 
 
 class CGenerator:
+    """Generate C/C++ header files from DWARF debugging information.
+
+    This class walks DWARF DIE trees and generates valid C code including type
+    definitions, variable declarations, and function prototypes. It leverages
+    AttributeParser for type resolution and uses Mako templates for rendering.
+
+    The generator maintains per-DIE caching to avoid redundant processing of
+    complex type trees. Each DIE is normalized into a template-friendly dict
+    structure before rendering.
+
+    Attributes:
+        session: SQLAlchemy session for ORM queries
+        ap: AttributeParser instance for type resolution
+        options: RenderOptions controlling output formatting
+        _decls_cache: Cache mapping DIE offset -> normalized declarations dict
+
+    Example:
+        ```python
+        # Basic usage
+        gen = CGenerator(session)
+        code = gen.generate_header(root_die, "my_types.h")
+        
+        # With custom options
+        opts = RenderOptions(indent="  ", header_guard="CUSTOM_H")
+        gen = CGenerator(session, options=opts)
+        
+        # With pre-existing AttributeParser
+        ap = AttributeParser(session)
+        gen = CGenerator(session, attribute_parser=ap)
+        ```
+
+    Note:
+        The generator skips anonymous types at top level (e.g., unnamed structs)
+        but includes them inline when used as struct members.
+    """
+
     def __init__(self, session, attribute_parser: AttributeParser | None = None, options: RenderOptions | None = None):
+        """Initialize CGenerator.
+
+        Args:
+            session: SQLAlchemy session connected to DWARF database
+            attribute_parser: Optional pre-configured AttributeParser (creates new if None)
+            options: Optional RenderOptions (uses defaults if None)
+        """
         self.session = session
         self.ap = attribute_parser or AttributeParser(session)
         self.options = options or RenderOptions()
@@ -60,14 +215,62 @@ class CGenerator:
 
     # ------------- Public API -------------------------------------------------
     def generate_header(self, start_die: model.DebugInformationEntry, header_name: str | None = None) -> str:
+        """Generate complete C header file from DIE tree.
+
+        Args:
+            start_die: Root DIE to start traversal (typically compilation unit)
+            header_name: Optional header filename for include guard generation
+
+        Returns:
+            Complete C header file as string with include guards and declarations
+
+        Example:
+            ```python
+            root = session.query(DebugInformationEntry).first()
+            code = gen.generate_header(root, "firmware.h")
+            print(code)
+            # Output:
+            # #ifndef _FIRMWARE_H_
+            # #define _FIRMWARE_H_
+            # /* Generated by objutils.dwarf.c_generator using DWARF DIEs */
+            # ...
+            # #endif /* _FIRMWARE_H_ */
+            ```
+        """
         decls = self.generate_declarations(start_die)
         hdr_guard = self._guard_name(header_name) if self.options.include_guards else None
         return self._render_header(decls, hdr_guard)
 
     def generate_declarations(self, start_die: model.DebugInformationEntry) -> dict[str, list[dict[str, Any]]]:
-        """Traverse DIE subtree and collect declarations grouped by category.
-        Returns a dict with keys: typedefs, enums, records, unions, variables, functions.
-        Each value is a list of normalized dicts ready for templating.
+        """Traverse DIE subtree and collect normalized declarations grouped by category.
+
+        Walks the DIE tree recursively and extracts all type definitions, variables,
+        and function prototypes. Anonymous types are skipped at top level but included
+        inline when referenced.
+
+        Args:
+            start_die: Root DIE to start traversal
+
+        Returns:
+            Dict with keys:
+                - "typedefs": List of typedef dicts
+                - "enums": List of enum dicts
+                - "records": List of struct/class dicts
+                - "unions": List of union dicts
+                - "variables": List of variable dicts
+                - "functions": List of function prototype dicts
+
+        Example:
+            ```python
+            decls = gen.generate_declarations(root_die)
+            print(f"Found {len(decls['typedefs'])} typedefs")
+            print(f"Found {len(decls['enums'])} enums")
+            print(f"Found {len(decls['records'])} structs")
+            ```
+
+        Note:
+            Results are cached by DIE offset. Multiple calls with the same DIE
+            return cached results immediately.
         """
         # Use DIE offset as a stable cache key when available
         key = getattr(start_die, "offset", None)
@@ -123,6 +326,14 @@ class CGenerator:
 
     # ------------- Normalization utilities -----------------------------------
     def _name_of(self, die: model.DebugInformationEntry) -> str:
+        """Extract name attribute from DIE.
+
+        Args:
+            die: Debug Information Entry
+
+        Returns:
+            Name as string, or empty string if unavailable
+        """
         a = getattr(die, "attributes_map", {}).get("name") if hasattr(die, "attributes_map") else None
         if a is None:
             for x in die.attributes or []:
@@ -137,6 +348,16 @@ class CGenerator:
             return ""
 
     def _raw_attr(self, die: model.DebugInformationEntry, name: str, converter: type = None):
+        """Get raw attribute value with optional type conversion.
+
+        Args:
+            die: Debug Information Entry
+            name: Attribute name to retrieve
+            converter: Optional type converter (e.g., int, str)
+
+        Returns:
+            Attribute value (optionally converted), or None if not found
+        """
         amap = getattr(die, "attributes_map", None)
         if amap is not None and name in amap:
             if converter is not None:
@@ -152,9 +373,24 @@ class CGenerator:
         return None
 
     def _render_type(self, t: Any) -> str:
-        """Render a C-like type string from a parsed type dict (from AttributeParser).
-        Supports base/typedef/struct/union/enum, pointer/array, const/volatile, and references.
-        Falls back to tag/name when structure is incomplete.
+        """Render a C-like type string from parsed type tree.
+
+        Handles base types, typedefs, structs, unions, enums, pointers, arrays,
+        const/volatile qualifiers, and references. Falls back to tag/name when
+        structure is incomplete.
+
+        Args:
+            t: Parsed type dict from AttributeParser or CircularReference marker
+
+        Returns:
+            Type string suitable for C code (e.g., "const int *", "struct foo[10]")
+
+        Example:
+            ```python
+            type_dict = ap.parse_type(offset)
+            type_str = gen._render_type(type_dict)
+            # "const int *" or "struct point" or "uint32_t[10]"
+            ```
         """
         # Non-dict markers like CircularReference
         if not isinstance(t, dict):
@@ -226,8 +462,32 @@ class CGenerator:
         return str(name) if name else tag
 
     def _render_head_suffix(self, t: Any) -> tuple[str, str]:
-        """Render type into (head, suffix) separating array dimensions into suffix.
-        For non-array types, suffix is empty and head equals _render_type(t).
+        """Render type into (head, suffix) separating array dimensions.
+
+        For array types, returns the element type in head and dimensions in suffix.
+        For non-array types, returns full type in head with empty suffix.
+
+        Args:
+            t: Parsed type dict from AttributeParser
+
+        Returns:
+            Tuple of (type_head, array_suffix)
+            - type_head: Type without array dimensions (e.g., "const int *")
+            - array_suffix: Array dimensions (e.g., "[10][20]")
+
+        Example:
+            ```python
+            # For "int arr[10][20]"
+            head, suffix = gen._render_head_suffix(type_dict)
+            # head = "int", suffix = "[10][20]"
+            
+            # For "const char *"
+            head, suffix = gen._render_head_suffix(type_dict)
+            # head = "const char *", suffix = ""
+            ```
+
+        Note:
+            This separation allows proper C syntax: `type_head name array_suffix;`
         """
         # Non-dict markers
         if not isinstance(t, dict):
@@ -271,8 +531,19 @@ class CGenerator:
 
     @lru_cache(maxsize=16384)
     def _split_type_desc(self, offset: int | None) -> tuple[str, str]:
-        """Return (head, suffix) for a type at DIE offset.
-        head is the type specifier with pointer/ref/qualifiers, suffix carries array dimensions like [3][N].
+        """Resolve type at DIE offset and return (head, suffix) tuple.
+
+        Args:
+            offset: Absolute DIE offset of type, or None
+
+        Returns:
+            Tuple of (type_head, array_suffix)
+            - For None offset: ("void", "")
+            - For invalid offset: ("<type@0x...>", "")
+            - For valid type: Type split into head and array suffix
+
+        Note:
+            Results are LRU-cached (16K entries) to avoid redundant parsing.
         """
         if isinstance(offset, int):
             try:
@@ -285,11 +556,58 @@ class CGenerator:
         return ("void", "")
 
     def _type_desc(self, offset: int | None) -> str:
+        """Get complete type description as single string.
+
+        Args:
+            offset: Absolute DIE offset of type, or None
+
+        Returns:
+            Complete type string (head + suffix concatenated)
+
+        Note:
+            This is a convenience wrapper over _split_type_desc for cases
+            where array suffix separation is not needed.
+        """
         # Backward-compatible single string (used in some places). Prefer split version for declarations.
         head, suffix = self._split_type_desc(offset)
         return head + suffix
 
     def _collect_members(self, die: model.DebugInformationEntry) -> list[dict[str, Any]]:
+        """Collect and normalize struct/union/class members.
+
+        Extracts all member DIEs and handles:
+            - Named members with explicit types
+            - Anonymous inline struct/union/enum definitions
+            - Member offsets (data_member_location)
+
+        Args:
+            die: Structure, class, or union DIE
+
+        Returns:
+            List of member dicts, each containing:
+                - name: Member name (or "<anon>")
+                - type: Full type string (if not inline)
+                - type_head: Type without array suffix
+                - type_suffix: Array dimensions
+                - inline: True if anonymous inline type
+                - inline_kind: "struct", "union", or "enum" (if inline)
+                - inline_members: Nested members (if inline struct/union)
+                - inline_items: Enumerator list (if inline enum)
+                - location: Member offset expression
+
+        Example:
+            ```python
+            struct_die = session.query(DebugInformationEntry).filter_by(
+                tag="structure_type", name="my_struct"
+            ).first()
+            members = gen._collect_members(struct_die)
+            for m in members:
+                if m.get('inline'):
+                    print(f"Anonymous {m['inline_kind']}: {m['name']}")
+                else:
+                    print(f"{m['type']} {m['name']}{m.get('type_suffix', '')}")
+            ```
+        """
         members: list[dict[str, Any]] = []
         for ch in getattr(die, "children", []) or []:
             ctag = getattr(ch.abbrev, "tag", ch.tag)
@@ -370,6 +688,14 @@ class CGenerator:
         return members
 
     def _normalize_typedef(self, die: model.DebugInformationEntry) -> dict[str, Any]:
+        """Normalize typedef DIE into template-ready dict.
+
+        Args:
+            die: Typedef DIE
+
+        Returns:
+            Dict with keys: name, target, target_head, target_suffix
+        """
         name = self._name_of(die) or "<anon_typedef>"
         toff = self._raw_attr(die, "type", int)
         if isinstance(toff, int):
@@ -380,6 +706,15 @@ class CGenerator:
         return {"name": name, "target": target, "target_head": head, "target_suffix": suffix}
 
     def _normalize_enum(self, die: model.DebugInformationEntry) -> dict[str, Any] | None:
+        """Normalize enumeration DIE into template-ready dict.
+
+        Args:
+            die: Enumeration_type DIE
+
+        Returns:
+            Dict with keys: name, items [(name, value), ...], byte_size
+            Returns None for anonymous enums (skipped at top level)
+        """
         name_raw = self._name_of(die)
         if not name_raw:
             return None  # Skip anonymous enums as standalone entities
@@ -394,6 +729,15 @@ class CGenerator:
         return {"name": name, "items": items, "byte_size": bsize}
 
     def _normalize_record(self, die: model.DebugInformationEntry) -> dict[str, Any] | None:
+        """Normalize structure/class DIE into template-ready dict.
+
+        Args:
+            die: Structure_type or class_type DIE
+
+        Returns:
+            Dict with keys: kind ("struct"), name, members, byte_size
+            Returns None for anonymous structs (skipped at top level)
+        """
         name_raw = self._name_of(die)
         if not name_raw:
             return None  # Skip anonymous structs/classes as standalone entities
@@ -403,6 +747,15 @@ class CGenerator:
         return {"kind": "struct", "name": name, "members": members, "byte_size": size}
 
     def _normalize_union(self, die: model.DebugInformationEntry) -> dict[str, Any] | None:
+        """Normalize union DIE into template-ready dict.
+
+        Args:
+            die: Union_type DIE
+
+        Returns:
+            Dict with keys: kind ("union"), name, members, byte_size
+            Returns None for anonymous unions (skipped at top level)
+        """
         name_raw = self._name_of(die)
         if not name_raw:
             return None  # Skip anonymous unions as standalone entities
@@ -412,6 +765,14 @@ class CGenerator:
         return {"kind": "union", "name": name, "members": members, "byte_size": size}
 
     def _normalize_variable(self, die: model.DebugInformationEntry) -> dict[str, Any]:
+        """Normalize variable DIE into template-ready dict.
+
+        Args:
+            die: Variable DIE
+
+        Returns:
+            Dict with keys: name, type, type_head, type_suffix, location
+        """
         name = self._name_of(die) or "<anon>"
         toff = self._raw_attr(die, "type", int)
         loc = self._raw_attr(die, "location")
@@ -429,6 +790,15 @@ class CGenerator:
         }
 
     def _normalize_function(self, die: model.DebugInformationEntry) -> dict[str, Any] | None:
+        """Normalize subprogram DIE into template-ready function prototype dict.
+
+        Args:
+            die: Subprogram DIE
+
+        Returns:
+            Dict with keys: name, returns, returns_head, returns_suffix, params
+            Returns None for unnamed subprograms (skipped)
+        """
         name = self._name_of(die)
         if not name:
             # Skip unnamed subprograms for prototypes
@@ -458,6 +828,15 @@ class CGenerator:
 
     # ------------- Rendering --------------------------------------------------
     def _render_header(self, decls: dict[str, list[dict[str, Any]]], guard: str | None) -> str:
+        """Render normalized declarations into complete C header file.
+
+        Args:
+            decls: Dict of declaration lists from generate_declarations()
+            guard: Include guard macro name, or None to skip guards
+
+        Returns:
+            Complete C header file as string
+        """
         tmpl = Template(self._HEADER_TEMPLATE)
         return tmpl.render(
             guard=guard,
@@ -471,6 +850,18 @@ class CGenerator:
         )
 
     def _guard_name(self, header_name: str | None) -> str:
+        """Generate include guard macro name from header filename.
+
+        Args:
+            header_name: Optional header filename (e.g., "my_types.h")
+
+        Returns:
+            Include guard macro (e.g., "_MY_TYPES_H_")
+
+        Note:
+            Uses self.options.header_guard if set, otherwise auto-generates
+            from filename by uppercasing and replacing non-alphanumeric chars with "_".
+        """
         if self.options.header_guard:
             return self.options.header_guard
         base = header_name or "GENERATED_DWARF_HEADER"
@@ -586,3 +977,30 @@ ${f['returns']} ${f['name']}(${', '.join([p.get('type_head', p['type']) + ' ' + 
 #endif /* ${guard} */
 % endif
 """
+    """str: Mako template for C header file generation.
+
+    Template Variables:
+        guard: Include guard macro name (or None)
+        typedefs: List of typedef dicts
+        enums: List of enum dicts with 'items' [(name, value), ...]
+        records: List of struct/class dicts with 'members'
+        unions: List of union dicts with 'members'
+        variables: List of variable dicts for extern declarations
+        functions: List of function prototype dicts with 'params'
+        opt: RenderOptions instance
+
+    Generated Structure:
+        1. Include guard (if enabled)
+        2. Generator comment
+        3. Typedefs section
+        4. Enums section (with hex values)
+        5. Structs/Classes section (with inline anonymous types)
+        6. Unions section (with inline anonymous types)
+        7. Extern variable declarations
+        8. Function prototypes
+        9. Include guard end
+
+    Note:
+        Anonymous inline types (struct/union/enum) are rendered inline within
+        their containing struct/union definition.
+    """
