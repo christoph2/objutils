@@ -1,15 +1,249 @@
 #!/usr/bin/env python
-"""Modern hex file format reader/writer base classes.
+"""Base Classes for Hex File Format Readers and Writers.
 
-This module provides abstract base classes for reading and writing various
-hex file formats used in embedded systems development.
+This module provides the abstract base classes and infrastructure for all hex file
+format parsers in objutils. It defines a consistent API that all format-specific
+readers and writers (Intel HEX, Motorola S-Records, TI-TXT, etc.) must implement.
 
-Modernization (2026):
-- Full type hints with Python 3.9+ syntax
+Overview
+--------
+The objutils library supports 13+ different hex file formats used in embedded systems
+development. Rather than implementing each parser from scratch, all formats share
+common infrastructure:
+
+- **Reader ABC**: Abstract base for parsing hex files into Image objects
+- **Writer ABC**: Abstract base for generating hex files from Image objects
+- **FormatParser**: Regex-based line parser using format specification strings
+- **Checksum utilities**: Common checksum algorithms (sum, XOR, CRC)
+- **Exception hierarchy**: Consistent error handling across formats
+
+This architecture enables:
+- **Code reuse**: Common parsing logic shared across formats
+- **Consistency**: All parsers follow same patterns
+- **Extensibility**: New formats easily added by subclassing
+- **Type safety**: Full type hints with Python 3.9+ syntax
+
+Architecture
+------------
+::
+
+    Reader (ABC)                    Writer (ABC)
+    ├── FORMAT_SPEC                 ├── FORMAT_SPEC
+    ├── loads(data) → Image         ├── dumps(img) → str
+    ├── load(fp) → Image            ├── dump(img, fp)
+    ├── probe(data) → bool          ├── compose_row()
+    └── parse_line()                └── compose_header/footer()
+
+    Format-Specific Implementations:
+    ├── IHexReader/Writer           # Intel HEX
+    ├── SRecReader/Writer           # Motorola S-Records
+    ├── TiTxtReader/Writer          # TI-TXT
+    ├── FpcReader/Writer            # FPC
+    └── ... (10+ more formats)
+
+Format Specification Strings
+-----------------------------
+Each format defines a FORMAT_SPEC dictionary describing its record structure
+using single-character codes::
+
+    FORMAT_SPEC = (
+        (TYPE_FROM_RECORD, ":%LL%AA%DD%CC"),  # Intel HEX
+        # % indicates variable-length field
+        # Fixed-width fields use repetition: LL = 2 hex digits
+    )
+
+**Format codes**:
+- ``L``: Length field (data byte count)
+- ``T``: Type/record identifier
+- ``A``: Address field
+- ``D``: Data payload
+- ``C``: Checksum
+- ``B``: Address checksum (some formats)
+- ``U``: Unparsed/free-form data
+- Other characters: Literal (e.g., ``:`` in Intel HEX, ``S`` in S-Records)
+
+The FormatParser converts these specifications into compiled regex patterns for
+efficient parsing.
+
+Usage Examples
+--------------
+**Implementing a new format reader**::
+
+    from objutils.hexfile import Reader
+
+    class MyFormatReader(Reader):
+        # Define record structure
+        FORMAT_SPEC = (
+            (TYPE_FROM_RECORD, ":LLTTAAAADDCC"),
+        )
+
+        def check_line(self, line, format_type):
+            \"\"\"Validate and parse single record.\"\"\"
+            # Use self.parse_line() to extract fields
+            if line.startswith(':'):
+                record = self.parse_line(line, format_type)
+                self.check_length(record)
+                self.check_checksum(record)
+                return record
+            return None
+
+        def is_data_line(self, line, format_type, record):
+            \"\"\"Return True if record contains data.\"\"\"
+            return record.type == 0x00  # Data record type
+
+**Implementing a new format writer**::
+
+    from objutils.hexfile import Writer
+
+    class MyFormatWriter(Writer):
+        FORMAT_SPEC = (
+            (TYPE_FROM_RECORD, ":LLTTAAAADDCC"),
+        )
+
+        def compose_row(self, address, length, row):
+            \"\"\"Generate single output record.\"\"\"
+            line = ":{}02{}{}".format(
+                self.format_byte(length),
+                self.format_address(address),
+                self.format_data(row)
+            )
+            checksum = self.calculate_checksum(line)
+            return line + self.format_byte(checksum)
+
+        def compose_footer(self, meta):
+            \"\"\"Generate end-of-file record.\"\"\"
+            return ":00000001FF"
+
+**Using format readers/writers via registry**::
+
+    import objutils
+
+    # High-level API (recommended)
+    img = objutils.load("ihex", "firmware.hex")
+    objutils.dump("srec", "firmware.srec", img)
+
+    # Direct reader/writer usage (advanced)
+    from objutils.ihex import IHexReader, IHexWriter
+
+    with open("firmware.hex") as f:
+        reader = IHexReader()
+        img = reader.load(f)
+
+    with open("output.hex", "w") as f:
+        writer = IHexWriter(img)
+        writer.dump(f)
+
+**Checksum calculation**::
+
+    from objutils.hexfile import Reader
+
+    class MyReader(Reader):
+        def check_checksum(self, record):
+            \"\"\"Validate record checksum.\"\"\"
+            calculated = self.calculate_checksum(record)
+            if calculated != record.checksum:
+                raise InvalidRecordChecksumError(
+                    f"Checksum mismatch at line {record.line_number}"
+                )
+
+        def calculate_checksum(self, record):
+            \"\"\"Calculate checksum for record.\"\"\"
+            # Example: Two's complement checksum
+            total = sum([record.length, record.type, record.address] +
+                       list(record.data))
+            return (~total + 1) & 0xFF
+
+Format-Specific Details
+-----------------------
+**Intel HEX** (ihex.py):
+- Most widely used format
+- Records start with ``:``
+- Types: 00 (data), 01 (EOF), 02/04 (extended addressing)
+
+**Motorola S-Records** (srec.py):
+- Industrial standard format
+- Records start with ``S``
+- Types: S0 (header), S1/S2/S3 (data), S7/S8/S9 (start address)
+
+**TI-TXT** (titxt.py):
+- Texas Instruments format
+- Section-based with ``@address`` markers
+- Simple ASCII hex without checksums
+
+**IEEE-695** (ieee695.py):
+- AMD 29K object format
+- Most complex format in objutils
+- Binary records with type-length-value structure
+
+See individual format modules for specific implementation details.
+
+Checksum Algorithms
+-------------------
+Common checksum types implemented:
+
+**Two's complement**::
+
+    sum = sum_of_bytes & 0xFF
+    checksum = (~sum + 1) & 0xFF
+
+**Simple sum**::
+
+    checksum = sum_of_bytes & 0xFF
+
+**XOR**::
+
+    checksum = reduce(xor, bytes) & 0xFF
+
+Each format implements its specific algorithm in ``calculate_checksum()`` and
+``check_checksum()`` methods.
+
+Error Handling
+--------------
+Consistent exception hierarchy for all formats:
+
+- **HexFileError**: Base for all hex file errors
+- **ParseError**: Base for parsing errors
+  - **InvalidRecordTypeError**: Unknown record type
+  - **InvalidRecordLengthError**: Length mismatch
+  - **InvalidRecordChecksumError**: Checksum validation failed
+- **AddressRangeToLargeError**: Address exceeds format limits
+
+Example error handling::
+
+    try:
+        img = objutils.load("ihex", "firmware.hex")
+    except InvalidRecordChecksumError as e:
+        print(f"Checksum error: {e}")
+    except ParseError as e:
+        print(f"Parse error: {e}")
+    except HexFileError as e:
+        print(f"Hex file error: {e}")
+
+Modernization (2026)
+--------------------
+Recent improvements to this module:
+
+- Full type hints with Python 3.9+ union syntax (``X | Y``)
 - ABC-based architecture with clear contracts
-- Immutable data structures with slots
+- Immutable data structures with ``@dataclass(frozen=True, slots=True)``
 - Proper exception hierarchy
-- Fixed typo: ALIGNMENT (was ALIGMENT)
+- Fixed typo: ``ALIGNMENT`` (was ``ALIGMENT``)
+- Removed legacy Python 2 compatibility code
+
+Integration
+-----------
+This module is used by:
+- All format-specific parsers (ihex, srec, titxt, etc.)
+- Registry system (objutils.registry) for format dispatch
+- High-level API (objutils.load/dump functions)
+
+See Also
+--------
+- :mod:`objutils.image` - Image class for binary data
+- :mod:`objutils.section` - Section class for memory regions
+- :mod:`objutils.registry` - Format registration and dispatch
+- :mod:`objutils.ihex` - Intel HEX implementation example
+- :mod:`objutils.srec` - Motorola S-Record implementation example
 """
 
 __copyright__ = """
@@ -317,16 +551,173 @@ class BaseType:
 class Reader(BaseType, ABC):
     """Abstract base class for hex file format readers.
 
-    Subclasses must:
-    1. Define FORMAT_SPEC (str or list of (type, format_string) tuples)
-    2. Implement check_line() for validation
-    3. Implement is_data_line() to distinguish data from metadata
+    The Reader class provides the framework for parsing hex file formats into Image
+    objects. All format-specific readers (Intel HEX, Motorola S-Records, TI-TXT, etc.)
+    inherit from this class and implement format-specific parsing logic.
 
-    Attributes:
-        ALIGNMENT: Memory alignment requirement (2**n bytes)
-        DATA_SEPARATOR: Optional separator character in data fields
-        VALID_CHARS: Regex pattern for valid characters
-        FORMAT_SPEC: Format specification (must be defined in subclass)
+    Architecture
+    ------------
+    The parsing process follows these steps:
+
+    1. **Format specification**: Define record structure with FORMAT_SPEC
+    2. **Pattern compilation**: FormatParser converts specs to regex patterns
+    3. **Line-by-line parsing**: read() processes each line
+    4. **Validation**: check_line() validates checksums and structure
+    5. **Data extraction**: is_data_line() identifies data vs. metadata
+    6. **Section creation**: Data records become Section objects
+    7. **Image assembly**: Sections combined into final Image
+
+    Subclass Requirements
+    ---------------------
+    To implement a new format reader, subclass Reader and:
+
+    1. **Define FORMAT_SPEC**:
+       - Simple: ``FORMAT_SPEC = ":LLTTAAAADDCC"``
+       - Multiple record types: ``FORMAT_SPEC = [(0, ":LLAA..."), (1, ":LLAA...")]``
+
+    2. **Implement check_line()**:
+       - Validate record structure
+       - Check checksums
+       - Raise exceptions on errors
+
+    3. **Implement is_data_line()**:
+       - Return True for data records
+       - Return False for metadata/control records
+
+    4. **Optional overrides**:
+       - ``parseData()``: Custom data processing
+       - ``special_processing()``: Format-specific handling
+       - ``probe()``: Format auto-detection
+
+    Class Attributes
+    ----------------
+    These can be overridden in subclasses:
+
+    ALIGNMENT : int
+        Memory alignment requirement (2**n bytes). Default: 0 (byte-aligned)
+    DATA_SEPARATOR : str | None
+        Optional separator in data fields (e.g., spaces). Default: None
+    VALID_CHARS : re.Pattern
+        Regex pattern for valid characters. Default: hex digits and common punctuation
+    FORMAT_SPEC : str | list[tuple[int, str]]
+        Format specification (required, must be defined in subclass)
+
+    Instance Attributes
+    -------------------
+    logger : Logger
+        Logging instance for warnings/errors
+    stats : Statistics
+        Parsing statistics (record counts, byte counts)
+    valid : bool
+        Validity flag (set to False on errors)
+    formats : list[tuple[int, re.Pattern]]
+        Compiled regex patterns from FORMAT_SPEC
+
+    Methods
+    -------
+    load(fp, **kws)
+        Load from file path or file-like object
+    loads(data, **kws)
+        Load from string or bytes
+    read(fp)
+        Core parsing logic (called by load/loads)
+    probe(data)
+        Check if data matches format (for auto-detection)
+
+    Abstract Methods (Must Implement)
+    ----------------------------------
+    check_line(container, format_type)
+        Validate parsed line
+    is_data_line(container, format_type)
+        Identify data vs. metadata records
+
+    Optional Overrides
+    ------------------
+    parseData(container, format_type)
+        Process data records (default: True)
+    special_processing(container, format_type)
+        Format-specific handling (default: pass)
+
+    Examples
+    --------
+    **Simple format reader**::
+
+        from objutils.hexfile import Reader
+
+        class SimpleHexReader(Reader):
+            FORMAT_SPEC = ":LLTTAAAADDCC"  # Intel HEX-like
+
+            def check_line(self, line, format_type):
+                # Validate checksum
+                calculated = self.calculate_checksum(line)
+                if calculated != line.checksum:
+                    raise InvalidRecordChecksumError()
+
+            def is_data_line(self, line, format_type):
+                # Type 0x00 = data, 0x01 = EOF
+                return line.type == 0x00
+
+    **Multi-record format**::
+
+        class MotorolarReader(Reader):
+            FORMAT_SPEC = [
+                (0, "S0LLAAAADDCC"),    # Header
+                (1, "S1LLAAAADDCC"),    # 16-bit data
+                (2, "S2LLAAAAAADDCC"),  # 24-bit data
+                (9, "S9LLAAAADDCC"),    # Start address
+            ]
+
+            def check_line(self, line, format_type):
+                # S-Record specific validation
+                if line.length != len(line.chunk) + 3:
+                    raise InvalidRecordLengthError()
+
+            def is_data_line(self, line, format_type):
+                return format_type in (1, 2, 3)
+
+    **Using a reader**::
+
+        # High-level API (recommended)
+        import objutils
+        img = objutils.load("ihex", "firmware.hex")
+
+        # Direct reader usage
+        from objutils.ihex import IHexReader
+        reader = IHexReader()
+        with open("firmware.hex", "rb") as f:
+            img = reader.read(f)
+
+        # From string data
+        hex_data = ":100000000C94340..."
+        img = reader.loads(hex_data)
+
+    **Checking parsing statistics**::
+
+        reader = IHexReader()
+        img = reader.load("firmware.hex")
+
+        print(f"Valid: {reader.valid}")
+        print(f"Record types: {reader.stats.record_types}")
+        print(f"Data bytes: {reader.stats.data_bytes}")
+
+    See Also
+    --------
+    - :class:`Writer` - Abstract base for format writers
+    - :class:`FormatParser` - Format specification parser
+    - :mod:`objutils.ihex` - Intel HEX reader implementation
+    - :mod:`objutils.srec` - Motorola S-Record reader implementation
+
+    Notes
+    -----
+    The Reader class handles:
+    - Line-by-line parsing with regex patterns
+    - Automatic section creation and merging
+    - Metadata extraction (start addresses, headers, etc.)
+    - Error collection with detailed line numbers
+    - Statistics tracking
+
+    Subclasses only need to implement format-specific validation and data
+    identification logic.
     """
 
     # Class attributes (override in subclasses)
@@ -601,14 +992,219 @@ class Reader(BaseType, ABC):
 class Writer(BaseType, ABC):
     """Abstract base class for hex file format writers.
 
-    Subclasses must:
-    1. Define MAX_ADDRESS_BITS
-    2. Implement compose_row() to format data lines
-    3. Optionally override compose_header() and compose_footer()
+    The Writer class provides the framework for generating hex file formats from Image
+    objects. All format-specific writers (Intel HEX, Motorola S-Records, TI-TXT, etc.)
+    inherit from this class and implement format-specific generation logic.
 
-    Attributes:
-        MAX_ADDRESS_BITS: Maximum address width supported
-        row_length: Bytes per output row (default: 16)
+    Architecture
+    ------------
+    The writing process follows these steps:
+
+    1. **Validation**: Check address range fits format constraints
+    2. **Pre-processing**: Optional format-specific preparations
+    3. **Header**: Generate format-specific header (if any)
+    4. **Data rows**: Split sections into fixed-length rows
+    5. **Row composition**: Format each row with address, data, checksum
+    6. **Footer**: Generate end-of-file record
+    7. **Post-processing**: Final formatting (newlines, etc.)
+
+    Subclass Requirements
+    ---------------------
+    To implement a new format writer, subclass Writer and:
+
+    1. **Define MAX_ADDRESS_BITS**:
+       - Maximum address width supported by format
+       - E.g., 16 for Intel HEX, 32 for S-Records
+
+    2. **Implement compose_row()**:
+       - Format single data record
+       - Include address, length, data, checksum
+       - Return formatted string without newline
+
+    3. **Optional overrides**:
+       - ``compose_header()``: Format-specific header
+       - ``compose_footer()``: End-of-file record
+       - ``pre_processing()``: Image manipulation before writing
+       - ``post_processing()``: Final data transformation
+
+    Class Attributes
+    ----------------
+    MAX_ADDRESS_BITS : int
+        Maximum address width in bits (required, must be defined in subclass)
+
+    Instance Attributes
+    -------------------
+    logger : Logger
+        Logging instance for warnings/errors
+    row_length : int
+        Bytes per output row (default: 16, configurable via dump/dumps)
+
+    Methods
+    -------
+    dump(fp, image, row_length=16, **kws)
+        Write to file path or file-like object
+    dumps(image, row_length=16, **kws)
+        Serialize to bytes
+    calculate_address_bits(image)
+        Determine required address width
+
+    Abstract Methods (Must Implement)
+    ----------------------------------
+    compose_row(address, length, row)
+        Format single data record
+
+    Optional Overrides
+    ------------------
+    compose_header(meta)
+        Generate header (default: "")
+    compose_footer(meta)
+        Generate footer (default: "")
+    pre_processing(image)
+        Pre-process image (default: pass)
+    post_processing(data)
+        Post-process output (default: ensure newline)
+
+    Examples
+    --------
+    **Simple format writer**::
+
+        from objutils.hexfile import Writer
+
+        class SimpleHexWriter(Writer):
+            MAX_ADDRESS_BITS = 16  # 16-bit addressing
+
+            def compose_row(self, address, length, row):
+                # Format: :LLAAAADDCC (Intel HEX-like)
+                data_str = "".join(f"{b:02X}" for b in row)
+                line = f":{length:02X}00{address:04X}{data_str}"
+
+                # Calculate checksum
+                checksum = self.calculate_checksum(line)
+                return line + f"{checksum:02X}"
+
+            def compose_footer(self, meta):
+                # End-of-file record
+                return ":00000001FF"
+
+    **Writer with header**::
+
+        class SRecordWriter(Writer):
+            MAX_ADDRESS_BITS = 32
+
+            def compose_header(self, meta):
+                # S0 header record
+                name = meta.get("name", "objutils")
+                data = name.encode("ascii")
+                return self._compose_s_record(0, 0, data)
+
+            def compose_row(self, address, length, row):
+                # S1/S2/S3 based on address size
+                record_type = self._select_record_type(address)
+                return self._compose_s_record(record_type, address, row)
+
+            def compose_footer(self, meta):
+                # S9/S8/S7 termination
+                start_addr = meta.get("start_address", 0)
+                return self._compose_termination(start_addr)
+
+    **Using a writer**::
+
+        # High-level API (recommended)
+        import objutils
+        img = objutils.load("ihex", "firmware.hex")
+        objutils.dump("srec", "firmware.srec", img)
+
+        # Direct writer usage
+        from objutils.srec import SRecWriter
+        writer = SRecWriter()
+        with open("firmware.srec", "wb") as f:
+            writer.dump(f, img, row_length=32)
+
+        # To bytes
+        hex_bytes = writer.dumps(img, row_length=16)
+
+    **Custom row length**::
+
+        # Default: 16 bytes per row
+        objutils.dump("ihex", "out16.hex", img)
+
+        # Custom: 32 bytes per row
+        objutils.dump("ihex", "out32.hex", img, row_length=32)
+
+        # Custom: 8 bytes per row (for readability)
+        objutils.dump("ihex", "out8.hex", img, row_length=8)
+
+    **Handling metadata**::
+
+        class MetadataWriter(Writer):
+            MAX_ADDRESS_BITS = 32
+
+            def compose_header(self, meta):
+                # Include version info in header
+                version = meta.get("version", "unknown")
+                return f"# Version: {version}"
+
+            def compose_footer(self, meta):
+                # Include start address if present
+                if "start_address" in meta:
+                    addr = meta["start_address"]
+                    return f":04000005{addr:08X}..."
+                return ":00000001FF"
+
+    **Address range validation**::
+
+        writer = MyWriter()
+        writer.MAX_ADDRESS_BITS = 16  # Max 64KB
+
+        try:
+            writer.dump("output.hex", large_image)
+        except AddressRangeToLargeError:
+            print("Image too large for 16-bit format!")
+            # Try format with larger address space
+            objutils.dump("srec", "output.srec", large_image)
+
+    See Also
+    --------
+    - :class:`Reader` - Abstract base for format readers
+    - :mod:`objutils.ihex` - Intel HEX writer implementation
+    - :mod:`objutils.srec` - Motorola S-Record writer implementation
+
+    Notes
+    -----
+    The Writer class handles:
+    - Automatic row splitting to configurable lengths
+    - Address range validation against format constraints
+    - Header/footer composition with metadata support
+    - Newline normalization (ensures trailing newline)
+
+    Subclasses only need to implement format-specific row composition and
+    optionally header/footer generation.
+
+    Common Patterns
+    ---------------
+    **Checksum calculation** in compose_row()::
+
+        def compose_row(self, address, length, row):
+            # Build record without checksum
+            record = f":{length:02X}{address:04X}00"
+            record += "".join(f"{b:02X}" for b in row)
+
+            # Calculate checksum
+            bytes_to_sum = [length, (address >> 8) & 0xFF,
+                          address & 0xFF, 0x00] + list(row)
+            checksum = (~sum(bytes_to_sum) + 1) & 0xFF
+
+            return record + f"{checksum:02X}"
+
+    **Address-dependent record types**::
+
+        def compose_row(self, address, length, row):
+            if address < 0x10000:
+                return self._compose_s1_record(address, row)
+            elif address < 0x1000000:
+                return self._compose_s2_record(address, row)
+            else:
+                return self._compose_s3_record(address, row)
     """
 
     MAX_ADDRESS_BITS: int  # Must be defined in subclass
