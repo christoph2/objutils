@@ -1,3 +1,118 @@
+"""DWARF DIE tree traversal with type resolution and variable value extraction.
+
+This module provides the AttributeParser class, a comprehensive DWARF DIE traverser
+that supports:
+    - Type tree resolution with circular reference detection
+    - Variable value extraction from ELF sections
+    - Complex type handling (arrays, structs, pointers, typedefs)
+    - DWARF expression evaluation for locations
+    - Compile unit summaries
+
+Key Components:
+    **AttributeParser**: Main class for DIE tree traversal and type resolution
+        - Resolves type references (handles CU-relative offsets)
+        - Extracts variable values from memory images
+        - Handles arrays (single/multi-dimensional), structs, scalars
+        - Evaluates DWARF location expressions
+        - Caches parsed types and DIE lookups (LRU)
+
+    **Variable**: Dataclass representing a variable with location and type info
+    **DIE**: Lightweight representation of a Debug Information Entry
+    **CompiledUnit**: Summary info for compilation units
+    **CircularReference**: Marker for self-referential types
+
+Architecture:
+    The AttributeParser combines:
+    1. **ELF ORM Layer** (SQLAlchemy) - Query DIEs from database
+    2. **DWARF Readers** - Decode DWARF-encoded data
+    3. **Stack Machine** - Evaluate DWARF expressions
+    4. **Image Access** - Read values from ELF section images
+
+Type Resolution:
+    Types are represented as DIE trees with:
+    - **tag**: DWARF tag (base_type, pointer_type, structure_type, etc.)
+    - **attributes**: Dict of attribute name -> value
+    - **children**: List of child DIEs (struct members, array bounds, etc.)
+
+    Type references (DW_AT_type) are recursively resolved, with special handling for:
+    - CU-relative reference forms (DW_FORM_ref1/2/4/8/udata)
+    - Typedef chains and type qualifiers (const, volatile, restrict)
+    - Circular references (linked lists, recursive structs)
+
+Variable Value Extraction:
+    The get_value() method extracts variable values from ELF section images:
+    - **Scalars**: Read directly via typed image access (uint32_le, float64_be, etc.)
+    - **Arrays**: Bulk read with automatic reshaping for multi-dimensional arrays
+    - **Structs**: Recursively extract members at calculated offsets
+    - **Pointers**: Treated as unsigned integers (address values)
+
+Location Resolution:
+    Variable locations are resolved via:
+    1. **ELF Symbol Table** (elf_location) - Preferred, most reliable
+    2. **DWARF Expressions** (dwarf_location) - Evaluated by stack machine
+    3. **Static Analysis** - Calculated offsets for struct members
+
+Usage Example:
+    ```python
+    from objutils.elf import ElfParser
+    from objutils.dwarf import DwarfProcessor
+    from objutils.dwarf.traverser import AttributeParser
+
+    # Parse ELF and import DWARF info
+    ep = ElfParser("firmware.elf")
+    dp = DwarfProcessor(ep)
+    dp.do_dbg_info()
+
+    # Create parser (opens existing .prgdb or imports from ELF)
+    parser = AttributeParser("firmware.elf")
+
+    # Get variable and extract value
+    die = parser.session.query(DebugInformationEntry).filter_by(tag="variable").first()
+    var = parser.variable(die)
+    value = parser.get_value(var)
+    print(f"{var.name} = {value}")
+
+    # Traverse DIE tree with formatted output
+    root = parser.session.query(DebugInformationEntry).first()
+    parser.traverse_tree(root)
+
+    # Parse type tree
+    type_tree = parser.type_tree(die)  # Accepts DIE, offset, or DW_AT_type attribute
+    ```
+
+Compile Unit Summaries:
+    ```python
+    from objutils.dwarf.traverser import CompiledUnitsSummary
+
+    summary = CompiledUnitsSummary(session)
+    # Prints organized list of compilation units by directory
+    ```
+
+Performance Optimizations:
+    - LRU cache (64K entries) on type_tree() method
+    - LRU cache (8K entries) on get_die() and parse_attributes()
+    - Leverages attributes_map for O(1) attribute access
+    - Bulk array reads via read_numeric_array()
+    - Shared type cache prevents redundant parsing
+
+Type Encoding Constants:
+    DWARF_TYPE_ENCODINGS: frozenset of tags representing type DIEs
+    DATA_REPRESENTATION: Mapping of attributes to their enum types
+
+ORM Schema Requirements:
+    - model.DebugInformationEntry with offset, tag, abbrev, attributes, children
+    - model.DIEAttribute with name, raw_value, form
+    - model.Elf_Section with section_name, section_image, sh_addr
+    - model.Elf_Symbol with symbol_name, st_value, section_name
+    - model.Elf_Header with address_size, endianess, is_64bit
+
+See Also:
+    - objutils.dwarf.attrparser: Simpler DIE traverser without value extraction
+    - objutils.dwarf.c_generator: Generates C code from DIE trees
+    - objutils.dwarf.readers: DWARF binary readers
+    - objutils.dwarf.sm: DWARF expression stack machine
+"""
+
 from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -52,14 +167,44 @@ DWARF_TYPE_ENCODINGS = frozenset(
         Tag.shared_type,
     }
 )
+"""frozenset: DWARF tags that represent type definitions.
+
+Used to identify DIEs that define types (as opposed to variables, functions, etc.).
+Includes base types, derived types (pointers, arrays), composite types (structs,
+unions, classes), and special types (typedefs, subroutines, enumerations).
+"""
 
 
 def is_type_encoding(encoding: Union[int, AttributeEncoding]) -> bool:
+    """Check if a DWARF tag represents a type definition.
+
+    Args:
+        encoding: DWARF tag value (int or AttributeEncoding enum)
+
+    Returns:
+        True if the tag represents a type, False otherwise
+
+    Example:
+        ```python
+        is_type_encoding(Tag.base_type)         # True
+        is_type_encoding(Tag.variable)          # False
+        is_type_encoding(Tag.structure_type)    # True
+        ```
+    """
     return encoding in DWARF_TYPE_ENCODINGS
 
 
 @dataclass
 class CompiledUnit:
+    """Summary information for a DWARF compilation unit.
+
+    Attributes:
+        name: Source file name (e.g., "main.c")
+        comp_dir: Compilation directory path
+        producer: Compiler identification string (e.g., "GCC 11.2.0")
+        language: Programming language (e.g., "DW_LANG_C99")
+    """
+
     name: str
     comp_dir: str
     producer: str
@@ -68,6 +213,17 @@ class CompiledUnit:
 
 @dataclass
 class DIE:
+    """Lightweight representation of a DWARF Debugging Information Entry.
+
+    Used as an alternative to the full ORM model for parsed type trees.
+    More efficient for caching and serialization than full model objects.
+
+    Attributes:
+        tag: DWARF tag name (e.g., "base_type", "structure_type", "variable")
+        children: List of child DIEs (e.g., struct members, array bounds)
+        attributes: Dict mapping attribute names to decoded values
+    """
+
     tag: str
     children: list[Any] = field(default_factory=list)
     attributes: dict[str, Any] = field(default_factory=dict)
@@ -75,6 +231,22 @@ class DIE:
 
 @dataclass
 class Variable:
+    """Represents a DWARF variable with location and type information.
+
+    Attributes:
+        name: Variable name from DW_AT_name
+        section: ELF section name containing the variable (e.g., ".data", ".bss")
+        elf_location: Address from ELF symbol table (most reliable)
+        dwarf_location: Decoded DWARF location expression (fallback)
+        static: True if variable has internal linkage (static storage)
+        type_desc: Parsed type tree (DIE or dict) describing the variable's type
+        _allocated: True if variable is in an allocated section (has image data)
+
+    Note:
+        Variables in .bss or other non-allocated sections have _allocated=False
+        and cannot have their values extracted.
+    """
+
     name: str
     section: Optional[str] = field(default=None)
     elf_location: Optional[int] = field(default=None)
@@ -104,12 +276,36 @@ DATA_REPRESENTATION = {
     "containing_type": int,
     "object_pointer": int,
 }
+"""dict: Mapping of DWARF attribute names to their Python type converters.
+
+Used during attribute parsing to convert raw integer values into more meaningful
+representations (enums or typed values). For example, the "encoding" attribute
+is converted from an integer to a BaseTypeEncoding enum value.
+
+Keys are attribute names (str), values are type converters (enum classes or int).
+"""
 
 
 # 'data_member_location': b'#\x00',
 
 
 def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, str]) -> Union[int, str]:
+    """Get attribute value from attributes_map with fallback default.
+
+    Args:
+        attrs: Attribute map (dict of name -> DIEAttribute)
+        key: Attribute name to retrieve
+        default: Default value if attribute not found
+
+    Returns:
+        Attribute's raw_value if found, otherwise the default value
+
+    Example:
+        ```python
+        name = get_attribute(die.attributes_map, "name", "unnamed")
+        size = get_attribute(die.attributes_map, "byte_size", 0)
+        ```
+    """
     attr: Optional[DIEAttribute] = attrs.get(key)
     if attr is None:
         return default
@@ -118,8 +314,37 @@ def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, 
 
 
 class CompiledUnitsSummary:
+    """Generate organized summary of compilation units grouped by directory.
+
+    Queries all compilation units from the database, groups them by compilation
+    directory, and prints a formatted report showing source files, compilers,
+    and languages used.
+
+    Args:
+        session: SQLAlchemy session connected to DWARF database
+
+    Example:
+        ```python
+        summary = CompiledUnitsSummary(session)
+        # Output:
+        # Compile Units in Directory: /home/user/project/src
+        #
+        #     main.c, Producer: 'GCC 11.2.0', Language: 'DW_LANG_C99'
+        #     utils.c, Producer: 'GCC 11.2.0', Language: 'DW_LANG_C99'
+        #
+        # Types used in Compile Units: constant, subprogram, variable, ...
+        ```
+
+    Note:
+        Constructor immediately prints the summary to stdout.
+    """
 
     def __init__(self, session) -> None:
+        """Create and print compilation unit summary.
+
+        Args:
+            session: SQLAlchemy session with DebugInformationEntry populated
+        """
         cus = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.tag == Tag.compile_unit).all()
         units = []
         tps = set()
@@ -148,6 +373,21 @@ class CompiledUnitsSummary:
 
 
 def compile_units_summary(session) -> None:
+    """Print simple list of all compilation units with metadata.
+
+    Alternative to CompiledUnitsSummary that prints a flat list without grouping.
+
+    Args:
+        session: SQLAlchemy session connected to DWARF database
+
+    Example:
+        ```python
+        compile_units_summary(session)
+        # Output:
+        # Compile Unit #0: 'main.c', Name: '/home/user/project' Producer: 'GCC 11.2.0', ...
+        # Compile Unit #1: 'utils.c', Name: '/home/user/project' Producer: 'GCC 11.2.0', ...
+        ```
+    """
     cus = session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.tag == Tag.compile_unit).all()
     for idx, cu in enumerate(cus):
         name = cu.attributes_map.get("name", "N/A").raw_value
@@ -159,18 +399,124 @@ def compile_units_summary(session) -> None:
 
 @dataclass
 class CircularReference:
+    """Marker for circular type references in DWARF type graphs.
+
+    When parse_type() detects a cycle (a type that references itself directly
+    or indirectly), it returns this sentinel object instead of recursing infinitely.
+
+    Attributes:
+        tag: The DWARF tag of the circular type (e.g., "structure_type")
+        name: The name of the type if available, empty string otherwise
+
+    Example:
+        ```python
+        # Linked list node with pointer to itself:
+        # struct node { struct node *next; };
+
+        type_dict = parser.parse_type(offset)
+        if isinstance(type_dict, CircularReference):
+            print(f"Circular: {type_dict.tag} '{type_dict.name}'")
+        ```
+
+    Note:
+        This is a duplicate of the CircularReference class in attrparser.py.
+        Both exist for module independence.
+    """
+
     tag: str
     name: str
 
 
 class AttributeParser:
-    """
-    Parse and traverse DIE trees and their type relationships with caching.
+    """Comprehensive DWARF DIE traverser with type resolution and value extraction.
 
-    Caching strategy (only here):
-    - parsed_types: memoizes fully parsed type dicts by DIE offset
-    - get_die(): LRU-cached DB lookup by offset to minimize ORM traffic
-    - attributes_map: leverages the ORM-side per-instance cache (if present)
+    This parser provides advanced DWARF debugging information analysis with:
+        - Type tree resolution following DW_AT_type references
+        - Variable value extraction from ELF section images
+        - Complex type handling (arrays, structs, pointers, typedefs, qualifiers)
+        - DWARF location expression evaluation
+        - Circular reference detection for recursive types
+        - Multi-level caching for performance
+
+    The AttributeParser can be initialized with either:
+        1. An existing SQLAlchemy session (backward compatible)
+        2. A filesystem path to an ELF file or .prgdb database
+
+    When given a path, the parser automatically:
+        - Opens or creates a .prgdb database file
+        - Imports DWARF info from ELF if needed
+        - Connects to the database session
+
+    Caching Strategy:
+        - **type_tree()**: LRU cache (64K entries) for complete type trees
+        - **get_die()**: LRU cache (8K entries) for DIE lookups by offset
+        - **parse_attributes()**: LRU cache (8K entries) for attribute parsing
+        - **parsed_types**: Per-instance dict cache for type dictionaries
+        - **type_stack**: Runtime cycle detection set
+
+    Type Resolution:
+        Types are parsed into DIE objects with:
+        - **tag**: DWARF tag name (e.g., "base_type", "pointer_type")
+        - **attributes**: Dict of attribute name -> converted value
+        - **children**: List of child DIEs (struct members, array bounds, etc.)
+
+        CU-relative reference forms (DW_FORM_ref1/2/4/8/udata) are automatically
+        converted to absolute offsets using the DIE's cu_start attribute.
+
+    Value Extraction:
+        The get_value() method handles:
+        - **Scalars**: Direct typed reads (uint32_le, float64_be, etc.)
+        - **Arrays**: Bulk reads with automatic multi-dimensional reshaping
+        - **Structs**: Recursive member extraction at calculated offsets
+        - **Pointers**: Treated as unsigned integers (address values)
+        - **Typedefs/Qualifiers**: Automatically unwrapped to base types
+
+    Location Resolution Priority:
+        1. ELF Symbol Table (elf_location) - Most reliable
+        2. DWARF Expression (dwarf_location) - Evaluated by stack machine
+        3. Calculated Offsets (for struct members)
+
+    Attributes:
+        session: SQLAlchemy session for ORM queries
+        type_stack: Set tracking offsets being parsed (cycle detection)
+        parsed_types: Cache mapping offset -> parsed DIE
+        att_types: Statistics dict mapping tag -> set of attribute names seen
+        allocated_sections: Frozenset of section names with allocated images
+        image: Image object for reading section data
+        endianess: Little or Big endian (from ELF header)
+        is_64bit: True for 64-bit ELF files
+        readers: Dict of DWARF attribute readers by form
+        section_readers: Dict mapping (encoding, size) -> typed reader name
+        stack_machine: DWARF expression evaluator
+        dwarf_expression: Helper for decoding location expressions
+
+    Class Attributes:
+        STOP_LIST: Attributes excluded from parsed type dictionaries
+            (sibling, decl_file, decl_line, decl_column, declaration,
+             specification, abstract_origin)
+
+    Example:
+        ```python
+        # Initialize from ELF file path (imports DWARF if needed)
+        parser = AttributeParser("firmware.elf")
+
+        # Get variable and extract value
+        die = parser.session.query(DebugInformationEntry).filter_by(tag="variable").first()
+        var = parser.variable(die)
+        value = parser.get_value(var)
+        print(f"{var.name} = {value}")
+
+        # Parse type tree
+        type_tree = parser.type_tree(die)  # Accepts DIE, offset, or attribute
+
+        # Traverse DIE tree with formatted output
+        root = parser.session.query(DebugInformationEntry).first()
+        parser.traverse_tree(root)
+        ```
+
+    Note:
+        Variables in non-allocated sections (.bss, .debug_*, etc.) cannot
+        have their values extracted and will return None from get_value().
     """
 
     # Attributes considered non-structural for high-level type dicts
@@ -185,20 +531,35 @@ class AttributeParser:
     }
 
     def __init__(self, session_or_path, *, import_if_needed: bool = True, force_import: bool = False, quiet: bool = True):
-        """
-        Create an AttributeParser.
+        """Initialize AttributeParser with session or ELF/database path.
 
-        Parameters
-        ----------
-        session_or_path:
-            Either an existing SQLAlchemy session (backward compatible) or a path to an ELF/.prgdb file.
-            If a path is given, the corresponding program database will be opened (and imported if needed).
-        import_if_needed: bool
-            When a path to an ELF is provided, import DWARF into a sibling .prgdb if it doesn't exist yet.
-        force_import: bool
-            Force re-import when creating the database from an ELF path.
-        quiet: bool
-            Suppress non-error output during on-demand import when a path is provided.
+        Args:
+            session_or_path: Either:
+                - SQLAlchemy session (backward compatible)
+                - Path to ELF file (str or Path) - opens/creates .prgdb
+                - Path to .prgdb file (str or Path) - opens existing database
+            import_if_needed: When True, import DWARF from ELF if .prgdb doesn't exist
+            force_import: When True, re-import DWARF even if .prgdb exists
+            quiet: When True, suppress non-error output during import
+
+        Raises:
+            FileNotFoundError: If path doesn't exist
+            ValueError: If database is corrupt or incompatible
+
+        Example:
+            ```python
+            # From existing session
+            parser = AttributeParser(session)
+
+            # From ELF (auto-imports to firmware.prgdb)
+            parser = AttributeParser("firmware.elf")
+
+            # From existing database
+            parser = AttributeParser("firmware.prgdb")
+
+            # Force re-import
+            parser = AttributeParser("firmware.elf", force_import=True)
+            ```
         """
         # Lazy import to avoid heavy module import/cycles at module import time.
         from objutils.elf import open_program_database  # local import by design
@@ -277,20 +638,46 @@ class AttributeParser:
 
     @lru_cache(maxsize=64 * 1024)
     def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
-        """Return a fully traversed type tree as a dict.
+        """Resolve and return complete type tree for a DIE, offset, or attribute.
 
-        Accepts one of:
-        - a DIE offset (absolute),
-        - a DIE instance that has a DW_AT_type attribute,
-        - a DIEAttribute instance (DW_AT_type) whose value references a type.
+        This method accepts multiple input types for convenience:
+            - **int**: Absolute DIE offset
+            - **DebugInformationEntry**: DIE with DW_AT_type attribute
+            - **DIEAttribute**: DW_AT_type attribute referencing a type
 
-        The returned dictionary contains:
-        - tag: DWARF tag name for the type DIE
-        - attrs: non-structural attributes with values; nested "type" attributes
-                 are resolved recursively into dicts
-        - children: list of child DIE dicts (e.g., members, enumerators, subranges)
+        The returned type tree is a nested DIE structure with:
+            - **tag**: DWARF tag name for the type DIE
+            - **attributes**: Dict of attribute name -> value (type refs recursively resolved)
+            - **children**: List of child DIE objects (members, enumerators, etc.)
 
-        Circular references are represented by CircularReference(tag, name).
+        Args:
+            obj: One of:
+                - Absolute DIE offset (int)
+                - DIE instance that has a DW_AT_type attribute
+                - DIEAttribute instance (DW_AT_type) referencing a type
+
+        Returns:
+            DIE object representing the complete type tree, or CircularReference
+            if a cycle is detected. Returns dict with "<invalid>" or "<no-type>"
+            tag on errors.
+
+        Example:
+            ```python
+            # From offset
+            type_tree = parser.type_tree(0x1234)
+
+            # From DIE
+            var_die = session.query(DebugInformationEntry).filter_by(tag="variable").first()
+            type_tree = parser.type_tree(var_die)
+
+            # From attribute
+            type_attr = var_die.attributes_map["type"]
+            type_tree = parser.type_tree(type_attr)
+            ```
+
+        Note:
+            Results are cached with LRU cache (64K entries). CU-relative reference
+            forms are automatically converted to absolute offsets.
         """
         result = None
         # Case 1: already an absolute DIE offset
@@ -322,6 +709,21 @@ class AttributeParser:
         return {"tag": "<unsupported>", "attrs": {}}
 
     def variable(self, obj: model.DebugInformationEntry) -> Variable:
+        """Create Variable object from variable DIE with resolved type and location.
+
+        Args:
+            obj: DIE with tag="variable"
+
+        Returns:
+            Variable object with name, type, location info, and allocation status
+
+        Example:
+            ```python
+            var_die = session.query(DebugInformationEntry).filter_by(tag="variable").first()
+            var = parser.variable(var_die)
+            print(f"{var.name}: type={var.type_desc.tag}, addr=0x{var.elf_location:x}")
+            ```
+        """
         name = self._attr_raw(obj, "name")
         type_desc = self.type_tree(obj)
         external = self._attr_raw(obj, "external")
@@ -355,6 +757,48 @@ class AttributeParser:
         )
 
     def get_value(self, var: Variable) -> Optional[Any]:
+        """Extract variable value from ELF section image.
+
+        This method resolves the variable's address and extracts its value based
+        on its DWARF type description. Handles scalars, arrays, structs, pointers,
+        and nested combinations.
+
+        Supported Types:
+            - **Scalars**: int8-64, uint8-64, float32/64 (all endiannesses)
+            - **Arrays**: Single and multi-dimensional, any element type
+            - **Structs**: Recursive extraction of all members
+            - **Pointers**: Returned as unsigned integer (address value)
+            - **Typedefs/Qualifiers**: Automatically unwrapped
+
+        Address Resolution (in order of preference):
+            1. var.elf_location (from ELF symbol table)
+            2. var.dwarf_location (decoded DWARF expression)
+            3. None (for struct members - calculated from parent)
+
+        Args:
+            var: Variable object with type_desc and location info
+
+        Returns:
+            Extracted value:
+                - **Scalar**: int or float
+                - **Array**: Nested lists matching array dimensions
+                - **Struct**: Dict mapping member names to values
+                - **None**: If variable not in allocated section or address unresolvable
+
+        Example:
+            ```python
+            var = parser.variable(var_die)
+            value = parser.get_value(var)
+
+            # Scalar: value = 42
+            # Array: value = [[1, 2], [3, 4]]
+            # Struct: value = {"x": 10, "y": 20.5}
+            ```
+
+        Note:
+            Variables in .bss or other non-allocated sections return None.
+            Type qualifiers (const, volatile, restrict) are transparent.
+        """
         if not var._allocated:
             # No image for variable, i.e. .bss section and the like.
             return None
@@ -684,10 +1128,21 @@ class AttributeParser:
         type_attr: DIEAttribute,
         context_die: Optional[model.DebugInformationEntry],
     ) -> Optional[int]:
-        """Resolve a DW_AT_type attribute's value to an absolute DIE offset.
+        """Resolve DW_AT_type attribute value to absolute DIE offset.
 
-        Handles CU-relative reference forms by adding the DIE's cu_start.
-        Returns None if the attribute cannot be interpreted as an integer offset.
+        Handles CU-relative reference forms (DW_FORM_ref1/2/4/8/udata) by adding
+        the context DIE's cu_start attribute to convert to absolute offset.
+
+        Args:
+            type_attr: DW_AT_type attribute with raw_value and form
+            context_die: Parent DIE providing cu_start for CU-relative refs
+
+        Returns:
+            Absolute DIE offset, or None if attribute cannot be interpreted
+
+        Note:
+            CU-relative forms are automatically detected and adjusted.
+            Other forms (DW_FORM_ref_addr, etc.) are assumed absolute.
         """
         raw = getattr(type_attr, "raw_value", None)
         try:
@@ -714,9 +1169,46 @@ class AttributeParser:
     # The cache lives per-instance because "self" participates in the key.
     @lru_cache(maxsize=8192)
     def get_die(self, offset: int) -> model.DebugInformationEntry | None:
+        """Retrieve DIE by absolute offset with LRU caching.
+
+        Args:
+            offset: Absolute DIE offset (not CU-relative)
+
+        Returns:
+            DebugInformationEntry if found, None otherwise
+
+        Note:
+            Cache is per-instance (8K entries) to minimize SQLAlchemy query overhead.
+        """
         return self.session.query(model.DebugInformationEntry).filter_by(offset=offset).one_or_none()
 
     def traverse_tree(self, entry: model.DebugInformationEntry, level: int = 0) -> None:
+        """Traverse DIE tree depth-first, printing formatted summaries.
+
+        Prints context-aware summaries for common DIE types:
+            - **variable**: Shows name, type, and location expression
+            - **enumerator**: Shows name, type, and constant value
+            - **subrange_type**: Shows array bounds (lower_bound, upper_bound)
+            - **member**: Shows struct member name, type, and offset
+            - **base_type**: Shows size and encoding (e.g., "4 bytes - signed")
+
+        Args:
+            entry: Root DIE to start traversal
+            level: Current indentation level (default: 0)
+
+        Example:
+            ```python
+            root = session.query(DebugInformationEntry).first()
+            parser.traverse_tree(root)
+            # Output:
+            # variable 'global_counter' -> uint32_t [location=addr(0x20000000)] [off=0x00001234]
+            #     base_type 'uint32_t' [4 bytes - unsigned] [off=0x00001100]
+            ```
+
+        Note:
+            Type references are automatically resolved and displayed.
+            Indentation increases by 4 spaces per level.
+        """
         tag = getattr(entry.abbrev, "tag", entry.tag)
         name = self._name_of(entry)
         type_info = ""
@@ -784,6 +1276,38 @@ class AttributeParser:
 
     @lru_cache(maxsize=8192)
     def parse_attributes(self, die: model.DebugInformationEntry, level: int) -> dict[str, Any]:
+        """Parse DIE attributes into dictionary with type conversion and resolution.
+
+        Extracts attributes from a DIE with special handling for:
+            - **type**: Recursively resolves to complete type tree
+            - **location/data_member_location**: Evaluates DWARF expressions
+            - **Enum attributes**: Converts to enum values (encoding, language, etc.)
+            - **CU-relative refs**: Adjusts to absolute offsets
+
+        Attributes in STOP_LIST are excluded (sibling, decl_file, decl_line, etc.).
+
+        Args:
+            die: Debug Information Entry to parse
+            level: Current recursion depth (for nested type resolution)
+
+        Returns:
+            Dict mapping attribute names to converted values.
+            Type attributes contain nested DIE objects.
+
+        Example:
+            ```python
+            attrs = parser.parse_attributes(die, 0)
+            # Result:
+            # {
+            #     "name": "my_var",
+            #     "type": DIE(tag="base_type", attributes={"byte_size": 4}),
+            #     "location": "addr(0x20000000)"
+            # }
+            ```
+
+        Note:
+            Results are LRU-cached (8K entries) per instance.
+        """
         result: dict[str, Any] = defaultdict(dict)
         # Prefer attributes_map to avoid repeated scans
         attrs_map = getattr(die, "attributes_map", None)
@@ -845,6 +1369,38 @@ class AttributeParser:
         return result
 
     def parse_type(self, offset: int, level: int = 0) -> dict[str, Any] | CircularReference:
+        """Recursively parse DWARF type DIE into structured representation.
+
+        Follows type references to build complete type descriptions with attributes
+        and children. Detects circular references (e.g., linked list nodes) and
+        returns CircularReference marker to prevent infinite recursion.
+
+        Args:
+            offset: Absolute DIE offset of the type
+            level: Current recursion depth (unused but kept for compatibility)
+
+        Returns:
+            DIE object with:
+                - **tag**: DWARF tag name (e.g., "base_type", "pointer_type")
+                - **attributes**: Dict of converted attribute values
+                - **children**: List of child DIE objects (members, enumerators, etc.)
+
+            OR CircularReference if a cycle is detected.
+
+        Example:
+            ```python
+            # Parse struct type
+            type_die = parser.parse_type(0x1234)
+            print(type_die.tag)  # "structure_type"
+            print(type_die.attributes["name"])  # "my_struct"
+            for member in type_die.children:
+                print(f"  {member.attributes['name']}: {member.attributes['type'].tag}")
+            ```
+
+        Note:
+            Results are cached in self.parsed_types dict.
+            CU-relative type references are automatically adjusted.
+        """
         # Cycle detection
         if offset in self.type_stack:
             # Try to enrich with name where possible
@@ -901,6 +1457,15 @@ class AttributeParser:
 
     # --- Helpers for summaries -------------------------------------------------
     def _get_attr(self, die: model.DebugInformationEntry, name: str):
+        """Get attribute by name from DIE, preferring attributes_map.
+
+        Args:
+            die: Debug Information Entry
+            name: Attribute name to retrieve
+
+        Returns:
+            DIEAttribute if found, None otherwise
+        """
         if hasattr(die, "attributes_map"):
             return die.attributes_map.get(name)
         for a in die.attributes or []:
@@ -909,16 +1474,48 @@ class AttributeParser:
         return None
 
     def _attr_raw(self, die: model.DebugInformationEntry, name: str):
+        """Get raw attribute value by name.
+
+        Args:
+            die: Debug Information Entry
+            name: Attribute name
+
+        Returns:
+            Attribute's raw_value if found, None otherwise
+        """
         a = self._get_attr(die, name)
         return None if a is None else a.raw_value
 
     def _name_of(self, die: model.DebugInformationEntry) -> str:
+        """Extract name attribute from DIE, returning empty string if not found.
+
+        Args:
+            die: Debug Information Entry
+
+        Returns:
+            Name as string, or empty string if unavailable
+        """
         try:
             return self._attr_raw(die, "name") or ""
         except Exception:
             return ""
 
     def _type_summary(self, offset: int) -> str:
+        """Generate concise human-readable summary for a type DIE.
+
+        Args:
+            offset: Absolute DIE offset of type
+
+        Returns:
+            Type name if available, otherwise tag name (e.g., "uint32_t" or "base_type")
+            Returns "<missing type at 0x...>" if DIE not found.
+
+        Example:
+            ```python
+            summary = parser._type_summary(0x1234)
+            # "uint32_t" or "structure_type" or "pointer_type"
+            ```
+        """
         die = self.get_die(offset)
         if die is None:
             return f"<missing type at 0x{offset:08x}>"

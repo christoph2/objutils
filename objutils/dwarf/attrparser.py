@@ -1,34 +1,89 @@
-"""
-AttributeParser: DWARF DIE attribute/type traversal with localized caching.
+"""DWARF Debugging Information Entry (DIE) attribute parser with optimized caching.
 
-This module provides a complete and optimized version of the AttributeParser that
-was previously drafted in a scratch script. Caching is implemented ONLY here, as
-requested:
+This module provides high-performance parsing and traversal of DWARF DIE trees,
+with specialized support for type reference resolution and circular reference detection.
 
-- Per-instance memoization of parsed types (parsed_types)
-- LRU cache for DIE lookups by CU-relative offset (get_die)
-- Cycle detection via type_stack to prevent infinite recursion
+The AttributeParser implements a three-tier caching strategy:
+    1. **parsed_types**: Per-instance memoization of fully parsed type dictionaries
+    2. **get_die()**: LRU-cached DIE lookups by CU-relative offset (reduces ORM overhead)
+    3. **type_stack**: Cycle detection to handle self-referential type definitions
 
-Usage example (pseudo):
+Key Features:
+    - Depth-first DIE tree traversal with intelligent caching
+    - Domain-specific formatting for common DIE tags (variables, typedefs, subprograms)
+    - Recursive type parsing with circular reference detection
+    - Leverages ORM-side attributes_map when available for performance
 
+Architecture:
+    The parser operates in two modes:
+
+    1. **Tree Traversal** (traverse_tree):
+       - Walks the DIE tree depth-first
+       - Prints formatted summaries for each DIE
+       - Automatically parses and caches type DIEs on-demand
+       - Tracks visited DIEs to avoid redundant processing
+
+    2. **Type Parsing** (parse_type):
+       - Recursively resolves type references
+       - Handles pointer types, struct/union members, arrays, typedefs
+       - Returns structured dictionaries with tag, attrs, and children
+       - Returns CircularReference marker for self-referential types
+
+Type Reference Resolution:
+    Type references are encoded as CU-relative DIE offsets in the "type" attribute.
+    The parser follows these references recursively, building a complete type graph
+    while detecting and breaking cycles.
+
+Example Usage:
+    ```python
     from objutils.elf import ElfParser
     from objutils.dwarf import DwarfProcessor
     from objutils.dwarf.attrparser import AttributeParser, traverse_dict
 
-    ep = ElfParser(<elf-path>)
+    # Parse ELF and extract DWARF debug info
+    ep = ElfParser("firmware.elf")
     dp = DwarfProcessor(ep)
     dp.do_dbg_info()
 
+    # Create parser and traverse DIE tree
     session = ep.session
     root = session.query(model.DebugInformationEntry).first()
     ap = AttributeParser(session)
     ap.traverse_tree(root)
 
-Notes:
-- The parser expects the ORM schema with DebugInformationEntry including
-  attributes, children, parent, offset and the convenience attributes_map.
-- Type references are assumed to be encoded as DIE offsets (CU-relative) stored
-  in DIEAttribute.raw_value for the "type" attribute and similar.
+    # Parse specific type by offset
+    type_dict = ap.parse_type(0x1234)
+    traverse_dict(type_dict)  # Pretty-print the type structure
+    ```
+
+Performance Considerations:
+    - LRU cache size of 8192 for DIE lookups (adjustable via maxsize parameter)
+    - Attributes are filtered via STOP_LIST to exclude non-structural metadata
+    - Visited set prevents redundant traversal of shared subtrees
+    - attributes_map provides O(1) attribute access when available
+
+ORM Schema Requirements:
+    The parser expects DebugInformationEntry with:
+    - offset: CU-relative DIE offset (int)
+    - tag: DIE tag name (str)
+    - abbrev.tag: Abbreviation-based tag access
+    - attributes: List of DIEAttribute objects
+    - attributes_map: Dict mapping attribute names to DIEAttribute (optional, performance)
+    - children: List of child DIEs
+    - parent: Parent DIE reference
+
+DIEAttribute Schema:
+    - name: Attribute name (str)
+    - raw_value: Decoded attribute value (int, str, bytes, etc.)
+
+Note:
+    Type references are assumed to be CU-relative offsets stored as integers
+    in DIEAttribute.raw_value for the "type" attribute and similar references.
+
+See Also:
+    - objutils.dwarf.c_generator: Generates C code from parsed DIE trees
+    - objutils.dwarf.traverser: Alternative DIE tree walker
+    - objutils.elf.model: SQLAlchemy ORM definitions for DWARF DIEs
 """
 
 from __future__ import annotations
@@ -42,23 +97,110 @@ from objutils.elf import model
 
 
 def lev_print(level: int, *args: Any, **kws: Any) -> None:
+    """Print with indentation based on nesting level.
+
+    Args:
+        level: Indentation level (each level = 4 spaces)
+        *args: Positional arguments passed to print()
+        **kws: Keyword arguments passed to print()
+    """
     print("    " * level, *args, **kws)
 
 
 @dataclass
 class CircularReference:
+    """Marker for circular type references in DWARF type graphs.
+
+    When parse_type() detects a cycle (a type that references itself directly
+    or indirectly), it returns this sentinel object instead of recursing infinitely.
+
+    Attributes:
+        tag: The DWARF tag of the circular type (e.g., "structure_type")
+        name: The name of the type if available, empty string otherwise
+
+    Example:
+        ```python
+        # Linked list node with pointer to itself:
+        # struct node { struct node *next; };
+
+        type_dict = parser.parse_type(offset)
+        if isinstance(type_dict, CircularReference):
+            print(f"Circular: {type_dict.tag} '{type_dict.name}'")
+        ```
+    """
+
     tag: str
     name: str
 
 
 class AttributeParser:
-    """
-    Parse and traverse DIE trees and their type relationships with caching.
+    """Parse and traverse DWARF DIE trees with optimized caching and type resolution.
 
-    Caching strategy (only here):
-    - parsed_types: memoizes fully parsed type dicts by DIE offset
-    - get_die(): LRU-cached DB lookup by offset to minimize ORM traffic
-    - attributes_map: leverages the ORM-side per-instance cache (if present)
+    This parser provides efficient traversal of DWARF Debugging Information Entry (DIE)
+    trees with intelligent caching of parsed types and DIE lookups. It handles circular
+    type references, follows type chains, and produces structured representations of
+    complex types (structs, unions, arrays, pointers, etc.).
+
+    Caching Strategy:
+        - **parsed_types**: Memoizes fully parsed type dictionaries by DIE offset
+          (prevents re-parsing the same type multiple times)
+        - **get_die()**: LRU cache (8192 entries) for DIE lookups by offset
+          (minimizes SQLAlchemy ORM query overhead)
+        - **visited_die_offsets**: Tracks already-traversed DIEs during tree walks
+          (avoids redundant processing of shared subtrees)
+        - **type_stack**: Runtime cycle detection for recursive type references
+          (prevents infinite recursion)
+
+    Attribute Filtering:
+        Non-structural attributes in STOP_LIST (decl_file, decl_line, decl_column,
+        sibling) are excluded from parsed type dictionaries to keep output focused
+        on semantic type information.
+
+    Type Parsing:
+        The parse_type() method recursively follows "type" attribute references,
+        building a nested dictionary structure:
+        ```python
+        {
+            "tag": "pointer_type",
+            "attrs": {"byte_size": 8, "type": {...}},
+            "children": []
+        }
+        ```
+
+    Tree Traversal:
+        The traverse_tree() method walks DIE trees depth-first, printing formatted
+        summaries with special handling for common DIE types (variables, functions,
+        typedefs, constants).
+
+    Attributes:
+        session: SQLAlchemy session for ORM queries
+        type_stack: Set of offsets currently being parsed (cycle detection)
+        parsed_types: Cache of offset -> parsed type dict
+        visited_die_offsets: Set of DIE offsets already traversed
+        att_types: Statistics dict mapping tag -> set of attribute names encountered
+
+    Example:
+        ```python
+        from objutils.dwarf.attrparser import AttributeParser
+
+        ap = AttributeParser(session)
+
+        # Traverse entire DIE tree with summaries
+        root_die = session.query(DebugInformationEntry).first()
+        ap.traverse_tree(root_die)
+
+        # Parse specific type
+        type_dict = ap.parse_type(0x1234)
+        if isinstance(type_dict, CircularReference):
+            print("Circular reference detected")
+        else:
+            print(f"Type: {type_dict['tag']}")
+        ```
+
+    Note:
+        This parser expects the ORM schema from objutils.elf.model with
+        DebugInformationEntry, DIEAttribute, and optionally attributes_map
+        for performance optimization.
     """
 
     # Attributes considered non-structural for high-level type dicts
@@ -70,6 +212,11 @@ class AttributeParser:
     }
 
     def __init__(self, session):
+        """Initialize AttributeParser with SQLAlchemy session.
+
+        Args:
+            session: SQLAlchemy session connected to ELF ORM database
+        """
         self.session = session
         # Used to detect cycles while descending type links
         self.type_stack: set[int] = set()
@@ -84,10 +231,35 @@ class AttributeParser:
     # The cache lives per-instance because "self" participates in the key.
     @lru_cache(maxsize=8192)
     def get_die(self, offset: int) -> model.DebugInformationEntry | None:
+        """Retrieve DIE by CU-relative offset with LRU caching.
+
+        This method wraps SQLAlchemy queries with an LRU cache to minimize
+        database overhead during type reference resolution. The cache is
+        per-instance and holds up to 8192 entries.
+
+        Args:
+            offset: CU-relative DIE offset (integer)
+
+        Returns:
+            DebugInformationEntry if found, None otherwise
+
+        Note:
+            The cache key includes self, so each AttributeParser instance
+            maintains its own independent cache.
+        """
         return self.session.query(model.DebugInformationEntry).filter(model.DebugInformationEntry.offset == offset).first()
 
     # --- Helpers for summaries -------------------------------------------------
     def _get_attr(self, die: model.DebugInformationEntry, name: str):
+        """Get attribute by name from DIE, preferring attributes_map if available.
+
+        Args:
+            die: Debug Information Entry
+            name: Attribute name to retrieve
+
+        Returns:
+            DIEAttribute if found, None otherwise
+        """
         amap = getattr(die, "attributes_map", None)
         if amap is not None:
             return amap.get(name)
@@ -97,10 +269,27 @@ class AttributeParser:
         return None
 
     def _attr_raw(self, die: model.DebugInformationEntry, name: str):
+        """Get raw attribute value by name.
+
+        Args:
+            die: Debug Information Entry
+            name: Attribute name
+
+        Returns:
+            Attribute's raw_value if found, None otherwise
+        """
         a = self._get_attr(die, name)
         return None if a is None else a.raw_value
 
     def _name_of(self, die: model.DebugInformationEntry) -> str:
+        """Extract name attribute from DIE, returning empty string if not found.
+
+        Args:
+            die: Debug Information Entry
+
+        Returns:
+            Name as string, or empty string if unavailable
+        """
         a = self._get_attr(die, "name")
         try:
             return str(a.raw_value) if a is not None and a.raw_value is not None else ""
@@ -108,6 +297,17 @@ class AttributeParser:
             return ""
 
     def _type_summary(self, offset: int) -> str:
+        """Generate human-readable summary for a type DIE.
+
+        Args:
+            offset: CU-relative offset of type DIE
+
+        Returns:
+            Type name or tag (e.g., "uint32_t" or "pointer_type")
+
+        Note:
+            This method is defensive and returns fallback strings on any error.
+        """
         try:
             t = self.parse_type(offset)
         except Exception:
@@ -129,7 +329,26 @@ class AttributeParser:
         return name or tag
 
     def traverse_tree(self, entry: model.DebugInformationEntry, level: int = 0) -> None:
-        """Depth-first traversal printing a summary and parsing types on-demand."""
+        """Traverse DIE tree depth-first, printing formatted summaries.
+
+        This method walks the DIE tree recursively, printing domain-specific
+        summaries for common DIE types (variables, typedefs, functions, constants).
+        Type DIEs are automatically parsed and cached on-demand.
+
+        Special handling for:
+            - **variable**: Shows name, type, and location
+            - **typedef**: Shows alias name and target type
+            - **constant**: Shows name, type, and value
+            - **subprogram**: Shows function signature with parameters
+
+        Args:
+            entry: Root DIE to start traversal
+            level: Current indentation level (default: 0)
+
+        Note:
+            Already-visited DIEs are skipped to avoid redundant processing.
+            Parsed types are cached in self.parsed_types.
+        """
         # Skip if already visited to avoid redundant work
         if entry.offset in self.visited_die_offsets:
             return
@@ -199,6 +418,23 @@ class AttributeParser:
             self.traverse_tree(child, level + 1)
 
     def parse_attributes(self, die: model.DebugInformationEntry, level: int) -> dict[str, Any]:
+        """Parse DIE attributes into structured dictionary.
+
+        Extracts attributes from a DIE, filtering out non-structural metadata
+        (decl_file, decl_line, etc.) and recursively resolving "type" references.
+
+        Args:
+            die: Debug Information Entry to parse
+            level: Current nesting level for recursive type parsing
+
+        Returns:
+            Dictionary with "attrs" key containing attribute name -> value mappings.
+            Type references are recursively resolved to nested dictionaries.
+
+        Note:
+            Attributes in STOP_LIST are excluded. The "type" attribute triggers
+            recursive parse_type() calls to follow type chains.
+        """
         result: dict[str, Any] = defaultdict(dict)
         # Prefer attributes_map to avoid repeated scans
         attrs_map = getattr(die, "attributes_map", None)
@@ -230,6 +466,47 @@ class AttributeParser:
         return result
 
     def parse_type(self, offset: int, level: int = 0) -> dict[str, Any] | CircularReference:
+        """Recursively parse DWARF type DIE into structured dictionary.
+
+        Follows type references to build complete type representations, handling
+        pointers, structs, unions, arrays, typedefs, and other DWARF type constructs.
+        Detects circular references and returns CircularReference marker to prevent
+        infinite recursion.
+
+        Args:
+            offset: CU-relative DIE offset of the type
+            level: Current recursion depth (for debugging)
+
+        Returns:
+            Dictionary with keys:
+                - "tag": DWARF tag name (e.g., "pointer_type", "structure_type")
+                - "attrs": Dict of attribute name -> value (type refs are recursively parsed)
+                - "children": List of child DIE dicts (e.g., struct members, enumerators)
+
+            OR CircularReference if a cycle is detected.
+
+        Raises:
+            None: Defensively handles missing DIEs and parse errors
+
+        Example:
+            ```python
+            # Parse a struct type
+            type_dict = parser.parse_type(0x1234)
+            # Result:
+            # {
+            #     "tag": "structure_type",
+            #     "attrs": {"name": "foo", "byte_size": 16},
+            #     "children": [
+            #         {"tag": "member", "attrs": {"name": "x", "type": {...}}},
+            #         {"tag": "member", "attrs": {"name": "y", "type": {...}}}
+            #     ]
+            # }
+            ```
+
+        Note:
+            Results are cached in self.parsed_types. Circular references
+            (e.g., linked list nodes) return CircularReference marker.
+        """
         # Cycle detection
         if offset in self.type_stack:
             # Try to enrich with name where possible
@@ -283,7 +560,28 @@ class AttributeParser:
 
 
 def traverse_dict(elem: dict[str, Any], level: int = 0) -> None:
-    """Pretty-print a parsed type dict (recursive)."""
+    """Pretty-print a parsed type dictionary recursively.
+
+    Formats and prints a structured type dictionary from parse_type(),
+    displaying tags, attributes, and children with proper indentation.
+
+    Args:
+        elem: Type dictionary from AttributeParser.parse_type()
+        level: Current indentation level
+
+    Example:
+        ```python
+        type_dict = parser.parse_type(0x1234)
+        traverse_dict(type_dict)
+        # Output:
+        # *** tag: structure_type
+        #     name ==> my_struct
+        #     byte_size ==> 16
+        #     *** tag: member
+        #         name ==> field1
+        #         ...
+        ```
+    """
     lev_print(level, f"*** tag: {elem.get('tag')}")
 
     # 1) Attributes
