@@ -37,10 +37,11 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Any
 
 import objutils.hexfile as hexfile
+
 
 # Record type identifiers
 DATA0 = 1  # !MAAAA DD

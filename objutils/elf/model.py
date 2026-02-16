@@ -35,7 +35,7 @@ The ORM creates tables for the following ELF structures:
   - **DebugInformationEntry (DIE)**: DWARF DIE nodes with tree relationships
     - Stores tag (DW_TAG_*), offset within CU, parent_id for tree traversal
     - Self-referential relationships: parent/children for DIE tree structure
-  
+
   - **DIEAttribute**: DWARF attributes attached to DIE entries
     - Stores attribute name (DW_AT_*), form (DW_FORM_*), and raw_value
     - Foreign key relationship back to DebugInformationEntry
@@ -123,7 +123,7 @@ __copyright__ = """
 import mmap
 import re
 import sqlite3
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict, Optional
 
 from sqlalchemy import (
     Column,
@@ -138,7 +138,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import declarative_base, declared_attr, relationship, Session
+from sqlalchemy.orm import Session, declarative_base, declared_attr, relationship
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
@@ -154,10 +154,10 @@ Base = declarative_base()
 
 class MixInBase:
     """Base mixin class providing common functionality for all ORM models.
-    
+
     This mixin provides automatic table name generation and a comprehensive
     __repr__ method for debugging and logging.
-    
+
     Methods:
         __tablename__: Generated from class name (lowercased)
         __repr__: Returns detailed representation of object attributes
@@ -166,7 +166,7 @@ class MixInBase:
     @declared_attr
     def __tablename__(self) -> str:
         """Generate table name from class name.
-        
+
         Returns:
             str: Lowercase class name used as SQLAlchemy table name.
         """
@@ -174,10 +174,10 @@ class MixInBase:
 
     def __repr__(self) -> str:
         """Generate detailed string representation of object.
-        
+
         Iterates through all database columns and formats them with their values.
         String values are repr'd; numeric values are formatted as-is.
-        
+
         Returns:
             str: Formatted string like "ClassName(col1 = val1, col2 = val2, ...)"
         """
@@ -193,7 +193,7 @@ class MixInBase:
 
 class RidMixIn(MixInBase):
     """Mixin providing row ID primary key.
-    
+
     Adds an auto-incrementing 'rid' (row ID) column as the primary key
     for all tables that inherit from this mixin.
     """
@@ -209,14 +209,14 @@ def StdInteger(
     index: bool = False,
 ) -> Column:
     """Create a standard INTEGER column.
-    
+
     Args:
         default: Default value for the column (default: 0)
         primary_key: Whether this column is a primary key (default: False)
         unique: Whether values must be unique (default: False)
         nullable: Whether NULL values are allowed (default: False)
         index: Whether to create an index on this column (default: False)
-    
+
     Returns:
         Column: SQLAlchemy Column configured for INTEGER storage
     """
@@ -238,16 +238,16 @@ def StdNumeric(
     index: bool = False,
 ) -> Column:
     """Create a standard NUMERIC column.
-    
+
     Uses NUMERIC(20, 0) for high-precision integer storage without decimals.
-    
+
     Args:
         default: Default value for the column (default: 0)
         primary_key: Whether this column is a primary key (default: False)
         unique: Whether values must be unique (default: False)
         nullable: Whether NULL values are allowed (default: False)
         index: Whether to create an index on this column (default: False)
-    
+
     Returns:
         Column: SQLAlchemy Column configured for NUMERIC(20, 0) storage
     """
@@ -269,14 +269,14 @@ def StdBigInt(
     index: bool = False,
 ) -> Column:
     """Create a standard large INTEGER column.
-    
+
     Args:
         default: Default value for the column (default: 0)
         primary_key: Whether this column is a primary key (default: False)
         unique: Whether values must be unique (default: False)
         nullable: Whether NULL values are allowed (default: False)
         index: Whether to create an index on this column (default: False)
-    
+
     Returns:
         Column: SQLAlchemy Column configured for INTEGER storage
     """
@@ -297,13 +297,13 @@ def StdFloat(
     nullable: bool = False,
 ) -> Column:
     """Create a standard floating-point column.
-    
+
     Args:
         default: Default value for the column (default: 0.0)
         primary_key: Whether this column is a primary key (default: False)
         unique: Whether values must be unique (default: False)
         nullable: Whether NULL values are allowed (default: False)
-    
+
     Returns:
         Column: SQLAlchemy Column configured for floating-point storage
     """
@@ -318,10 +318,10 @@ def StdFloat(
 
 class Meta(Base, RidMixIn):
     """Metadata table for database schema information.
-    
+
     Stores schema version and creation timestamp information for the database.
     Used for schema migration and versioning.
-    
+
     Attributes:
         hash_value: Hash of ELF file or metadata (VARCHAR)
         ts_created: Timestamp when database was created (DateTime with timezone)
@@ -333,12 +333,12 @@ class Meta(Base, RidMixIn):
 
 class Elf_Header(Base, RidMixIn):
     """ORM model for ELF file header (Elf_Ehdr).
-    
+
     Stores the main ELF header information including file identification (e_ident),
     architecture information, offsets, and counts for all major ELF structures.
-    
+
     This is the entry point for understanding any ELF file's structure and properties.
-    
+
     Attributes:
         ei_class (int): ELF file class (32-bit=1, 64-bit=2)
         ei_data (int): ELF data encoding (little-endian=1, big-endian=2)
@@ -382,14 +382,14 @@ class Elf_Header(Base, RidMixIn):
     @hybrid_property
     def endianess(self) -> defs.ELFDataEncoding:
         """Get the endianness of the ELF file.
-        
+
         Determined by ei_data field:
         - 1 = Little-endian (ELFDATA2LSB)
         - 2 = Big-endian (ELFDATA2MSB)
-        
+
         Returns:
             defs.ELFDataEncoding: Enum representing file endianness
-        
+
         Raises:
             ValueError: If ei_data contains an invalid value
         """
@@ -403,11 +403,11 @@ class Elf_Header(Base, RidMixIn):
     @hybrid_property
     def is_64bit(self) -> bool:
         """Check if ELF file is 64-bit.
-        
+
         Based on ei_class field:
         - 1 = 32-bit
         - 2 = 64-bit
-        
+
         Returns:
             bool: True if 64-bit, False if 32-bit
         """
@@ -416,7 +416,7 @@ class Elf_Header(Base, RidMixIn):
     @hybrid_property
     def address_size(self) -> int:
         """Get the address size in bytes for this ELF file.
-        
+
         Returns:
             int: 8 bytes for 64-bit files, 4 bytes for 32-bit files
         """
@@ -425,10 +425,10 @@ class Elf_Header(Base, RidMixIn):
 
 class Elf_ProgramHeaders(Base, RidMixIn):
     """ORM model for ELF program header (Elf_Phdr).
-    
+
     Represents a loadable segment/program header. Program headers describe how the
     kernel should load the file into memory during program execution.
-    
+
     Attributes:
         p_type (int): Segment type (PT_LOAD=1, PT_DYNAMIC=2, PT_INTERP=3, etc.)
         p_offset (int): Segment file offset
@@ -452,14 +452,14 @@ class Elf_ProgramHeaders(Base, RidMixIn):
 
 class Elf_Section(Base, RidMixIn):
     """ORM model for ELF section header (Elf_Shdr).
-    
+
     Represents a section within an ELF file. Sections contain the actual data and code:
     code (.text), initialized data (.data), uninitialized data (.bss), symbol tables,
     string tables, debug information, etc.
-    
+
     Provides comprehensive flag checking via hybrid properties that work in both
     Python and SQL queries. Supports filtering by section type, flags, and content.
-    
+
     Attributes:
         index (int): Sequential section index (unique)
         sh_name (int): Section name string table index
@@ -494,7 +494,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def is_debug(self) -> bool:
         """Check if section contains debug information.
-        
+
         Returns:
             bool: True if section name starts with ".debug"
         """
@@ -503,7 +503,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def is_dwo(self) -> bool:
         """Check if section contains split debug information.
-        
+
         Returns:
             bool: True if section name starts with ".dwo" (DWARF object files)
         """
@@ -512,7 +512,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def has_content(self) -> bool:
         """Check if section has actual content.
-        
+
         Returns:
             bool: True if section is not NOBITS/NULL and has non-zero size
         """
@@ -524,7 +524,7 @@ class Elf_Section(Base, RidMixIn):
     @has_content.expression
     def has_content(self) -> Any:
         """SQL expression for checking if section has content.
-        
+
         Returns:
             Any: SQLAlchemy expression for use in WHERE clauses
         """
@@ -536,7 +536,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def progbits(self) -> bool:
         """Check if section is PROGBITS type (code or data).
-        
+
         Returns:
             bool: True if sh_type is SHT_PROGBITS
         """
@@ -545,7 +545,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_method
     def get_flags(self) -> int:
         """Get section flags.
-        
+
         Returns:
             int: Raw section flags value (sh_flags)
         """
@@ -554,10 +554,10 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_method
     def test_flags(self, mask: int) -> bool:
         """Test if section flags match a bitmask.
-        
+
         Args:
             mask: Bitmask to test against sh_flags
-        
+
         Returns:
             bool: True if (sh_flags & mask) == mask
         """
@@ -566,10 +566,10 @@ class Elf_Section(Base, RidMixIn):
     @test_flags.expression
     def test_flags(self, mask: int) -> Any:
         """SQL expression for testing section flags.
-        
+
         Args:
             mask: Bitmask to test against sh_flags
-        
+
         Returns:
             Any: SQLAlchemy expression for use in WHERE clauses
         """
@@ -578,7 +578,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def section_type(self) -> defs.SectionType:
         """Get section type as enum.
-        
+
         Returns:
             defs.SectionType: Enum representing the section type
         """
@@ -587,10 +587,10 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def section_display_name(self) -> str:
         """Get human-readable section type name.
-        
+
         For processor-specific or OS-specific types, returns the offset from
         the base constant (e.g., "SHT_LOPROC + 0x00000010").
-        
+
         Returns:
             str: Section type name or formatted offset for special types
         """
@@ -607,7 +607,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_writeable(self) -> bool:
         """Check if section is writeable.
-        
+
         Returns:
             bool: True if SHF_WRITE flag is set
         """
@@ -616,7 +616,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_executable(self) -> bool:
         """Check if section is executable.
-        
+
         Returns:
             bool: True if SHF_EXECINSTR flag is set
         """
@@ -625,7 +625,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_alloc(self) -> bool:
         """Check if section occupies memory.
-        
+
         Returns:
             bool: True if SHF_ALLOC flag is set
         """
@@ -634,7 +634,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_merge(self) -> bool:
         """Check if section data can be merged.
-        
+
         Returns:
             bool: True if SHF_MERGE flag is set
         """
@@ -643,7 +643,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_strings(self) -> bool:
         """Check if section contains null-terminated strings.
-        
+
         Returns:
             bool: True if SHF_STRINGS flag is set
         """
@@ -652,7 +652,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_info_link(self) -> bool:
         """Check if sh_info contains section link.
-        
+
         Returns:
             bool: True if SHF_INFO_LINK flag is set
         """
@@ -661,7 +661,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_link_order(self) -> bool:
         """Check if section order matters during linking.
-        
+
         Returns:
             bool: True if SHF_LINK_ORDER flag is set
         """
@@ -670,7 +670,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_os_nonconforming(self) -> bool:
         """Check if section uses OS-specific semantics.
-        
+
         Returns:
             bool: True if SHF_OS_NONCONFORMING flag is set
         """
@@ -679,7 +679,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_group(self) -> bool:
         """Check if section is member of a group.
-        
+
         Returns:
             bool: True if SHF_GROUP flag is set
         """
@@ -688,7 +688,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_tls(self) -> bool:
         """Check if section contains thread-local storage.
-        
+
         Returns:
             bool: True if SHF_TLS flag is set
         """
@@ -697,7 +697,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_ordered(self) -> bool:
         """Check if section ordering is significant (Solaris only).
-        
+
         Returns:
             bool: True if SHF_ORDERED flag is set
         """
@@ -706,7 +706,7 @@ class Elf_Section(Base, RidMixIn):
     @hybrid_property
     def flag_exclude(self) -> bool:
         """Check if section is excluded from linking (Solaris only).
-        
+
         Returns:
             bool: True if SHF_EXCLUDE flag is set
         """
@@ -715,14 +715,14 @@ class Elf_Section(Base, RidMixIn):
 
 class Elf_Symbol(Base, RidMixIn):
     """ORM model for ELF symbol table entry (Elf_Sym).
-    
+
     Represents a symbol (function, variable, label, etc.) in an ELF file.
     Symbol tables enable linking, relocation, debugging, and runtime symbol lookup.
-    
+
     Provides extensive properties for checking symbol attributes and access rights.
     All 'st_*' attributes are raw values from symbol tables per the ELF specification;
     other attributes exist for convenience and resolved information.
-    
+
     Attributes:
         st_name (int): Index into string table for symbol name
         st_value (int): Symbol value (address or offset, indexed for fast lookup)
@@ -751,7 +751,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def hidden(self) -> bool:
         """Check if symbol is hidden or internal.
-        
+
         Returns:
             bool: True if st_other is STV_HIDDEN or STV_INTERNAL
         """
@@ -763,7 +763,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hidden.expression
     def hidden(self) -> Any:
         """SQL expression for checking if symbol is hidden.
-        
+
         Returns:
             Any: SQLAlchemy expression for use in WHERE clauses
         """
@@ -772,7 +772,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def weak(self) -> bool:
         """Check if symbol is weak.
-        
+
         Returns:
             bool: True if st_bind is STB_WEAK
         """
@@ -781,7 +781,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def absolute(self) -> bool:
         """Check if symbol is absolute (not relative to a section).
-        
+
         Returns:
             bool: True if st_shndx is SHN_ABS
         """
@@ -790,7 +790,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def undefined(self) -> bool:
         """Check if symbol is undefined (external reference).
-        
+
         Returns:
             bool: True if st_shndx is SHN_UNDEF
         """
@@ -799,7 +799,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def local(self) -> bool:
         """Check if symbol is local.
-        
+
         Returns:
             bool: True if st_bind is STB_LOCAL
         """
@@ -808,7 +808,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def global_(self) -> bool:
         """Check if symbol is global.
-        
+
         Returns:
             bool: True if st_bind is STB_GLOBAL
         """
@@ -817,7 +817,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_method
     def get_access(self) -> int:
         """Get symbol access flags.
-        
+
         Returns:
             int: Raw access flags value
         """
@@ -826,10 +826,10 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_method
     def test_access(self, mask: int) -> bool:
         """Test if symbol access flags match a bitmask.
-        
+
         Args:
             mask: Bitmask to test against access flags
-        
+
         Returns:
             bool: True if (access & mask) == mask
         """
@@ -838,10 +838,10 @@ class Elf_Symbol(Base, RidMixIn):
     @test_access.expression
     def test_access(self, mask: int) -> Any:
         """SQL expression for testing symbol access flags.
-        
+
         Args:
             mask: Bitmask to test against access flags
-        
+
         Returns:
             Any: SQLAlchemy expression for use in WHERE clauses
         """
@@ -850,7 +850,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def writeable(self) -> bool:
         """Check if symbol is in a writeable section.
-        
+
         Returns:
             bool: True if SHF_WRITE flag is set in access
         """
@@ -859,7 +859,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def executeable(self) -> bool:
         """Check if symbol is in an executable section.
-        
+
         Returns:
             bool: True if SHF_EXECINSTR flag is set in access
         """
@@ -868,7 +868,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def allocate(self) -> bool:
         """Check if symbol occupies memory.
-        
+
         Returns:
             bool: True if SHF_ALLOC flag is set in access
         """
@@ -877,7 +877,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def symbol_bind(self) -> defs.SymbolBinding:
         """Get symbol binding type as enum.
-        
+
         Returns:
             defs.SymbolBinding: Enum representing symbol binding
         """
@@ -886,7 +886,7 @@ class Elf_Symbol(Base, RidMixIn):
     @hybrid_property
     def symbol_type(self) -> defs.SymbolType:
         """Get symbol type as enum.
-        
+
         Returns:
             defs.SymbolType: Enum representing symbol type
         """
@@ -895,9 +895,9 @@ class Elf_Symbol(Base, RidMixIn):
 
 class Elf_Comment(Base, RidMixIn):
     """ORM model for ELF comment section entry.
-    
+
     Stores text comments found in ELF files (typically from .comment sections).
-    
+
     Attributes:
         text (str): Comment text content
     """
@@ -907,10 +907,10 @@ class Elf_Comment(Base, RidMixIn):
 
 class Elf_Note(Base, RidMixIn):
     """ORM model for ELF note entry.
-    
+
     Notes provide extensible metadata in ELF files for vendor-specific or
     architecture-specific information (e.g., build IDs, capabilities).
-    
+
     Attributes:
         section_name (str): Name of section containing this note (unique)
         type (int): Note type identifier
@@ -926,14 +926,14 @@ class Elf_Note(Base, RidMixIn):
 
 class DIEAttribute(Base, RidMixIn):
     """ORM model for DWARF Debug Information Entry (DIE) attribute.
-    
+
     Represents a single attribute (DW_AT_*) attached to a DIE. Attributes contain
     metadata about the DIE (e.g., name, type, location, size, etc.).
-    
+
     Stores attribute names as integer enum values for performance. The _coerce_name
     validator allows flexible input (int, enum, or string name) which is normalized
     to an integer for storage.
-    
+
     Attributes:
         name (int): Attribute tag/name as AttributeEncoding enum value (indexed)
         form (int): Attribute form (DW_FORM_*) indicating how value is encoded (indexed)
@@ -953,14 +953,14 @@ class DIEAttribute(Base, RidMixIn):
     @orm.validates("name")
     def _coerce_name(self, key: str, value: Any) -> int:
         """Accept attribute name as int, enum, or string and coerce to integer.
-        
+
         Flexible validator that normalizes different input formats (integer,
         AttributeEncoding enum instance, or string name) to integer storage format.
-        
+
         Args:
             key: Validator key name (always "name")
             value: Input value to coerce (int, enum, or string)
-        
+
         Returns:
             int: Integer representation of attribute name
         """
@@ -983,10 +983,10 @@ class DIEAttribute(Base, RidMixIn):
     @property
     def encoding_name(self) -> str:
         """Get attribute name as string regardless of internal storage.
-        
+
         Exposes the attribute name in human-readable string format, converting
         from integer storage if needed.
-        
+
         Returns:
             str: String name of the attribute
         """
@@ -1009,13 +1009,13 @@ class DIEAttribute(Base, RidMixIn):
 
 class DebugInformationEntry(Base, RidMixIn):
     """ORM model for DWARF Debug Information Entry (DIE).
-    
+
     Represents a node in the DWARF debug information tree. DIEs describe source code
     constructs (functions, variables, types, scopes, etc.) and enable source-level debugging.
-    
+
     Supports tree traversal through parent/children relationships. Uses validators to
     accept flexible tag input formats (integer, enum, or string name).
-    
+
     Attributes:
         tag (int): DWARF tag (DW_TAG_*) as integer enum, indexed for fast queries
         offset (int): Byte offset of this DIE within its Compilation Unit, indexed
@@ -1056,14 +1056,14 @@ class DebugInformationEntry(Base, RidMixIn):
     @orm.validates("tag")
     def _coerce_tag(self, key: str, value: Any) -> int:
         """Accept tag as int, enum, or string name and coerce to integer.
-        
+
         Flexible validator that normalizes different input formats (integer,
         DWARF Tag enum instance, or string name) to integer storage format.
-        
+
         Args:
             key: Validator key name (always "tag")
             value: Input value to coerce (int, enum, or string)
-        
+
         Returns:
             int: Integer representation of DWARF tag
         """
@@ -1086,11 +1086,11 @@ class DebugInformationEntry(Base, RidMixIn):
     @property
     def abbrev(self) -> Any:
         """Get abbreviated representation of DIE tag for convenience.
-        
+
         Returns a simple object with a tag property containing the string tag name,
         even though the database stores the tag as an integer. Enables convenient
         access to tag name without manual enum conversion.
-        
+
         Returns:
             Any: Object with __str__/__repr__ returning Tag(name) format
         """
@@ -1100,7 +1100,7 @@ class DebugInformationEntry(Base, RidMixIn):
 
             def __init__(self, tag_value: Any) -> None:
                 """Initialize abbrev with tag value and convert to string name.
-                
+
                 Args:
                     tag_value: Integer, enum, or string tag value
                 """
@@ -1123,7 +1123,7 @@ class DebugInformationEntry(Base, RidMixIn):
 
             def __str__(self) -> str:
                 """Return string representation of tag.
-                
+
                 Returns:
                     str: Tag name in format "Tag(tagname)"
                 """
@@ -1134,12 +1134,12 @@ class DebugInformationEntry(Base, RidMixIn):
         return _Abbrev(self.tag)
 
     @property
-    def attributes_map(self) -> Dict[str, "DIEAttribute"]:
+    def attributes_map(self) -> dict[str, "DIEAttribute"]:
         """Get attributes as a dictionary keyed by attribute name.
-        
+
         Lazily builds and caches a mapping of attribute names to DIEAttribute
         objects for convenient access by attribute name rather than iteration.
-        
+
         Returns:
             Dict[str, DIEAttribute]: Dictionary mapping attribute names to their objects
         """
@@ -1148,10 +1148,10 @@ class DebugInformationEntry(Base, RidMixIn):
 
             def _attr_key(a: "DIEAttribute") -> str:
                 """Normalize attribute key to string even if stored as integer enum.
-                
+
                 Args:
                     a: DIEAttribute object
-                
+
                 Returns:
                     str: Attribute name as string
                 """
@@ -1171,10 +1171,10 @@ class DebugInformationEntry(Base, RidMixIn):
 
     def get_attribute(self, name: str) -> Optional["DIEAttribute"]:
         """Get a specific attribute by name.
-        
+
         Args:
             name: Attribute name string (e.g., "DW_AT_name")
-        
+
         Returns:
             Optional[DIEAttribute]: The attribute object, or None if not found
         """
@@ -1183,7 +1183,7 @@ class DebugInformationEntry(Base, RidMixIn):
 
 class DebugInformation(Base, RidMixIn):
     """ORM model for DWARF debug information collection.
-    
+
     Container table for organizing DWARF debugging information. Currently serves
     as a placeholder for future expansion of debug metadata storage.
     """
@@ -1193,7 +1193,7 @@ class DebugInformation(Base, RidMixIn):
 
 class CompilationUnit(Base, RidMixIn):
     """ORM model for DWARF Compilation Unit (CU).
-    
+
     Represents a compilation unit (single translation unit) within debug information.
     Currently serves as a placeholder for future expansion of CU-level metadata.
     """
@@ -1203,32 +1203,32 @@ class CompilationUnit(Base, RidMixIn):
 
 def calculateCacheSize(value: int) -> int:
     """Convert cache size in bytes to SQLite PRAGMA format.
-    
+
     SQLite PRAGMA CACHE_SIZE accepts negative values representing number of pages.
     This function converts a byte size to the appropriate negative page count.
-    
+
     Args:
         value: Cache size in bytes
-    
+
     Returns:
         int: Negative page count for PRAGMA CACHE_SIZE
     """
     return -(value // PAGE_SIZE)
 
 
-REGEX_CACHE: Dict[str, Any] = {}
+REGEX_CACHE: dict[str, Any] = {}
 
 
 def regexer(value: Optional[str], expr: Optional[str]) -> int:
     """SQLite-compatible regex function for pattern matching.
-    
+
     Used with SQLite's CREATE_FUNCTION to enable REGEXP operators in SQL queries.
     Caches compiled regex patterns for performance.
-    
+
     Args:
         value: String to search (may be None)
         expr: Regex pattern to match (may be None)
-    
+
     Returns:
         int: 1 if pattern matches, 0 otherwise
     """
@@ -1244,14 +1244,14 @@ def regexer(value: Optional[str], expr: Optional[str]) -> int:
 @event.listens_for(Engine, "connect")
 def set_sqlite3_pragmas(dbapi_connection: Any, connection_record: Any) -> None:
     """Configure SQLite pragmas for optimal ELF database performance.
-    
+
     Called automatically when SQLAlchemy connects to the SQLite database.
     Configures memory management, foreign keys, synchronization, and locking.
-    
+
     Args:
         dbapi_connection: SQLite connection object
         connection_record: SQLAlchemy connection record
-    
+
     Pragmas configured:
         - FOREIGN_KEYS: Enable referential integrity constraints
         - PAGE_SIZE: Match system page size for efficient I/O
@@ -1274,22 +1274,22 @@ def set_sqlite3_pragmas(dbapi_connection: Any, connection_record: Any) -> None:
 
 class Model:
     """Main database interface for ELF ORM operations.
-    
+
     Manages SQLAlchemy engine, session, and database schema. Handles automatic
     database creation with .prgdb extension, schema initialization, and backward
     compatibility migrations.
-    
+
     The Model class provides the primary interface for:
     - Creating/opening ELF analysis databases
     - Accessing ORM session for queries
     - Managing schema initialization and migration
-    
+
     Example:
         >>> db = Model("firmware.elf.prgdb", debug=False)
         >>> header = db.session.query(Elf_Header).first()
         >>> sections = db.session.query(Elf_Section).all()
         >>> db.close()
-    
+
     Attributes:
         dbname (str): Database file path (":memory:" or file path)
         _engine (Engine): SQLAlchemy engine
@@ -1299,10 +1299,10 @@ class Model:
 
     def __init__(self, filename: str = ":memory:", debug: bool = False) -> None:
         """Initialize ELF database model and create tables.
-        
+
         Creates SQLite database file and initializes all ORM tables. Automatically
         runs schema migration for older databases to ensure compatibility.
-        
+
         Args:
             filename: Database file path or ":memory:" (default: ":memory:")
                      File extension .prgdb is optional
@@ -1334,14 +1334,14 @@ class Model:
 
     def _ensure_schema(self) -> None:
         """Ensure required columns and indexes exist for older databases.
-        
+
         Adds missing columns and creates indexes with minimal changes without
         rebuilding the database. Uses ALTER TABLE and CREATE INDEX IF NOT EXISTS
         statements for safe, non-destructive schema migration.
-        
+
         This method handles backward compatibility for databases created by
         older versions of objutils that lacked certain columns or indexes.
-        
+
         Silently continues if inspection or ALTER operations fail, leaving
         the database in its existing state if migration is not possible.
         """
@@ -1403,7 +1403,7 @@ class Model:
 
     def close(self) -> None:
         """Close database connection and dispose of engine.
-        
+
         Closes the SQLAlchemy session and disposes of the engine, releasing
         all database connections and resources.
         """
@@ -1413,7 +1413,7 @@ class Model:
     @property
     def engine(self) -> Engine:
         """Get the SQLAlchemy engine.
-        
+
         Returns:
             Engine: SQLAlchemy database engine
         """
@@ -1422,7 +1422,7 @@ class Model:
     @property
     def session(self) -> Session:
         """Get the SQLAlchemy session.
-        
+
         Returns:
             Session: SQLAlchemy ORM session for queries and operations
         """
@@ -1431,7 +1431,7 @@ class Model:
     @property
     def metadata(self) -> Any:
         """Get the SQLAlchemy metadata.
-        
+
         Returns:
             Any: SQLAlchemy metadata containing table definitions
         """

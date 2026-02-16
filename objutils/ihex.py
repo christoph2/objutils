@@ -35,6 +35,7 @@ import objutils.hexfile as hexfile
 import objutils.utils as utils
 from objutils.checksums import COMPLEMENT_TWOS, lrc
 
+
 # Record type identifiers
 DATA = 0
 EOF = 1
@@ -83,9 +84,7 @@ class Reader(hexfile.Reader):
         """
         # Verify length matches actual data
         if line.length != len(line.chunk):
-            raise hexfile.InvalidRecordLengthError(
-                "Byte count doesn't match length of actual data."
-            )
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
         # Verify checksum (two's complement LRC)
         checksum = checksums.lrc(
@@ -94,10 +93,7 @@ class Reader(hexfile.Reader):
             checksums.COMPLEMENT_TWOS,
         )
         if line.checksum != checksum:
-            raise hexfile.InvalidRecordChecksumError(
-                f"Checksum mismatch: expected {checksum:02X}, "
-                f"got {line.checksum:02X}"
-            )
+            raise hexfile.InvalidRecordChecksumError(f"Checksum mismatch: expected {checksum:02X}, " f"got {line.checksum:02X}")
 
     def is_data_line(self, line: Any, format_type: int) -> bool:
         """Determine if record contains data.
@@ -166,12 +162,7 @@ class Reader(hexfile.Reader):
         elif line.type == START_LINEAR_ADDRESS:
             # Start linear address (EIP for x86)
             if len(line.chunk) == 4:
-                eip = (
-                    (line.chunk[0] << 24)
-                    | (line.chunk[1] << 16)
-                    | (line.chunk[2] << 8)
-                    | line.chunk[3]
-                )
+                eip = (line.chunk[0] << 24) | (line.chunk[1] << 16) | (line.chunk[2] << 8) | line.chunk[3]
                 line.add_processing_instruction(("eip", eip))
                 self.debug(f"START_LINEAR_ADDRESS: {hex(eip)}")
             else:

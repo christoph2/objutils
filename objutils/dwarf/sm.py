@@ -32,7 +32,7 @@ manipulate a stack to compute addresses, values, and other runtime information.
 
 Architecture:
     The stack machine consists of:
-    
+
     1. **Stack**: Simple stack data structure for operands
     2. **Operations**: Individual operation classes (150+ opcodes)
     3. **StackMachine**: Executor that decodes and runs expressions
@@ -62,10 +62,10 @@ Usage Example:
 
     # Create readers for binary parsing
     readers = DwarfReaders(endianess=Endianess.Little, address_size=8)
-    
+
     # Create and configure stack machine
     sm = StackMachine(readers)
-    
+
     # Evaluate DWARF expression (as bytes)
     expr = b'\\x03\\x00\\x10\\x00\\x00\\x00\\x00\\x00\\x00'  # DW_OP_addr 0x1000
     result = sm.evaluate(expr)
@@ -79,7 +79,7 @@ Advanced Example:
     expr = bytes([0x75, 0x10, 0x23, 0x20])  # breg5(16) + 32
     result = sm.evaluate(expr)
     # Result: "breg5(16); plus_uconst(32)"
-    
+
     # Access final stack value
     final_value = sm.stack.tos if not sm.stack.empty() else None
     ```
@@ -102,12 +102,12 @@ Stack Machine Features:
 
 Implementation Pattern:
     Each DWARF operation is implemented as a class inheriting from OperationBase:
-    
+
     ```python
     class Plus_Uconst(OperationBase):
         DISPLAY_NAME = "plus_uconst"
         PARAMETERS = ["uleb"]  # Read one ULEB parameter
-        
+
         def stack_op(self, stack):
             # Pop value, add parameter, push result
             value = stack.pop()

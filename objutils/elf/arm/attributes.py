@@ -85,7 +85,7 @@ AttributeDescription = namedtuple("AttributeDescription", "tag value parameterTy
 
 class Reader(IntEnum):
     """Parameter type identifiers for ARM EABI attribute values.
-    
+
     These define how attribute values are encoded in the binary format:
     - INT32: 32-bit integer (endianness depends on target)
     - CSTRING: Null-terminated ASCII string
@@ -434,10 +434,10 @@ WRS         Wind River Systems.
 
 class Attribute:
     """Represents a parsed ARM EABI build attribute.
-    
+
     Attributes store metadata about compiled code, including architecture
     requirements, ABI compliance, and toolchain settings.
-    
+
     Attributes:
         tag: Numeric identifier for the attribute type.
         tag_name: Human-readable name of the attribute.
@@ -453,7 +453,7 @@ class Attribute:
         description: str | None = None,
     ) -> None:
         """Initialize an Attribute instance.
-        
+
         Args:
             tag: Numeric tag identifier.
             tag_name: Name of the attribute tag.
@@ -471,41 +471,40 @@ class Attribute:
 
     def __repr__(self) -> str:
         """Return a detailed string representation of the attribute.
-        
+
         Returns:
             String representation showing all attribute fields.
         """
         return (
-            f"Attribute(tag = {self.tag}, tag_name = {self.tag_name}, "
-            f"value = {self.value}, description = {self.description})"
+            f"Attribute(tag = {self.tag}, tag_name = {self.tag_name}, " f"value = {self.value}, description = {self.description})"
         )
 
 
 def parse(buffer: bytes, byteorder: str = "<") -> dict[str, list[Attribute]]:
     """Parse ARM EABI build attributes from a binary buffer.
-    
+
     Parses the .ARM.attributes section format, which consists of:
     - Format version byte (always 'A' = 0x41)
     - Vendor subsections containing attribute tag-value pairs
     - Hierarchical organization (file/section/symbol scopes)
-    
+
     The parser handles multiple vendor subsections and extracts all attributes
     with their human-readable descriptions based on the ARM EABI specification.
-    
+
     Args:
         buffer: Raw bytes from the .ARM.attributes ELF section.
         byteorder: Byte order indicator:
             - "<": Little-endian (default, most ARM targets)
             - ">": Big-endian (legacy ARM systems)
-    
+
     Returns:
         Dictionary mapping vendor names (e.g., "aeabi") to lists of Attribute
         objects. Each Attribute contains the tag, name, value, and description.
-    
+
     Raises:
         KeyError: If an unknown attribute tag is encountered.
         ConstructError: If the binary format is invalid or corrupted.
-    
+
     Example:
         >>> data = b'A\\x00\\x00\\x00\\x2f\\x61\\x65\\x61\\x62\\x69...'
         >>> attrs = parse(data)

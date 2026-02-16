@@ -7,7 +7,7 @@ of the standard Tektronix format with 24-bit addressing and symbol support.
 Format specification:
 - Data records: %LL6CCAAAAADD
   - LL: Length field (2 * (data_length + 5) in hex)
-  - 6: Record type identifier  
+  - 6: Record type identifier
   - CC: Checksum (nibble sum)
   - AAAAAA: 24-bit address (hex)
   - DD: Data bytes (hex)
@@ -50,6 +50,7 @@ import objutils.checksums as checksums
 import objutils.hexfile as hexfile
 import objutils.utils as utils
 
+
 # Record type identifiers
 DATA = 1
 SYMBOL = 2
@@ -89,9 +90,7 @@ class Reader(hexfile.Reader):
 
             # Verify length matches actual data
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
             # Verify checksum (nibble sum of address + length + data)
             checksum = checksums.nibble_sum(
@@ -103,16 +102,11 @@ class Reader(hexfile.Reader):
                 )
             )
             if line.checksum != checksum:
-                raise hexfile.InvalidRecordChecksumError(
-                    f"Checksum mismatch: expected {checksum:02X}, "
-                    f"got {line.checksum:02X}"
-                )
+                raise hexfile.InvalidRecordChecksumError(f"Checksum mismatch: expected {checksum:02X}, " f"got {line.checksum:02X}")
 
         elif format_type == SYMBOL:
             # Symbol record: extract address from end of symbol string
-            checksum = checksums.nibble_sum(
-                utils.make_list(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk])
-            )
+            checksum = checksums.nibble_sum(utils.make_list(3, ((line.length + 5) * 2), [ord(b) for b in line.chunk]))
 
             # Symbol format: "NAME1234" where 1234 is hex address
             chunk = line.chunk.strip()
@@ -169,9 +163,7 @@ class Writer(hexfile.Writer):
             Formatted Extended Tektronix record: %LL6CCAAAAADD
         """
         # Calculate checksum (nibble sum of address + length + data)
-        checksum = checksums.nibble_sum(
-            utils.make_list(utils.int_to_array(address), 6, ((length + 5) * 2), row)
-        )
+        checksum = checksums.nibble_sum(utils.make_list(utils.int_to_array(address), 6, ((length + 5) * 2), row))
 
         # Length field: 2 * (data_length + 5)
         line = f"%{(length + 5) * 2:02X}6{checksum:02X}{address:06X}{Writer.hex_bytes(row)}"

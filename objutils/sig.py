@@ -43,6 +43,7 @@ from typing import Any, Optional
 import objutils.checksums as checksums
 from objutils import hexfile, utils
 
+
 # Record type identifiers
 DATA = 1
 EOF = 2
@@ -72,9 +73,7 @@ class Reader(hexfile.Reader):
         if format_type == DATA:
             # Verify length matches actual data
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
             # Verify address checksum (rotated XOR of address + length)
             address_checksum = checksums.rotatedXOR(
@@ -84,16 +83,14 @@ class Reader(hexfile.Reader):
             )
             if line.addrChecksum != address_checksum:
                 raise hexfile.InvalidRecordChecksumError(
-                    f"Address checksum mismatch: expected {address_checksum:02X}, "
-                    f"got {line.addrChecksum:02X}"
+                    f"Address checksum mismatch: expected {address_checksum:02X}, " f"got {line.addrChecksum:02X}"
                 )
 
             # Verify data checksum (rotated XOR of data bytes)
             data_checksum = checksums.rotatedXOR(line.chunk, 8, checksums.ROTATE_LEFT)
             if line.checksum != data_checksum:
                 raise hexfile.InvalidRecordChecksumError(
-                    f"Data checksum mismatch: expected {data_checksum:02X}, "
-                    f"got {line.checksum:02X}"
+                    f"Data checksum mismatch: expected {data_checksum:02X}, " f"got {line.checksum:02X}"
                 )
 
     def is_data_line(self, line: Any, format_type: int) -> bool:

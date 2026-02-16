@@ -272,7 +272,8 @@ import enum
 import sys
 from bisect import bisect_right
 from operator import attrgetter, eq
-from typing import Any, Iterable, Optional, Protocol, Union
+from typing import Any, Optional, Protocol, Union
+from collections.abc import Iterable
 
 from objutils.exceptions import InvalidAddressError
 from objutils.section import Section, join_sections

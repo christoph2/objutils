@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""ELF (Executable and Linkable Format) binary file parser and processor.
+r"""ELF (Executable and Linkable Format) binary file parser and processor.
 
 This module provides comprehensive support for parsing and analyzing ELF binary
 files, with a focus on embedded systems and cross-compilation scenarios.
@@ -67,21 +67,21 @@ Instead of accessing nested header structures, the parser provides direct proper
 access for convenience:
 
     parser = ElfParser('firmware.elf')
-    
+
     # Basic identification fields (EI_* from e_ident[0..15])
     machine_type = parser.e_machine     # Target machine type (e.g., 83 for AVR)
     endian = parser.endianess           # '<' for little-endian, '>' for big-endian
     is_64bit = parser.ei_class == 2     # Check if 64-bit ELF
-    
+
     # Extended header fields
     entry_point = parser.e_entry        # Program entry point address
     section_header_offset = parser.e_shoff
     num_sections = parser.e_shnum
-    
+
     # Segment and section information
     segments = parser.segments          # List of program header entries
     sections = parser.sections.fetch()  # Fetch all sections
-    
+
     # Metadata
     comment = parser.comment            # .comment section content
     notes = parser.notes                # ELF notes
@@ -95,7 +95,7 @@ access for convenience:
         print(f"Address: 0x{text_section.sh_addr:08x}")
         print(f"Size: {text_section.sh_size} bytes")
         print(f"Data: {text_section.section_image}")
-    
+
     # Fetch with filtering
     sections = parser.sections.fetch(order_by_address=True)
     debug_sections = parser.sections.fetch(name_pattern=r'^\.debug')
@@ -107,14 +107,14 @@ access for convenience:
     if sym:
         print(f"Value: 0x{sym.st_value:08x}")
         print(f"Size: {sym.st_size}")
-    
+
     # Fetch symbols with complex filtering
     global_funcs = parser.symbols.fetch(
         bindings='g',           # Global binding
         types_str='func',       # Function type
         order_by_value=True     # Sort by address
     )
-    
+
     # Fetch with regex filtering and section grouping
     result = parser.symbols.fetch(
         name_pattern=r'^[^_]',  # Exclude C-prefixed symbols
@@ -169,7 +169,7 @@ Use the `import_dwarf_to_db()` function to extract DWARF debug information
 from an ELF file and populate the program database:
 
     from objutils.elf import import_dwarf_to_db, open_program_database
-    
+
     # Import DWARF to create .prgdb database
     rc = import_dwarf_to_db(
         'firmware.elf',
@@ -179,7 +179,7 @@ from an ELF file and populate the program database:
         run_aranges=True,    # Process address ranges
         force=False          # Don't rebuild if already exists
     )
-    
+
     if rc == 0:
         db = open_program_database('firmware.elf')
         # Access debug information via database
@@ -565,7 +565,7 @@ class SectionAPI(DBAPI):
         name_pattern: str | None = None,
         order_by_address: bool = True,
     ) -> list[model.Elf_Section]:
-        """Fetch sections with optional filtering and sorting.
+        r"""Fetch sections with optional filtering and sorting.
 
         Args:
             sections: Comma or space-separated list of section names to include
@@ -1355,25 +1355,25 @@ class ElfParser:
 
     def get_string(self, table_index: int, entry: int) -> str:
         """Get a null-terminated string from a string table by offset.
-        
+
         Retrieves an ASCII string from the specified string table section at the
         given byte offset. This method is commonly used to resolve section names,
         symbol names, and other string references stored in ELF string tables
         (e.g., .strtab, .shstrtab, .dynstr).
-        
+
         Args:
             table_index: Index into self._images array identifying the string table section.
             entry: Byte offset within the string table where the null-terminated string begins.
-        
+
         Returns:
             The parsed ASCII string. Returns empty string if entry offset exceeds
             string table bounds.
-        
+
         Note:
             - String tables store null-terminated C strings back-to-back
             - Multiple ELF structures may reference the same string by offset
             - Out-of-bounds access safely returns empty string instead of raising exception
-        
+
         Example:
             >>> # Internally used to resolve section names from .shstrtab:
             >>> section_name = parser.get_string(shstrtab_index, section.sh_name)
@@ -1386,16 +1386,16 @@ class ElfParser:
 
     def _parse_program_headers(self) -> None:
         """Parse ELF program headers (segments) from the binary file.
-        
+
         Parses all program header table entries and populates the database with
         segment information. Program headers describe how the ELF file should be
         loaded into memory at runtime, defining segments for code, data, dynamic
         linking, thread-local storage, etc.
-        
+
         The parser automatically handles both 32-bit (ELF32) and 64-bit (ELF64)
         program header formats, which differ in field size and ordering. For 64-bit
         ELF files, the p_flags field appears before offset/address fields.
-        
+
         Program header structure for 32-bit ELF:
             - p_type: Segment type (PT_LOAD, PT_DYNAMIC, PT_INTERP, etc.)
             - p_offset: File offset where segment data begins
@@ -1405,15 +1405,15 @@ class ElfParser:
             - p_memsz: Size of segment in memory (bytes, may exceed filesz for .bss)
             - p_flags: Segment flags (read/write/execute permissions)
             - p_align: Segment alignment requirement
-        
+
         Program header structure for 64-bit ELF:
             - Field order differs: p_flags comes after p_type and before p_offset
-        
+
         Side Effects:
             - Sets self._program_headers to list of parsed segment structures
             - Populates database with model.Elf_ProgramHeaders entries
             - Commits changes to database via self.session
-        
+
         Note:
             - Only runs if e_shnum attribute exists (valid ELF header was parsed)
             - Number of program headers determined by self.e_phnum from ELF header
@@ -1468,12 +1468,12 @@ class ElfParser:
 
     def _parse_symbol_section(self, section: model.Elf_Section) -> None:
         """Parse symbol table section and populate database with symbol entries.
-        
+
         Parses all symbol entries from a symbol table section (SHT_SYMTAB or SHT_DYNSYM)
         and stores them in the database. Each symbol represents a function, variable,
         section, or other named entity with associated metadata like address, size,
         binding, type, and visibility.
-        
+
         Symbol table structure for 32-bit ELF:
             - st_name: Offset into string table for symbol name
             - st_value: Symbol value (typically address)
@@ -1481,26 +1481,26 @@ class ElfParser:
             - st_info: Symbol binding (4 bits) and type (4 bits)
             - st_other: Symbol visibility
             - st_shndx: Section index symbol is defined in (or special value)
-        
+
         Symbol table structure for 64-bit ELF:
             - Field order differs: st_name, st_info, st_other, st_shndx, st_value, st_size
-        
+
         Args:
             section: Elf_Section database model representing the symbol table section.
                 Must have sh_link pointing to the associated string table section.
-        
+
         Side Effects:
             - Bulk inserts model.Elf_Symbol entries into database
             - Commits transaction on success, rolls back on error
             - Prints error messages if symbol parsing or database operations fail
-        
+
         Note:
             - Symbol names are resolved via section.sh_link string table index
             - st_shndx may be special value (SHN_ABS, SHN_COMMON, SHN_UNDEF) or section index
             - Symbol section_name field resolved from st_shndx section reference
             - Parse errors for individual symbols are caught and logged but don't stop processing
             - Uses bulk_save_objects for efficient database insertion
-        
+
         Example:
             Symbol types (st_info.st_type):
                 - STT_NOTYPE (0): Type not specified
@@ -1579,19 +1579,19 @@ class ElfParser:
 
     def _parse_comment(self, data: bytes) -> str:
         """Parse .comment section containing compiler/linker identification strings.
-        
+
         The .comment section typically contains null-terminated ASCII strings identifying
         the compiler, linker, and build tools used to create the ELF file. This method
         extracts and formats these strings for display.
-        
+
         Args:
             data: Raw bytes from the .comment section.
-        
+
         Returns:
             Formatted comment string. If data contains null bytes, returns lines joined
             with newlines. If no null bytes present, returns the entire data as ASCII.
             Returns empty string if data is empty or None.
-        
+
         Note:
             - Comment sections typically contain multiple null-terminated strings
             - Common formats:
@@ -1599,7 +1599,7 @@ class ElfParser:
                 * "Linker: LLD 14.0.0"
             - Each tool in the build chain may add its own comment string
             - Empty strings between null bytes are filtered out
-        
+
         Example:
             >>> # Parse .comment section
             >>> comment_section = parser.sections.get('.comment')
@@ -1627,7 +1627,7 @@ class ElfParser:
 
     def _parse_note(self, data: bytes) -> typing.Any | None:
         """Parse ELF note section containing vendor-specific metadata.
-        
+
         ELF note sections store arbitrary vendor-specific metadata in a structured format.
         Common uses include:
             - Build IDs (NT_GNU_BUILD_ID)
@@ -1635,27 +1635,27 @@ class ElfParser:
             - Version information
             - Hardware capabilities
             - Gold linker version
-        
+
         Note structure:
             - namesz: Length of name field including null terminator (32-bit)
             - descsz: Length of descriptor field (32-bit)
             - type: Note type (vendor-specific interpretation) (32-bit)
             - name: Vendor name string (null-terminated, padded to 4-byte alignment)
             - desc: Binary descriptor data (vendor-specific format)
-        
+
         Args:
             data: Raw bytes from a NOTE section (SHT_NOTE).
-        
+
         Returns:
             Parsed note structure with fields: namesz, descsz, type, name (ASCII string),
             desc (hex-encoded string). Returns None if data is empty/None or parsing fails.
-        
+
         Note:
             - Name field is parsed as null-terminated ASCII string
             - Descriptor field is converted to hexadecimal string for safe display
             - Parse errors (StreamError) are caught and return None
             - Common vendor names: "GNU", "Go", "Android", "FreeBSD"
-        
+
         Example:
             >>> # Parse .note.gnu.build-id section
             >>> note_section = parser.sections.get('.note.gnu.build-id')
@@ -1687,7 +1687,7 @@ class ElfParser:
 
     def debug_sections(self) -> OrderedDict[str, typing.Any]:
         """Get all DWARF debug sections from the ELF file.
-        
+
         Retrieves all sections with names starting with ".debug" and wraps them
         in DebugInfo named tuples for convenient access. DWARF debug sections contain
         debugging information for source-level debugging, including:
@@ -1699,20 +1699,20 @@ class ElfParser:
             - .debug_ranges: Non-contiguous address ranges
             - .debug_frame: Call frame information (stack unwinding)
             - .debug_loc: Location lists for variables
-        
+
         Returns:
             OrderedDict mapping section names to DebugInfo(section, image) named tuples.
             Keys are section names (e.g., '.debug_info', '.debug_line').
             Values are DebugInfo objects containing:
                 - section: model.Elf_Section database model
                 - image: bytes data of the section
-        
+
         Note:
             - Only sections with names starting with ".debug" are included
             - Currently .debug_abbrev is explicitly skipped (special handling placeholder)
             - Sections are returned in the order they appear in the ELF file
             - Empty dict returned if no debug sections present (stripped binary)
-        
+
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> debug = parser.debug_sections()
@@ -1741,33 +1741,33 @@ class ElfParser:
         strict: bool,
     ) -> bool:
         """Determine if a section belongs to a segment with configurable checks.
-        
+
         This is the core implementation of section-to-segment mapping logic, implementing
         the complex rules defined in the ELF specification for determining which sections
         are contained within which program segments (loadable memory regions).
-        
+
         The algorithm performs four independent checks:
-        
+
         1. **valid_segment**: Type compatibility check
            - TLS sections (.tdata, .tbss) only belong to PT_TLS, PT_GNU_RELRO, or PT_LOAD
            - Non-TLS sections excluded from PT_TLS and PT_PHDR segments
-        
+
         2. **has_offset**: File offset range check
            - NOBITS sections (e.g., .bss) considered to have valid offset
            - For sections with file data, verify offset falls within segment file range
            - In strict mode, section must start within segment (not at boundary)
            - Section's file size must fit within segment's file size
-        
+
         3. **has_VMA**: Virtual memory address range check (if enabled)
            - Skipped if check_vma=False or section lacks SHF_ALLOC flag
            - Section's virtual address must fall within segment's memory range
            - In strict mode, section must start within segment (not at boundary)
            - Section's memory size must fit within segment's memory size
-        
+
         4. **has_dynamic_size**: Special handling for PT_DYNAMIC segments
            - Ensures dynamic sections have content or segment is empty
            - Validates offset/address relationships for dynamic sections
-        
+
         Args:
             section_header: Section to check for membership in segment.
             segment: Program header (segment) to check against.
@@ -1775,17 +1775,17 @@ class ElfParser:
                 If False, skip VMA checks (useful for relocatable objects).
             strict: If True, enforce stricter boundary conditions.
                 Section must start within segment bounds, not exactly at the end.
-        
+
         Returns:
             True if section belongs to the segment according to all four checks,
             False otherwise.
-        
+
         Note:
             - Thread-Local Storage (TLS) sections have special mapping rules
             - NOBITS sections (.bss, .tbss) have no file representation, only memory size
             - Strict mode prevents sections from starting at segment boundaries
             - This is used internally by section_in_segment() and section_in_segment_strict()
-        
+
         Example:
             >>> # Check if .text section belongs to first LOAD segment
             >>> text_section = parser.sections.get('.text')
@@ -1840,27 +1840,25 @@ class ElfParser:
         )
         return valid_segment and has_offset and has_VMA and has_dynamic_size
 
-    def section_in_segment(
-        self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders
-    ) -> bool:
+    def section_in_segment(self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders) -> bool:
         """Check if a section fits within a segment using standard rules.
-        
+
         Convenience wrapper around section_in_segment1() with standard (non-strict)
         checking enabled. This is the default method for determining section-to-segment
         mappings in most ELF analysis scenarios.
-        
+
         Args:
             section_header: Section to test for membership in segment.
             segment: Program header (segment) to check against.
-        
+
         Returns:
             True if section belongs to segment, False otherwise.
-        
+
         Note:
             - Enables VMA checking (check_vma=True)
             - Uses non-strict mode (strict=False) allowing sections at segment boundaries
             - See section_in_segment1() for detailed algorithm description
-        
+
         Example:
             >>> # Build mapping of all sections to their containing segments
             >>> for section in parser.sections.fetch():
@@ -1870,28 +1868,26 @@ class ElfParser:
         """
         return self.section_in_segment1(section_header, segment, 1, 0)
 
-    def section_in_segment_strict(
-        self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders
-    ) -> bool:
+    def section_in_segment_strict(self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders) -> bool:
         """Check if a section fits within a segment using strict boundary rules.
-        
+
         Convenience wrapper around section_in_segment1() with strict checking enabled.
         In strict mode, sections must start strictly within segment bounds, not exactly
         at the end boundary. This is useful for validating well-formed ELF files.
-        
+
         Args:
             section_header: Section to test for membership in segment.
             segment: Program header (segment) to check against.
-        
+
         Returns:
             True if section strictly belongs to segment, False otherwise.
-        
+
         Note:
             - Enables VMA checking (check_vma=True)
             - Uses strict mode (strict=True) rejecting sections at segment boundaries
             - Stricter than section_in_segment() - may reject edge cases
             - See section_in_segment1() for detailed algorithm description
-        
+
         Example:
             >>> # Validate that .text section is properly contained in LOAD segment
             >>> text = parser.sections.get('.text')
@@ -1904,22 +1900,22 @@ class ElfParser:
 
     def create_section_to_segment_mapping(self) -> OrderedDict[int, list]:
         """Create empty mapping structure for section-to-segment relationships.
-        
+
         Initializes an OrderedDict that will map program header (segment) indices
         to lists of sections contained within each segment. The mapping structure
         is created with an empty list for each segment index but is not populated
         with actual section assignments.
-        
+
         Returns:
             OrderedDict mapping segment indices (0 to e_phnum-1) to empty lists.
             Also stores the mapping in self.sections_to_segments for later use.
-        
+
         Note:
             - This method only creates the empty mapping structure
             - Actual section assignments must be done separately using section_in_segment()
             - The mapping is indexed by program header index, not segment type
             - All e_phnum program headers get an entry, even if they contain no sections
-        
+
         Example:
             >>> # Create mapping and populate with section assignments
             >>> mapping = parser.create_section_to_segment_mapping()
@@ -1936,33 +1932,31 @@ class ElfParser:
         self.sections_to_segments = mapping
         return self.sections_to_segments
 
-    def tbss_special(
-        self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders
-    ) -> bool:
+    def tbss_special(self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders) -> bool:
         """Check if section is a TBSS section in a non-TLS segment (special case).
-        
+
         Detects the special case of Thread-Local BSS (.tbss) sections when they
         appear in segments other than PT_TLS. TBSS sections have the SHF_TLS flag
         and SHT_NOBITS type, representing uninitialized thread-local storage.
-        
+
         In non-TLS segments (typically PT_LOAD or PT_GNU_RELRO), TBSS sections
         should be treated as having zero effective size because they don't occupy
         file or memory space in those segments - they're only accounted for in the
         dedicated PT_TLS segment.
-        
+
         Args:
             section_header: Section to check for TBSS special case.
             segment: Program header (segment) containing the section.
-        
+
         Returns:
             True if section is TBSS and segment is not PT_TLS, False otherwise.
-        
+
         Note:
             - TBSS = Thread-Local BSS (uninitialized thread-local variables)
             - PT_TLS segments contain the template for per-thread storage
             - TBSS sections may appear in multiple segments with different semantics
             - This affects size calculations in section_size() method
-        
+
         Example:
             >>> # Check if .tbss has special handling in LOAD segment
             >>> tbss = parser.sections.get('.tbss')
@@ -1977,36 +1971,34 @@ class ElfParser:
             and segment.p_type != defs.PT_TLS
         )
 
-    def section_size(
-        self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders
-    ) -> int:
+    def section_size(self, section_header: model.Elf_Section, segment: model.Elf_ProgramHeaders) -> int:
         """Get the effective size of a section within a specific segment.
-        
+
         Returns the section's effective size when contained in the given segment,
         accounting for the special case of TBSS (Thread-Local BSS) sections in
         non-TLS segments. The effective size is used for segment boundary calculations
         in section-to-segment mapping logic.
-        
+
         Args:
             section_header: Section whose effective size to compute.
             segment: Program header (segment) context for size calculation.
-        
+
         Returns:
             0 if section is TBSS in a non-TLS segment (special case),
             otherwise returns section_header.sh_size (actual section size in bytes).
-        
+
         Note:
             - TBSS sections have zero effective size in non-TLS segments
             - Normal sections always return their sh_size
             - Used by section_in_segment1() for boundary validation
             - NOBITS sections (.bss, .tbss) have sh_size but no file data
-        
+
         Example:
             >>> # Compare section size in different segment contexts
             >>> tbss = parser.sections.get('.tbss')
             >>> tls_segment = next(s for s in parser.segments if s.p_type == defs.PT_TLS)
             >>> load_segment = next(s for s in parser.segments if s.p_type == defs.PT_LOAD)
-            >>> 
+            >>>
             >>> tls_size = parser.section_size(tbss, tls_segment)
             >>> load_size = parser.section_size(tbss, load_segment)
             >>> print(f"Size in PT_TLS: {tls_size}")    # Non-zero
@@ -2016,32 +2008,32 @@ class ElfParser:
 
     def get_basic_header_field(self, name: str) -> typing.Any:
         """Get a field value from the basic ELF header.
-        
+
         Retrieves a field from the ELF header structure. The "basic" header includes
         the initial identification bytes (e_ident) and core header fields that are
         present in all ELF files regardless of type (executable, shared object, etc.).
-        
+
         Basic header fields include:
             - e_ident: 16-byte identification array (EI_MAG, EI_CLASS, EI_DATA, etc.)
             - e_type: Object file type (ET_REL, ET_EXEC, ET_DYN, ET_CORE)
             - e_machine: Target architecture (EM_386, EM_ARM, EM_X86_64, etc.)
             - e_version: ELF version (always 1 for current ELF)
-        
+
         Args:
             name: Name of the header field to retrieve (e.g., 'e_type', 'e_machine').
-        
+
         Returns:
             Value of the requested header field. Type depends on the field
             (typically int for most fields).
-        
+
         Raises:
             AttributeError: If the field name doesn't exist in the header.
-        
+
         Note:
             - Despite the name, this method now accesses self._header directly
             - Historical implementation used self._basic_header.header.fields
             - For most use cases, direct property access is preferred (e.g., parser.e_machine)
-        
+
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> machine = parser.get_basic_header_field('e_machine')
@@ -2053,11 +2045,11 @@ class ElfParser:
 
     def get_extended_header_field(self, name: str) -> typing.Any:
         """Get a field value from the extended ELF header.
-        
+
         Retrieves a field from the extended ELF header structure. The "extended" header
         includes fields beyond the basic identification that provide detailed information
         about the file's structure, entry point, and table locations.
-        
+
         Extended header fields include:
             - e_entry: Entry point virtual address (start of program execution)
             - e_phoff: Program header table file offset
@@ -2069,23 +2061,23 @@ class ElfParser:
             - e_shentsize: Section header entry size
             - e_shnum: Number of section header entries
             - e_shstrndx: Section header string table index
-        
+
         Args:
             name: Name of the header field to retrieve (e.g., 'e_entry', 'e_phnum').
-        
+
         Returns:
             Value of the requested header field. Type depends on the field
             (typically int for addresses/offsets/counts).
-        
+
         Raises:
             AttributeError: If the field name doesn't exist in the header.
-        
+
         Note:
             - Despite the name, this method now accesses self._header directly
             - Historical implementation used self._extended_header
             - "Basic" vs "Extended" distinction is mostly conceptual now
             - For most use cases, direct property access is preferred (e.g., parser.e_entry)
-        
+
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> entry = parser.get_extended_header_field('e_entry')
@@ -2351,7 +2343,7 @@ class ElfParser:
         exclude_pattern: str = "",
         callback: typing.Callable[[str, typing.Any], None] | None = None,
     ) -> Image:
-        """Create an Image object from ELF sections with optional filtering.
+        r"""Create an Image object from ELF sections with optional filtering.
 
         Constructs a binary image by extracting allocatable ELF sections and combining
         them into a single Image object. The image can be optionally joined (adjacent

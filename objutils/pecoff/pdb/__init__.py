@@ -10,12 +10,12 @@ the typically stripped COFF symbol table in release binaries.
 
 Overview:
     PDB files contain rich debug information:
-    
+
     - **Symbols**: Function names, variables, constants
     - **Types**: Structures, unions, enums, typedefs
     - **Source Info**: File names, line numbers
     - **Call Frames**: Stack unwinding data
-    
+
     ```
     PE File + PDB:
     ┌──────────────┐     ┌──────────────┐
@@ -33,7 +33,7 @@ Architecture:
     - Symbol server support
     - Handles PDB loading and parsing
     - Provides symbol enumeration API
-    
+
     **Symbol Enumeration**:
     1. Initialize dbghelp session (SymInitialize)
     2. Load PE module (SymLoadModuleExW)
@@ -41,7 +41,7 @@ Architecture:
     4. Enumerate symbols (SymEnumSymbolsA with callback)
     5. Extract type information (optional)
     6. Cleanup (SymCleanup)
-    
+
     **Type Information Extraction**:
     - Uses dbghelp type info API (SymGetTypeInfo)
     - Recursively resolves pointers, arrays, structs
@@ -51,14 +51,14 @@ Usage Examples:
     **Basic Symbol Extraction**:
     ```python
     from objutils.pecoff.pdb import pdb_symbols_for_pe
-    
+
     # Load symbols from PDB
     symbols = pdb_symbols_for_pe("app.exe")
-    
+
     for sym in symbols:
         print(f"{sym['name']:40s} @ {sym['address']:#010x}")
     ```
-    
+
     **With Symbol Search Path**:
     ```python
     # Search multiple directories for PDB
@@ -67,26 +67,26 @@ Usage Examples:
         symbol_path="C:\\Symbols;SRV*C:\\SymCache*https://msdl.microsoft.com/download/symbols"
     )
     ```
-    
+
     **Advanced Session Management**:
     ```python
     from objutils.pecoff.pdb import PdbSession
-    
+
     with PdbSession("app.exe", symbol_path=[".", "C:\\Symbols"]) as pdb:
         # Enumerate all symbols
         for sym in pdb.enum_symbols():
             if sym.is_function():
                 print(f"Function: {sym.name} @ {sym.Address:#x}")
-        
+
         # Get module info
         info = pdb.get_module_info()
         print(f"Module base: {info.base_of_dll:#x}")
     ```
-    
+
     **Type Information Extraction**:
     ```python
     from objutils.pecoff.pdb import CTypeInfoDump
-    
+
     # Extract C type definitions
     type_dumper = CTypeInfoDump(pdb_session.handle, base_address)
     type_info = type_dumper.get_type_from_type_index(type_idx)
@@ -99,19 +99,19 @@ Key Components:
     - **BasicType**: Primitive types (int, float, void, etc.)
     - **SymFlag**: Symbol flags (export, local, function, etc.)
     - **IMAGEHLP_SYMBOL_TYPE_INFO**: Type info query constants
-    
+
     **Data Classes**:
     - **ModuleInfo**: Module metadata (base address, size, entry point)
     - **SYMBOL_INFO**: Symbol information structure (ctypes)
     - **MODULEINFO**: Windows API module info structure
-    
+
     **Core Classes**:
     - **CTypeInfoDump**: Type information extraction and resolution
     - **PdbSession**: Manages dbghelp.dll lifetime and operations
 
 dbghelp.dll API:
     The module wraps these key dbghelp functions:
-    
+
     - **SymInitialize**: Initialize symbol handler
     - **SymCleanup**: Cleanup symbol handler
     - **SymLoadModuleExW**: Load module for symbol resolution
@@ -121,11 +121,11 @@ dbghelp.dll API:
 
 Symbol Search Paths:
     dbghelp supports flexible symbol search:
-    
+
     - **Local paths**: "C:\\Symbols;D:\\Debug"
     - **Symbol servers**: "SRV*C:\\Cache*https://msdl.microsoft.com/download/symbols"
     - **Combined**: "C:\\Local;SRV*C:\\Cache*https://server"
-    
+
     The `_NT_SYMBOL_PATH` environment variable is respected.
 
 Limitations:
@@ -137,14 +137,14 @@ Limitations:
 
 Error Handling:
     On non-Windows platforms, dbghelp/kernel32/psapi are set to None:
-    
+
     ```python
     from objutils.pecoff.pdb import _WINDOWS
-    
+
     if not _WINDOWS:
         print("PDB support unavailable (not Windows)")
     ```
-    
+
     Import errors are caught and gracefully handled in __init__.py.
 
 See Also:
@@ -157,10 +157,10 @@ See Also:
 Example Integration:
     ```python
     from objutils.pecoff import PeParser
-    
+
     # PeParser automatically attempts PDB loading
     pe = PeParser("kernel32.dll", pdb_path=["C:\\Symbols"])
-    
+
     # Symbols now include PDB data if found
     for sym in pe.symbols:
         print(f"{sym['name']}: {sym['value']:#x}")

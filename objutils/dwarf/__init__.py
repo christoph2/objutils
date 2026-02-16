@@ -41,17 +41,17 @@ Usage Example:
     ```python
     from objutils.elf import model
     from objutils.dwarf import DwarfProcessor
-    
+
     # Load ELF file
     elf = model.Elf("firmware.elf", verbose=False)
-    
+
     # Parse DWARF debug information
     dwarf = DwarfProcessor.from_elf(elf)
-    
+
     # Access compilation units
     for cu in dwarf.compilation_units:
         print(f"CU: {cu.name} (offset: {cu.offset:#x})")
-        
+
         # Traverse DIE tree
         for die in cu.dies:
             if die.tag == "DW_TAG_variable":
@@ -64,13 +64,13 @@ Advanced Usage:
     ```python
     # Find specific DIEs by tag
     functions = dwarf.find_dies_by_tag("DW_TAG_subprogram")
-    
+
     # Resolve type references
     for func in functions:
         return_type_ref = func.get_attribute("DW_AT_type")
         return_type_die = dwarf.resolve_die_reference(return_type_ref)
         print(f"{func.name} returns {return_type_die.name}")
-    
+
     # Evaluate location expressions
     var_location_expr = var_die.attributes["DW_AT_location"]
     readers = dwarf.readers
@@ -79,7 +79,7 @@ Advanced Usage:
 
 DIE Tree Structure:
     DWARF organizes debug information as a tree of Debug Information Entries:
-    
+
     ```
     DW_TAG_compile_unit (root)
       ├── DW_TAG_subprogram (function)
@@ -97,16 +97,16 @@ DIE Tree Structure:
 
 Abbreviation System:
     DIE structure is defined by abbreviation codes to save space:
-    
+
     - **Abbrev Code**: Identifies the DIE's schema (tag + attributes)
     - **Abbreviation Table**: Maps codes to (tag, has_children, attribute_list)
     - Each compilation unit references its own abbreviation table
-    
+
     This allows compact encoding: DIE stores abbrev code + attribute values only.
 
 Location Expressions:
     DWARF uses expressions to describe variable locations dynamically:
-    
+
     - Stack-based bytecode evaluated at runtime
     - Operations: DW_OP_addr, DW_OP_breg*, DW_OP_plus_uconst, etc.
     - Used for: Variables, struct members, array elements
@@ -114,7 +114,7 @@ Location Expressions:
 
 Type System:
     DWARF represents C/C++ types as DIEs:
-    
+
     - **Base types**: DW_TAG_base_type (int, float, char)
     - **Pointer types**: DW_TAG_pointer_type
     - **Array types**: DW_TAG_array_type + DW_TAG_subrange_type
@@ -124,7 +124,7 @@ Type System:
 
 Data Classes:
     The module uses dataclasses for clean data representation:
-    
+
     - **@dataclass Attribute**: Single attribute definition
     - **@dataclass Abbrevation**: DIE schema (tag + attributes)
     - **@dataclass DIEAttribute**: Attribute with parsed value
