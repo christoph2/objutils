@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 
 from objutils.dwarf.c_generator import CGenerator, RenderOptions
 from objutils.elf import model

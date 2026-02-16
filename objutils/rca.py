@@ -43,6 +43,7 @@ from typing import Any, Optional
 
 import objutils.hexfile as hexfile
 
+
 # Record type identifiers
 DATA = 1
 EOF = 2

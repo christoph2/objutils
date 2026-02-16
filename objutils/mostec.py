@@ -43,6 +43,7 @@ import objutils.checksums as checksums
 import objutils.hexfile as hexfile
 import objutils.utils as utils
 
+
 # Record type identifiers
 DATA = 1
 EOF = 2
@@ -70,9 +71,7 @@ class Reader(hexfile.Reader):
         if format_type == DATA:
             # Verify length matches actual data
             if line.length != len(line.chunk):
-                raise hexfile.InvalidRecordLengthError(
-                    "Byte count doesn't match length of actual data."
-                )
+                raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
             # Verify checksum (16-bit LRC of address + length + data)
             checksum = checksums.lrc(
@@ -81,10 +80,7 @@ class Reader(hexfile.Reader):
                 checksums.COMPLEMENT_NONE,
             )
             if line.checksum != checksum:
-                raise hexfile.InvalidRecordChecksumError(
-                    f"Checksum mismatch: expected {checksum:04X}, "
-                    f"got {line.checksum:04X}"
-                )
+                raise hexfile.InvalidRecordChecksumError(f"Checksum mismatch: expected {checksum:04X}, " f"got {line.checksum:04X}")
 
     def is_data_line(self, line: Any, format_type: int) -> bool:
         """Determine if record contains data.

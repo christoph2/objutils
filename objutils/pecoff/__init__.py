@@ -6,12 +6,12 @@ dynamic libraries (.dll), and object files (.obj).
 
 Overview:
     The PE/COFF parser extracts:
-    
+
     - **Headers**: DOS stub, COFF header, Optional header (PE32/PE32+)
     - **Sections**: Code (.text), data (.data), resources (.rsrc), etc.
     - **Symbols**: From COFF symbol table or PDB debug info
     - **Image creation**: Convert sections to objutils.Image for analysis
-    
+
     ```
     PE File Structure:
     ┌──────────────────┐
@@ -38,34 +38,34 @@ Architecture:
     **Two-Phase Parsing**:
     1. Validation: Check DOS/PE signatures
     2. Parsing: Extract headers, sections, symbols
-    
+
     **Memory-Mapped I/O**: For efficient access to large PE files
-    
+
     **SQLAlchemy Integration**: Optional database storage via model.Model
-    
+
     **PDB Support**: Automatic debug symbol loading (Windows only)
 
 Usage Examples:
     **Basic Parsing**:
     ```python
     from objutils.pecoff import PeParser
-    
+
     # Parse Windows executable
     pe = PeParser("C:\\Windows\\System32\\kernel32.dll")
-    
+
     # Access headers
     print(f"Machine: {pe.machine():#x}")
     print(f"Image base: {pe.image_base():#x}")
     print(f"Sections: {len(pe.sections)}")
     print(f"Symbols: {len(pe.symbols)}")
-    
+
     # Enumerate sections
     for section in pe.sections:
         print(f"{section['name']:8s} @ {section['virtual_address']:#010x}")
-    
+
     pe.close()
     ```
-    
+
     **Image Creation**:
     ```python
     # Convert PE sections to objutils.Image
@@ -73,16 +73,16 @@ Usage Examples:
         add_image_base=True,  # Use absolute addresses
         include_pattern=".text"  # Only code section
     )
-    
+
     # Access binary data
     code = img.read(0x401000, 100)  # Read 100 bytes at address
     ```
-    
+
     **With PDB Symbols**:
     ```python
     # Parse with PDB debug symbols (Windows only)
     pe = PeParser("app.exe", pdb_path=[".", "C:\\Symbols"])
-    
+
     # Symbols now include PDB data if found
     for sym in pe.symbols:
         print(f"{sym['name']}: {sym['value']:#x}")
@@ -90,10 +90,10 @@ Usage Examples:
 
 PE32 vs PE32+:
     The parser automatically detects 32-bit vs 64-bit executables:
-    
+
     - **PE32** (32-bit): Magic 0x10B, 32-bit image_base
     - **PE32+** (64-bit): Magic 0x20B, 64-bit image_base
-    
+
     Key differences:
     - Image base size: 4 bytes vs 8 bytes
     - Pointer size: 32-bit vs 64-bit
@@ -101,7 +101,7 @@ PE32 vs PE32+:
 
 Construct Structures:
     Binary parsing uses the `construct` library with these structures:
-    
+
     - **CoffHeader**: Machine, section count, timestamp, characteristics
     - **OptionalHeaderPe32**: 32-bit entry point, image base, alignments
     - **OptionalHeaderPe32Plus**: 64-bit variant
@@ -114,7 +114,7 @@ Integration:
     img = pe.create_image()
     objutils.dump("ihex", "firmware.hex", img)
     ```
-    
+
     **With ORM models**:
     ```python
     pe.create_db_on_demand()

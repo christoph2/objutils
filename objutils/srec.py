@@ -84,6 +84,7 @@ class Reader(hexfile.Reader):
     16-bit, 24-bit, and 32-bit address modes. Also supports optional symbol
     table parsing.
     """
+
     FORMAT_SPEC = (
         (S0, "S0LLAAAADDCC"),
         (S1, "S1LLAAAADDCC"),
@@ -233,6 +234,7 @@ class Writer(hexfile.Writer):
     address range. Supports optional S5 record count and start address
     termination records.
     """
+
     record_type: Optional[int] = None
     s5record: bool = False
     start_address: Optional[int] = None

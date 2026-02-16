@@ -39,6 +39,7 @@ from typing import Any, BinaryIO
 
 import objutils.hexfile as hexfile
 
+
 # Record type identifiers (Intel HEX compatible)
 DATA = 0
 EOF = 1
@@ -102,17 +103,12 @@ class Reader(hexfile.Reader):
         """
         # Verify length matches actual data
         if line.length != len(line.chunk):
-            raise hexfile.InvalidRecordLengthError(
-                "Byte count doesn't match length of actual data."
-            )
+            raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
         # Verify checksum (16-bit sum of data bytes)
         checksum = sum(line.chunk) & 0xFFFF
         if line.checksum != checksum:
-            raise hexfile.InvalidRecordChecksumError(
-                f"Checksum mismatch: expected {checksum:04X}, "
-                f"got {line.checksum:04X}"
-            )
+            raise hexfile.InvalidRecordChecksumError(f"Checksum mismatch: expected {checksum:04X}, " f"got {line.checksum:04X}")
 
     def is_data_line(self, line: Any, format_type: int) -> bool:
         """Determine if record contains data.

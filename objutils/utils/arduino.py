@@ -9,6 +9,7 @@ import hashlib
 import tempfile
 from pathlib import Path
 
+
 # Arduino cache directory locations (Windows)
 ARDUINO_TEMP_BASE_A = Path(tempfile.gettempdir()) / "arduino" / "sketches"
 ARDUINO_TEMP_BASE_B = Path(Path.home()) / "AppData" / "Local" / "arduino" / "sketches"
@@ -83,11 +84,7 @@ def build_artifacts(sketch_name: str) -> dict[str, Path]:
     result["DIRECTORY"] = sketch_dir
 
     # Find build artifacts (exclude bootloader variants)
-    artifacts = [
-        f
-        for f in sketch_dir.iterdir()
-        if not f.is_dir() and f.suffix in SUFFIXES and "with_bootloader" not in f.name
-    ]
+    artifacts = [f for f in sketch_dir.iterdir() if not f.is_dir() and f.suffix in SUFFIXES and "with_bootloader" not in f.name]
 
     for artifact in artifacts:
         # Map extension to uppercase key (e.g., ".hex" -> "HEX")
