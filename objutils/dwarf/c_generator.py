@@ -372,6 +372,19 @@ class CGenerator:
                     return a.raw_value
         return None
 
+    def _coerce_type_node(self, t: Any) -> tuple[str | None, dict[str, Any], list[Any]]:
+        """Normalize a parsed type node (dict or DIE) into (tag, attrs, children)."""
+        if isinstance(t, dict):
+            tag = t.get("tag", "<type>")
+            attrs = t.get("attrs", {}) if isinstance(t.get("attrs"), dict) else {}
+            children = t.get("children", []) or []
+            return tag, attrs, children
+        if hasattr(t, "tag") and hasattr(t, "attributes") and hasattr(t, "children"):
+            attrs = t.attributes if isinstance(t.attributes, dict) else {}
+            children = t.children or []
+            return t.tag, attrs, children
+        return None, {}, []
+
     def _render_type(self, t: Any) -> str:
         """Render a C-like type string from parsed type tree.
 
@@ -392,12 +405,9 @@ class CGenerator:
             # "const int *" or "struct point" or "uint32_t[10]"
             ```
         """
-        # Non-dict markers like CircularReference
-        if not isinstance(t, dict):
+        tag, attrs, children = self._coerce_type_node(t)
+        if tag is None:
             return getattr(t, "name", getattr(t, "tag", "<type>"))
-
-        tag = t.get("tag", "<type>")
-        attrs = t.get("attrs", {}) if isinstance(t.get("attrs"), dict) else {}
         name = attrs.get("name")
 
         # Named simple types
@@ -433,9 +443,10 @@ class CGenerator:
             elem_s = self._render_type(elem) if elem is not None else "<elem>"
             # Collect dimensions from subrange_type children using count/upper_bound-lower_bound+1
             dims: list[str] = []
-            for ch in t.get("children", []) or []:
-                if ch.get("tag") == "subrange_type":
-                    a = ch.get("attrs") or {}
+            for ch in children:
+                ctag, cattrs, _ = self._coerce_type_node(ch)
+                if ctag == "subrange_type":
+                    a = cattrs or {}
                     count = a.get("count")
                     ub = a.get("upper_bound")
                     lb = a.get("lower_bound")
@@ -489,21 +500,19 @@ class CGenerator:
         Note:
             This separation allows proper C syntax: `type_head name array_suffix;`
         """
-        # Non-dict markers
-        if not isinstance(t, dict):
+        tag, attrs, children = self._coerce_type_node(t)
+        if tag is None:
             return (getattr(t, "name", getattr(t, "tag", "<type>")), "")
-
-        tag = t.get("tag", "<type>")
-        attrs = t.get("attrs", {}) if isinstance(t.get("attrs"), dict) else {}
 
         if tag == "array_type":
             # Split inner first, then add dimensions to suffix
             inner = attrs.get("type")
             head, suffix = self._render_head_suffix(inner) if inner is not None else ("<elem>", "")
             dims: list[str] = []
-            for ch in t.get("children", []) or []:
-                if ch.get("tag") == "subrange_type":
-                    a = ch.get("attrs") or {}
+            for ch in children:
+                ctag, cattrs, _ = self._coerce_type_node(ch)
+                if ctag == "subrange_type":
+                    a = cattrs or {}
                     count = a.get("count")
                     ub = a.get("upper_bound")
                     lb = a.get("lower_bound")
