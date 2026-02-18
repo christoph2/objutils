@@ -22,18 +22,22 @@ Installation
 
    pip install objutils
 
-or run
+For development (editable install):
 
 .. code-block:: shell
 
-   python setup.py develop
+   pip install -e .
 
-on your local installation.
+Or with Poetry:
+
+.. code-block:: shell
+
+   poetry install
 
 Prerequisites
 -------------
 
-- Python >= 3.4
+- Python >= 3.9
 
 Features
 --------

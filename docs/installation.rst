@@ -4,7 +4,7 @@ Installation and Getting Started
 Supported Python and platforms
 ------------------------------
 
-- Python >= 3.4 (CPython; PyPy not tested)
+- Python >= 3.9 (CPython; PyPy not tested)
 - Cross-platform; no OS-specific restrictions
 
 Install
@@ -20,7 +20,13 @@ For development (editable install):
 
 .. code-block:: shell
 
-   python setup.py develop
+   pip install -e .
+
+Or with Poetry:
+
+.. code-block:: shell
+
+   poetry install
 
 Quick verification
 ------------------
