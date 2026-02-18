@@ -121,6 +121,27 @@ For example:
     HEX image written to: 'sample_proj.srec' [51084 total bytes]
 
 
+oj_elf_import
+-------------
+
+Import DWARF sections from an ELF into a ``.prgdb`` SQLite database.
+
+.. code-block:: shell
+
+    oj-elf-import path\to\program.elf
+    oj-elf-import path\to\program.elf --out program.prgdb --force
+
+
+oj_cgen
+-------
+
+Generate C/C++ declarations from a ``.prgdb`` database using DWARF DIEs.
+
+.. code-block:: shell
+
+    oj-cgen program.prgdb --out generated.h
+    oj-cgen program.prgdb --start 0x14182 --no-guard
+
 
 oj_elf_info
 -----------
@@ -259,6 +280,49 @@ If you also want to see the contents, add *-d* option:
     ---------------
            16 bytes
     ---------------
+
+oj_coff_info
+------------
+
+Display information about PE/COFF files (EXE/DLL/OBJ), optionally with PDB symbols.
+
+.. code-block:: shell
+
+    oj-coff-info app.exe
+    oj-coff-info app.exe --pdb app.pdb
+
+
+oj_coff_syms
+------------
+
+List symbols contained in a PE/COFF file (COFF table or PDB if available).
+
+.. code-block:: shell
+
+    oj-coff-syms app.exe
+    oj-coff-syms app.exe --pattern printf --order-by N
+
+
+oj_coff_extract
+---------------
+
+Extract sections contributing to the program image from a PE/COFF file.
+
+.. code-block:: shell
+
+    oj-coff-extract app.exe app.srec -t srec
+    oj-coff-extract app.exe app.hex -t ihex -j
+
+
+oj_coff_import
+--------------
+
+Import PE/COFF header, sections, and symbols into a ``.pedb`` SQLite database.
+
+.. code-block:: shell
+
+    oj-coff-import app.exe
+    oj-coff-import app.exe --out app.pedb --force
 
 arduino_build_artifacts
 -----------------------

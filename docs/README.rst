@@ -38,8 +38,9 @@ Prerequisites
 Features
 --------
 
-- ELF files could read, including symbols.
-- Typified access (scalar and arrays) to binaray data.
+- Read ELF files (including symbols) and extract loadable sections.
+- Inspect PE/COFF files and symbols (optional PDB support).
+- Typed access (scalars, arrays, strings) to binary data.
 
 Supported HEX formats
 ^^^^^^^^^^^^^^^^^^^^^
