@@ -5,11 +5,11 @@ Readme
 .. image:: https://github.com/christoph2/objutils/raw/master/docs/objutils_banner.png
     :align: center
 
-|PyPI| |Python Versions| |License: LGPL v3+| |Code style: black|
+|PyPI| |Python Versions| |License: GPLv2| |Code style: black|
 
 
 Binary data stored in hex-files is in widespread use especially in embedded systems applications.
-``objutils`` gives you programmatic access to a wide array of formats and offers an practical API
+``objutils`` gives you programmatic access to a wide array of formats and offers a practical API
 to work with such data.
 
 Get the latest version from `Github <https://github.com/christoph2/objutils>`_
@@ -373,7 +373,7 @@ If you contribute code to this project, you are implicitly allowing your code to
    :target: https://pypi.org/project/objutils/
 .. |Python Versions| image:: https://img.shields.io/pypi/pyversions/objutils.svg
    :target: https://pypi.org/project/objutils/
-.. |License: LGPL v3+| image:: https://img.shields.io/badge/License-LGPL%20v3%2B-blue.svg
-   :target: https://www.gnu.org/licenses/lgpl-3.0
+.. |License: GPLv2| image:: https://img.shields.io/badge/License-GPL%20v2-blue.svg
+   :target: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 .. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
