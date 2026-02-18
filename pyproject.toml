@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.8.9"
+version = "0.8.10"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
@@ -117,7 +117,7 @@ skip = ["*-manylinux_i686", "*-musllinux_x86_64", "*-musllinux_i686"] # Skip Lin
 build-frontend = "build"
 
 [tool.bumpver]
-current_version = "0.8.9"
+current_version = "0.8.10"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
