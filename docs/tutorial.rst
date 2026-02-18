@@ -4,7 +4,7 @@ Tutorial
 This tutorial walks you through the basics of working with objutils: creating sections and images,
 converting between HEX formats, controlling join behavior, and using typed access helpers.
 
-If you prefer a notebook, also see tutorial1.ipynb in the repository root (can be viewed on GitHub).
+If you prefer runnable examples, see the scripts and examples in the repository.
 
 Prerequisites
 -------------
