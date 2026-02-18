@@ -191,6 +191,7 @@ from collections import OrderedDict
 from collections.abc import Iterator
 from typing import Any, NamedTuple
 
+from objutils.hexfile import ReaderProtocol, WriterProtocol
 from objutils.utils import SingletonBase
 
 
@@ -261,8 +262,8 @@ class Codec(NamedTuple):
         writer = codec.Writer()
     """
 
-    Reader: type[Any]
-    Writer: type[Any]
+    Reader: type[ReaderProtocol]
+    Writer: type[WriterProtocol]
     description: str
 
 
