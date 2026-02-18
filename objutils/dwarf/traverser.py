@@ -608,8 +608,14 @@ class AttributeParser:
         else:
             debug_line_str = b""
         elf_header = self.session.query(model.Elf_Header).first()
-        address_size = elf_header.address_size
-        endianess = Endianess.Little if elf_header.endianess == defs.ELFDataEncoding.ELFDATA2LSB else Endianess.Big
+        if elf_header is None:
+            address_size = 4
+            endianess = Endianess.Little
+            is_64bit = False
+        else:
+            address_size = elf_header.address_size
+            endianess = Endianess.Little if elf_header.endianess == defs.ELFDataEncoding.ELFDATA2LSB else Endianess.Big
+            is_64bit = elf_header.is_64bit
         factory = DwarfReaders(
             endianess=endianess,
             address_size=address_size,
@@ -618,7 +624,7 @@ class AttributeParser:
         )
         # BaseTypeEncoding
         self.endianess = endianess
-        self.is_64bit = elf_header.is_64bit
+        self.is_64bit = is_64bit
         self.readers = factory.readers
         postfix = "_le" if (endianess == Endianess.Little) else "_be"
         self.stack_machine = factory.stack_machine
