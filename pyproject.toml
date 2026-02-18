@@ -43,6 +43,16 @@ keywords=[
 ]
 build = "build_ext.py"
 
+include = [
+    { path = "objutils/*.so", format = "wheel" },
+    { path = "objutils/*.pyd", format = "wheel" },
+
+    { path = "CMakeLists.txt", format = "sdist" },
+
+	{ path = "objutils/extensions/*hpp", format = "sdist" },
+	{ path = "objutils/extensions/*cpp", format = "sdist" },
+]
+
 [tool.poetry.scripts]
 oj-elf-info = "objutils.scripts.oj_elf_info:main"
 oj-elf-syms = "objutils.scripts.oj_elf_syms:main"
