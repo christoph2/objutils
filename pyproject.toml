@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objutils"
-version = "0.8.10"
+version = "0.8.11"
 description = "Objectfile library for Python"
 authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
 license = "GPLv2"
@@ -109,15 +109,13 @@ include = '\.pyi?$'
 
 
 [tool.cibuildwheel]
-build = "cp3{9,10,11,12,13}-*"
 build-verbosity = 3
-#test-command = "pytest {package}/tests"
-#test-command = "pytest -svv objutils/tests"
-skip = ["*-manylinux_i686", "*-musllinux_x86_64", "*-musllinux_i686"] # Skip Linux 32bit and MUSL builds.
+build = "cp3{9, 10,11,12,13,14}-*"
+skip = ["*_i686", "*-musllinux*"]
 build-frontend = "build"
 
 [tool.bumpver]
-current_version = "0.8.10"
+current_version = "0.8.11"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
