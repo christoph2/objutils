@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Base Classes for Hex File Format Readers and Writers.
 
-This module provides the abstract base classes and infrastructure for all hex file
+This module provides the base classes and protocols for all hex file
 format parsers in objutils. It defines a consistent API that all format-specific
 readers and writers (Intel HEX, Motorola S-Records, TI-TXT, etc.) must implement.
 
@@ -11,8 +11,8 @@ The objutils library supports 13+ different hex file formats used in embedded sy
 development. Rather than implementing each parser from scratch, all formats share
 common infrastructure:
 
-- **Reader ABC**: Abstract base for parsing hex files into Image objects
-- **Writer ABC**: Abstract base for generating hex files from Image objects
+- **Reader Base**: Base class for parsing hex files into Image objects
+- **Writer Base**: Base class for generating hex files from Image objects
 - **FormatParser**: Regex-based line parser using format specification strings
 - **Checksum utilities**: Common checksum algorithms (sum, XOR, CRC)
 - **Exception hierarchy**: Consistent error handling across formats
@@ -27,7 +27,7 @@ Architecture
 ------------
 ::
 
-    Reader (ABC)                    Writer (ABC)
+    Reader (Base)                   Writer (Base)
     ├── FORMAT_SPEC                 ├── FORMAT_SPEC
     ├── loads(data) → Image         ├── dumps(img) → str
     ├── load(fp) → Image            ├── dump(img, fp)
@@ -249,7 +249,7 @@ See Also
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2025 by Christoph Schueler <cpu12.gems@googlemail.com>
+   (C) 2010-2026 by Christoph Schueler <cpu12.gems@googlemail.com>
 
    All Rights Reserved
 
@@ -270,14 +270,13 @@ __copyright__ = """
 
 import math
 import re
-from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, BinaryIO, Optional, Union
+from typing import Any, BinaryIO, Optional, Protocol, Union
 
 from objutils.image import Image
 from objutils.logger import Logger
@@ -543,13 +542,67 @@ class BaseType:
         self.logger.debug(msg)
 
 
+class ReaderProtocol(Protocol):
+    """PEP-544 protocol for Reader implementations."""
+
+    logger: Logger
+    stats: "Statistics"
+    valid: bool
+    formats: list[tuple[int, re.Pattern]]
+
+    def load(self, fp: Union[str, Path, BinaryIO], **kws: Any) -> Image: ...
+
+    def loads(self, image: Union[str, bytes, bytearray], **kws: Any) -> Image: ...
+
+    def read(self, fp: BinaryIO) -> Image: ...
+
+    def probe(self, fp: BinaryIO, **kws: Any) -> bool: ...
+
+    def probes(self, image: Union[str, bytes, bytearray]) -> bool: ...
+
+    def check_line(self, line: Any, format_type: int) -> None: ...
+
+    def is_data_line(self, line: Any, format_type: int) -> bool: ...
+
+    def classifyLine(self, line: Any) -> int: ...
+
+    def special_processing(self, line: Any, format_type: int) -> None: ...
+
+    def parseData(self, line: Any, format_type: int) -> bool: ...
+
+
+class WriterProtocol(Protocol):
+    """PEP-544 protocol for Writer implementations."""
+
+    logger: Logger
+    valid: bool
+
+    def dump(self, fp: Union[str, Path, BinaryIO], image: Image, row_length: int = 16, **kws: Any) -> None: ...
+
+    def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> str: ...
+
+    def calculate_address_bits(self, image: Image) -> int: ...
+
+    def post_processing(self, data: bytes) -> bytes: ...
+
+    def pre_processing(self, image: Image) -> None: ...
+
+    def set_parameters(self, **kws: Any) -> None: ...
+
+    def compose_row(self, address: int, length: int, row: Sequence[int]) -> str: ...
+
+    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]: ...
+
+    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]: ...
+
+
 # ============================================================================
-# Abstract Reader Base Class
+# Reader Base Class
 # ============================================================================
 
 
-class Reader(BaseType, ABC):
-    """Abstract base class for hex file format readers.
+class Reader(BaseType):
+    """Base class for hex file format readers.
 
     The Reader class provides the framework for parsing hex file formats into Image
     objects. All format-specific readers (Intel HEX, Motorola S-Records, TI-TXT, etc.)
@@ -922,9 +975,8 @@ class Reader(BaseType, ABC):
             buffer = create_string_buffer(image)
         return self.probe(buffer)
 
-    # Abstract methods that subclasses must implement
+    # Methods that subclasses must implement
 
-    @abstractmethod
     def check_line(self, line: Any, format_type: int) -> None:
         """Validate record format and checksums.
 
@@ -938,7 +990,6 @@ class Reader(BaseType, ABC):
         """
         raise NotImplementedError("Subclasses must implement check_line()")
 
-    @abstractmethod
     def is_data_line(self, line: Any, format_type: int) -> bool:
         """Determine if line contains data vs metadata.
 
@@ -985,12 +1036,12 @@ class Reader(BaseType, ABC):
 
 
 # ============================================================================
-# Abstract Writer Base Class
+# Writer Base Class
 # ============================================================================
 
 
-class Writer(BaseType, ABC):
-    """Abstract base class for hex file format writers.
+class Writer(BaseType):
+    """Base class for hex file format writers.
 
     The Writer class provides the framework for generating hex file formats from Image
     objects. All format-specific writers (Intel HEX, Motorola S-Records, TI-TXT, etc.)
@@ -1338,9 +1389,8 @@ class Writer(BaseType, ABC):
             else:
                 setattr(self, k, v)
 
-    # Abstract methods that subclasses must implement
+    # Methods that subclasses must implement
 
-    @abstractmethod
     def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
         """Compose single data row.
 
