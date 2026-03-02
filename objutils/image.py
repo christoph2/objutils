@@ -271,9 +271,9 @@ __copyright__ = """
 import enum
 import sys
 from bisect import bisect_right
+from collections.abc import Iterable
 from operator import attrgetter, eq
 from typing import Any, Optional, Protocol, Union
-from collections.abc import Iterable
 
 from objutils.exceptions import InvalidAddressError
 from objutils.section import Section, join_sections
