@@ -60,6 +60,14 @@ def main():
         default=False,
         help="hexdump contents",
     )
+    parser.add_argument(
+        "-p",
+        "--print-filename",
+        dest="print_filename",
+        action="store_true",
+        default=False,
+        help="Print filename including path",
+    )
 
     args = parser.parse_args()
 
@@ -69,6 +77,8 @@ def main():
 
     img = load(args.file_type.lower(), args.hex_file)
     # print(img.meta)
+    if args.print_filename:
+        print(f"\nFile: {args.hex_file}")
     print("\nSections")
     print("--------\n")
     print("Num   Address    Length")
