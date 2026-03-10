@@ -68,6 +68,14 @@ def main():
         default=False,
         help="Print filename including path",
     )
+    parser.add_argument(
+        "-j",
+        "--join-sections",
+        dest="join_section",
+        action="store_true",
+        default=False,
+        help="Join adjacent sections",
+    )
 
     args = parser.parse_args()
 
@@ -76,9 +84,10 @@ def main():
         sys.exit(1)
 
     img = load(args.file_type.lower(), args.hex_file)
-    # print(img.meta)
     if args.print_filename:
         print(f"\nFile: {args.hex_file}")
+    if args.join_section:
+        img.join_sections()
     print("\nSections")
     print("--------\n")
     print("Num   Address    Length")
