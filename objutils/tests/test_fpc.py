@@ -5,7 +5,6 @@ import pytest
 
 from objutils import dumps, loads, probes
 
-
 # for key, value in sorted(registry.registry().items()):
 #    print("{0:10} {1}".format(key, value.description))
 

@@ -47,7 +47,6 @@ from objutils import checksums
 from objutils.image import Image
 from objutils.utils import create_string_buffer, slicer
 
-
 DATA_ABS = 1
 DATA_INC = 2
 DATA_REL = 3

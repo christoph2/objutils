@@ -3,7 +3,6 @@ import unittest
 
 from objutils import dumps, loads
 
-
 EMON52 = b"""10 0000:57 6F 77 21 20 44 69 64 20 79 6F 75 20 72 65 61 0564
 10 0010:6C 6C 79 20 67 6F 20 74 68 72 6F 75 67 68 20 61 05E9
 10 0020:6C 6C 20 74 68 69 73 20 74 72 6F 75 62 6C 65 20 05ED

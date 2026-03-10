@@ -94,7 +94,7 @@ class CanonicalDumper(Dumper):
         if ints:
             print("%02x " * len(ints) % unpack(*ints), file=self._fp, end=" ")
         else:
-            print("", file=self._fp, end="")
+            print(" ", file=self._fp, end="")
         if len(ints) < self.LINE_LENGTH:
             spaces = "   " * (self.LINE_LENGTH - len(ints))
             print(spaces, file=self._fp, end="")

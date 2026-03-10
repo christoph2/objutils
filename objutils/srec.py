@@ -57,7 +57,6 @@ import objutils.utils as utils
 from objutils.checksums import COMPLEMENT_ONES, lrc
 from objutils.utils import make_list
 
-
 # Record type identifiers
 S0 = 1
 S1 = 2

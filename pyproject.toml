@@ -60,6 +60,7 @@ oj-hex-info = "objutils.scripts.oj_hex_info:main"
 oj-elf-arm-attrs = "objutils.scripts.oj_elf_arm_attrs:main"
 oj-elf-extract = "objutils.scripts.oj_elf_extract:main"
 oj-elf-import = "objutils.scripts.oj_elf_import:main"
+oj-dwarf-import = "objutils.scripts.oj_dwarf_import:main"
 oj-coff-info = "objutils.scripts.oj_coff_info:main"
 oj-coff-syms = "objutils.scripts.oj_coff_syms:main"
 oj-coff-extract = "objutils.scripts.oj_coff_extract:main"
@@ -81,7 +82,6 @@ bumpver = "^2023.1129"
 pre-commit = "^3.7.0"
 pytest = "^8.1.1"
 black = "^24.10.0"
-isort = "^5.13.2"
 ruff = "^0.6.9"
 pyupgrade = "^3.17.0"
 bandit = "^1.7.10"
@@ -93,11 +93,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 addopts = "--verbose --tb=short --junitxml=result.xml -o junit_family=xunit2"
 testpaths = "objutils/tests"
-
-[tool.isort]
-profile = "black"
-force_single_line = false
-lines_after_imports = 2
 
 [tool.mypy]
 strict = false

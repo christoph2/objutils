@@ -35,7 +35,6 @@ import objutils.hexfile as hexfile
 import objutils.utils as utils
 from objutils.checksums import COMPLEMENT_TWOS, lrc
 
-
 # Record type identifiers
 DATA = 0
 EOF = 1

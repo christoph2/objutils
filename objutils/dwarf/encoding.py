@@ -41,7 +41,6 @@ from enum import IntEnum
 from construct import Int8ul, Int16ub, Int16ul, Int32ub, Int32ul, Int64ub, Int64ul
 from construct.core import Bytes, Construct, ConstructError, CString, singleton
 
-
 # from objutils.dwarf.lineprog import Line
 
 NULL_CHAR: bytes = b"\x00"
@@ -118,7 +117,7 @@ class ULEB(Construct):
         while True:
             try:
                 bval = ord(stream.read(1))
-            except Exception as e:
+            except (AttributeError, OSError, TypeError, ValueError) as e:
                 raise ULEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             if bval & 0x80 == 0:
@@ -194,7 +193,7 @@ class SLEB(Construct):
         while True:
             try:
                 bval = ord(stream.read(1))
-            except Exception as e:
+            except (AttributeError, OSError, TypeError, ValueError) as e:
                 raise SLEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             shift += 7

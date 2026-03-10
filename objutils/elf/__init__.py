@@ -284,12 +284,12 @@ from construct import (
     this,
 )
 from sqlalchemy import func, not_
+from sqlalchemy.exc import SQLAlchemyError
 
 from objutils import Image, Section
 from objutils.elf import defs, model
 from objutils.elf.arm import attributes
 from objutils.utils import create_memorymapped_fileview
-
 
 MAGIC: bytes = b"\x7fELF"
 
@@ -905,113 +905,6 @@ class ElfParser:
         ),
     )
 
-    def create_db_on_demand(self) -> None:
-        db_exists = self.db_name.exists()
-        new_db = False
-        hash_value = calculate_crypto_hash(self.fp.tobytes())
-        if db_exists:
-            db = model.Model(self.db_name)
-            session = db.session
-            meta = session.query(model.Meta).first()
-            if meta:
-                pass
-                # TODO: log.debug
-                # print(f"Calculated hash: {hash_value} DB-hash: {meta.hash_value} EQ: {hash_value == meta.hash_value}")
-            if (meta is None) or (hash_value != meta.hash_value):
-                new_db = True
-                try:
-                    db.close()
-                finally:
-                    try:
-                        os.unlink(self.db_name)
-                    except Exception as e:
-                        print(f"{e}")
-            else:
-                # Validate schema compatibility (e.g., required columns exist)
-                try:
-                    from sqlalchemy import inspect as sa_inspect
-
-                    inspector = sa_inspect(db.engine)
-                    try:
-                        die_cols = [c["name"] for c in inspector.get_columns("debuginformationentry")]
-                    except Exception:
-                        die_cols = []
-                    try:
-                        dieattr_cols = [c["name"] for c in inspector.get_columns("dieattribute")]
-                    except Exception:
-                        dieattr_cols = []
-                    required_die_cols = {"tag", "offset", "parent_id"}
-                    required_dieattr_cols = {"entry_id"}
-                    if (not required_die_cols.issubset(set(die_cols))) or (not required_dieattr_cols.issubset(set(dieattr_cols))):
-                        # Invalidate outdated schema: rebuild database
-                        new_db = True
-                        try:
-                            db.close()
-                        finally:
-                            try:
-                                os.unlink(self.db_name)
-                            except Exception as e:
-                                print(f"{e}")
-                    else:
-                        # Close the preliminary connection before opening the main one to avoid file locking.
-                        db.close()
-                except Exception:
-                    # If inspection fails for any reason, rebuild to be safe
-                    new_db = True
-                    try:
-                        db.close()
-                    finally:
-                        try:
-                            os.unlink(self.db_name)
-                        except Exception as e:
-                            print(f"{e}")
-        else:
-            new_db = True
-        self.db = model.Model(self.db_name)
-        self.session = self.db.session
-        if new_db:
-            meta = model.Meta(hash_value=hash_value)
-            self.session.add(meta)
-            self.load_data()
-        else:
-            self._header = self.session.query(model.Elf_Header).first()
-            self._program_headers = self.session.query(model.Elf_ProgramHeaders).all()
-            self.set_data_types(self)
-
-    def load_data(self):
-        basic_header = ElfParser.BasicHeader.parse(self.fp)
-        bh_fields = basic_header.header.fields
-        self.set_data_types(bh_fields)
-        eh_fields = self._parser_extended_header()
-
-        self._header = model.Elf_Header(
-            ei_class=bh_fields.ei_class,
-            ei_data=bh_fields.ei_data,
-            ei_version=bh_fields.ei_version,
-            ei_osabi=bh_fields.ei_osabi,
-            ei_abiversion=bh_fields.ei_abiversion,
-            e_type=eh_fields.e_type,
-            e_machine=eh_fields.e_machine,
-            e_version=eh_fields.e_version,
-            e_entry=eh_fields.e_entry,
-            e_phoff=eh_fields.e_phoff,
-            e_shoff=eh_fields.e_shoff,
-            e_flags=eh_fields.e_flags,
-            e_ehsize=eh_fields.e_ehsize,
-            e_phentsize=eh_fields.e_phentsize,
-            e_phnum=eh_fields.e_phnum,
-            e_shentsize=eh_fields.e_shentsize,
-            e_shnum=eh_fields.e_shnum,
-            e_shstrndx=eh_fields.e_shstrndx,
-        )
-        self.session.add(self._header)
-        self._parse_section_headers()
-        self._parse_program_headers()
-        self.create_section_to_segment_mapping()
-        for section in self._symbol_sections:
-            self._parse_symbol_section(section)
-        self.session.commit()
-
     def __init__(self, filename: str) -> None:
         """Initialize ElfParser with an ELF file.
 
@@ -1115,7 +1008,7 @@ class ElfParser:
                 finally:
                     try:
                         os.unlink(self.db_name)
-                    except Exception as e:
+                    except OSError as e:
                         print(f"{e}")
             else:
                 # Validate schema compatibility (e.g., required columns exist)
@@ -1125,11 +1018,11 @@ class ElfParser:
                     inspector = sa_inspect(db.engine)
                     try:
                         die_cols = [c["name"] for c in inspector.get_columns("debuginformationentry")]
-                    except Exception:
+                    except SQLAlchemyError:
                         die_cols = []
                     try:
                         dieattr_cols = [c["name"] for c in inspector.get_columns("dieattribute")]
-                    except Exception:
+                    except SQLAlchemyError:
                         dieattr_cols = []
                     required_die_cols = {"tag", "offset", "parent_id"}
                     required_dieattr_cols = {"entry_id"}
@@ -1141,12 +1034,12 @@ class ElfParser:
                         finally:
                             try:
                                 os.unlink(self.db_name)
-                            except Exception as e:
+                            except OSError as e:
                                 print(f"{e}")
                     else:
                         # Close the preliminary connection before opening the main one to avoid file locking.
                         db.close()
-                except Exception:
+                except (OSError, SQLAlchemyError):
                     # If inspection fails for any reason, rebuild to be safe
                     new_db = True
                     try:
@@ -1154,7 +1047,7 @@ class ElfParser:
                     finally:
                         try:
                             os.unlink(self.db_name)
-                        except Exception as e:
+                        except OSError as e:
                             print(f"{e}")
         else:
             new_db = True
@@ -1168,6 +1061,18 @@ class ElfParser:
             self._header = self.session.query(model.Elf_Header).first()
             self._program_headers = self.session.query(model.Elf_ProgramHeaders).all()
             self.set_data_types(self)
+
+    def close(self) -> None:
+        """Release database and file resources."""
+        db = getattr(self, "db", None)
+        if db is not None:
+            db.close()
+        fp = getattr(self, "fp", None)
+        if fp is not None and hasattr(fp, "release"):
+            try:
+                fp.release()
+            except BufferError:
+                pass
 
     def load_data(self) -> None:
         """Parse ELF file and populate database.
@@ -1573,7 +1478,7 @@ class ElfParser:
         try:
             self.session.bulk_save_objects(symbols)
             self.session.commit()
-        except Exception as e:
+        except SQLAlchemyError as e:
             self.session.rollback()
             print(f"{e}")
 
@@ -2527,21 +2432,21 @@ def import_dwarf_to_db(
             if default_db_path.exists():
                 try:
                     default_db_path.unlink()
-                except Exception:
+                except OSError:
                     pass
             if out_db:
                 outp = Path(out_db)
                 if outp.exists():
                     try:
                         outp.unlink()
-                    except Exception:
+                    except OSError:
                         pass
-    except Exception:
+    except OSError:
         pass
 
     try:
         ep = ElfParser(str(elf_p))
-    except Exception as e:
+    except (OSError, SQLAlchemyError, StreamError, ValueError) as e:
         _print(f"Failed to open ELF file '{elf_path}': {e}")
         return 2
 
@@ -2557,32 +2462,32 @@ def import_dwarf_to_db(
     if run_pubnames:
         try:
             dp.pubnames()
-        except Exception as e:
+        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
             if verbose:
                 _print(f"Warning: pubnames failed: {e}")
     if run_aranges:
         try:
             dp.aranges()
-        except Exception as e:
+        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
             if verbose:
                 _print(f"Warning: aranges failed: {e}")
     if run_lines:
         try:
             dp.do_lines()
-        except Exception as e:
+        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
             if verbose:
                 _print(f"Warning: do_lines failed: {e}")
 
     try:
         dp.do_dbg_info()
-    except Exception as e:
+    except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
         _print(f"Error while parsing .debug_info: {e}")
         return 3
 
     if run_mac:
         try:
             dp.do_mac_info()
-        except Exception as e:
+        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
             if verbose:
                 _print(f"Warning: do_mac_info failed: {e}")
 
@@ -2597,17 +2502,17 @@ def import_dwarf_to_db(
                 else:
                     try:
                         ep.db.close()
-                    except Exception:
+                    except SQLAlchemyError:
                         pass
                     import shutil as _shutil
 
                     _shutil.copyfile(str(src_db), str(dst_db))
-                    _print(f"Wrote database: {dst_db}")
+                _print(f"Wrote database: {dst_db}")
             else:
                 _print(f"Database available at: {src_db}")
         else:
             _print(f"Database available at: {default_db_path}")
-    except Exception as e:
+    except (OSError, SQLAlchemyError) as e:
         _print(f"Failed to write/copy database: {e}")
         return 4
 

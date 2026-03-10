@@ -17,7 +17,6 @@ import pytest
 
 from objutils.elf import ElfParser
 
-
 # Test data directory
 EXAMPLES_DIR = Path(__file__).parent.parent.parent / "examples"
 SAMPLE_ELF_FILES = [
@@ -36,7 +35,11 @@ def sample_elf_path():
 @pytest.fixture
 def parser(sample_elf_path):
     """Create ElfParser instance for testing."""
-    return ElfParser(str(sample_elf_path))
+    parser = ElfParser(str(sample_elf_path))
+    try:
+        yield parser
+    finally:
+        parser.close()
 
 
 class TestElfParserBasics:
@@ -45,7 +48,10 @@ class TestElfParserBasics:
     def test_parser_creation(self, sample_elf_path):
         """Test that ElfParser can be instantiated."""
         parser = ElfParser(str(sample_elf_path))
-        assert parser is not None
+        try:
+            assert parser is not None
+        finally:
+            parser.close()
 
     def test_parser_has_endianness(self, parser):
         """Test that parser determines endianness."""
@@ -156,13 +162,16 @@ class TestMultipleElfFiles:
             pytest.skip(f"Sample file {elf_file} not found")
 
         parser = ElfParser(str(elf_path))
-        assert parser is not None
-        # Check basic header properties work
-        assert hasattr(parser, "e_machine")
-        assert isinstance(parser.e_machine, int)
-        # Check sections API works
-        sections = parser.sections.fetch()
-        assert sections is not None
+        try:
+            assert parser is not None
+            # Check basic header properties work
+            assert hasattr(parser, "e_machine")
+            assert isinstance(parser.e_machine, int)
+            # Check sections API works
+            sections = parser.sections.fetch()
+            assert sections is not None
+        finally:
+            parser.close()
 
 
 class TestElfDefs:
@@ -236,7 +245,10 @@ class TestElfDatabase:
 
                 # Parse - should create test.elf.prgdb
                 parser = ElfParser(str(temp_elf))
-                assert parser is not None
+                try:
+                    assert parser is not None
+                finally:
+                    parser.close()
 
                 # Database file should exist
                 db_path = Path(str(temp_elf) + ".prgdb")

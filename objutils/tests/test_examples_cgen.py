@@ -22,9 +22,12 @@ def test_examples_cgen_run_on_prgdb_writes_output(tmp_path):
     # Build a small DB on disk
     db, cu = build_sample_db(str(db_path))
     try:
+        start_offset = cu.offset
+        # Release writer before running the helper to avoid SQLite locking.
+        db.close()
         out_path = tmp_path / "out.h"
         mod = _load_examples_cgen()
-        rc = mod.run_on_prgdb(str(db_path), start_offset=None, out=str(out_path))
+        rc = mod.run_on_prgdb(str(db_path), start_offset=start_offset, out=str(out_path))
         assert rc == 0
         assert out_path.exists()
         content = out_path.read_text(encoding="utf-8")

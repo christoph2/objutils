@@ -3,7 +3,6 @@ import unittest
 
 from objutils import dumps, loads
 
-
 TEST1 = b""" $A0000,
 7F D2 43 A6 7F F3 43 A6 3F C0 00 3F 3B DE 70 0C
 3B E0 00 01 93 FE 00 00 7F FA 02 A6 93 FE 00 04

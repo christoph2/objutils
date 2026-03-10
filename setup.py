@@ -2,7 +2,6 @@ import os
 
 from setuptools import find_packages, setup
 
-
 with open(os.path.join("objutils", "version.py")) as f:
     for line in f:
         if line.startswith("__version__"):
@@ -41,6 +40,7 @@ setup(
             "oj-hex-info = objutils.scripts.oj_hex_info:main",
             "oj-elf-arm-attrs = objutils.scripts.oj_elf_arm_attrs:main",
             "oj-elf-extract = objutils.scripts.oj_elf_extract:main",
+            "oj-dwarf-import = objutils.scripts.oj_dwarf_import:main",
             "oj-coff-info = objutils.scripts.oj_coff_info:main",
             "oj-coff-syms = objutils.scripts.oj_coff_syms:main",
             "oj-coff-extract = objutils.scripts.oj_coff_extract:main",

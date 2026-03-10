@@ -125,24 +125,14 @@ import re
 import sqlite3
 from typing import Any, Optional
 
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    and_,
-    create_engine,
-    event,
-    not_,
-    orm,
-    text,
-    types,
-)
+from sqlalchemy import Column, ForeignKey, and_, create_engine, event, not_, orm, text, types
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import Session, declarative_base, declared_attr, relationship
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
-
 
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
@@ -970,13 +960,13 @@ class DIEAttribute(Base, RidMixIn):
             # enum instance or int-like
             try:
                 return int(value)
-            except Exception:
+            except (TypeError, ValueError):
                 pass
             # string name
             from objutils.dwarf.constants import AttributeEncoding as AttrEnc
 
             return int(AttrEnc[str(value)])
-        except Exception:
+        except (AttributeError, KeyError, TypeError, ValueError):
             # Leave as-is if coercion fails; SQLite will accept, and map builder will handle
             return value
 
@@ -992,18 +982,18 @@ class DIEAttribute(Base, RidMixIn):
         """
         try:
             from objutils.dwarf.constants import AttributeEncoding as AttrEnc
-        except Exception:
+        except ImportError:
             AttrEnc = None
         v = getattr(self, "name", None)
         if isinstance(v, int) and AttrEnc is not None:
             try:
                 return AttrEnc(v).name
-            except Exception:
+            except (TypeError, ValueError):
                 return str(v)
         # enum-like or string
         try:
             return v.name  # enum
-        except Exception:
+        except AttributeError:
             return str(v)
 
 
@@ -1073,13 +1063,13 @@ class DebugInformationEntry(Base, RidMixIn):
             # enum instance or int-like
             try:
                 return int(value)
-            except Exception:
+            except (TypeError, ValueError):
                 pass
             # string name
             from objutils.dwarf.constants import Tag as DwarfTag
 
             return int(DwarfTag[str(value)])
-        except Exception:
+        except (AttributeError, KeyError, TypeError, ValueError):
             # Leave as-is if coercion fails; SQLite will accept, and abbrev mapping will handle
             return value
 
@@ -1107,18 +1097,18 @@ class DebugInformationEntry(Base, RidMixIn):
                 # Expose string tag name for consumer code even though DB stores int
                 try:
                     from objutils.dwarf.constants import Tag as DwarfTag
-                except Exception:
+                except ImportError:
                     DwarfTag = None
                 if isinstance(tag_value, int) and DwarfTag is not None:
                     try:
                         self.tag = DwarfTag(tag_value).name
-                    except Exception:
+                    except (TypeError, ValueError):
                         self.tag = str(tag_value)
                 else:
                     # already a string or enum-like; best effort string
                     try:
                         self.tag = tag_value.name  # enum
-                    except Exception:
+                    except AttributeError:
                         self.tag = str(tag_value)
 
             def __str__(self) -> str:
@@ -1158,11 +1148,11 @@ class DebugInformationEntry(Base, RidMixIn):
                 # Normalize attribute key to string even if stored as integer enum
                 try:
                     return a.encoding_name
-                except Exception:
+                except AttributeError:
                     v = getattr(a, "name", None)
                     try:
                         return v.name  # enum-like
-                    except Exception:
+                    except AttributeError:
                         return str(v)
 
             cache = {_attr_key(attr): attr for attr in (self.attributes or [])}
@@ -1352,12 +1342,12 @@ class Model:
             # Ensure debuginformationentry columns exist
             try:
                 die_cols = {c["name"] for c in inspector.get_columns("debuginformationentry")}
-            except Exception:
+            except SQLAlchemyError:
                 die_cols = set()
             # Ensure dieattribute columns exist
             try:
                 dia_cols = {c["name"] for c in inspector.get_columns("dieattribute")}
-            except Exception:
+            except SQLAlchemyError:
                 dia_cols = set()
             with self.engine.begin() as conn:
                 # --- Columns ---
@@ -1373,11 +1363,11 @@ class Model:
                 # --- Indexes ---
                 try:
                     die_indexes = {i.get("name") for i in inspector.get_indexes("debuginformationentry")}
-                except Exception:
+                except SQLAlchemyError:
                     die_indexes = set()
                 try:
                     dia_indexes = {i.get("name") for i in inspector.get_indexes("dieattribute")}
-                except Exception:
+                except SQLAlchemyError:
                     dia_indexes = set()
 
                 # Critical for traversal speed: lookups by DIE.offset
@@ -1397,7 +1387,7 @@ class Model:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_name ON dieattribute ("name")'))
                 if "idx_dia_form" not in dia_indexes and "form" in dia_cols:
                     conn.execute(text('CREATE INDEX IF NOT EXISTS idx_dia_form ON dieattribute ("form")'))
-        except Exception:
+        except SQLAlchemyError:
             # Be permissive: if inspection or ALTER fails, leave as-is.
             pass
 

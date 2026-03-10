@@ -18,7 +18,6 @@ from objutils.section import (
     filler,
 )
 
-
 try:
     import numpy as np
 except ImportError:

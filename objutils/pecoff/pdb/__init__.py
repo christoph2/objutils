@@ -176,14 +176,13 @@ from enum import IntEnum
 from functools import lru_cache
 from typing import Optional
 
-
 # DLLs
 try:
     dbghelp = ctypes.WinDLL("dbghelp")  # type: ignore[attr-defined]
     kernel32 = ctypes.WinDLL("kernel32")  # type: ignore[attr-defined]
     psapi = ctypes.WinDLL("psapi")
     _WINDOWS = True
-except Exception:  # pragma: no cover - non-Windows environment
+except OSError:  # pragma: no cover - non-Windows environment
     dbghelp = None  # type: ignore[assignment]
     kernel32 = None  # type: ignore[assignment]
     psapi = None
@@ -1046,7 +1045,7 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
         with PdbSession(symbol_path if not symbol_path else [symbol_path]) as session:
             mod_base = session.load_module(pe_path)
             return session.enum_symbols(mod_base, b"*")
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         print(f"Error: {str(e)}")
         return []  # Return an empty list in case of errors.
 

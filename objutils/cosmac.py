@@ -42,7 +42,6 @@ from typing import Any
 
 import objutils.hexfile as hexfile
 
-
 # Record type identifiers
 DATA0 = 1  # !MAAAA DD
 DATA1 = 2  # ?MAAAA DD

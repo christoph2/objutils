@@ -3,7 +3,6 @@ import unittest
 
 from objutils import dumps, loads
 
-
 TITEXT = b"""@DEAD
 99 F2 B9 CB 79 D3 EE F8 8F C6 A9 40 AB CD 71 A6
 F0 52 5E 0C 13 9D 0A 2C 26 1F 62 25 53 F0 3D ED

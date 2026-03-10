@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         pp = PeParser(args.pe)
-    except Exception as e:
+    except (OSError, ValueError, RuntimeError) as e:
         print(f"\n'{args.pe}' is not a valid PE/COFF file. Raised exception: '{repr(e)}'.")
         return 1
 

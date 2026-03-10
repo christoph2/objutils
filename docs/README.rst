@@ -46,6 +46,16 @@ Features
 - Inspect PE/COFF files and symbols (optional PDB support).
 - Typed access (scalars, arrays, strings) to binary data.
 
+Recent improvements
+-------------------
+
+- New ``oj-dwarf-import`` CLI replaces ``dwarfer.py``/``cu_info.py`` for DWARF imports, CU listing, summaries, and attribute traversal.
+- Faster DWARF imports: batched ORM writes, quiet flag propagation, and safe DWARF expression evaluation keep large ELF files stable.
+- Exception handling and typing tightened across DWARF/ELF/PECOFF modules and public APIs to surface real errors without masking them.
+- ``ElfParser.close()`` releases SQLite/mmap handles; examples/tests now close parsers to avoid database locks.
+- S-Record metadata stays minimal and numeric (no data records mixed in); Mostec/Tek SREC roundtrips now reproduce expected files.
+- Fortran-ordered ndarray reads/writes honor legacy column-major expectations; hexdump empty rows keep canonical spacing.
+
 Supported HEX formats
 ^^^^^^^^^^^^^^^^^^^^^
 ``objutils`` supports a bunch of HEX formats...

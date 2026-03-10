@@ -47,7 +47,6 @@ from typing import Any
 import objutils.hexfile as hexfile
 from objutils.checksums import lrc
 
-
 STX = "\x02"
 ETX = "\x03"
 

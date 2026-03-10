@@ -26,7 +26,6 @@ __copyright__ = """
 
 import abc
 
-
 DUMMY_PROTOCOL = None
 
 

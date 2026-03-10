@@ -26,71 +26,68 @@ __copyright__ = """
 
 import os
 import struct
+from typing import BinaryIO
 
 
 class PlainBinaryReader:
     LITTLE_ENDIAN = "<"
     BIG_ENDIAN = ">"
 
-    def __init__(self, image, byte_order_prefix="@"):
-        self.image = image
+    def __init__(self, image: BinaryIO, byte_order_prefix: str = "@"):
+        self.image: BinaryIO = image
         self.image.seek(0, os.SEEK_END)
         self._size = self.image.tell()
         self.image.seek(0, os.SEEK_SET)
-        self.byte_order_prefix = byte_order_prefix
-        self.pos = 0
+        self.byte_order_prefix: str = byte_order_prefix
+        self.pos: int = 0
 
-    def _get_pos(self):
+    def _get_pos(self) -> int:
         return self.image.tell()
 
-    def _set_pos(self, pos):
+    def _set_pos(self, pos: int) -> None:
         self.image.seek(pos, os.SEEK_SET)
 
-    def _get_size(self):
+    def _get_size(self) -> int:
         return self._size
 
-    def reset(self):
+    def reset(self) -> None:
         self.pos = 0
 
-    def next_byte(self):
+    def next_byte(self) -> int:
         return self.u8()
 
-    def value(self, conversion_code, size):
-        (res,) = struct.unpack(
-            "%c%c"
-            % (
-                self.byte_order_prefix,
-                conversion_code,
-            ),
-            self.image.read(size),
-        )
+    def value(self, conversion_code: str, size: int) -> int:
+        data = self.image.read(size)
+        if len(data) != size:
+            raise EOFError(f"Expected to read {size} bytes, got {len(data)}.")
+        (res,) = struct.unpack(f"{self.byte_order_prefix}{conversion_code}", data)
         return res
 
-    def u8(self):
+    def u8(self) -> int:
         return self.value("B", 1)
 
-    def u16(self):
+    def u16(self) -> int:
         return self.value("H", 2)
 
-    def u32(self):
+    def u32(self) -> int:
         return self.value("L", 4)
 
-    def u64(self):
+    def u64(self) -> int:
         return self.value("Q", 8)
 
-    def s8(self):
+    def s8(self) -> int:
         return self.value("b", 1)
 
-    def s16(self):
+    def s16(self) -> int:
         return self.value("h", 2)
 
-    def s32(self):
+    def s32(self) -> int:
         return self.value("l", 4)
 
-    def s64(self):
+    def s64(self) -> int:
         return self.value("q", 8)
 
-    def uleb(self):
+    def uleb(self) -> int:
         result = 0
         shift = 0
         while True:
@@ -101,7 +98,7 @@ class PlainBinaryReader:
             shift += 7
         return result
 
-    def sleb(self):
+    def sleb(self) -> int:
         result = 0
         shift = 0
         idx = 0
@@ -117,7 +114,7 @@ class PlainBinaryReader:
             result |= mask
         return result
 
-    def asciiz(self):
+    def asciiz(self) -> str:
         result = []
         while True:
             ch = self.next_byte()

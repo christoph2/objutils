@@ -47,19 +47,7 @@ from construct import (
 )
 
 from objutils.dwarf import constants
-from objutils.dwarf.encoding import (
-    SLEB,
-    ULEB,
-    Address,
-    Block1,
-    Block2b,
-    Block2l,
-    Block4b,
-    Block4l,
-    BlockUleb,
-    Endianess,
-    StrP,
-)
+from objutils.dwarf.encoding import SLEB, ULEB, Address, Block1, Block2b, Block2l, Block4b, Block4l, BlockUleb, Endianess, StrP
 from objutils.dwarf.sm import StackMachine
 
 

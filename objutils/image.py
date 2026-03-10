@@ -278,7 +278,6 @@ from typing import Any, Optional, Protocol, Union
 from objutils.exceptions import InvalidAddressError
 from objutils.section import Section, join_sections
 
-
 # NOTE: Crypto hashes could be used for optimized comparison and storage.
 # This would require adding a dependency on hashlib and implementing hash
 # caching for sections. Consider implementing if performance becomes an issue

@@ -25,9 +25,10 @@ __copyright__ = """
 
 import argparse
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from objutils import dump
 from objutils.elf import ElfParser
-
 
 # import sys
 # sys.argv.extend(["-t", "ihex", "./examples/hello_xcp.ino.elf", "./examples/hello_xcp.hex"])
@@ -82,7 +83,7 @@ def main():
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
-    except Exception as e:
+    except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
         print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
         exit(1)
     print("\nExtracting from...\n")

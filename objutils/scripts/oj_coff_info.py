@@ -21,7 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     print("Pths", args.pdb_file)
     try:
         pp = PeParser(args.pe_file, pdb_path=args.pdb_file)
-    except Exception as e:
+    except (OSError, ValueError, RuntimeError) as e:
         print(f"\n'{args.pe_file}' is not a valid PE/COFF file. Raised exception: '{repr(e)}'.")
         return 1
 

@@ -39,7 +39,6 @@ from typing import Any, BinaryIO
 
 import objutils.hexfile as hexfile
 
-
 # Record type identifiers (Intel HEX compatible)
 DATA = 0
 EOF = 1

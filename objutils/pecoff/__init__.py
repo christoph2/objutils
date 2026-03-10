@@ -148,10 +148,9 @@ from objutils.utils import create_memorymapped_fileview
 
 from . import defs, model
 
-
 try:
     from .pdb import pdb_symbols_for_pe  # type: ignore
-except Exception:  # pragma: no cover
+except ImportError:  # pragma: no cover
     pdb_symbols_for_pe = None  # type: ignore[assignment]
 
 
@@ -351,7 +350,8 @@ class PeParser:
             ValueError: If DOS or PE signatures are invalid
         """
         f = self._f
-        assert f is not None
+        if f is None:
+            raise RuntimeError("PE/COFF file handle is not initialized")
 
         # DOS header
         f.seek(0)
@@ -448,7 +448,7 @@ class PeParser:
                 # pdb_file = str(self._pdb_path) if self._pdb_path else str(self._path)
                 # self.symbols = pdb_symbols_for_pe(pdb_file)  # type: ignore[misc]
                 self.symbols = pdb_symbols_for_pe(self._path, self._pdb_path)  # type: ignore[misc]
-            except Exception as e:
+            except (OSError, RuntimeError, ValueError) as e:
                 # Best-effort only; ignore if PDB not available
                 print(f"Failed to retrieve PDB symbols: {e}")
 
@@ -473,7 +473,8 @@ class PeParser:
             Use PDB files for comprehensive symbol information.
         """
         f = self._f
-        assert f is not None
+        if f is None:
+            raise RuntimeError("PE/COFF file handle is not initialized")
         ptr = self.coff_header["pointer_to_symbol_table"]
         count = self.coff_header["number_of_symbols"]
         f.seek(ptr)
@@ -626,7 +627,8 @@ class PeParser:
             - This matches how objutils.elf creates images from sections
         """
         f = self._f
-        assert f is not None
+        if f is None:
+            raise RuntimeError("PE/COFF file handle is not initialized")
         sections = []
         img_base = self.image_base() if add_image_base else 0
         for s in self.sections:
@@ -737,11 +739,12 @@ class SectionAPI:
     def __init__(self, parent: PeParser):
         self.parent = parent
 
-    def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Section]:
-        self.parent.create_db_on_demand()
-        assert self.parent.db is not None
-        with self.parent.db.session() as ses:
-            q = ses.query(model.Pe_Section)
+        def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Section]:
+            self.parent.create_db_on_demand()
+            if self.parent.db is None:
+                raise RuntimeError("PE database is not initialized")
+            with self.parent.db.session() as ses:
+                q = ses.query(model.Pe_Section)
             if name_pattern:
                 q = q.filter(model.Pe_Section.name.like(f"%{name_pattern}%"))
             return q.order_by(model.Pe_Section.vaddr).all()
@@ -751,11 +754,12 @@ class SymbolAPI:
     def __init__(self, parent: PeParser):
         self.parent = parent
 
-    def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Symbol]:
-        self.parent.create_db_on_demand()
-        assert self.parent.db is not None
-        with self.parent.db.session() as ses:
-            q = ses.query(model.Pe_Symbol)
+        def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Symbol]:
+            self.parent.create_db_on_demand()
+            if self.parent.db is None:
+                raise RuntimeError("PE database is not initialized")
+            with self.parent.db.session() as ses:
+                q = ses.query(model.Pe_Symbol)
             if name_pattern:
                 q = q.filter(model.Pe_Symbol.name.like(f"%{name_pattern}%"))
             return q.order_by(model.Pe_Symbol.value).all()

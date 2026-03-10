@@ -32,7 +32,6 @@ from objutils.logger import Logger
 from objutils.section import Section
 from objutils.utils import create_string_buffer
 
-
 SHF_DTD = """<!--
     DTD for the S Hexdump Format, as of 2003-10-10
     Linus Walleij, Joachim Strombergson, Patrik Faltstrom 2003

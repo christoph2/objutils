@@ -293,7 +293,7 @@ class AttributeParser:
         a = self._get_attr(die, "name")
         try:
             return str(a.raw_value) if a is not None and a.raw_value is not None else ""
-        except Exception:
+        except (UnicodeDecodeError, ValueError, TypeError):
             return ""
 
     def _type_summary(self, offset: int) -> str:
@@ -310,13 +310,13 @@ class AttributeParser:
         """
         try:
             t = self.parse_type(offset)
-        except Exception:
+        except (AttributeError, KeyError, TypeError, ValueError):
             return f"<type@0x{offset:08x}>"
         if not isinstance(t, dict):
             # CircularReference or other marker
             try:
                 return f"{getattr(t, 'tag', '')}({getattr(t, 'name', '')})"
-            except Exception:
+            except (AttributeError, TypeError, ValueError):
                 return f"<type@0x{offset:08x}>"
         tag = t.get("tag", "<type>")
         name = ""
@@ -324,7 +324,7 @@ class AttributeParser:
         if "name" in attrs and attrs["name"]:
             try:
                 name = str(attrs["name"])
-            except Exception:
+            except (UnicodeDecodeError, ValueError, TypeError):
                 name = ""
         return name or tag
 
@@ -396,7 +396,8 @@ class AttributeParser:
                         ptoff = self._attr_raw(ch, "type")
                         ptdesc = self._type_summary(int(ptoff)) if isinstance(ptoff, (int,)) else "<unknown>"
                         lev_print(level + 2, f"param: {pn or '<anon>'} : {ptdesc}")
-            except Exception:
+            except (AttributeError, TypeError, ValueError):
+                # Ignore malformed children but keep traversing siblings
                 pass
 
         # Print attributes (already decoded by DWARF pass)
@@ -409,7 +410,7 @@ class AttributeParser:
             try:
                 tp = self.parse_type(entry.offset, level + 1)
                 traverse_dict(tp, level + 1)
-            except Exception:
+            except (AttributeError, TypeError, ValueError):
                 # Defensive: never let printing a type break the traversal
                 pass
 
@@ -454,7 +455,7 @@ class AttributeParser:
             if attr_name == "type":
                 try:
                     referenced_offset = int(attr.raw_value)
-                except Exception:
+                except (TypeError, ValueError):
                     referenced_offset = None
                 if referenced_offset and referenced_offset != die.offset:
                     result.setdefault("attrs", {})[attr_name] = self.parse_type(referenced_offset, level + 1)
@@ -524,7 +525,7 @@ class AttributeParser:
                 if name_attr is not None:
                     try:
                         name_val = str(name_attr.raw_value)
-                    except Exception:
+                    except (UnicodeDecodeError, ValueError, TypeError):
                         name_val = ""
             return CircularReference(tag=(die.abbrev.tag if die else ""), name=name_val)
 

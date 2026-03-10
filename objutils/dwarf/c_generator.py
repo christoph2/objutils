@@ -344,7 +344,7 @@ class CGenerator:
             return ""
         try:
             return str(a.raw_value)
-        except Exception:
+        except (UnicodeDecodeError, ValueError, TypeError):
             return ""
 
     def _raw_attr(self, die: model.DebugInformationEntry, name: str, converter: type = None):
@@ -459,7 +459,7 @@ class CGenerator:
                             lbi = int(lb) if lb is not None else 0
                             if ubi is not None:
                                 size = ubi - lbi + 1
-                    except Exception:
+                    except (TypeError, ValueError):
                         size = None
                     if isinstance(size, int) and size >= 0:
                         dims.append(f"[{size}]")
@@ -525,7 +525,7 @@ class CGenerator:
                             lbi = int(lb) if lb is not None else 0
                             if ubi is not None:
                                 size = ubi - lbi + 1
-                    except Exception:
+                    except (TypeError, ValueError):
                         size = None
                     if isinstance(size, int) and size >= 0:
                         dims.append(f"[{size}]")
@@ -557,7 +557,7 @@ class CGenerator:
         if isinstance(offset, int):
             try:
                 t = self.ap.parse_type(offset)
-            except Exception:
+            except (AttributeError, ValueError, TypeError):
                 t = None
             if t is None:
                 return (f"<type@0x{offset:08x}>", "")
@@ -846,7 +846,7 @@ class CGenerator:
         Returns:
             Complete C header file as string
         """
-        tmpl = Template(self._HEADER_TEMPLATE)
+        tmpl = Template(self._HEADER_TEMPLATE)  # nosec B702: static template for generated headers only
         return tmpl.render(
             guard=guard,
             typedefs=decls.get("typedefs", []),

@@ -62,7 +62,6 @@ import enum
 import struct
 from collections import namedtuple
 
-
 ELF_MAGIC = b"\x7fELF"
 
 EI_NIDENT = 16  # Size of e_ident[].
@@ -666,7 +665,7 @@ class MachineData:
         self.flags = flags
         try:
             ELFMachineType(machine_code)
-        except Exception:
+        except (TypeError, ValueError):
             self.type_name = "???"
             self.type_value = -1
             self.machine_name = "<unknown>"
@@ -741,7 +740,6 @@ class ArmMachineData(MachineData):
             List of ARM-specific features extracted from e_flags.
             Currently returns empty list (implementation placeholder).
         """
-        eabi = self.flags & EF_ARM_EABIMASK
         flags = self.flags = self.flags & EF_ARM_EABIMASK_COM
         result = []
 

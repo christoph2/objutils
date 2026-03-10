@@ -64,21 +64,9 @@ __copyright__ = """
 from collections import namedtuple
 from enum import IntEnum
 
-from construct import (
-    Byte,
-    Bytes,
-    Computed,
-    CString,
-    Int32ub,
-    Int32ul,
-    Struct,
-    Switch,
-    Tell,
-    this,
-)
+from construct import Byte, Bytes, Computed, CString, Int32ub, Int32ul, Struct, Switch, Tell, this
 
 from objutils.dwarf.encoding import ULEB
-
 
 AttributeDescription = namedtuple("AttributeDescription", "tag value parameterType conv")
 

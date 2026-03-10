@@ -28,7 +28,6 @@ import operator
 import struct
 import zlib
 
-
 COMPLEMENT_NONE = 0
 COMPLEMENT_ONES = 1
 COMPLEMENT_TWOS = 2

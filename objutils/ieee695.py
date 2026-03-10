@@ -30,7 +30,6 @@ from functools import reduce
 
 from objutils.logger import Logger
 
-
 """
 $00-$7F     Simple number in the range 0 to 127, or 7-bit ASCII string with length 0 to 127.
 $80-$84     Number larger than 127 or negative. 0 to 4 bytes follow. $80 is used as a place

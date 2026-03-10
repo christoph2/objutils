@@ -31,7 +31,6 @@ from objutils.image import Image
 from objutils.section import Section
 from objutils.utils import create_string_buffer
 
-
 ##
 ## TODO: binzipped format: a separate file for each section + MANIFEST (csv: fname, address, length)
 ##

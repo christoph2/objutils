@@ -143,7 +143,6 @@ from objutils.dwarf.readers import DwarfReaders
 from objutils.elf import defs, model
 from objutils.elf.model import DIEAttribute
 
-
 DWARF_TYPE_ENCODINGS = frozenset(
     {
         Tag.base_type,
@@ -642,6 +641,12 @@ class AttributeParser:
         }
         self.dwarf_expression = factory.dwarf_expression
 
+    def _safe_expression(self, attr):
+        try:
+            return self.dwarf_expression(attr.form, attr.raw_value)
+        except (AttributeError, IndexError, TypeError, ValueError) as exc:
+            return f"<expr-error:{exc}>"
+
     @lru_cache(maxsize=64 * 1024)
     def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
         """Resolve and return complete type tree for a DIE, offset, or attribute.
@@ -749,7 +754,7 @@ class AttributeParser:
             elf_location = None
         location = self._get_attr(obj, "location")
         if location is not None:
-            dwarf_location = self.dwarf_expression(location.form, location.raw_value)
+            dwarf_location = self._safe_expression(location)
         else:
             dwarf_location = None
         return Variable(
@@ -824,7 +829,7 @@ class AttributeParser:
                         addr = int(inner, 0)
                     elif s.startswith("0x"):
                         addr = int(s, 16)
-            except Exception:
+            except (TypeError, ValueError):
                 addr = None
 
         if addr is None:
@@ -938,7 +943,7 @@ class AttributeParser:
                         lb_attr = sr_attrs.get("lower_bound")
                         try:
                             lb = int(lb_attr) if lb_attr is not None else 0
-                        except Exception:
+                        except (TypeError, ValueError):
                             lb = 0
                         ub_attr = sr_attrs.get("upper_bound")
                         if ub_attr is None:
@@ -947,13 +952,13 @@ class AttributeParser:
                                 continue
                             try:
                                 dim = int(cnt)
-                            except Exception:
+                            except (TypeError, ValueError):
                                 continue
                         else:
                             try:
                                 ub = int(ub_attr)
                                 dim = ub - lb + 1
-                            except Exception:
+                            except (TypeError, ValueError):
                                 continue
                         if dim <= 0:
                             continue
@@ -990,12 +995,12 @@ class AttributeParser:
                 if t in {"base_type", "pointer_type"}:
                     try:
                         return int(attrs.get("byte_size"))
-                    except Exception:
+                    except (TypeError, ValueError):
                         return None
                 bsz = attrs.get("byte_size")
                 try:
                     return int(bsz) if bsz is not None else None
-                except Exception:
+                except (TypeError, ValueError):
                     return None
 
             dims, leaf = _dims_and_leaf(node0)
@@ -1012,7 +1017,7 @@ class AttributeParser:
                     byte_size = base.attributes.get("byte_size")
                     try:
                         key = (encoding, int(byte_size))
-                    except Exception:
+                    except (TypeError, ValueError):
                         key = None
                     dtype = self.section_readers.get(key) if key is not None else None
                     if dtype:
@@ -1022,7 +1027,7 @@ class AttributeParser:
                         try:
                             flat_vals = list(self.image.read_numeric_array(addr, int(total_len), dtype))
                             return _reshape(flat_vals, dims)
-                        except Exception:
+                        except (LookupError, TypeError, ValueError):
                             return None
             elif leaf_tag == "pointer_type":
                 attrs = _get_attrs(leaf)
@@ -1030,7 +1035,7 @@ class AttributeParser:
                 try:
                     bits = int(bsz) * 8
                     dtype = f"uint{bits}{postfix}"
-                except Exception:
+                except (TypeError, ValueError):
                     dtype = None
                 if dtype:
                     total_len = 1
@@ -1039,7 +1044,7 @@ class AttributeParser:
                     try:
                         flat_vals = list(self.image.read_numeric_array(addr, int(total_len), dtype))
                         return _reshape(flat_vals, dims)
-                    except Exception:
+                    except (LookupError, TypeError, ValueError):
                         return None
 
             # Fallback for composite element (e.g., struct/union or other non-numeric): iterate elements
@@ -1117,7 +1122,7 @@ class AttributeParser:
             return None
         try:
             key = (encoding, int(byte_size))
-        except Exception:
+        except (TypeError, ValueError):
             return None
         dtype = self.section_readers.get(key)
         if not dtype:
@@ -1126,7 +1131,7 @@ class AttributeParser:
         # 4) Read and return the value
         try:
             return self.image.read_numeric(addr, dtype)
-        except Exception:
+        except (LookupError, TypeError, ValueError):
             return None
 
     def _resolve_type_offset(
@@ -1153,7 +1158,7 @@ class AttributeParser:
         raw = getattr(type_attr, "raw_value", None)
         try:
             off = int(raw) if raw is not None else None
-        except Exception:
+        except (TypeError, ValueError):
             off = None
         if off is None:
             return None
@@ -1168,7 +1173,7 @@ class AttributeParser:
             ):
                 base = getattr(context_die, "cu_start", 0) if context_die is not None else 0
                 off += int(base or 0)
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             pass
         return off
 
@@ -1224,7 +1229,7 @@ class AttributeParser:
             raw = getattr(attr, "raw_value", None)
             try:
                 off = int(raw) if raw is not None else None
-            except Exception:
+            except (TypeError, ValueError):
                 off = None
             if off is not None:
                 try:
@@ -1238,11 +1243,11 @@ class AttributeParser:
                     ):
                         base = getattr(entry, "cu_start", 0) or 0
                         off += int(base)
-                except Exception:
+                except (AttributeError, TypeError, ValueError):
                     pass
                 type_info = f" -> {self._type_summary(int(off))}"
         if "location" in entry.attributes_map:
-            location = self.dwarf_expression(entry.attributes_map["location"].form, entry.attributes_map["location"].raw_value)
+            location = self._safe_expression(entry.attributes_map["location"])
             print(f"{'    ' * level}{tag} '{name}'{type_info} [location={location}] [off=0x{entry.offset:08x}]")
         else:
             if tag == "enumerator" and "const_value" in entry.attributes_map:
@@ -1259,9 +1264,7 @@ class AttributeParser:
                     f"{'    ' * level}{tag} '{name}'{type_info} [lower_bound={lower_bound}: upper_bound={upper_bound}] [off=0x{entry.offset:08x}]"
                 )
             elif tag == "member" and "data_member_location" in entry.attributes_map:
-                data_member_location = self.dwarf_expression(
-                    entry.attributes_map["data_member_location"].form, entry.attributes_map["data_member_location"].raw_value
-                )
+                data_member_location = self._safe_expression(entry.attributes_map["data_member_location"])
                 print(f"{'    ' * level}{tag} '{name}'{type_info} [location={data_member_location}] [off=0x{entry.offset:08x}]")
             elif tag == "base_type":
                 descr = ""
@@ -1333,7 +1336,7 @@ class AttributeParser:
             if attr_name == "type":
                 try:
                     referenced_offset = int(attr.raw_value)
-                except Exception:
+                except (TypeError, ValueError):
                     referenced_offset = None
                 if referenced_offset is not None:
                     # Adjust CU-relative reference forms to absolute DIE offsets
@@ -1348,7 +1351,7 @@ class AttributeParser:
                         ):
                             base = getattr(die, "cu_start", 0) or 0
                             referenced_offset += int(base)
-                    except Exception:
+                    except (AttributeError, TypeError, ValueError):
                         pass
                 if referenced_offset and referenced_offset != die.offset:
                     # result.setdefault("attrs", {})[attr_name] = self.parse_type(referenced_offset, level + 1)
@@ -1360,12 +1363,12 @@ class AttributeParser:
                 converter = DATA_REPRESENTATION[attr_name]
                 try:
                     attr_value = int(attr.raw_value)
-                except Exception:
+                except (TypeError, ValueError):
                     result[attr_name] = attr.raw_value
                     continue
                 try:
                     converted_value = converter(attr_value)
-                except Exception:
+                except (TypeError, ValueError):
                     converted_value = attr_value
                 result[attr_name] = converted_value
             elif attr_name in ("location", "data_member_location", "vtable_elem_location"):
@@ -1424,7 +1427,7 @@ class AttributeParser:
                 if name_attr is not None:
                     try:
                         name_val = str(name_attr.raw_value)
-                    except Exception:
+                    except (TypeError, ValueError):
                         name_val = ""
             return CircularReference(tag=(die.abbrev.tag if die else ""), name=name_val)
 
@@ -1503,7 +1506,7 @@ class AttributeParser:
         """
         try:
             return self._attr_raw(die, "name") or ""
-        except Exception:
+        except (AttributeError, TypeError):
             return ""
 
     def _type_summary(self, offset: int) -> str:

@@ -43,7 +43,6 @@ from typing import Any, Optional
 import objutils.checksums as checksums
 from objutils import hexfile, utils
 
-
 # Record type identifiers
 DATA = 1
 EOF = 2

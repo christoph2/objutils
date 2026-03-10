@@ -132,6 +132,43 @@ Import DWARF sections from an ELF into a ``.prgdb`` SQLite database.
     oj-elf-import path\to\program.elf --out program.prgdb --force
 
 
+oj_dwarf_import
+---------------
+
+Import DWARF sections into a ``.prgdb`` database and optionally inspect compile units or traverse DIE attributes.
+
+.. code-block:: shell
+
+    usage: oj-dwarf-import [-h] [--out-db OUT_DB] [--force] [--quiet] [--verbose]
+                           [--skip-lines] [--skip-pubnames] [--skip-aranges] [--skip-mac]
+                           [--list-cus] [--summary] [--walk-attrs] [--offset OFFSET]
+                           elf
+
+    positional arguments:
+      elf                   ELF file with DWARF sections
+
+    optional arguments:
+      --out-db OUT_DB       Output .prgdb path (default: <elf>.prgdb)
+      --force               Overwrite existing database
+      --quiet, -q           Suppress non-error output
+      --verbose, -v         Verbose DWARF processing output
+      --skip-lines          Skip .debug_line processing
+      --skip-pubnames       Skip .debug_pubnames processing
+      --skip-aranges        Skip .debug_aranges processing
+      --skip-mac            Skip .debug_macro processing
+      --list-cus            List compile units after import
+      --summary             Print DIE/attribute counts after import
+      --walk-attrs          Traverse DIE attributes (starts at first DIE unless --offset is set)
+      --offset OFFSET       Absolute DIE offset (decimal or 0x-prefixed hex) used for --walk-attrs
+
+Examples:
+
+.. code-block:: shell
+
+    oj-dwarf-import program.elf --list-cus --summary
+    oj-dwarf-import program.elf --walk-attrs --offset 0x1234 -q
+
+
 oj_cgen
 -------
 

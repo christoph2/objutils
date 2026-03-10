@@ -6,7 +6,6 @@ import unittest
 from objutils.image import Image
 from objutils.utils import create_string_buffer
 
-
 TEST1 = """
 Section #0000
 -------------

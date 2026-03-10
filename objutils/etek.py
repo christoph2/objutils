@@ -50,7 +50,6 @@ import objutils.checksums as checksums
 import objutils.hexfile as hexfile
 import objutils.utils as utils
 
-
 # Record type identifiers
 DATA = 1
 SYMBOL = 2

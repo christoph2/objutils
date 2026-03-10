@@ -29,7 +29,6 @@ __copyright__ = """
 
 from collections import namedtuple
 
-
 # Type representing a binary difference
 BinDiff = namedtuple("BinDiff", "type offset a b")
 BinDiff.__doc__ = """Binary difference between two byte sequences.

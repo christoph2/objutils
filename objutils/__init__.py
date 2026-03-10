@@ -51,7 +51,8 @@ __copyright__ = """
 
 import os
 import sys
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any, BinaryIO, Optional
 
 from rich import pretty
 from rich.console import Console
@@ -74,7 +75,6 @@ import objutils.titxt
 from objutils.image import Image  # noqa: F401
 from objutils.registry import registry
 from objutils.section import Section  # noqa: F401
-
 
 # Optional developer-friendly console and tracebacks; disabled by default for library consumers.
 _ENABLE_RICH = os.getenv("OBJUTILS_RICH", "0").lower() in {"1", "true", "yes"}
@@ -122,7 +122,7 @@ registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex sp
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 
-def load(codec_name: str, *args: Any, **kws: Any) -> Image:
+def load(codec_name: str, fp: str | Path | BinaryIO, **kws: Any) -> Image:
     """Load hex data from file.
 
     Parameters
@@ -134,10 +134,10 @@ def load(codec_name: str, *args: Any, **kws: Any) -> Image:
     -------
     class:`Image`
     """
-    return registry.get(codec_name).Reader().load(*args, **kws)
+    return registry.get(codec_name).Reader().load(fp, **kws)
 
 
-def loads(codec_name: str, *args: Any, **kws: Any) -> Image:
+def loads(codec_name: str, data: str | bytes | bytearray, **kws: Any) -> Image:
     """Load hex data from bytes.
 
     Parameters
@@ -150,10 +150,10 @@ def loads(codec_name: str, *args: Any, **kws: Any) -> Image:
     class:`Image`
     """
 
-    return registry.get(codec_name).Reader().loads(*args, **kws)
+    return registry.get(codec_name).Reader().loads(data, **kws)
 
 
-def probe(*args: Any, **kws: Any) -> Optional[str]:
+def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
     """Try to guess codec from file.
 
     Returns
@@ -164,12 +164,12 @@ def probe(*args: Any, **kws: Any) -> Optional[str]:
 
     for name, codec in registry:
         reader = codec.Reader()
-        if reader.probe(*args, **kws):
+        if reader.probe(fp, **kws):
             return name
     return None
 
 
-def probes(*args: Any, **kws: Any) -> Optional[str]:
+def probes(data: str | bytes | bytearray, **kws: Any) -> Optional[str]:
     """Try to guess codec from bytes.
 
     Returns
@@ -180,12 +180,12 @@ def probes(*args: Any, **kws: Any) -> Optional[str]:
 
     for name, codec in registry:
         reader = codec.Reader()
-        if reader.probes(*args, **kws):
+        if reader.probes(data, **kws):
             return name
     return None
 
 
-def dump(codec_name: str, *args: Any, **kws: Any) -> None:
+def dump(codec_name: str, fp: str | Path | BinaryIO, image: Image, **kws: Any) -> None:
     """Save hex data to file.
 
     Parameters
@@ -198,10 +198,10 @@ def dump(codec_name: str, *args: Any, **kws: Any) -> None:
     bytes
     """
 
-    registry.get(codec_name).Writer().dump(*args, **kws)
+    registry.get(codec_name).Writer().dump(fp, image, **kws)
 
 
-def dumps(codec_name: str, *args: Any, **kws: Any) -> bytes:
+def dumps(codec_name: str, image: Image, **kws: Any) -> bytes:
     """Save hex data to bytes.
 
     Parameters
@@ -214,4 +214,4 @@ def dumps(codec_name: str, *args: Any, **kws: Any) -> bytes:
     bytes
     """
 
-    return registry.get(codec_name).Writer().dumps(*args, **kws)
+    return registry.get(codec_name).Writer().dumps(image, **kws)

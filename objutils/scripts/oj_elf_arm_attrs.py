@@ -25,6 +25,8 @@ __copyright__ = """
 
 import argparse
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from objutils.elf import ElfParser, defs
 
 
@@ -35,7 +37,7 @@ def main():
     args = parser.parse_args()
     try:
         ep = ElfParser(args.elf_file)
-    except Exception as e:
+    except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
         print(f"\n{args.elf_file!r} is not valid ELF file. Raised exception: {e!r}.")
         exit(1)
     if ep.e_machine not in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):

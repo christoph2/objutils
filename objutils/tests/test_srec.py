@@ -7,7 +7,6 @@ from objutils import dumps, loads, probes
 from objutils.hexfile import MetaRecord
 from objutils.image import Image
 
-
 SIG = b""":B00010A5576F77212044696420796F75207265617B
 :B01010E56C6C7920676F207468726F756768206136
 :B02010256C6C20746861742074726F75626C652068

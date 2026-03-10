@@ -24,6 +24,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from objutils.dwarf.c_generator import CGenerator, RenderOptions
 from objutils.elf import model
 
@@ -41,7 +43,7 @@ def _parse_offset(s: str) -> int | None:
         if s.startswith("0x"):
             return int(s, 16)
         return int(s, 10)
-    except Exception:
+    except (TypeError, ValueError):
         return None
 
 
@@ -97,7 +99,7 @@ def generate_from_db(
     try:
         db = model.Model(str(dbp))
         sess = db.session
-    except Exception as e:
+    except (OSError, SQLAlchemyError, ValueError) as e:
         _print(f"Failed to open database '{db_path}': {e}", quiet)
         return 1
 
@@ -108,14 +110,14 @@ def generate_from_db(
             _print(f"Start DIE not found at offset: {hex(start_offset) if isinstance(start_offset, int) else start_offset}", quiet)
             try:
                 db.close()
-            except Exception:
+            except (OSError, SQLAlchemyError):
                 pass
             return 3
         else:
             _print("No root DIE found in database (parent_id IS NULL).", quiet)
             try:
                 db.close()
-            except Exception:
+            except (OSError, SQLAlchemyError):
                 pass
             return 2
 
@@ -133,10 +135,10 @@ def generate_from_db(
     gen = CGenerator(sess, options=opts)
     try:
         code = gen.generate_header(start_die, header_name=header_name)
-    except Exception as e:
+    except (SQLAlchemyError, RuntimeError, ValueError) as e:
         try:
             db.close()
-        except Exception:
+        except (OSError, SQLAlchemyError):
             pass
         _print(f"Generation failed: {e}", quiet)
         return 1
@@ -148,11 +150,11 @@ def generate_from_db(
             outp.write_text(code, encoding="utf-8")
             if verbose:
                 _print(f"Wrote header: {outp}", quiet)
-        except Exception as e:
+        except OSError as e:
             _print(f"Failed to write output file '{out_path}': {e}", quiet)
             try:
                 db.close()
-            except Exception:
+            except (OSError, SQLAlchemyError):
                 pass
             return 4
     else:
@@ -161,7 +163,7 @@ def generate_from_db(
 
     try:
         db.close()
-    except Exception:
+    except (OSError, SQLAlchemyError):
         pass
     return 0
 

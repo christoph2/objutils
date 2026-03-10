@@ -9,7 +9,6 @@ import hashlib
 import tempfile
 from pathlib import Path
 
-
 # Arduino cache directory locations (Windows)
 ARDUINO_TEMP_BASE_A = Path(tempfile.gettempdir()) / "arduino" / "sketches"
 ARDUINO_TEMP_BASE_B = Path(Path.home()) / "AppData" / "Local" / "arduino" / "sketches"

@@ -187,7 +187,7 @@ import io
 import json
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from construct import (
     Array,
@@ -198,20 +198,9 @@ from construct import (
     Flag,
     If,
     IfThenElse,
-    Int8sl,
     Int8ul,
-    Int16sb,
-    Int16sl,
-    Int16ub,
-    Int16ul,
-    Int32sb,
-    Int32sl,
     Int32ub,
     Int32ul,
-    Int64sb,
-    Int64sl,
-    Int64ub,
-    Int64ul,
     Padding,
     Pass,
     Struct,
@@ -221,27 +210,10 @@ from construct import (
 )
 
 from objutils.dwarf import constants
-from objutils.dwarf.encoding import (
-    SLEB,
-    ULEB,
-    Address,
-    ArrayOfCStrings,
-    Block1,
-    Block2b,
-    Block2l,
-    Block4b,
-    Block4l,
-    BlockUleb,
-    Endianess,
-    FilenameSequence,
-    One,
-    StrP,
-)
+from objutils.dwarf.encoding import ULEB, Address, ArrayOfCStrings, Endianess, FilenameSequence, One
 from objutils.dwarf.lineprog import LineNumberProgram
 from objutils.dwarf.readers import DwarfReaders
-from objutils.dwarf.sm import StackMachine
 from objutils.elf import model
-
 
 # Mapping of attribute encodings to their enum types
 ENCODED_ATTRIBUTES = {
@@ -657,11 +629,12 @@ class DwarfProcessor:
 
     UTF8String = CString(encoding="utf8")
 
-    def __init__(self, elf_parser):
+    def __init__(self, elf_parser, *, verbose: bool = True):
         """Initialize DWARF processor from ELF parser.
 
         Args:
             elf_parser: objutils.elf.model.Elf instance with debug sections
+            verbose: When False, suppresses verbose CU logging during import
 
         Raises:
             TypeError: If ELF file contains no DWARF sections
@@ -686,6 +659,7 @@ class DwarfProcessor:
             self.line_strings = b""
 
         self.db_session = elf_parser.session
+        self.verbose = verbose
         self.install_dwarf_readers()
 
     def install_dwarf_readers(self):
@@ -865,7 +839,7 @@ class DwarfProcessor:
                 "stop" / Tell,
             )
 
-        hdr = LineNumberProgramHeader.parse_stream(image)
+        LineNumberProgramHeader.parse_stream(image)
         prg = LineNumberProgram(image)  # noqa: F841
 
     def do_mac_info(self):
@@ -1064,110 +1038,131 @@ class DwarfProcessor:
         result = []
         die_map = {}
         idx = 0
-        while True:
-            section_pos = image.tell()
-            if section_pos >= section_length - 1:
-                break
-            root_element = DebugInformationEntry("root")
-            die_stack = [root_element]
-            db_die_stack = []
+        session = self.db_session
+        try:
+            no_autoflush = session.no_autoflush
+        except AttributeError:
+            from contextlib import nullcontext
 
-            dbgInfo = DbgInfo.parse_stream(image)  # CU
-            # print(dbgInfo)
-            cu_length = dbgInfo.header.unit_length
-            version = dbgInfo.header.version
-            if version < 5:
-                debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
-                address_size = dbgInfo.body.address_size
-            else:
-                debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
-                address_size = dbgInfo.body.address_size
-            idx += 1
-            print(
-                f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}  pointer-size:  {address_size}  version: {version}"
-            )
-            level = 0
-            pos = 0
-            offset += dbgInfo.stop - dbgInfo.start
-            form_readers = self.get_form_readers(address_size)
-            if pos >= cu_length:
-                break
+            no_autoflush = nullcontext
+
+        with no_autoflush():
             while True:
-                start = image.tell()
-                if start >= dbgInfo.start + cu_length + 4:
+                section_pos = image.tell()
+                if section_pos >= section_length - 1:
                     break
-                if start >= section_length - 1:
-                    break
-                attr = Attribute.parse_stream(image)
-                abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
-                if not abbr:
-                    # End of a sibling list: pop one level on both in-memory and DB stacks
-                    if level > 0:
-                        level -= 1
-                    # Pop in-memory DIE stack if we have a nested context (keep root at index 0)
-                    if len(die_stack) > 1:
-                        die_stack.pop()
-                    # Pop DB parent stack so subsequent siblings attach to the correct parent
-                    if db_die_stack:
-                        db_die_stack.pop()
+                root_element = DebugInformationEntry("root")
+                die_stack = [root_element]
+                db_die_stack = []
+                pending_dies = []
+                pending_attrs = []
+
+                dbgInfo = DbgInfo.parse_stream(image)  # CU
+                cu_length = dbgInfo.header.unit_length
+                version = dbgInfo.header.version
+                if version < 5:
+                    debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                    address_size = dbgInfo.body.address_size
                 else:
-                    die = DebugInformationEntry(abbr.tag)
-                    db_die = model.DebugInformationEntry(tag=abbr.tag)
-                    # Cache-friendly: store DIE offset for quick lookups by external tools
-                    db_die.offset = start
-                    # Store CU start for reference resolution later
-                    db_die.cu_start = dbgInfo.start
-                    # Set parent on DB DIE if we have one on stack
-                    if db_die_stack:
-                        db_die.parent = db_die_stack[-1]
-                    self.db_session.add(db_die)
-                    if attr.attr != 0:
-                        die_stack[-1].children.append(die)
-                    die_start = start
-                    if abbr.children:
-                        die_stack.append(die)
-                        # Push this db_die as the current parent for subsequent entries until a null DIE is encountered
-                        db_die_stack.append(db_die)
-                        level += 1
-                    else:
-                        pass
-                    for enc, form, special_value in abbr.attrs:
-                        reader = form_readers.get(form)
-                        start = image.tell()
-                        if reader is None:
-                            if form == constants.AttributeForm.DW_FORM_implicit_const:
-                                value = special_value
-                                # In-memory representation (keep minimal to preserve structure)
-                                die.attributes.append((enc.name, DIEAttribute(value, value)))
-                                # DB attribute: store name, form, raw value; display computed lazily
-                                db_die.attributes.append(model.DIEAttribute(name=int(enc), form=int(form), raw_value=value))
-                                offset += attr.stop - attr.start
-                                pos = image.tell()
-                                if pos >= dbgInfo.start + cu_length + 4:
-                                    break
-                                continue
-                            else:
-                                # Unknown reader; skip gracefully
-                                continue
-                        try:
-                            value = reader.parse_stream(image)
-                        except Exception:
-                            # Reraise without printing for performance
-                            raise
-                        # In-memory representation: do not compute heavy display, keep simple
-                        die.attributes.append((enc.name, DIEAttribute(value, value)))
-                        # DB attribute: store for lazy display
-                        try:
-                            db_die.attributes.append(model.DIEAttribute(name=int(enc), form=int(form), raw_value=value))
-                        except Exception:
-                            db_die.attributes.append(model.DIEAttribute(name=int(enc), raw_value=value))
-                    offset += attr.stop - attr.start
-                    pos = image.tell()
-                    if pos >= dbgInfo.start + cu_length + 4:
+                    debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                    address_size = dbgInfo.body.address_size
+                idx += 1
+                if self.verbose:
+                    print(
+                        f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}  pointer-size:  {address_size}  version: {version}"
+                    )
+                level = 0
+                pos = 0
+                offset += dbgInfo.stop - dbgInfo.start
+                form_readers = self.get_form_readers(address_size)
+                if pos >= cu_length:
+                    break
+                while True:
+                    die_start = None
+                    start = image.tell()
+                    if start >= dbgInfo.start + cu_length + 4:
                         break
-                die_map[die_start] = die
-            result.append(root_element)
-            self.db_session.commit()
+                    if start >= section_length - 1:
+                        break
+                    attr = Attribute.parse_stream(image)
+                    abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
+                    if not abbr:
+                        # End of a sibling list: pop one level on both in-memory and DB stacks
+                        if level > 0:
+                            level -= 1
+                        # Pop in-memory DIE stack if we have a nested context (keep root at index 0)
+                        if len(die_stack) > 1:
+                            die_stack.pop()
+                        # Pop DB parent stack so subsequent siblings attach to the correct parent
+                        if db_die_stack:
+                            db_die_stack.pop()
+                    else:
+                        die = DebugInformationEntry(abbr.tag)
+                        db_die = model.DebugInformationEntry(tag=abbr.tag)
+                        # Cache-friendly: store DIE offset for quick lookups by external tools
+                        db_die.offset = start
+                        # Store CU start for reference resolution later
+                        db_die.cu_start = dbgInfo.start
+                        # Set parent on DB DIE if we have one on stack
+                        if db_die_stack:
+                            db_die.parent = db_die_stack[-1]
+                        pending_dies.append(db_die)
+                        if attr.attr != 0:
+                            die_stack[-1].children.append(die)
+                        die_start = start
+                        if abbr.children:
+                            die_stack.append(die)
+                            # Push this db_die as the current parent for subsequent entries until a null DIE is encountered
+                            db_die_stack.append(db_die)
+                            level += 1
+                        for enc, form, special_value in abbr.attrs:
+                            reader = form_readers.get(form)
+                            start = image.tell()
+                            if reader is None:
+                                if form == constants.AttributeForm.DW_FORM_implicit_const:
+                                    value = special_value
+                                    # In-memory representation (keep minimal to preserve structure)
+                                    die.attributes.append((enc.name, DIEAttribute(value, value)))
+                                    pending_attrs.append((db_die, enc, form, value))
+                                    offset += attr.stop - attr.start
+                                    pos = image.tell()
+                                    if pos >= dbgInfo.start + cu_length + 4:
+                                        break
+                                    continue
+                                else:
+                                    # Unknown reader; skip gracefully
+                                    continue
+                            value = reader.parse_stream(image)
+                            # In-memory representation: do not compute heavy display, keep simple
+                            die.attributes.append((enc.name, DIEAttribute(value, value)))
+                            # DB attribute: store for lazy display
+                            pending_attrs.append((db_die, enc, form, value))
+                        offset += attr.stop - attr.start
+                        pos = image.tell()
+                        if pos >= dbgInfo.start + cu_length + 4:
+                            break
+                    if die_start is not None:
+                        die_map[die_start] = die
+
+                if pending_dies:
+                    session.add_all(pending_dies)
+                    session.flush()
+                    if pending_attrs:
+                        attr_rows = []
+                        for db_die, enc, form, value in pending_attrs:
+                            attr_rows.append(
+                                {
+                                    "name": int(enc),
+                                    "form": int(form) if form is not None else None,
+                                    "raw_value": value,
+                                    "entry_id": db_die.rid,
+                                }
+                            )
+                        if attr_rows:
+                            session.execute(model.DIEAttribute.__table__.insert(), attr_rows)
+                    session.flush()
+                result.append(root_element)
+                session.commit()
         return DebugInformation(die_map, [d.children[0] for d in result])
 
     def pubnames(self):

@@ -283,7 +283,6 @@ from objutils.logger import Logger
 from objutils.section import Section, join_sections
 from objutils.utils import create_string_buffer, slicer
 
-
 # Format specification constants
 SIXTEEN_BITS = 0
 TWENTY_BITS = 1
@@ -412,7 +411,7 @@ class Statistics:
 class MetaRecord:
     """Metadata record (header/footer information)."""
 
-    format_type: str
+    format_type: int
     address: Optional[int]
     chunk: Optional[bytearray]
 
@@ -901,14 +900,15 @@ class Reader(BaseType):
                 # Format-specific processing
                 self.special_processing(container, format_type)
 
-                # Store metadata
-                meta_data[format_type].append(
-                    MetaRecord(
-                        format_type=str(format_type),
-                        address=getattr(container, "address", None),
-                        chunk=getattr(container, "chunk", None),
+                # Store metadata (non-data/control records only)
+                if not self.is_data_line(container, format_type):
+                    meta_data[format_type].append(
+                        MetaRecord(
+                            format_type=format_type,
+                            address=getattr(container, "address", None),
+                            chunk=getattr(container, "chunk", None),
+                        )
                     )
-                )
                 break  # Pattern matched, stop trying formats
 
         if not matched:
