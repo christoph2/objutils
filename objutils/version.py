@@ -1,3 +1,3 @@
 """objutils version module"""
 
-__version__ = "0.8.12"
+__version__ = "0.9.0"
