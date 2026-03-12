@@ -41,6 +41,7 @@ setup(
             "oj-elf-arm-attrs = objutils.scripts.oj_elf_arm_attrs:main",
             "oj-elf-extract = objutils.scripts.oj_elf_extract:main",
             "oj-dwarf-import = objutils.scripts.oj_dwarf_import:main",
+            "oj-dwarf-info = objutils.scripts.oj_dwarf_info:main",
             "oj-coff-info = objutils.scripts.oj_coff_info:main",
             "oj-coff-syms = objutils.scripts.oj_coff_syms:main",
             "oj-coff-extract = objutils.scripts.oj_coff_extract:main",

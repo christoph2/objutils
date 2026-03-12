@@ -1044,9 +1044,9 @@ class DwarfProcessor:
         except AttributeError:
             from contextlib import nullcontext
 
-            no_autoflush = nullcontext
+            no_autoflush = nullcontext()
 
-        with no_autoflush():
+        with no_autoflush:
             while True:
                 section_pos = image.tell()
                 if section_pos >= section_length - 1:

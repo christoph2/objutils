@@ -54,10 +54,10 @@ The ORM creates tables for the following ELF structures:
    - DIE parent-child tree traversal
    - DIEAttribute access from DebugInformationEntry
 5. **SQLite Pragmas**: Performance tuning via set_sqlite3_pragmas event listener
-   - PRAGMA FOREIGN_KEYS=ON: Enable referential integrity
-   - PRAGMA CACHE_SIZE, PAGE_SIZE: Memory and disk optimization
-   - PRAGMA SYNCHRONOUS=OFF: Fast writes
-   - PRAGMA LOCKING_MODE=EXCLUSIVE: Prevent concurrent access issues
+    - PRAGMA FOREIGN_KEYS=ON: Enable referential integrity
+    - PRAGMA CACHE_SIZE, PAGE_SIZE: Memory and disk optimization
+    - PRAGMA SYNCHRONOUS=OFF: Fast writes
+    - PRAGMA busy_timeout / LOCKING_MODE=NORMAL: Reduce contention and avoid stale locks
 
 **Database Auto-Creation (.prgdb files):**
 
@@ -130,12 +130,15 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import Session, declarative_base, declared_attr, relationship
+from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
 
 CACHE_SIZE = 4  # MB
 PAGE_SIZE = mmap.PAGESIZE
+SQLITE_TIMEOUT_SECONDS = 30
+SQLITE_TIMEOUT_MS = SQLITE_TIMEOUT_SECONDS * 1000
 
 DB_EXTENSION = ".prgdb"
 
@@ -1247,7 +1250,7 @@ def set_sqlite3_pragmas(dbapi_connection: Any, connection_record: Any) -> None:
         - PAGE_SIZE: Match system page size for efficient I/O
         - CACHE_SIZE: Tune memory usage
         - SYNCHRONOUS: Disable disk sync for speed (assumes reliable filesystem)
-        - LOCKING_MODE: Use exclusive locking for consistency
+        - busy_timeout + LOCKING_MODE=NORMAL: Avoid stale exclusive locks and wait for contention
         - TEMP_STORE: Keep temporary data in memory
     """
     dbapi_connection.create_function("REGEXP", 2, regexer)
@@ -1257,7 +1260,8 @@ def set_sqlite3_pragmas(dbapi_connection: Any, connection_record: Any) -> None:
     cursor.execute(f"PRAGMA PAGE_SIZE={PAGE_SIZE}")
     cursor.execute(f"PRAGMA CACHE_SIZE={calculateCacheSize(CACHE_SIZE * 1024 * 1024)}")
     cursor.execute("PRAGMA SYNCHRONOUS=OFF")  # FULL
-    cursor.execute("PRAGMA LOCKING_MODE=EXCLUSIVE")  # NORMAL
+    cursor.execute(f"PRAGMA busy_timeout={SQLITE_TIMEOUT_MS}")
+    cursor.execute("PRAGMA LOCKING_MODE=NORMAL")
     cursor.execute("PRAGMA TEMP_STORE=MEMORY")  # FILE
     cursor.close()
 
@@ -1309,7 +1313,11 @@ class Model:
         self._engine = create_engine(
             f"sqlite:///{self.dbname}",
             echo=debug,
-            connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
+            connect_args={
+                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+                "timeout": SQLITE_TIMEOUT_SECONDS,
+            },
+            poolclass=NullPool,
             native_datetime=True,
         )
 

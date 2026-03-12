@@ -1191,7 +1191,12 @@ class AttributeParser:
         Note:
             Cache is per-instance (8K entries) to minimize SQLAlchemy query overhead.
         """
-        return self.session.query(model.DebugInformationEntry).filter_by(offset=offset).one_or_none()
+        query = (
+            self.session.query(model.DebugInformationEntry)
+            .filter_by(offset=offset)
+            .order_by(model.DebugInformationEntry.cu_start, model.DebugInformationEntry.rid)
+        )
+        return query.first()
 
     def traverse_tree(self, entry: model.DebugInformationEntry, level: int = 0) -> None:
         """Traverse DIE tree depth-first, printing formatted summaries.
