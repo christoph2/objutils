@@ -103,16 +103,16 @@ class Reader(hexfile.Reader):
                 line = fp.readline()
                 if not line:
                     break
-                
+
                 line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
                 line_str = line_str.strip()
                 if not line_str:
                     continue
-                
+
                 # Check for explicit start symbols (!M or ?M)
                 if line_str.startswith(("!M", "?M")):
                     return True
-            
+
             # If no symbols found, it's probably not Cosmac (or a very bare-bones version)
             return False
         finally:

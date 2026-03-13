@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import unittest
 
-import pytest
 
 from objutils import dumps, loads, probes
 from objutils.hexfile import MetaRecord

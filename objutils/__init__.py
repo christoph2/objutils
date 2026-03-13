@@ -169,7 +169,7 @@ def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
     # to avoid false positives.
     priority = ["sig", "srec", "titxt", "shf", "fpc", "ihex"]
     codecs_to_test = []
-    
+
     # First, the high-priority ones
     for name in priority:
         try:
@@ -177,7 +177,7 @@ def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
             codecs_to_test.append((name, codec))
         except Exception:
             pass
-            
+
     # Then all others
     for name, codec in registry:
         if name not in priority:
@@ -205,7 +205,7 @@ def probes(data: str | bytes | bytearray, **kws: Any) -> Optional[str]:
         buffer = io.BytesIO(data.encode("ascii", errors="ignore"))
     else:
         buffer = io.BytesIO(data)
-        
+
     return probe(buffer, **kws)
 
 

@@ -213,7 +213,7 @@ class Reader(hexfile.Reader):
         start_pos = 0
         try:
             start_pos = fp.tell()
-        except (AttributeError, os.error):
+        except (AttributeError, OSError):
             pass
 
         try:
@@ -232,21 +232,22 @@ class Reader(hexfile.Reader):
                 if not VALID_CHARS.match(line_str):
                     return False
                 lines.append(line_str)
-            
+
             if not lines:
                 return False
 
             # Reset and decode to check if it matches the hex patterns
             fp.seek(start_pos)
             decoded = self.decode(fp)
-            
+
             # Simple manual check of the decoded hex against patterns
             # Format: DATA_ABS (CCLL0000AAAAAAAADD), DATA_INC (CCLL0001DD), DATA_REL (CCLL0002AAAAAAAADD)
             lines = decoded.splitlines()
             if not lines:
                 return False
-            
+
             import re
+
             valid_hex = re.compile(r"^[0-9A-F]+$")
             matched = 0
             for line in lines[:5]:
@@ -265,7 +266,7 @@ class Reader(hexfile.Reader):
         finally:
             try:
                 fp.seek(start_pos)
-            except (AttributeError, os.error):
+            except (AttributeError, OSError):
                 pass
 
 

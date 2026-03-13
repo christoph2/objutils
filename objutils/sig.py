@@ -114,12 +114,12 @@ class Reader(hexfile.Reader):
                 line = fp.readline()
                 if not line:
                     break
-                
+
                 line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
                 line_str = line_str.strip()
                 if not line_str.startswith(":"):
                     continue
-                
+
                 # Check if it matches the general pattern
                 for _, pattern in self.formats:
                     m = pattern.match(line_str)
@@ -132,7 +132,7 @@ class Reader(hexfile.Reader):
                                 addr = int(line_str[1:5], 16)
                                 length = int(line_str[5:7], 16)
                                 checksum_given = int(line_str[7:9], 16)
-                                
+
                                 # Check if it could be Intel HEX.
                                 # Intel HEX: :LLAAAATTDDCC
                                 # Signetics: :AAAALLBBDDCC
@@ -152,7 +152,7 @@ class Reader(hexfile.Reader):
                                                 is_ihex = True
                                     except ValueError:
                                         pass
-                                
+
                                 if is_ihex:
                                     continue
 

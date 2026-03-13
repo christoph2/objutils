@@ -102,11 +102,11 @@ class Reader(hexfile.Reader):
             data = fp.read(100)
             if b"!M" in data:
                 return True
-            
+
             # If no header, check for AAAA DD; records
             if not data:
                 return False
-            
+
             data_str = data.decode(errors="ignore")
             # Pattern: 4 hex digits, space, at least one hex byte, semicolon
             if re.search(r"[0-9A-F]{4}\s+[0-9A-F]{2}\s*;", data_str):
