@@ -549,11 +549,11 @@ class ReaderProtocol(Protocol):
     valid: bool
     formats: list[tuple[int, re.Pattern]]
 
-    def load(self, fp: Union[str, Path, BinaryIO], **kws: Any) -> Image: ...
+    def load(self, fp: Union[str, Path, BinaryIO], join: bool = False, **kws: Any) -> Image: ...
 
-    def loads(self, image: Union[str, bytes, bytearray], **kws: Any) -> Image: ...
+    def loads(self, image: Union[str, bytes, bytearray], join: bool = False, **kws: Any) -> Image: ...
 
-    def read(self, fp: BinaryIO) -> Image: ...
+    def read(self, fp: BinaryIO, join: bool = False) -> Image: ...
 
     def probe(self, fp: BinaryIO, **kws: Any) -> bool: ...
 
@@ -794,11 +794,12 @@ class Reader(BaseType):
                 pattern = FormatParser(format_str, self.DATA_SEPARATOR).parse()
                 self.formats.append((format_type, pattern))
 
-    def load(self, fp: Union[str, Path, BinaryIO], **kws: Any) -> Image:
+    def load(self, fp: Union[str, Path, BinaryIO], join: bool = False, **kws: Any) -> Image:
         """Load image from file path or file-like object.
 
         Args:
             fp: File path (str/Path) or opened binary file
+            join: Merge consecutive sections (default: False)
             **kws: Additional keyword arguments
 
         Returns:
@@ -806,18 +807,19 @@ class Reader(BaseType):
         """
         if isinstance(fp, (str, Path)):
             with open(fp, "rb") as f:
-                return self.read(f)
+                return self.read(f, join=join)
         else:
-            data = self.read(fp)
+            data = self.read(fp, join=join)
             if hasattr(fp, "close"):
                 fp.close()
             return data
 
-    def loads(self, image: Union[str, bytes, bytearray], **kws: Any) -> Image:
+    def loads(self, image: Union[str, bytes, bytearray], join: bool = False, **kws: Any) -> Image:
         """Load image from string or bytes.
 
         Args:
             image: String, bytes, or bytearray containing hex data
+            join: Merge consecutive sections (default: False)
             **kws: Additional keyword arguments
 
         Returns:
@@ -827,13 +829,14 @@ class Reader(BaseType):
             buffer = create_string_buffer(bytes(image, "ascii"))
         else:
             buffer = create_string_buffer(image)
-        return self.load(buffer)
+        return self.load(buffer, join=join)
 
-    def read(self, fp: BinaryIO) -> Image:
+    def read(self, fp: BinaryIO, join: bool = False) -> Image:
         """Read and parse hex file.
 
         Args:
             fp: Binary file-like object
+            join: Merge consecutive sections (default: False)
 
         Returns:
             Parsed Image with sections
@@ -914,19 +917,22 @@ class Reader(BaseType):
         if not matched:
             raise ParseError("No valid records found in file")
 
-        # Join consecutive sections
-        sections = join_sections(sections)
-        img = Image(sections, meta=dict(meta_data), join=True)
+        if join:
+            sections = join_sections(sections)
+        img = Image(sections, meta=dict(meta_data), join=False)
         img.valid = self.valid  # Attach validation status
         return img
 
     def probe(self, fp: BinaryIO, **kws: Any) -> bool:
         """Test if file matches this format.
 
-        Samples first ~500 bytes and checks if patterns match.
+        Samples first ~25 lines and checks if patterns match.
+        For Intel HEX, we also perform a basic validation of the record type
+        field to avoid false positives with other formats starting with ':'.
 
         Args:
             fp: Binary file-like object
+            **kws: Additional keyword arguments
 
         Returns:
             True if file appears to be this format
@@ -934,20 +940,59 @@ class Reader(BaseType):
         MAX_SAMPLE_LINES = 25
         MIN_MATCH_THRESHOLD = 0.5
 
+        if not hasattr(self, "formats") or not self.formats:
+            return False
+
+        # Record start position to restore later
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+
         examined = 0
         matched_count = 0
 
-        for line_number, line in enumerate(fp.readlines(), 1):
-            if line_number > MAX_SAMPLE_LINES:
-                break
-
-            line_str = line.decode() if isinstance(line, bytes) else line
-            examined += 1
-
-            for _, pattern in self.formats:
-                if pattern.match(line_str):
-                    matched_count += 1
+        try:
+            for _ in range(MAX_SAMPLE_LINES):
+                line = fp.readline()
+                if not line:
                     break
+
+                try:
+                    line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                except Exception:
+                    continue
+
+                line_str = line_str.strip()
+                if not line_str:
+                    continue
+
+                examined += 1
+
+                for _, pattern in self.formats:
+                    m = pattern.match(line_str)
+                    if m:
+                        # Intel HEX specific check: record type (7th and 8th chars)
+                        # must be between 00 and 05.
+                        if line_str.startswith(":") and len(line_str) >= 9:
+                            try:
+                                record_type = int(line_str[7:9], 16)
+                                if 0 <= record_type <= 5:
+                                    matched_count += 1
+                                    break
+                            except ValueError:
+                                pass
+                        else:
+                            matched_count += 1
+                            break
+
+        finally:
+            # Restore original position
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, io.UnsupportedOperation):
+                pass
 
         if examined == 0:
             return False
@@ -960,20 +1005,24 @@ class Reader(BaseType):
 
         return match_ratio >= MIN_MATCH_THRESHOLD
 
-    def probes(self, image: Union[str, bytes, bytearray]) -> bool:
+    def probes(self, image: Union[str, bytes, bytearray], **kws: Any) -> bool:
         """Test if string/bytes matches this format.
 
         Args:
             image: String, bytes, or bytearray
+            **kws: Additional keyword arguments
 
         Returns:
             True if data appears to be this format
         """
         if isinstance(image, str):
-            buffer = create_string_buffer(bytes(image, "ascii"))
+            buffer = io.BytesIO(bytes(image, "ascii"))
+        elif isinstance(image, (bytes, bytearray)):
+            buffer = io.BytesIO(image)
         else:
-            buffer = create_string_buffer(image)
-        return self.probe(buffer)
+            return False
+
+        return self.probe(buffer, **kws)
 
     # Methods that subclasses must implement
 
@@ -1282,8 +1331,8 @@ class Writer(BaseType):
             if hasattr(fp, "close"):
                 fp.close()
 
-    def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> bytes:
-        """Serialize image to bytes.
+    def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> bytearray:
+        """Serialize image to bytearray.
 
         Args:
             image: Image to serialize
@@ -1291,7 +1340,7 @@ class Writer(BaseType):
             **kws: Additional keyword arguments
 
         Returns:
-            Serialized hex file as bytes
+            Serialized hex file as bytearray
 
         Raises:
             AddressRangeToLargeError: If address exceeds format limits
@@ -1300,7 +1349,7 @@ class Writer(BaseType):
         self.row_length = row_length
 
         if hasattr(image, "sections") and not image.sections:
-            return b""
+            return bytearray()
 
         if self.calculate_address_bits(image) > self.MAX_ADDRESS_BITS:
             raise AddressRangeToLargeError("Could not encode image - address too large")
@@ -1328,7 +1377,7 @@ class Writer(BaseType):
         if footer:
             result.append(footer)
 
-        return self.post_processing(bytes("\n".join(result), "ascii"))
+        return self.post_processing(bytearray("\n".join(result), "ascii"))
 
     def calculate_address_bits(self, image: Image) -> int:
         """Calculate address width required for image.
@@ -1347,7 +1396,7 @@ class Writer(BaseType):
         highest_address = last_segment.start_address + last_segment.length
         return int(math.ceil(math.log(highest_address + 1) / math.log(2)))
 
-    def post_processing(self, data: bytes) -> bytes:
+    def post_processing(self, data: bytearray) -> bytearray:
         """Post-process serialized data (optional override).
 
         Ensures newline termination by default.
@@ -1359,7 +1408,7 @@ class Writer(BaseType):
             Post-processed data
         """
         if not data.endswith(b"\n"):
-            data += b"\n"
+            data.extend(b"\n")
         return data
 
     def pre_processing(self, image: Image) -> None:
@@ -1543,11 +1592,12 @@ class ASCIIHexReader(Reader):
         self.address += len(section)
         return True
 
-    def read(self, fp: BinaryIO) -> Image:
+    def read(self, fp: BinaryIO, join: bool = False) -> Image:
         """Read ASCII hex file.
 
         Args:
             fp: Binary file-like object
+            join: Merge consecutive sections (default: False)
 
         Returns:
             Parsed Image
@@ -1567,7 +1617,9 @@ class ASCIIHexReader(Reader):
             if breakRequest:
                 break
 
-        return Image(self.sections, join=True)
+        if join:
+            return Image(join_sections(self.sections), join=False)
+        return Image(self.sections, join=False)
 
     def check_line(self, line: Any, format_type: int) -> None:
         """No validation needed for ASCII hex formats."""

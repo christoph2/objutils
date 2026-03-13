@@ -18,6 +18,8 @@ __version__ = "0.9.0"
 __all__ = [
     "Image",
     "Section",
+    "LazySection",
+    "InvalidAddressError",
     "registry",
     "load",
     "loads",
@@ -49,6 +51,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import io
 import os
 import sys
 from pathlib import Path
@@ -72,9 +75,9 @@ import objutils.sig
 import objutils.srec
 import objutils.tek
 import objutils.titxt
-from objutils.image import Image  # noqa: F401
+from objutils.image import Image, InvalidAddressError  # noqa: F401
 from objutils.registry import registry
-from objutils.section import Section  # noqa: F401
+from objutils.section import Section, LazySection  # noqa: F401
 
 # Optional developer-friendly console and tracebacks; disabled by default for library consumers.
 _ENABLE_RICH = os.getenv("OBJUTILS_RICH", "0").lower() in {"1", "true", "yes"}
@@ -122,7 +125,7 @@ registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex sp
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 
-def load(codec_name: str, fp: str | Path | BinaryIO, **kws: Any) -> Image:
+def load(codec_name: str, fp: str | Path | BinaryIO, join: bool = False, **kws: Any) -> Image:
     """Load hex data from file.
 
     Parameters
@@ -134,10 +137,10 @@ def load(codec_name: str, fp: str | Path | BinaryIO, **kws: Any) -> Image:
     -------
     class:`Image`
     """
-    return registry.get(codec_name).Reader().load(fp, **kws)
+    return registry.get(codec_name).Reader().load(fp, join=join, **kws)
 
 
-def loads(codec_name: str, data: str | bytes | bytearray, **kws: Any) -> Image:
+def loads(codec_name: str, data: str | bytes | bytearray, join: bool = False, **kws: Any) -> Image:
     """Load hex data from bytes.
 
     Parameters
@@ -150,7 +153,7 @@ def loads(codec_name: str, data: str | bytes | bytearray, **kws: Any) -> Image:
     class:`Image`
     """
 
-    return registry.get(codec_name).Reader().loads(data, **kws)
+    return registry.get(codec_name).Reader().loads(data, join=join, **kws)
 
 
 def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
@@ -161,11 +164,32 @@ def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
     str | None
         The detected codec name or None if undetected.
     """
-
+    # Priority order for probing.
+    # We prioritize formats with more unique/strict probing logic (like 'sig' vs 'ihex')
+    # to avoid false positives.
+    priority = ["sig", "srec", "titxt", "shf", "fpc", "ihex"]
+    codecs_to_test = []
+    
+    # First, the high-priority ones
+    for name in priority:
+        try:
+            codec = registry.get(name)
+            codecs_to_test.append((name, codec))
+        except Exception:
+            pass
+            
+    # Then all others
     for name, codec in registry:
-        reader = codec.Reader()
-        if reader.probe(fp, **kws):
-            return name
+        if name not in priority:
+            codecs_to_test.append((name, codec))
+
+    for name, codec in codecs_to_test:
+        try:
+            reader = codec.Reader()
+            if hasattr(reader, "probe") and reader.probe(fp, **kws):
+                return name
+        except Exception:
+            pass
     return None
 
 
@@ -177,12 +201,12 @@ def probes(data: str | bytes | bytearray, **kws: Any) -> Optional[str]:
     str | None
         The detected codec name or None if undetected.
     """
-
-    for name, codec in registry:
-        reader = codec.Reader()
-        if reader.probes(data, **kws):
-            return name
-    return None
+    if isinstance(data, str):
+        buffer = io.BytesIO(data.encode("ascii", errors="ignore"))
+    else:
+        buffer = io.BytesIO(data)
+        
+    return probe(buffer, **kws)
 
 
 def dump(codec_name: str, fp: str | Path | BinaryIO, image: Image, **kws: Any) -> None:
@@ -201,8 +225,8 @@ def dump(codec_name: str, fp: str | Path | BinaryIO, image: Image, **kws: Any) -
     registry.get(codec_name).Writer().dump(fp, image, **kws)
 
 
-def dumps(codec_name: str, image: Image, **kws: Any) -> bytes:
-    """Save hex data to bytes.
+def dumps(codec_name: str, image: Image, **kws: Any) -> bytearray:
+    """Save hex data to bytearray.
 
     Parameters
     ----------

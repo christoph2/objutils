@@ -84,6 +84,40 @@ class Reader(hexfile.ASCIIHexReader):
         """
         super().__init__(address_pattern, data_pattern, etx_pattern, separators=", %'")
 
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches ASH format.
+
+        ASH uses STX/ETX framing and $A address markers.
+        """
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, Exception):
+            pass
+
+        try:
+            matched_stx = False
+            matched_address = False
+            for _ in range(10):
+                line = fp.readline()
+                if not line:
+                    break
+                line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                if STX in line_str:
+                    matched_stx = True
+                if "$A" in line_str:
+                    matched_address = True
+                if matched_stx and matched_address:
+                    return True
+            return matched_stx or matched_address
+        except Exception:
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, Exception):
+                pass
+
 
 class Writer(hexfile.ASCIIHexWriter):
     """ASCII Space Hex format writer.

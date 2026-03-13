@@ -37,6 +37,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import io
 import re
 from collections.abc import Mapping, Sequence
 from typing import Any, Optional
@@ -84,6 +85,40 @@ class Reader(hexfile.Reader):
             True for DATA records, False for EOF
         """
         return format_type == DATA
+
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches RCA format.
+
+        RCA format uses !M marker in header and AAAA DD; records.
+        """
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+
+        try:
+            # Peek first 100 bytes for !M marker
+            data = fp.read(100)
+            if b"!M" in data:
+                return True
+            
+            # If no header, check for AAAA DD; records
+            if not data:
+                return False
+            
+            data_str = data.decode(errors="ignore")
+            # Pattern: 4 hex digits, space, at least one hex byte, semicolon
+            if re.search(r"[0-9A-F]{4}\s+[0-9A-F]{2}\s*;", data_str):
+                return True
+            return False
+        except Exception:
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, io.UnsupportedOperation):
+                pass
 
 
 class Writer(hexfile.Writer):

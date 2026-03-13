@@ -39,6 +39,7 @@ __copyright__ = """
 from collections.abc import Mapping, Sequence
 from typing import Any, Optional
 
+import io
 import objutils.checksums as checksums
 import objutils.hexfile as hexfile
 import objutils.utils as utils
@@ -92,6 +93,68 @@ class Reader(hexfile.Reader):
             True for DATA records, False for EOF
         """
         return format_type == DATA
+
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches MOS Technology format.
+
+        MOS Technology format uses ;LLAAAADDCCCC.
+        """
+        MAX_SAMPLE_LINES = 5
+
+        # Save position
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+
+        try:
+            matched = 0
+            for _ in range(MAX_SAMPLE_LINES):
+                line = fp.readline()
+                if not line:
+                    break
+
+                line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                line_str = line_str.strip()
+                if not line_str.startswith(";"):
+                    continue
+
+                # Check if it matches the general pattern
+                for _, pattern in self.formats:
+                    m = pattern.match(line_str)
+                    if m:
+                        # For Mostec, we check if the checksum matches (16-bit LRC)
+                        # Format: ;LLAAAADDCCCC
+                        # LL (2) AAAA (4) DD (var) CCCC (4)
+                        if len(line_str) >= 11:
+                            try:
+                                length = int(line_str[1:3], 16)
+                                addr = int(line_str[3:7], 16)
+                                data_hex = line_str[7:-4]
+                                checksum_given = int(line_str[-4:], 16)
+
+                                if len(data_hex) == length * 2:
+                                    data = bytearray.fromhex(data_hex)
+                                    expected = checksums.lrc(
+                                        utils.make_list(utils.int_to_array(addr), length, data),
+                                        16,
+                                        checksums.COMPLEMENT_NONE,
+                                    )
+                                    if checksum_given == expected:
+                                        matched += 1
+                                        break
+                            except ValueError:
+                                pass
+                        elif line_str == ";00":
+                            matched += 1
+                            break
+            return matched > 0
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, io.UnsupportedOperation):
+                pass
 
 
 class Writer(hexfile.Writer):

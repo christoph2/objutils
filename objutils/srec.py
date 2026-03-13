@@ -95,11 +95,12 @@ class Reader(hexfile.Reader):
         (S9, "S9LLAAAACC"),
     )
 
-    def load(self, fp: Any, **kws: Any) -> Any:
+    def load(self, fp: Any, join: bool = False, **kws: Any) -> Any:
         """Load and parse S-Record file.
 
         Args:
             fp: File path (str) or file object to read from
+            join: Merge consecutive sections (default: False)
             **kws: Additional keyword arguments (unused)
 
         Returns:
@@ -111,7 +112,7 @@ class Reader(hexfile.Reader):
         """
         if isinstance(fp, str):
             fp = open(fp, "rb")
-        data = self.read(fp)
+        data = self.read(fp, join=join)
 
         ## todo: extract Symbols and wipe them out.
         """

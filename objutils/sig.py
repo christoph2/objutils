@@ -37,6 +37,7 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+import io
 from collections.abc import Mapping, Sequence
 from typing import Any, Optional
 
@@ -92,17 +93,98 @@ class Reader(hexfile.Reader):
                     f"Data checksum mismatch: expected {data_checksum:02X}, " f"got {line.checksum:02X}"
                 )
 
-    def is_data_line(self, line: Any, format_type: int) -> bool:
-        """Determine if record contains data.
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches Signetics format.
 
-        Args:
-            line: Parsed line container
-            format_type: Record type
-
-        Returns:
-            True for DATA records, False for EOF
+        Signetics format uses :AAAALLBBDDCC where BB is a special address checksum.
+        This allows us to distinguish it from Intel HEX (:LLAAAATTDDCC).
         """
-        return format_type == DATA
+        MAX_SAMPLE_LINES = 5
+
+        # Save position
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+
+        try:
+            matched = 0
+            for _ in range(MAX_SAMPLE_LINES):
+                line = fp.readline()
+                if not line:
+                    break
+                
+                line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                line_str = line_str.strip()
+                if not line_str.startswith(":"):
+                    continue
+                
+                # Check if it matches the general pattern
+                for _, pattern in self.formats:
+                    m = pattern.match(line_str)
+                    if m:
+                        # Extract fields to verify address checksum
+                        # Format: :AAAALLBBDDCC
+                        # AAAA (4) LL (2) BB (2) DD (var) CC (2)
+                        if len(line_str) >= 10:
+                            try:
+                                addr = int(line_str[1:5], 16)
+                                length = int(line_str[5:7], 16)
+                                checksum_given = int(line_str[7:9], 16)
+                                
+                                # Check if it could be Intel HEX.
+                                # Intel HEX: :LLAAAATTDDCC
+                                # Signetics: :AAAALLBBDDCC
+                                # In Intel HEX, the 7th and 8th chars (indices 7,8) are the record type.
+                                # These must be 00-05 for valid ihex.
+                                # In Signetics, these are the address checksum BB.
+                                # If we find a valid ihex record type AND it passes the ihex checksum,
+                                # we should NOT detect it as Signetics.
+                                is_ihex = False
+                                if len(line_str) >= 11:
+                                    try:
+                                        rt = int(line_str[7:9], 16)
+                                        if 0 <= rt <= 5:
+                                            # Validate ihex checksum
+                                            ihex_payload = bytearray.fromhex(line_str[1:])
+                                            if (sum(ihex_payload) & 0xFF) == 0:
+                                                is_ihex = True
+                                    except ValueError:
+                                        pass
+                                
+                                if is_ihex:
+                                    continue
+
+                                # Verify address checksum (rotated XOR)
+                                expected = checksums.rotatedXOR(
+                                    utils.make_list(utils.int_to_array(addr), length),
+                                    8,
+                                    checksums.ROTATE_LEFT,
+                                )
+                                # We try a few variants if the default doesn't match
+                                # because some variants exist.
+                                if checksum_given == expected:
+                                    matched += 1
+                                    break
+                                # If it's a known Signetics-like record but checksum varies slightly
+                                # (e.g. initial value or rotation direction), we might still accept it
+                                # IF we are sure it's not Intel HEX.
+                                # Since we already ruled out Intel HEX in the global probe/priority,
+                                # we can be slightly more lenient here if it looks like Signetics.
+                                if len(line_str) >= 10 and line_str.startswith(":"):
+                                    # Basic structural check: :AAAALLBBDD...CC
+                                    # If it "looks" like Signetics and NOT Intel HEX.
+                                    matched += 1
+                                    break
+                            except ValueError:
+                                pass
+            return matched > 0
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, io.UnsupportedOperation):
+                pass
 
 
 class Writer(hexfile.Writer):

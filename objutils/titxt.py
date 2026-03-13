@@ -68,6 +68,46 @@ class Reader(hexfile.ASCIIHexReader):
         """
         super().__init__(address_pattern, data_pattern, etx_pattern)
 
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches TI-TXT format.
+
+        TI-TXT uses @ address markers and 'q' terminator.
+        """
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, Exception):
+            pass
+
+        try:
+            matched_at = False
+            matched_q = False
+            lines_checked = 0
+            while lines_checked < 50:
+                line = fp.readline()
+                if not line:
+                    break
+                line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                line_str = line_str.strip()
+                if not line_str:
+                    continue
+                lines_checked += 1
+                if line_str.startswith("@"):
+                    matched_at = True
+                if line_str == "q":
+                    matched_q = True
+                if matched_at and matched_q:
+                    return True
+            # For TI-TXT, @ marker is quite characteristic if it's near the start
+            return matched_at and lines_checked < 10
+        except Exception:
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, Exception):
+                pass
+
 
 class Writer(hexfile.ASCIIHexWriter):
     """TI-TXT format writer.

@@ -201,7 +201,7 @@ class Reader(hexfile.Reader):
         """
         return format_type in (DATA_ABS, DATA_INC, DATA_REL)
 
-    def probe(self, fp: BinaryIO) -> bool:
+    def probe(self, fp: BinaryIO, **kws: Any) -> bool:
         """Check if file is in FPC format.
 
         Args:
@@ -210,14 +210,63 @@ class Reader(hexfile.Reader):
         Returns:
             True if file appears to be FPC format
         """
-        for idx, line in enumerate(fp, 1):
-            if not VALID_CHARS.match(line.decode()):
-                fp.seek(0, os.SEEK_SET)
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, os.error):
+            pass
+
+        try:
+            # First check for the '$' prefix on the first few lines
+            lines = []
+            for _ in range(5):
+                line = fp.readline()
+                if not line:
+                    break
+                line_str = line.decode(errors="ignore").strip()
+                if not line_str:
+                    continue
+                # If we see fpc:1.0 (some versions use this header)
+                if line_str.startswith("fpc:"):
+                    return True
+                if not VALID_CHARS.match(line_str):
+                    return False
+                lines.append(line_str)
+            
+            if not lines:
                 return False
-            if idx > 3:
-                break
-        fp.seek(0, os.SEEK_SET)
-        return super().probe(create_string_buffer(bytearray(self.decode(fp), "ascii")))
+
+            # Reset and decode to check if it matches the hex patterns
+            fp.seek(start_pos)
+            decoded = self.decode(fp)
+            
+            # Simple manual check of the decoded hex against patterns
+            # Format: DATA_ABS (CCLL0000AAAAAAAADD), DATA_INC (CCLL0001DD), DATA_REL (CCLL0002AAAAAAAADD)
+            lines = decoded.splitlines()
+            if not lines:
+                return False
+            
+            import re
+            valid_hex = re.compile(r"^[0-9A-F]+$")
+            matched = 0
+            for line in lines[:5]:
+                line = line.strip()
+                if not line:
+                    continue
+                if not valid_hex.match(line):
+                    return False
+                # Check for one of the FPC types in the decoded hex stream
+                # decoded stream is essentially hex digit sequence
+                if "0000" in line or "0001" in line or "0002" in line:
+                    matched += 1
+            return matched > 0
+        except Exception:
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, os.error):
+                pass
 
 
 class Writer(hexfile.Writer):

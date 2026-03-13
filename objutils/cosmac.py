@@ -82,35 +82,44 @@ class Reader(hexfile.Reader):
         # Cosmac has no checksums - nothing to validate
         return None
 
-    def is_data_line(self, line: Any, format_type: int) -> bool:
-        """Determine if record contains data and update address tracking.
+    def probe(self, fp: Any, **kws: Any) -> bool:
+        """Check if file matches RCA Cosmac format.
 
-        Args:
-            line: Parsed line container
-            format_type: Record type
-
-        Returns:
-            True for all DATA record types, False for meta records
+        Cosmac format is extremely flexible (!MAAAA DD, ?MAAAA DD, AAAA DD, DD),
+        making it very prone to false positives. We check for the presence
+        of start symbols (!M or ?M) to confirm.
         """
-        if format_type == DATA3:
-            # Continuation record - check for start symbols
-            if line.junk in ("!M", "?M"):  # Start symbol, not data
-                return False
+        MAX_SAMPLE_LINES = 10
 
-            # Address continues from previous record
-            line.address = self.previous_address + self.previous_length
-            self.previous_address = line.address
-            self.previous_length = len(line.chunk)
-        else:
-            # Explicit address record - update tracking
-            if hasattr(line, "chunk"):
-                length = len(line.chunk)
-            else:
-                length = 0
-            self.previous_address = line.address
-            self.previous_length = length
+        # Save position
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, Exception):
+            pass
 
-        return format_type in (DATA0, DATA1, DATA2, DATA3)
+        try:
+            for _ in range(MAX_SAMPLE_LINES):
+                line = fp.readline()
+                if not line:
+                    break
+                
+                line_str = line.decode(errors="ignore") if isinstance(line, bytes) else line
+                line_str = line_str.strip()
+                if not line_str:
+                    continue
+                
+                # Check for explicit start symbols (!M or ?M)
+                if line_str.startswith(("!M", "?M")):
+                    return True
+            
+            # If no symbols found, it's probably not Cosmac (or a very bare-bones version)
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, Exception):
+                pass
 
 
 class Writer(hexfile.Writer):

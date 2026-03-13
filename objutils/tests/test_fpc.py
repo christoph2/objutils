@@ -21,7 +21,7 @@ $%%%%%"""
 
 
 fromSrec = loads("srec", SREC)
-dataFromSRec = dumps("fpc", fromSrec)  # Fixme: Does _NOT_ return 'bytes'!
+dataFromSRec = dumps("fpc", fromSrec)
 
 fromFPC = loads("fpc", FPC)
 dataFromFPC = dumps("srec", fromFPC, row_length=32, s5record=True)
@@ -37,11 +37,9 @@ class TestRoundTrip(unittest.TestCase):
 
 
 class TestProbe(unittest.TestCase):
-    @pytest.mark.skip
     def testProbeSrec(self):
         self.assertEqual(probes(SREC), "srec")
 
-    @pytest.mark.skip
     def testProbeFpc(self):
         self.assertEqual(probes(FPC), "fpc")
 

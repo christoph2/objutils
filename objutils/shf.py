@@ -24,6 +24,7 @@ __copyright__ = """
 """
 
 import re
+from typing import Any
 import xml.etree.ElementTree as ET  # nosec B405
 from hashlib import sha1
 
@@ -75,7 +76,7 @@ class Reader:
 
     logger = Logger(__name__)
 
-    def load(self, fp):
+    def load(self, fp, join: bool = False, **kws: Any):
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = fp.read()
@@ -125,16 +126,47 @@ class Reader:
             # print(tag, attrib)
             # print(section_data, sha1_digest(section_data))
             sections.append(Section(address, section_data))
-        img = Image(sections)
+        if join:
+            sections = join_sections(sections)
+        img = Image(sections, join=False)
         if hasattr(fp, "close"):
             fp.close()
         return img
 
-    def loads(self, image):
+    def loads(self, image, join: bool = False, **kws: Any):
         if isinstance(image, str):
-            return self.load(create_string_buffer(bytes(image, "ascii")))
+            return self.load(create_string_buffer(bytes(image, "ascii")), join=join)
         else:
-            return self.load(create_string_buffer(image))
+            return self.load(create_string_buffer(image), join=join)
+
+    def probe(self, fp, **kws: Any) -> bool:
+        """Check if file is in S Hexdump Format (SHF).
+
+        SHF is an XML-based format.
+        """
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, Exception):
+            pass
+
+        try:
+            # Peek first 100 bytes
+            data = fp.read(100)
+            if not data:
+                return False
+            data_str = data.decode(errors="ignore")
+            # SHF should contain <?xml and <dump or <block
+            if "<?xml" in data_str and "<dump" in data_str:
+                return True
+            return False
+        except Exception:
+            return False
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, Exception):
+                pass
 
 
 class Writer:

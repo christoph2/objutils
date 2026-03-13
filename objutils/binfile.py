@@ -26,7 +26,9 @@ __copyright__ = """
 import io
 import zipfile
 from contextlib import closing
+from typing import Any, BinaryIO, Union
 
+import objutils.hexfile as hexfile
 from objutils.image import Image
 from objutils.section import Section
 from objutils.utils import create_string_buffer
@@ -40,22 +42,26 @@ class NoContiniousError(Exception):
     pass
 
 
-class Reader:
-    def load(self, fp, address: int = 0x0000):
+class Reader(hexfile.Reader):
+    def load(self, fp: Union[str, BinaryIO], address: int = 0x0000, **kws: Any) -> Image:
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = fp.read()
         sec = Section(address, data)
-        img = Image([sec], valid=True)
+        img = Image([sec], valid=True, join=False)
         if hasattr(fp, "close"):
             fp.close()
         return img
 
-    def loads(self, image: Image, address: int = 0x0000):
+    def loads(self, image: Union[str, bytes, bytearray], address: int = 0x0000, **kws: Any) -> Image:
         if isinstance(image, str):
-            return self.load(create_string_buffer(bytes(image, "ascii")), address)
+            return self.load(io.BytesIO(bytes(image, "ascii")), address)
         else:
-            return self.load(create_string_buffer(image), address)
+            return self.load(io.BytesIO(image), address)
+
+    def probe(self, fp: BinaryIO, **kws: Any) -> bool:
+        """Binary files cannot be reliably probed by content alone."""
+        return False
 
 
 class Writer:
@@ -91,8 +97,30 @@ class Writer:
         return result
 
 
-class BinZipReader:
-    pass
+class BinZipReader(hexfile.Reader):
+    def probe(self, fp: BinaryIO, **kws: Any) -> bool:
+        """Probe for zip files."""
+        start_pos = 0
+        try:
+            start_pos = fp.tell()
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+        try:
+            return zipfile.is_zipfile(fp)
+        finally:
+            try:
+                fp.seek(start_pos)
+            except (AttributeError, io.UnsupportedOperation):
+                pass
+
+    def load(self, fp: Union[str, BinaryIO], **kws: Any) -> Image:
+        """Load from zip file."""
+        # TODO: Implementation
+        return Image([], valid=True)
+
+    def loads(self, data: Union[str, bytes, bytearray], **kws: Any) -> Image:
+        """Load from zip bytes."""
+        return self.load(io.BytesIO(data) if isinstance(data, (bytes, bytearray)) else io.BytesIO(data.encode()))
 
 
 class BinZipWriter:
