@@ -184,7 +184,7 @@ import sys
 from array import array
 from collections import namedtuple
 from copy import copy
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import reduce
 from operator import attrgetter, mul
 from typing import Any, TextIO, Union
@@ -435,15 +435,32 @@ class Section:
         are equal if they have the same start address, data, and name.
     """
 
-    start_address: int = field(hash=True, compare=True, default=0)
-    data: bytearray = field(default_factory=bytearray, compare=True, hash=True)
-    name: str = field(default="", compare=True, hash=True)
-
-    def __post_init__(self):
+    def __init__(self, start_address: int = 0, data: Any = None, name: str = ""):
+        self._start_address = start_address
+        self.data = _data_converter(data if data is not None else bytearray())
+        self.name = name
+        self._parent_image = None
         self.repr = reprlib.Repr()
         self.repr.maxstring = 64
         self.repr.maxother = 64
-        self.data = _data_converter(self.data)
+
+    @property
+    def start_address(self) -> int:
+        return self._start_address
+
+    @start_address.setter
+    def start_address(self, value: int) -> None:
+        if not isinstance(value, int):
+            raise TypeError("start_address must be of type int")
+        if value < 0:
+            raise ValueError("start_address must be >= 0")
+        if hasattr(self, "_parent_image") and self._parent_image:
+            self._parent_image._validate_address_change(self, value)
+        self._start_address = value
+
+    def __post_init__(self):
+        # We handle initialization in __init__ now.
+        pass
 
     def __iter__(self):
         yield self
@@ -791,7 +808,7 @@ class Section:
         return "Section(address = 0X{:08X}, length = {:d}, data = {})".format(
             self.start_address,
             self.length,
-            self.repr.repr(memoryview(self.data).tobytes()),
+            self.repr.repr(bytes(self.data)),
         )
 
     def __len__(self) -> int:
@@ -807,6 +824,63 @@ class Section:
     @property
     def address(self) -> int:  # Alias
         return self.start_address
+
+    @address.setter
+    def address(self, value: int) -> None:
+        self.start_address = value
+
+
+class LazySection(Section):
+    """Memory-mapped Section for large binary files.
+
+    LazySection uses `mmap` to map a file into memory instead of loading
+    everything into RAM. This is more efficient for very large files.
+    """
+
+    def __init__(self, start_address: int, filename: str, offset: int = 0, length: int = -1, name: str = ""):
+        import mmap
+        import os
+
+        self._start_address = start_address
+        self.name = name
+        self.filename = filename
+        self._file = open(filename, "rb")
+        if length == -1:
+            length = os.path.getsize(filename) - offset
+
+        self.data = mmap.mmap(self._file.fileno(), length, offset=offset, access=mmap.ACCESS_READ)
+        self.__post_init__()
+
+    def __post_init__(self):
+        super().__post_init__()
+
+    def write(self, addr: int, data: bytes, **kws) -> None:
+        raise NotImplementedError("LazySection is read-only")
+
+    def write_numeric(self, addr: int, value: Union[int, float], dtype: str, **kws) -> None:
+        raise NotImplementedError("LazySection is read-only")
+
+    def write_numeric_array(self, addr: int, data: Union[list[int], list[float]], dtype: str, **kws) -> None:
+        raise NotImplementedError("LazySection is read-only")
+
+    def write_string(self, addr: int, value: str, encoding: str = "latin1", **kws):
+        raise NotImplementedError("LazySection is read-only")
+
+    def write_ndarray(self, addr: int, array: np.ndarray, order: str = None, **kws) -> None:
+        raise NotImplementedError("LazySection is read-only")
+
+    def __del__(self):
+        """Close memory-mapped file when section is destroyed."""
+        try:
+            if hasattr(self, "data") and self.data:
+                self.data.close()
+        except (AttributeError, ValueError):
+            pass
+        try:
+            if hasattr(self, "_file") and self._file:
+                self._file.close()
+        except (AttributeError, ValueError):
+            pass
 
 
 def join_sections(sections: list[Section]) -> list[Section]:

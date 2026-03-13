@@ -421,6 +421,8 @@ class Image:
             sections = list(sections)
         else:
             raise TypeError(f"Argument section is of wrong type {sections!r}")
+        for section in sections:
+            section._parent_image = self
         self._sections = sorted(sections, key=attrgetter("start_address"))
         self._join = join
         if join:
@@ -832,6 +834,17 @@ class Image:
         into single sections, reducing fragmentation and improving efficiency.
         """
         self._sections = join_sections(self._sections)
+        for section in self._sections:
+            section._parent_image = self
+
+    def _validate_address_change(self, section: Section, new_address: int) -> None:
+        """Validate that changing a section's address doesn't cause overlaps."""
+        # Temporary remove section to check against others
+        others = [s for s in self._sections if s is not section]
+        for s in others:
+            # Check if new range [new_address, new_address + len(section)) overlaps with s
+            if not (new_address + len(section) <= s.start_address or new_address >= s.start_address + len(s)):
+                raise InvalidAddressError(f"New address 0x{new_address:08x} causes overlap with section at 0x{s.start_address:08x}")
 
     def split(self, at: Optional[int] = None, equal_parts: Optional[int] = None, remap: Optional[bool] = None) -> None:
         """Split image into multiple parts.

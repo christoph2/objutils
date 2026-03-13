@@ -27,31 +27,17 @@ import argparse
 import sys
 from os import path
 
-from objutils import load
+from objutils import load, probe
 
 
 def main():
     parser = argparse.ArgumentParser(description="Displays informations about HEX files.")
     parser.add_argument(
-        "file_type",
-        help="file type",
-        choices=[
-            "ash",
-            "cosmac",
-            "emon52",
-            "etek",
-            "fpc",
-            "ihex",
-            "mostec",
-            "rca",
-            "shf",
-            "sig",
-            "srec",
-            "tek",
-            "titxt",
-        ],
+        "file_or_type",
+        nargs="?",
+        help="file type or HEX file (if type is omitted)",
     )
-    parser.add_argument("hex_file", help="HEX file")
+    parser.add_argument("hex_file", nargs="?", help="HEX file")
     parser.add_argument(
         "-d",
         "--dump",
@@ -79,15 +65,32 @@ def main():
 
     args = parser.parse_args()
 
-    if not path.exists(args.hex_file):
-        print(f"File '{args.hex_file}' does not exist.")
+    if args.hex_file is None:
+        if args.file_or_type is None:
+            parser.error("too few arguments")
+        # Only one positional argument given: it's the hex_file, type is to be probed.
+        hex_file = args.file_or_type
+        file_type = None
+    else:
+        # Two positional arguments given: type and file.
+        file_type = args.file_or_type
+        hex_file = args.hex_file
+
+    if not path.exists(hex_file):
+        print(f"File '{hex_file}' does not exist.")
         sys.exit(1)
 
-    img = load(args.file_type.lower(), args.hex_file)
+    if file_type is None:
+        with open(hex_file, "rb") as f:
+            file_type = probe(f)
+
+    if file_type is None:
+        print(f"Could not determine file type for '{hex_file}'.")
+        sys.exit(1)
+
+    img = load(file_type.lower(), hex_file, join=args.join_section)
     if args.print_filename:
-        print(f"\nFile: {args.hex_file}")
-    if args.join_section:
-        img.join_sections()
+        print(f"\nFile: {hex_file}")
     print("\nSections")
     print("--------\n")
     print("Num   Address    Length")

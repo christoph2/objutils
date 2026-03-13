@@ -524,12 +524,12 @@ class Reader:
         elif discr == ASG:
             delim = self.readByte(self.fpos)
             if delim != 0xBE:
-                pass  # todo: FormatError!!!
+                raise hexfile.FormatError(f"Expected 0xBE, got 0x{delim:02X} at 0x{self.fpos:X}")
             executionStartingAddr = self.readNumber(self.fpos)
             self.logger.debug(f"STARTING-ADDRESS: 0x{executionStartingAddr:04X}")
             delim = self.readByte(self.fpos)
             if delim != 0xBF:
-                pass  # todo: FormatError!!!
+                raise hexfile.FormatError(f"Expected 0xBF, got 0x{delim:02X} at 0x{self.fpos:X}")
             self.info.executionStartingAddr = executionStartingAddr
         else:
             raise NotImplementedError(hex(discr))
@@ -587,7 +587,7 @@ class Reader:
             elif attrDef == 19:
                 pass
             else:
-                pass  # todo: FormatError!!!
+                raise hexfile.FormatError(f"Invalid symbol attribute at 0x{self.fpos:X}")
             ##            n4 =self.readNumber(self.fpos) # If n2 is non-zero, number of elements in the symbol type specified in n2
             if symbolTypeIndex != 0:
                 numberOfElements = self.readNumber(self.fpos)
@@ -873,7 +873,7 @@ class Reader:
         """"""
         typeIndex = self.readNumber(self.fpos)  # noqa: F841
         if self.readByte(self.fpos) != 0xCE:
-            pass  # todo: raise FormatError!!
+            raise hexfile.FormatError(f"Expected 0xCE at 0x{self.fpos:X}")
         localNameIndex = self.readNumber(self.fpos)  # noqa: F841
         values = []
         while True:
