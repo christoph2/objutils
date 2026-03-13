@@ -129,7 +129,7 @@ from sqlalchemy import Column, ForeignKey, and_, create_engine, event, not_, orm
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import Session, declarative_base, declared_attr, relationship
+from sqlalchemy.orm import Session, declarative_base, relationship
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import func
 
@@ -155,15 +155,6 @@ class MixInBase:
         __tablename__: Generated from class name (lowercased)
         __repr__: Returns detailed representation of object attributes
     """
-
-    @declared_attr
-    def __tablename__(self) -> str:
-        """Generate table name from class name.
-
-        Returns:
-            str: Lowercase class name used as SQLAlchemy table name.
-        """
-        return self.__name__.lower()
 
     def __repr__(self) -> str:
         """Generate detailed string representation of object.
@@ -301,7 +292,7 @@ def StdFloat(
         Column: SQLAlchemy Column configured for floating-point storage
     """
     return Column(
-        types.Integer,
+        types.Float,
         default=default,
         nullable=nullable,
         primary_key=primary_key,
@@ -310,6 +301,7 @@ def StdFloat(
 
 
 class Meta(Base, RidMixIn):
+    __tablename__ = "meta"
     """Metadata table for database schema information.
 
     Stores schema version and creation timestamp information for the database.
@@ -325,6 +317,7 @@ class Meta(Base, RidMixIn):
 
 
 class Elf_Header(Base, RidMixIn):
+    __tablename__ = "elf_header"
     """ORM model for ELF file header (Elf_Ehdr).
 
     Stores the main ELF header information including file identification (e_ident),
@@ -417,6 +410,7 @@ class Elf_Header(Base, RidMixIn):
 
 
 class Elf_ProgramHeaders(Base, RidMixIn):
+    __tablename__ = "elf_programheaders"
     """ORM model for ELF program header (Elf_Phdr).
 
     Represents a loadable segment/program header. Program headers describe how the
@@ -444,6 +438,7 @@ class Elf_ProgramHeaders(Base, RidMixIn):
 
 
 class Elf_Section(Base, RidMixIn):
+    __tablename__ = "elf_section"
     """ORM model for ELF section header (Elf_Shdr).
 
     Represents a section within an ELF file. Sections contain the actual data and code:
@@ -707,6 +702,7 @@ class Elf_Section(Base, RidMixIn):
 
 
 class Elf_Symbol(Base, RidMixIn):
+    __tablename__ = "elf_symbol"
     """ORM model for ELF symbol table entry (Elf_Sym).
 
     Represents a symbol (function, variable, label, etc.) in an ELF file.
@@ -887,6 +883,7 @@ class Elf_Symbol(Base, RidMixIn):
 
 
 class Elf_Comment(Base, RidMixIn):
+    __tablename__ = "elf_comment"
     """ORM model for ELF comment section entry.
 
     Stores text comments found in ELF files (typically from .comment sections).
@@ -899,6 +896,7 @@ class Elf_Comment(Base, RidMixIn):
 
 
 class Elf_Note(Base, RidMixIn):
+    __tablename__ = "elf_note"
     """ORM model for ELF note entry.
 
     Notes provide extensible metadata in ELF files for vendor-specific or
@@ -918,6 +916,7 @@ class Elf_Note(Base, RidMixIn):
 
 
 class DIEAttribute(Base, RidMixIn):
+    __tablename__ = "dieattribute"
     """ORM model for DWARF Debug Information Entry (DIE) attribute.
 
     Represents a single attribute (DW_AT_*) attached to a DIE. Attributes contain
@@ -1001,6 +1000,7 @@ class DIEAttribute(Base, RidMixIn):
 
 
 class DebugInformationEntry(Base, RidMixIn):
+    __tablename__ = "debuginformationentry"
     """ORM model for DWARF Debug Information Entry (DIE).
 
     Represents a node in the DWARF debug information tree. DIEs describe source code
@@ -1175,6 +1175,7 @@ class DebugInformationEntry(Base, RidMixIn):
 
 
 class DebugInformation(Base, RidMixIn):
+    __tablename__ = "debuginformation"
     """ORM model for DWARF debug information collection.
 
     Container table for organizing DWARF debugging information. Currently serves
@@ -1185,6 +1186,7 @@ class DebugInformation(Base, RidMixIn):
 
 
 class CompilationUnit(Base, RidMixIn):
+    __tablename__ = "compilationunit"
     """ORM model for DWARF Compilation Unit (CU).
 
     Represents a compilation unit (single translation unit) within debug information.
@@ -1324,7 +1326,13 @@ class Model:
         self._session = orm.Session(self._engine, autoflush=True, autocommit=False)
 
         self._metadata = Base.metadata
-        Base.metadata.create_all(self.engine)
+        if self.dbname == ":memory:":
+            # In-memory database must create all tables immediately as there's no pre-existing schema
+            Base.metadata.create_all(self.engine)
+        else:
+            # File-based database might already exist, so we only create missing tables
+            Base.metadata.create_all(self.engine)
+
         # Ensure schema upgrades for older databases opened directly via Model
         self._ensure_schema()
         self.session.flush()
