@@ -11,7 +11,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
 
-
 TOP_DIR = Path(__file__).parent
 
 print("Platform", platform.system())
