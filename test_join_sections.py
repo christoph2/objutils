@@ -216,7 +216,7 @@ def test_address_and_length_correctness():
         Section(0x0000, b"\x01\x02\x03"),
         Section(0x0003, b"\x04\x05"),
         Section(0x0005, b"\x06\x07\x08\x09"),
-        Section(0x1000, b"\x0A"),
+        Section(0x1000, b"\x0a"),
     ]
 
     print("Before join:")
@@ -239,7 +239,7 @@ def test_address_and_length_correctness():
     # Second section: 0x1000 to 0x1001
     assert joined[1].start_address == 0x1000
     assert joined[1].length == 1
-    assert joined[1].data == b"\x0A"
+    assert joined[1].data == b"\x0a"
     print("✓ PASSED\n")
 
 
@@ -268,6 +268,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         exit(1)
-
