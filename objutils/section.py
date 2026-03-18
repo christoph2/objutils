@@ -157,7 +157,7 @@ See Also
 __copyright__ = """
     objutils - Object file library for Python.
 
-   (C) 2010-2025 by Christoph Schueler <github.com/Christoph2,
+   (C) 2010-2026 by Christoph Schueler <github.com/Christoph2,
                                         cpu12.gems@googlemail.com>
 
    All Rights Reserved
@@ -218,6 +218,7 @@ FORMATS = {
     "int32": "i",
     "uint64": "Q",
     "int64": "q",
+    "float16": "e",
     "float32": "f",
     "float64": "d",
 }
@@ -231,6 +232,7 @@ TYPE_SIZES = {
     "int32": 4,
     "uint64": 8,
     "int64": 8,
+    "float16": 2,
     "float32": 4,
     "float64": 8,
 }
@@ -241,13 +243,46 @@ BYTEORDER = {
     "be": ">",
 }
 
+ASAM_BYTEORDER_ALIASES = {
+    "LITTLE_ENDIAN": "MSB_LAST",
+    "BIG_ENDIAN": "MSB_FIRST",
+}
+
+ASAM_STRING_ENCODINGS = {
+    "ASCII": "ascii",
+    "UTF8": "utf-8",
+    "UTF16": "utf-16",
+    "UTF32": "utf-32",
+}
+
+ASAM_NUMERIC_DTYPES = {
+    "UBYTE": "uint8",
+    "SBYTE": "int8",
+    "UWORD": "uint16",
+    "SWORD": "int16",
+    "ULONG": "uint32",
+    "SLONG": "int32",
+    "A_UINT64": "uint64",
+    "A_INT64": "int64",
+    "FLOAT16_IEEE": "float16",
+    "FLOAT32_IEEE": "float32",
+    "FLOAT64_IEEE": "float64",
+}
+
+ASAM_ENDIAN_FOR_BYTEORDER = {
+    "MSB_FIRST": "be",
+    "MSB_LAST": "le",
+    "MSB_FIRST_MSW_LAST": "be",
+    "MSB_LAST_MSW_FIRST": "le",
+}
+
 TypeInformation = namedtuple("TypeInformation", "type byte_order size")
 
 DTYPE = re.compile(
     r"""
       (?:(?P<uns>u)?int(?P<len>8 | 16 | 32 | 64)(?P<sep>[-/_:])(?P<end> be | le))
     | (?P<byte>byte)
-    | (?P<flt>float)(?P<flen>32 | 64)""",
+    | (?P<flt>float)(?P<flen>16 | 32 | 64)""",
     re.IGNORECASE | re.VERBOSE,
 )
 
@@ -512,6 +547,50 @@ class Section:
         else:
             return f"{BYTEORDER.get(bo)}{FORMATS.get(fmt)}"
 
+    def _resolve_asam_byteorder(self, byte_order: str) -> str:
+        normalized = byte_order.strip().upper()
+        normalized = ASAM_BYTEORDER_ALIASES.get(normalized, normalized)
+        if normalized not in ASAM_ENDIAN_FOR_BYTEORDER:
+            raise ValueError(f"Unsupported ASAM byte order {byte_order!r}")
+        return normalized
+
+    def _permute_asam_bytes_for_read(self, data: bytes, byte_order: str) -> bytes:
+        size = len(data)
+        if size <= 1:
+            return data
+        if byte_order == "MSB_FIRST_MSW_LAST":
+            if size % 2 != 0:
+                raise ValueError("MSB_FIRST_MSW_LAST requires even-sized numeric types")
+            return b"".join(data[idx + 1 : idx + 2] + data[idx : idx + 1] for idx in range(0, size, 2))
+        if byte_order == "MSB_LAST_MSW_FIRST":
+            if size % 2 != 0:
+                raise ValueError("MSB_LAST_MSW_FIRST requires even-sized numeric types")
+            return b"".join(data[idx + 1 : idx + 2] + data[idx : idx + 1] for idx in range(0, size, 2))
+        return data
+
+    def _permute_asam_bytes_for_write(self, data: bytes, byte_order: str) -> bytes:
+        size = len(data)
+        if size <= 1:
+            return data
+        if byte_order == "MSB_FIRST_MSW_LAST":
+            if size % 2 != 0:
+                raise ValueError("MSB_FIRST_MSW_LAST requires even-sized numeric types")
+            return b"".join(data[idx + 1 : idx + 2] + data[idx : idx + 1] for idx in range(0, size, 2))
+        if byte_order == "MSB_LAST_MSW_FIRST":
+            if size % 2 != 0:
+                raise ValueError("MSB_LAST_MSW_FIRST requires even-sized numeric types")
+            return b"".join(data[idx + 1 : idx + 2] + data[idx : idx + 1] for idx in range(0, size, 2))
+        return data
+
+    def _asam_numeric_dtype_to_internal(self, asam_dtype: str, asam_byte_order: str) -> str:
+        normalized_dtype = asam_dtype.strip().upper()
+        internal_dtype = ASAM_NUMERIC_DTYPES.get(normalized_dtype)
+        if internal_dtype is None:
+            raise TypeError(f"Unsupported ASAM datatype {asam_dtype!r}")
+        if internal_dtype in ("uint8", "int8"):
+            return internal_dtype
+        return f"{internal_dtype}_{ASAM_ENDIAN_FOR_BYTEORDER[asam_byte_order]}"
+
     def read(self, addr: int, length: int, **kws) -> bytes:
         """Read raw bytes from section at specified address.
 
@@ -674,6 +753,72 @@ class Section:
             raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
+
+    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws) -> Union[int, float]:
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        value = self.read_numeric(addr, internal_dtype, **kws)
+        if TYPE_SIZES.get(internal_dtype.split("_")[0], 0) <= 1:
+            return value
+
+        fmt = self._getformat(internal_dtype)
+        packed = struct.pack(fmt, value)
+        permuted = self._permute_asam_bytes_for_read(packed, asam_byte_order)
+        return struct.unpack(fmt, permuted)[0]
+
+    def write_asam_numeric(
+        self,
+        addr: int,
+        value: Union[int, float],
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws,
+    ) -> None:
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        if TYPE_SIZES.get(internal_dtype.split("_")[0], 0) <= 1:
+            self.write_numeric(addr, value, internal_dtype, **kws)
+            return
+
+        fmt = self._getformat(internal_dtype)
+        packed = struct.pack(fmt, value)
+        permuted = self._permute_asam_bytes_for_write(packed, asam_byte_order)
+        self.write(addr, permuted)
+
+    def read_asam_string(self, addr: int, dtype: str, length: int = -1, **kws) -> str:
+        encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
+        if encoding is None:
+            raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
+        if length == -1 and encoding in ("utf-8", "utf-16", "utf-32"):
+            offset = addr - self.start_address
+            if offset < 0:
+                raise InvalidAddressError(f"read_asam_string(0x{addr:08x}) access out of bounds.")
+            tail = self.data[offset:]
+            terminator = "\x00".encode(encoding=encoding)
+            pos = tail.find(terminator)
+            if pos != -1:
+                return tail[:pos].decode(encoding=encoding)
+            raise TypeError("Unterminated String!!!")
+        return self.read_string(addr, encoding=encoding, length=length, **kws)
+
+    def write_asam_string(self, addr: int, value: str, dtype: str, **kws) -> None:
+        encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
+        if encoding is None:
+            raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
+        if encoding == "ascii":
+            self.write_string(addr, value, encoding=encoding, **kws)
+            return
+
+        offset = addr - self.start_address
+        if offset < 0:
+            raise InvalidAddressError(f"write_asam_string(0x{addr:08x}) access out of bounds.")
+        encoded = value.encode(encoding=encoding)
+        terminator = "\x00".encode(encoding=encoding)
+        total_length = len(encoded) + len(terminator)
+        if offset + total_length > self.length:
+            raise InvalidAddressError(f"write_asam_string(0x{addr:08x}) access out of bounds.")
+        self.data[offset : offset + len(encoded)] = encoded
+        self.data[offset + len(encoded) : offset + total_length] = terminator
 
     def write_numeric_array(self, addr: int, data: Union[list[int], list[float]], dtype: str, **kws) -> None:
         if not hasattr(data, "__iter__"):

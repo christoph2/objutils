@@ -617,6 +617,29 @@ class Image:
         """
         self._call_address_function("write_numeric", addr, value, dtype, **kws)
 
+    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws: Any) -> Union[int, float]:
+        """Read a numeric ASAM datatype with ECU byte order semantics."""
+        return self._call_address_function("read_asam_numeric", addr, dtype, byte_order, **kws)
+
+    def write_asam_numeric(
+        self,
+        addr: int,
+        value: Union[int, float],
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws: Any,
+    ) -> None:
+        """Write a numeric ASAM datatype with ECU byte order semantics."""
+        self._call_address_function("write_asam_numeric", addr, value, dtype, byte_order, **kws)
+
+    def read_asam_string(self, addr: int, dtype: str, length: int = -1, **kws: Any) -> str:
+        """Read an ASAM string datatype (ASCII/UTF8/UTF16/UTF32)."""
+        return self._call_address_function("read_asam_string", addr, dtype, length, **kws)
+
+    def write_asam_string(self, addr: int, value: str, dtype: str, **kws: Any) -> None:
+        """Write an ASAM string datatype (ASCII/UTF8/UTF16/UTF32)."""
+        self._call_address_function("write_asam_string", addr, value, dtype, **kws)
+
     def read_numeric_array(self, addr: int, length: int, dtype: str, **kws: Any) -> list[Union[int, float]]:
         """Read array of numeric values from image.
 

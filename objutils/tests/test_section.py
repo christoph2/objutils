@@ -585,6 +585,59 @@ def test_write_uint8_array_boundary_case3(filler_0_16):
         filler_0_16.write_numeric_array(-1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
 
 
+def test_write_asam_numeric_msb_first_msw_last_uword():
+    sec = Section(data=bytearray(4))
+    sec.write_asam_numeric(0, 0x1234, "UWORD", byte_order="MSB_FIRST_MSW_LAST")
+    assert sec.data[:2] == bytearray([0x34, 0x12])
+
+
+def test_read_asam_numeric_msb_first_msw_last_uword():
+    sec = Section(data=bytearray([0x34, 0x12, 0x00, 0x00]))
+    assert sec.read_asam_numeric(0, "UWORD", byte_order="MSB_FIRST_MSW_LAST") == 0x1234
+
+
+def test_write_asam_numeric_msb_last_msw_first_ulong():
+    sec = Section(data=bytearray(8))
+    sec.write_asam_numeric(0, 0x11223344, "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert sec.data[:4] == bytearray([0x33, 0x44, 0x11, 0x22])
+
+
+def test_read_asam_numeric_msb_last_msw_first_ulong():
+    sec = Section(data=bytearray([0x33, 0x44, 0x11, 0x22, 0x00, 0x00, 0x00, 0x00]))
+    assert sec.read_asam_numeric(0, "ULONG", byte_order="MSB_LAST_MSW_FIRST") == 0x11223344
+
+
+def test_write_asam_numeric_msb_last_msw_first_a_uint64():
+    sec = Section(data=bytearray(16))
+    sec.write_asam_numeric(0, 0x1122334455667788, "A_UINT64", byte_order="MSB_LAST_MSW_FIRST")
+    assert sec.data[:8] == bytearray([0x77, 0x88, 0x55, 0x66, 0x33, 0x44, 0x11, 0x22])
+
+
+def test_read_asam_numeric_msb_last_msw_first_a_uint64():
+    sec = Section(data=bytearray([0x77, 0x88, 0x55, 0x66, 0x33, 0x44, 0x11, 0x22] + [0x00] * 8))
+    assert sec.read_asam_numeric(0, "A_UINT64", byte_order="MSB_LAST_MSW_FIRST") == 0x1122334455667788
+
+
+def test_asam_byteorder_aliases_legacy_names():
+    sec = Section(data=bytearray(4))
+    sec.write_asam_numeric(0, 0x1234, "UWORD", byte_order="BIG_ENDIAN")
+    assert sec.data[:2] == bytearray([0x12, 0x34])
+    sec.write_asam_numeric(0, 0x1234, "UWORD", byte_order="LITTLE_ENDIAN")
+    assert sec.data[:2] == bytearray([0x34, 0x12])
+
+
+def test_asam_string_utf8_roundtrip():
+    sec = Section(data=bytearray(64))
+    sec.write_asam_string(0, "Grüße", "UTF8")
+    assert sec.read_asam_string(0, "UTF8") == "Grüße"
+
+
+def test_asam_float16_ieee_roundtrip():
+    sec = Section(data=bytearray(8))
+    sec.write_asam_numeric(0, 1.5, "FLOAT16_IEEE", byte_order="MSB_LAST")
+    assert sec.read_asam_numeric(0, "FLOAT16_IEEE", byte_order="MSB_LAST") == pytest.approx(1.5, rel=1e-3)
+
+
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_write_ndarray1():
     sec = Section(start_address=0x1000, data=bytearray(32))

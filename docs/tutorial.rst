@@ -86,6 +86,57 @@ Supported scalar types:
 
 An endianness suffix (``_be`` or ``_le``) is required.
 
+ASAM byte order and datatype helpers
+------------------------------------
+
+For ECU/ASAM style type names and byte orders (including word-swap variants), use the dedicated ASAM helpers:
+
+.. code-block:: python
+
+   from objutils import Image, Section
+
+   img = Image([Section(0x2000, bytes(64))])
+
+   # ASAM numerics
+   img.write_asam_numeric(0x2000, 0x11223344, "ULONG", "MSB_FIRST")
+   img.write_asam_numeric(0x2004, 0x11223344, "ULONG", "MSB_FIRST_MSW_LAST")
+   img.write_asam_numeric(0x2008, 0x11223344, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   # Roundtrip reads
+   a = img.read_asam_numeric(0x2000, "ULONG", "MSB_FIRST")
+   b = img.read_asam_numeric(0x2004, "ULONG", "MSB_FIRST_MSW_LAST")
+   c = img.read_asam_numeric(0x2008, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   # ASAM strings
+   img.write_asam_string(0x2010, "MOTOR", "ASCII")
+   img.write_asam_string(0x2020, "Drehzahl", "UTF8")
+   s0 = img.read_asam_string(0x2010, "ASCII")
+   s1 = img.read_asam_string(0x2020, "UTF8")
+
+Supported ASAM byte orders:
+
+- ``MSB_FIRST``
+- ``MSB_LAST``
+- ``MSB_FIRST_MSW_LAST``
+- ``MSB_LAST_MSW_FIRST``
+- ``LITTLE_ENDIAN`` (legacy alias for ``MSB_LAST``)
+- ``BIG_ENDIAN`` (legacy alias for ``MSB_FIRST``)
+
+Supported ASAM numeric datatypes:
+
+- ``UBYTE``, ``SBYTE``
+- ``UWORD``, ``SWORD``
+- ``ULONG``, ``SLONG``
+- ``A_UINT64``, ``A_INT64``
+- ``FLOAT16_IEEE``, ``FLOAT32_IEEE``, ``FLOAT64_IEEE``
+
+Supported ASAM string datatypes:
+
+- ``ASCII``
+- ``UTF8``
+- ``UTF16``
+- ``UTF32``
+
 CLI companions
 --------------
 

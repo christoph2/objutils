@@ -1330,5 +1330,18 @@ def test_write_uint8_array_boundary_case3_1():
         img.write_numeric_array(0x0FFF, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "uint8_be")
 
 
+def test_image_write_read_asam_numeric_word_swap_32bit():
+    img = Image(Section(data=bytearray(16), start_address=0x1000))
+    img.write_asam_numeric(0x1000, 0x11223344, "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert img.read(0x1000, 4) == b"\x33\x44\x11\x22"
+    assert img.read_asam_numeric(0x1000, "ULONG", byte_order="MSB_LAST_MSW_FIRST") == 0x11223344
+
+
+def test_image_asam_string_ascii_roundtrip():
+    img = Image(Section(data=bytearray(16), start_address=0x1000))
+    img.write_asam_string(0x1000, "ABC", "ASCII")
+    assert img.read_asam_string(0x1000, "ASCII") == "ABC"
+
+
 if __name__ == "__main__":
     unittest.main()

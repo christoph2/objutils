@@ -323,6 +323,55 @@ The folling types are supported:
 
 In any case, endianess suffixes **_be** or **_le** are required.
 
+For ASAM workflows there are dedicated helpers with explicit byte-order names:
+
+.. code-block:: python
+
+   img0 = Image([Section(0x1000, bytes(64))])
+   img0.write_asam_numeric(0x1000, 0x11223344, "ULONG", "MSB_FIRST")
+   img0.write_asam_numeric(0x1004, 0x11223344, "ULONG", "MSB_FIRST_MSW_LAST")
+   img0.write_asam_numeric(0x1008, 0x11223344, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   print(hex(img0.read_asam_numeric(0x1000, "ULONG", "MSB_FIRST")))
+   print(hex(img0.read_asam_numeric(0x1004, "ULONG", "MSB_FIRST_MSW_LAST")))
+   print(hex(img0.read_asam_numeric(0x1008, "ULONG", "MSB_LAST_MSW_FIRST")))
+
+   # All reads print 0x11223344 again.
+
+Supported ASAM byte orders:
+
+* MSB_FIRST
+* MSB_LAST
+* MSB_FIRST_MSW_LAST (word-swap)
+* MSB_LAST_MSW_FIRST (word-swap)
+* LITTLE_ENDIAN (legacy alias for MSB_LAST)
+* BIG_ENDIAN (legacy alias for MSB_FIRST)
+
+Supported ASAM numeric datatypes:
+
+* UBYTE, SBYTE
+* UWORD, SWORD
+* ULONG, SLONG
+* A_UINT64, A_INT64
+* FLOAT16_IEEE, FLOAT32_IEEE, FLOAT64_IEEE
+
+ASAM string helpers are available, too:
+
+.. code-block:: python
+
+   img0.write_asam_string(0x1020, "MOTOR", "ASCII")
+   img0.write_asam_string(0x1030, "Drehzahl", "UTF8")
+
+   print(img0.read_asam_string(0x1020, "ASCII"))
+   print(img0.read_asam_string(0x1030, "UTF8"))
+
+Supported ASAM string datatypes:
+
+* ASCII
+* UTF8
+* UTF16
+* UTF32
+
 Arrays are also supported.
 
 .. code-block:: python

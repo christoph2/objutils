@@ -53,6 +53,28 @@ Read/write typed values at absolute addresses
    img.write_numeric_array(0x2004, [1, 2, 3, 4], "uint16_le")
    img.write_string(0x2010, "hello")
 
+Read/write ASAM values (incl. word-swap byte orders)
+-----------------------------------------------------
+
+.. code-block:: python
+
+   from objutils import Image, Section
+
+   img = Image([Section(0x3000, bytes(64))])
+
+   # ASAM numeric helpers
+   img.write_asam_numeric(0x3000, 0x11223344, "ULONG", "MSB_FIRST")
+   img.write_asam_numeric(0x3004, 0x11223344, "ULONG", "MSB_FIRST_MSW_LAST")
+   img.write_asam_numeric(0x3008, 0x11223344, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   value0 = img.read_asam_numeric(0x3000, "ULONG", "MSB_FIRST")
+   value1 = img.read_asam_numeric(0x3004, "ULONG", "MSB_FIRST_MSW_LAST")
+   value2 = img.read_asam_numeric(0x3008, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   # ASAM string helpers
+   img.write_asam_string(0x3010, "MOTOR", "ASCII")
+   name = img.read_asam_string(0x3010, "ASCII")
+
 Extract loadable image from ELF
 -------------------------------
 
