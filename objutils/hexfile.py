@@ -499,16 +499,21 @@ class FormatParser:
 # ============================================================================
 
 
+@dataclass
 class Container:
-    """Legacy dynamic attribute container.
+    """Modern attribute container for parsed hex records."""
 
-    Deprecated: Use ParsedRecord instead.
-    """
-
-    def __init__(self) -> None:
-        self.processing_instructions: list[Any] = []
+    line_number: int = 0
+    address: Optional[int] = None
+    length: Optional[int] = None
+    type: Optional[int] = None
+    checksum: Optional[int] = None
+    chunk: Optional[bytearray] = None
+    junk: Optional[str] = None
+    processing_instructions: list[Any] = field(default_factory=list)
 
     def add_processing_instruction(self, pi: Any) -> None:
+        """Add a processing instruction to the record."""
         self.processing_instructions.append(pi)
 
 
@@ -785,6 +790,7 @@ class Reader(BaseType):
         self.stats = Statistics()
         self.valid = True
         self.formats: list[tuple[int, re.Pattern[str]]] = []
+        self.base_address = 0   # Base address for relative addressing (if applicable - mainly Intel HEX)
 
         # Parse FORMAT_SPEC into compiled patterns
         if isinstance(self.FORMAT_SPEC, str):
@@ -870,11 +876,16 @@ class Reader(BaseType):
                 self.stats.record_types[format_type] += 1
 
                 # Parse scalar values (address, length, type, checksum)
-                for key, value in dict_.items():
-                    if key not in ("chunk", "junk"):
-                        setattr(container, key, atoi(value))
-                    elif key == "junk":
-                        setattr(container, key, value)
+                if "address" in dict_:
+                    container.address = atoi(dict_["address"])
+                if "length" in dict_:
+                    container.length = atoi(dict_["length"])
+                if "type" in dict_:
+                    container.type = atoi(dict_["type"])
+                if "checksum" in dict_:
+                    container.checksum = atoi(dict_["checksum"])
+                if "junk" in dict_:
+                    container.junk = dict_["junk"]
 
                 # Parse data chunk
                 if "chunk" in dict_:
@@ -894,8 +905,8 @@ class Reader(BaseType):
                 # Process data lines
                 if self.is_data_line(container, format_type):
                     if self.parseData(container, format_type):
-                        address = getattr(container, "address", 0)
-                        chunk = getattr(container, "chunk", bytearray())
+                        address = (container.address if container.address is not None else 0) + self.base_address
+                        chunk = container.chunk if container.chunk is not None else bytearray()
                         self.stats.data_bytes[format_type] += len(chunk)
                         section = Section(address, chunk)
                         sections.append(section)
@@ -908,8 +919,8 @@ class Reader(BaseType):
                     meta_data[format_type].append(
                         MetaRecord(
                             format_type=format_type,
-                            address=getattr(container, "address", None),
-                            chunk=getattr(container, "chunk", None),
+                            address=container.address,
+                            chunk=container.chunk,
                         )
                     )
                 break  # Pattern matched, stop trying formats

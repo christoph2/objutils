@@ -56,19 +56,6 @@ class Reader(hexfile.Reader):
     def __init__(self) -> None:
         """Initialize reader with address calculation state."""
         super().__init__()
-        self.segmentAddress: int = 0
-        self._address_calculator: Callable[[int], int] = self._default_address_calculator
-
-    def _default_address_calculator(self, x: int) -> int:
-        """Default address calculator (identity function).
-
-        Args:
-            x: Input address
-
-        Returns:
-            Same address unchanged
-        """
-        return x
 
     def check_line(self, line: Any, format_type: int) -> None:
         """Validate Intel HEX record checksum.
@@ -106,7 +93,7 @@ class Reader(hexfile.Reader):
         """
         return line.type == DATA
 
-    def calculate_extended_address(self, line: Any, shift_by: int, name: str) -> None:
+    def calculate_base_address(self, line: Any, shift_by: int, name: str) -> None:
         """Calculate extended address from segment/linear address record.
 
         Args:
@@ -118,9 +105,7 @@ class Reader(hexfile.Reader):
             # Extract 16-bit segment value
             segment = (line.chunk[0] << 8) | line.chunk[1]
             line.add_processing_instruction(("segment", segment))
-
-            # Update address calculator to add segment base
-            self._address_calculator = partial(operator.add, segment << shift_by)
+            self.base_address = segment << shift_by
             self.debug(f"EXTENDED_{name.upper()}_ADDRESS: {segment:#X}")
         else:
             self.error(f"Bad Extended {name} Address at line #{line.line_number}.")
@@ -135,19 +120,15 @@ class Reader(hexfile.Reader):
         Note:
             Handles extended addressing, start addresses, and EOF records.
         """
-        if line.type == DATA:
-            # Apply extended address calculation
-            line.address = self._address_calculator(line.address)
-
-        elif line.type == EXTENDED_SEGMENT_ADDRESS:
+        if line.type == EXTENDED_SEGMENT_ADDRESS:
             # Extended segment address (20-bit: segment << 4)
-            self.calculate_extended_address(line, 4, "Segment")
-
+            self.calculate_base_address(line, 4, "Segment")
         elif line.type == START_SEGMENT_ADDRESS:
             # Start segment address (CS:IP for x86)
             if len(line.chunk) == 4:
                 cs = (line.chunk[0] << 8) | line.chunk[1]
                 ip = (line.chunk[2] << 8) | line.chunk[3]
+                self.base_address = (cs << 4) + ip
                 line.add_processing_instruction(("cs", cs))
                 line.add_processing_instruction(("ip", ip))
                 self.debug(f"START_SEGMENT_ADDRESS: {hex(cs)}:{hex(ip)}")
@@ -156,12 +137,13 @@ class Reader(hexfile.Reader):
 
         elif line.type == EXTENDED_LINEAR_ADDRESS:
             # Extended linear address (32-bit: segment << 16)
-            self.calculate_extended_address(line, 16, "Linear")
+            self.calculate_base_address(line, 16, "Linear")
 
         elif line.type == START_LINEAR_ADDRESS:
             # Start linear address (EIP for x86)
             if len(line.chunk) == 4:
                 eip = (line.chunk[0] << 24) | (line.chunk[1] << 16) | (line.chunk[2] << 8) | line.chunk[3]
+                self.base_address = eip
                 line.add_processing_instruction(("eip", eip))
                 self.debug(f"START_LINEAR_ADDRESS: {hex(eip)}")
             else:
