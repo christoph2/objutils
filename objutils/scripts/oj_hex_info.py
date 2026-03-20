@@ -54,14 +54,6 @@ def main():
         default=False,
         help="Print filename including path",
     )
-    parser.add_argument(
-        "-j",
-        "--join-sections",
-        dest="join_section",
-        action="store_true",
-        default=False,
-        help="Join adjacent sections",
-    )
 
     args = parser.parse_args()
 
@@ -88,7 +80,7 @@ def main():
         print(f"Could not determine file type for '{hex_file}'.")
         sys.exit(1)
 
-    img = load(file_type.lower(), hex_file, join=args.join_section)
+    img = load(file_type.lower(), hex_file)
     if args.print_filename:
         print(f"\nFile: {hex_file}")
     print("\nSections")

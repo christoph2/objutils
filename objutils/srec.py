@@ -95,7 +95,7 @@ class Reader(hexfile.Reader):
         (S9, "S9LLAAAACC"),
     )
 
-    def load(self, fp: Any, join: bool = False, **kws: Any) -> Any:
+    def load(self, fp: Any, join: bool = True, **kws: Any) -> Any:
         """Load and parse S-Record file.
 
         Args:

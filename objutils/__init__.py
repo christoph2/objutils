@@ -125,7 +125,7 @@ registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex sp
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
 
 
-def load(codec_name: str, fp: str | Path | BinaryIO, join: bool = False, **kws: Any) -> Image:
+def load(codec_name: str, fp: str | Path | BinaryIO, join: bool = True, **kws: Any) -> Image:
     """Load hex data from file.
 
     Parameters
@@ -140,7 +140,7 @@ def load(codec_name: str, fp: str | Path | BinaryIO, join: bool = False, **kws: 
     return registry.get(codec_name).Reader().load(fp, join=join, **kws)
 
 
-def loads(codec_name: str, data: str | bytes | bytearray, join: bool = False, **kws: Any) -> Image:
+def loads(codec_name: str, data: str | bytes | bytearray, join: bool = True, **kws: Any) -> Image:
     """Load hex data from bytes.
 
     Parameters

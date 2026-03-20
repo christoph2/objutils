@@ -108,7 +108,7 @@ class Reader(hexfile.Reader):
             out_lines.append("".join(values))
         return "\n".join(out_lines)
 
-    def read(self, fp: BinaryIO) -> Image:
+    def read(self, fp: BinaryIO, join: bool = False) -> Image:
         """Read FPC file and convert to Image.
 
         Args:
@@ -117,7 +117,7 @@ class Reader(hexfile.Reader):
         Returns:
             Image object containing decoded sections
         """
-        return super().read(create_string_buffer(bytearray(self.decode(fp), "ascii")))
+        return super().read(create_string_buffer(bytearray(self.decode(fp), "ascii")), join=join)
 
     def convert_quintuple(self, quintuple: str) -> int:
         """Convert 5-character base-85 quintuple to 32-bit integer.
