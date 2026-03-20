@@ -93,6 +93,40 @@ class TestHexfile(unittest.TestCase):
         self.assertEqual(roundtrip.sections[0].start_address, 0x2000)
         self.assertEqual(roundtrip.sections[0].data, b"\x11\x22\x33\x44\x55\x66")
 
+    def test_reader_join_merges_full_containment_when_overlap_matches(self):
+        """A fully-contained section with identical bytes should be absorbed."""
+        sec_outer = Section(0x3000, b"\x10\x20\x30\x40\x50")
+        sec_inner = Section(0x3001, b"\x20\x30")
+        roundtrip = loads("ihex", dumps("ihex", Image([sec_inner, sec_outer], join=False)), join=True)
+
+        self.assertEqual(len(roundtrip.sections), 1)
+        self.assertEqual(roundtrip.sections[0].start_address, 0x3000)
+        self.assertEqual(roundtrip.sections[0].data, b"\x10\x20\x30\x40\x50")
+
+    def test_reader_join_merges_transitive_overlaps(self):
+        """Compatible overlap chains should merge transitively into one section."""
+        sec_a = Section(0x1000, b"ABCD")
+        sec_b = Section(0x1002, b"CD12")
+        sec_c = Section(0x1004, b"1234")
+        roundtrip = loads("ihex", dumps("ihex", Image([sec_a, sec_b, sec_c], join=False)), join=True)
+
+        self.assertEqual(len(roundtrip.sections), 1)
+        self.assertEqual(roundtrip.sections[0].start_address, 0x1000)
+        self.assertEqual(roundtrip.sections[0].data, b"ABCD1234")
+
+    def test_reader_join_conflict_stays_split_but_followup_still_merges(self):
+        """After a conflicting overlap split, later compatible records still merge."""
+        sec_a = Section(0x1000, b"\x01\x02\x03\x04")
+        sec_b = Section(0x1002, b"\x09\x09\x05\x06")
+        sec_c = Section(0x1006, b"\x07\x08")
+        roundtrip = loads("ihex", dumps("ihex", Image([sec_a, sec_b, sec_c], join=False)), join=True)
+
+        self.assertEqual(len(roundtrip.sections), 2)
+        self.assertEqual(roundtrip.sections[0].start_address, 0x1000)
+        self.assertEqual(roundtrip.sections[0].data, b"\x01\x02\x03\x04")
+        self.assertEqual(roundtrip.sections[1].start_address, 0x1002)
+        self.assertEqual(roundtrip.sections[1].data, b"\x09\x09\x05\x06\x07\x08")
+
 
 def main():
     unittest.main()
