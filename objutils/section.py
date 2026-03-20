@@ -1029,11 +1029,10 @@ class LazySection(Section):
 
 
 def join_sections(sections: list[Section]) -> list[Section]:
-    """Join consecutive sections into contiguous blocks.
+    """Join sections when their address ranges are compatible.
 
-    Merges sections that are adjacent in memory (where one section's end address
-    equals the next section's start address) into single sections. Non-consecutive
-    sections remain separate.
+    Merges sections that are adjacent in memory or overlap with identical bytes in
+    the shared range. Conflicting overlaps remain separate sections.
 
     The function sorts sections by start address before processing.
 
@@ -1041,7 +1040,7 @@ def join_sections(sections: list[Section]) -> list[Section]:
         sections: List of Section objects to join
 
     Returns:
-        New list of Section objects with consecutive sections merged
+        New list of Section objects with compatible sections merged
 
     Raises:
         TypeError: If any element is not a Section instance
@@ -1068,20 +1067,46 @@ def join_sections(sections: list[Section]) -> list[Section]:
         This function is automatically called when creating an Image with
         ``join=True`` parameter.
     """
-    result_sections = []
-    sections.sort(key=attrgetter("start_address"))
-    prev_section = Section()
+    result_sections: list[Section] = []
     for section in sections:
         if not isinstance(section, Section):
             raise TypeError("'{}' is not a 'Section' instance", section)
-        if section.start_address == prev_section.start_address + prev_section.length and result_sections:
-            last_segment = result_sections[-1]
-            last_segment.data.extend(section.data)
-        else:
-            # Create a new section.
+
+    sorted_sections = sorted(sections, key=attrgetter("start_address"))
+
+    for section in sorted_sections:
+
+        if not result_sections:
             result_sections.append(Section(section.start_address, section.data))
-        prev_section = section
-    if result_sections:
-        return result_sections
-    else:
-        return []
+            continue
+
+        last_segment = result_sections[-1]
+        last_end = last_segment.start_address + last_segment.length
+        section_start = section.start_address
+        section_end = section_start + section.length
+
+        if section_start > last_end:
+            result_sections.append(Section(section.start_address, section.data))
+            continue
+
+        if section_start == last_end:
+            last_segment.data.extend(section.data)
+            continue
+
+        overlap_start = section_start
+        overlap_end = min(last_end, section_end)
+        overlap_length = overlap_end - overlap_start
+        last_offset = overlap_start - last_segment.start_address
+        section_offset = overlap_start - section_start
+
+        last_overlap = last_segment.data[last_offset : last_offset + overlap_length]
+        section_overlap = section.data[section_offset : section_offset + overlap_length]
+        if last_overlap != section_overlap:
+            result_sections.append(Section(section.start_address, section.data))
+            continue
+
+        if section_end > last_end:
+            tail_offset = overlap_end - section_start
+            last_segment.data.extend(section.data[tail_offset:])
+
+    return result_sections

@@ -837,6 +837,21 @@ class Reader(BaseType):
             buffer = create_string_buffer(image)
         return self.load(buffer, join=join)
 
+    def _parse_optional_int(self, groups: dict[str, Optional[str]], key: str) -> Optional[int]:
+        """Parse an optional numeric capture group using ``atoi``.
+
+        Args:
+            groups: Regex named groups from a parsed line.
+            key: Group name to parse.
+
+        Returns:
+            Parsed integer or ``None`` if the group is missing/empty.
+        """
+        value = groups.get(key)
+        if value is None or value == "":
+            return None
+        return atoi(value)
+
     def read(self, fp: BinaryIO, join: bool = False) -> Image:
         """Read and parse hex file.
 
@@ -866,30 +881,23 @@ class Reader(BaseType):
                     continue
 
                 matched = True
-                container = Container()
-                container.line_number = line_number
-                dict_ = match.groupdict()
+                dict_: dict[str, Optional[str]] = match.groupdict()
 
                 if not dict_:
                     continue
 
                 self.stats.record_types[format_type] += 1
 
-                # Parse scalar values (address, length, type, checksum)
-                if "address" in dict_:
-                    container.address = atoi(dict_["address"])
-                if "length" in dict_:
-                    container.length = atoi(dict_["length"])
-                if "type" in dict_:
-                    container.type = atoi(dict_["type"])
-                if "checksum" in dict_:
-                    container.checksum = atoi(dict_["checksum"])
-                if "junk" in dict_:
-                    container.junk = dict_["junk"]
+                address = self._parse_optional_int(dict_, "address")
+                length = self._parse_optional_int(dict_, "length")
+                record_type = self._parse_optional_int(dict_, "type")
+                checksum = self._parse_optional_int(dict_, "checksum")
+                junk = dict_.get("junk")
 
                 # Parse data chunk
-                if "chunk" in dict_:
-                    chunk_str = dict_["chunk"]
+                chunk: Optional[bytearray] = None
+                chunk_str = dict_.get("chunk")
+                if chunk_str is not None:
                     if self.DATA_SEPARATOR:
                         chunk_str = chunk_str.replace(self.DATA_SEPARATOR, "")
 
@@ -897,7 +905,16 @@ class Reader(BaseType):
                     if chunk_str:
                         for idx in range(0, len(chunk_str), 2):
                             chunk.append(atoi(chunk_str[idx : idx + 2]))
-                    container.chunk = chunk
+
+                container = Container(
+                    line_number=line_number,
+                    address=address,
+                    length=length,
+                    type=record_type,
+                    checksum=checksum,
+                    chunk=chunk,
+                    junk=junk,
+                )
 
                 # Validate line
                 self.check_line(container, format_type)

@@ -134,11 +134,9 @@ class Reader(hexfile.Reader):
                 self.debug(f"START_SEGMENT_ADDRESS: {hex(cs)}:{hex(ip)}")
             else:
                 self.error(f"Bad Segment Address at line #{line.line_number}.")
-
         elif line.type == EXTENDED_LINEAR_ADDRESS:
             # Extended linear address (32-bit: segment << 16)
             self.calculate_base_address(line, 16, "Linear")
-
         elif line.type == START_LINEAR_ADDRESS:
             # Start linear address (EIP for x86)
             if len(line.chunk) == 4:
@@ -148,12 +146,10 @@ class Reader(hexfile.Reader):
                 self.debug(f"START_LINEAR_ADDRESS: {hex(eip)}")
             else:
                 self.error(f"Bad Linear Address at line #{line.line_number}.")
-
         elif line.type == EOF:
             # End of file - nothing to process
             pass
-
-        else:
+        elif line.type != DATA:
             self.warn(f"Invalid record type [{line.type}] at line {line.line_number}")
 
 
