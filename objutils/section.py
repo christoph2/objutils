@@ -587,8 +587,6 @@ class Section:
         internal_dtype = ASAM_NUMERIC_DTYPES.get(normalized_dtype)
         if internal_dtype is None:
             raise TypeError(f"Unsupported ASAM datatype {asam_dtype!r}")
-        if internal_dtype in ("uint8", "int8"):
-            return internal_dtype
         return f"{internal_dtype}_{ASAM_ENDIAN_FOR_BYTEORDER[asam_byte_order]}"
 
     def read(self, addr: int, length: int, **kws) -> bytes:
