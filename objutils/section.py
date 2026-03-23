@@ -32,6 +32,9 @@ Architecture
     ├── read/write(addr, length)             # Raw bytes
     ├── read_numeric/write_numeric(addr, dtype)   # Single values
     ├── read_numeric_array/write_numeric_array()  # Arrays
+    ├── read_asam_numeric/write_asam_numeric()    # ASAM scalars
+    ├── read_asam_numeric_array/write_asam_numeric_array()  # ASAM arrays
+    ├── read_asam_ndarray/write_asam_ndarray()    # ASAM NumPy arrays
     ├── read_string/write_string()                # Null-terminated strings
     └── read_ndarray/write_ndarray()              # NumPy arrays
 

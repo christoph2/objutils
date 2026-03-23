@@ -56,6 +56,21 @@ Read/write typed values at absolute addresses
 Read/write ASAM values (incl. word-swap byte orders)
 -----------------------------------------------------
 
+Use these helpers when your calibration metadata uses ASAM type names
+(``ULONG``, ``UWORD``, ``FLOAT32_IEEE``) and ECU byte-order terms
+(``MSB_FIRST``, ``MSB_LAST_MSW_FIRST``).
+
+ASAM API quick reference:
+
+- ``read_asam_numeric(addr, dtype, byte_order="MSB_LAST")``
+- ``write_asam_numeric(addr, value, dtype, byte_order="MSB_LAST")``
+- ``read_asam_numeric_array(addr, length, dtype, byte_order="MSB_LAST")``
+- ``write_asam_numeric_array(addr, data, dtype, byte_order="MSB_LAST")``
+- ``read_asam_ndarray(addr, length, dtype, shape=None, order=None, byte_order="MSB_LAST")``
+- ``write_asam_ndarray(addr, array, dtype, byte_order="MSB_LAST", order=None)``
+- ``read_asam_string(addr, dtype, length=-1)``
+- ``write_asam_string(addr, value, dtype)``
+
 .. code-block:: python
 
    from objutils import Image, Section
@@ -71,9 +86,50 @@ Read/write ASAM values (incl. word-swap byte orders)
    value1 = img.read_asam_numeric(0x3004, "ULONG", "MSB_FIRST_MSW_LAST")
    value2 = img.read_asam_numeric(0x3008, "ULONG", "MSB_LAST_MSW_FIRST")
 
+   # ASAM numeric array helpers
+   img.write_asam_numeric_array(0x3020, [0x11223344, 0x55667788], "ULONG", "MSB_LAST_MSW_FIRST")
+   values = img.read_asam_numeric_array(0x3020, 2, "ULONG", "MSB_LAST_MSW_FIRST")
+
+   # ASAM ndarray helpers
+   import numpy as np
+
+   arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
+   img.write_asam_ndarray(0x3040, arr, "UWORD", "MSB_FIRST", order="F")
+   arr2 = img.read_asam_ndarray(0x3040, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST")
+
    # ASAM string helpers
    img.write_asam_string(0x3010, "MOTOR", "ASCII")
    name = img.read_asam_string(0x3010, "ASCII")
+
+Why ``length`` is in bytes for ndarrays:
+
+- ``read_asam_numeric_array(..., length=2, dtype="ULONG")`` means 2 elements.
+- ``read_asam_ndarray(..., length=12, dtype="UWORD")`` means 12 raw bytes.
+
+Byte-order notes:
+
+- ``MSB_FIRST``: big-endian element storage.
+- ``MSB_LAST``: little-endian element storage.
+- ``*_MSW_*`` variants: additional 16-bit word swapping for 32/64-bit values.
+- For 8-bit datatypes (``UBYTE``, ``SBYTE``), byte-order has no practical effect.
+
+Complete ASAM array roundtrip with raw-byte check:
+
+.. code-block:: python
+
+   from objutils import Image, Section
+
+   img = Image([Section(0x4000, bytes(32))])
+
+   # Write two ULONG values using word-swapped little-endian semantics.
+   img.write_asam_numeric_array(0x4000, [0x11223344, 0x55667788], "ULONG", "MSB_LAST_MSW_FIRST")
+
+   # Verify binary layout in memory.
+   assert img.read(0x4000, 8) == b"\x33\x44\x11\x22\x77\x88\x55\x66"
+
+   # Roundtrip back to logical values.
+   values = img.read_asam_numeric_array(0x4000, 2, "ULONG", "MSB_LAST_MSW_FIRST")
+   assert values == (0x11223344, 0x55667788)
 
 Extract loadable image from ELF
 -------------------------------
