@@ -638,6 +638,24 @@ def test_asam_float16_ieee_roundtrip():
     assert sec.read_asam_numeric(0, "FLOAT16_IEEE", byte_order="MSB_LAST") == pytest.approx(1.5, rel=1e-3)
 
 
+def test_write_asam_numeric_array_msb_last_msw_first_ulong():
+    sec = Section(data=bytearray(16))
+    sec.write_asam_numeric_array(0, [0x11223344, 0x55667788], "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert sec.data[:8] == bytearray([0x33, 0x44, 0x11, 0x22, 0x77, 0x88, 0x55, 0x66])
+
+
+def test_read_asam_numeric_array_msb_last_msw_first_ulong():
+    sec = Section(data=bytearray([0x33, 0x44, 0x11, 0x22, 0x77, 0x88, 0x55, 0x66] + [0x00] * 8))
+    assert sec.read_asam_numeric_array(0, 2, "ULONG", byte_order="MSB_LAST_MSW_FIRST") == (0x11223344, 0x55667788)
+
+
+def test_asam_numeric_array_signed_roundtrip():
+    sec = Section(data=bytearray(16))
+    sec.write_asam_numeric_array(0, [-1, -2, 3], "SWORD", byte_order="MSB_FIRST")
+    assert sec.data[:6] == bytearray([0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x03])
+    assert sec.read_asam_numeric_array(0, 3, "SWORD", byte_order="MSB_FIRST") == (-1, -2, 3)
+
+
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_write_ndarray1():
     sec = Section(start_address=0x1000, data=bytearray(32))
@@ -819,3 +837,29 @@ def test_write_ndarray_fortan_02():
     assert sec.read(0x1000, 24) == bytearray(
         b"\x01\x00\x04\x00\x07\x00\n\x00\x02\x00\x05\x00\x08\x00\x0b\x00\x03\x00\x06\x00\t\x00\x0c\x00"
     )
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_write_asam_ndarray_msb_last_msw_first_ulong():
+    sec = Section(start_address=0x1000, data=bytearray(32))
+    arr = np.array([0x11223344, 0x55667788], dtype=np.uint32)
+    sec.write_asam_ndarray(0x1000, arr, "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert sec.read(0x1000, 8) == bytearray([0x33, 0x44, 0x11, 0x22, 0x77, 0x88, 0x55, 0x66])
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_read_asam_ndarray_msb_last_msw_first_ulong():
+    sec = Section(start_address=0x1000, data=bytearray([0x33, 0x44, 0x11, 0x22, 0x77, 0x88, 0x55, 0x66] + [0x00] * 24))
+    result = sec.read_asam_ndarray(0x1000, 8, "ULONG", shape=(2,), byte_order="MSB_LAST_MSW_FIRST")
+    assert np.array_equal(result, np.array([0x11223344, 0x55667788], dtype=np.uint32))
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_fortran_roundtrip():
+    sec = Section(start_address=0x1000, data=bytearray(32))
+    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
+    sec.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", order="F")
+    assert sec.read(0x1000, 12) == bytearray(b"\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00")
+    result = sec.read_asam_ndarray(0x1000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST_MSW_LAST")
+    assert np.array_equal(result, arr)
+

@@ -640,6 +640,28 @@ class Image:
         """Write an ASAM string datatype (ASCII/UTF8/UTF16/UTF32)."""
         self._call_address_function("write_asam_string", addr, value, dtype, **kws)
 
+    def read_asam_numeric_array(
+        self,
+        addr: int,
+        length: int,
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws: Any,
+    ) -> list[Union[int, float]]:
+        """Read an ASAM numeric array with ECU byte order semantics."""
+        return self._call_address_function("read_asam_numeric_array", addr, length, dtype, byte_order, **kws)
+
+    def write_asam_numeric_array(
+        self,
+        addr: int,
+        data: Iterable[Union[int, float]],
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws: Any,
+    ) -> None:
+        """Write an ASAM numeric array with ECU byte order semantics."""
+        self._call_address_function("write_asam_numeric_array", addr, data, dtype, byte_order, **kws)
+
     def read_numeric_array(self, addr: int, length: int, dtype: str, **kws: Any) -> list[Union[int, float]]:
         """Read array of numeric values from image.
 
@@ -688,6 +710,18 @@ class Image:
         """
         self._call_address_function("write_ndarray", addr, array, order=order, **kws)
 
+    def write_asam_ndarray(
+        self,
+        addr: int,
+        array: Any,
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        order: Optional[str] = None,
+        **kws: Any,
+    ) -> None:
+        """Write a NumPy ndarray using ASAM datatype and ECU byte order semantics."""
+        self._call_address_function("write_asam_ndarray", addr, array, dtype, byte_order, order=order, **kws)
+
     def read_ndarray(
         self,
         addr: int,
@@ -714,6 +748,19 @@ class Image:
             InvalidAddressError: If address is out of range.
         """
         return self._call_address_function("read_ndarray", addr, length, dtype, shape, order, **kws)
+
+    def read_asam_ndarray(
+        self,
+        addr: int,
+        length: int,
+        dtype: str,
+        shape: Optional[tuple[int, ...]] = None,
+        order: Optional[str] = None,
+        byte_order: str = "MSB_LAST",
+        **kws: Any,
+    ) -> Any:
+        """Read a NumPy ndarray using ASAM datatype and ECU byte order semantics."""
+        return self._call_address_function("read_asam_ndarray", addr, length, dtype, shape, order, byte_order, **kws)
 
     def read_string(self, addr: int, encoding: str = "latin1", length: int = -1, **kws: Any) -> str:
         """Read string from image.
