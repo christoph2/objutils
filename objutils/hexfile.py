@@ -790,7 +790,7 @@ class Reader(BaseType):
         self.stats = Statistics()
         self.valid = True
         self.formats: list[tuple[int, re.Pattern[str]]] = []
-        self.base_address = 0   # Base address for relative addressing (if applicable - mainly Intel HEX)
+        self.base_address = 0  # Base address for relative addressing (if applicable - mainly Intel HEX)
 
         # Parse FORMAT_SPEC into compiled patterns
         if isinstance(self.FORMAT_SPEC, str):

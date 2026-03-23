@@ -25,10 +25,9 @@ __copyright__ = """
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
-import operator
 from collections.abc import Mapping, Sequence
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 import objutils.checksums as checksums
 import objutils.hexfile as hexfile

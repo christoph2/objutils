@@ -862,4 +862,3 @@ def test_asam_ndarray_fortran_roundtrip():
     assert sec.read(0x1000, 12) == bytearray(b"\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00")
     result = sec.read_asam_ndarray(0x1000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST_MSW_LAST")
     assert np.array_equal(result, arr)
-
