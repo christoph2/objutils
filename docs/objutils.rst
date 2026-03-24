@@ -6,10 +6,7 @@ Subpackages
 
 .. toctree::
 
-    objutils.coff
-    objutils.dwarf
     objutils.elf
-    objutils.tests
 
 Submodules
 ----------

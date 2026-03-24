@@ -60,22 +60,24 @@ Use these helpers when your calibration metadata uses ASAM type names
 (``ULONG``, ``UWORD``, ``FLOAT32_IEEE``) and ECU byte-order terms
 (``MSB_FIRST``, ``MSB_LAST_MSW_FIRST``).
 
-ASAM API quick reference:
+.. rubric:: Scalar and string quick reference
 
 - ``read_asam_numeric(addr, dtype, byte_order="MSB_LAST")``
 - ``write_asam_numeric(addr, value, dtype, byte_order="MSB_LAST")``
-- ``read_asam_numeric_array(addr, length, dtype, byte_order="MSB_LAST")``
-- ``write_asam_numeric_array(addr, data, dtype, byte_order="MSB_LAST")``
-- ``read_asam_ndarray(addr, length, dtype, shape=None, order=None, byte_order="MSB_LAST")``
-- ``write_asam_ndarray(addr, array, dtype, byte_order="MSB_LAST", order=None)``
 - ``read_asam_string(addr, dtype, length=-1)``
 - ``write_asam_string(addr, value, dtype)``
+
+Array-specific ASAM methods are summarized in the ``ASAM Array Cheat Sheet`` below.
+
+The example below shows ASAM scalars, Python arrays, NumPy arrays, and strings
+side by side in one small image.
 
 .. code-block:: python
 
    from objutils import Image, Section
+   import numpy as np
 
-   img = Image([Section(0x3000, bytes(64))])
+   img = Image([Section(0x3000, bytes(96))])
 
    # ASAM numeric helpers
    img.write_asam_numeric(0x3000, 0x11223344, "ULONG", "MSB_FIRST")
@@ -91,44 +93,106 @@ ASAM API quick reference:
    values = img.read_asam_numeric_array(0x3020, 2, "ULONG", "MSB_LAST_MSW_FIRST")
 
    # ASAM ndarray helpers
-   import numpy as np
-
    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
    img.write_asam_ndarray(0x3040, arr, "UWORD", "MSB_FIRST", order="F")
    arr2 = img.read_asam_ndarray(0x3040, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST")
 
    # ASAM string helpers
    img.write_asam_string(0x3010, "MOTOR", "ASCII")
+   img.write_asam_string(0x3030, "Drehzahl", "UTF8")
    name = img.read_asam_string(0x3010, "ASCII")
+   label = img.read_asam_string(0x3030, "UTF8")
 
-Why ``length`` is in bytes for ndarrays:
+.. note::
+   **Length semantics**
 
-- ``read_asam_numeric_array(..., length=2, dtype="ULONG")`` means 2 elements.
-- ``read_asam_ndarray(..., length=12, dtype="UWORD")`` means 12 raw bytes.
+   - ``read_asam_numeric_array(..., length=2, dtype="ULONG")`` means 2 elements.
+   - ``read_asam_ndarray(..., length=12, dtype="UWORD")`` means 12 raw bytes.
 
-Byte-order notes:
+.. note::
+   **Byte-order notes**
 
-- ``MSB_FIRST``: big-endian element storage.
-- ``MSB_LAST``: little-endian element storage.
-- ``*_MSW_*`` variants: additional 16-bit word swapping for 32/64-bit values.
-- For 8-bit datatypes (``UBYTE``, ``SBYTE``), byte-order has no practical effect.
+   - ``MSB_FIRST``: big-endian element storage.
+   - ``MSB_LAST``: little-endian element storage.
+   - ``*_MSW_*`` variants: additional 16-bit word swapping for 32/64-bit values.
+   - For 8-bit datatypes (``UBYTE``, ``SBYTE``), byte-order has no practical effect.
 
-Complete ASAM array roundtrip with raw-byte check:
+
+ASAM Array Cheat Sheet (HOW-TO)
+-------------------------------
+
+Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 18 22 20
+
+   * - Method
+     - ``length`` semantics
+     - Returns
+     - Typical usage
+   * - ``read_asam_numeric_array(...)``
+     - element count
+     - ``tuple[int]`` / ``tuple[float]``
+     - scalar lists/tuples
+   * - ``write_asam_numeric_array(...)``
+     - n/a (from ``len(data)``)
+     - ``None``
+     - scalar lists/tuples
+   * - ``read_asam_ndarray(...)``
+     - byte count
+     - ``numpy.ndarray``
+     - matrix/tensor data
+   * - ``write_asam_ndarray(...)``
+     - n/a (from ``array.nbytes``)
+     - ``None``
+     - matrix/tensor data
+
+.. rubric:: Minimal signatures
+
+- ``read_asam_numeric_array(addr, length, dtype, byte_order="MSB_LAST")``
+- ``write_asam_numeric_array(addr, data, dtype, byte_order="MSB_LAST")``
+- ``read_asam_ndarray(addr, length, dtype, shape=None, order=None, byte_order="MSB_LAST")``
+- ``write_asam_ndarray(addr, array, dtype, byte_order="MSB_LAST", order=None)``
+
+.. rubric:: Supported byte orders
+
+- ``MSB_FIRST`` (big-endian)
+- ``MSB_LAST`` (little-endian)
+- ``MSB_FIRST_MSW_LAST`` (word-swapped)
+- ``MSB_LAST_MSW_FIRST`` (word-swapped)
+- ``BIG_ENDIAN`` / ``LITTLE_ENDIAN`` (legacy aliases)
+
+.. note::
+   **Fortran-order**
+
+   With ``order="F"``, keep the existing project convention used by
+   ``fortran_array_from_buffer``. For a logical 2x3 matrix, reads use
+   ``shape=(3, 2)`` in the current helper path.
+
+.. warning::
+   **Frequent pitfalls**
+
+   - Confusing element count vs. byte count for ``length``.
+   - Forgetting that byte order is applied per element, not per full buffer.
+   - Passing unsupported ASAM dtype names (must be values like ``UWORD``/``ULONG``).
+   - Assuming MSW swapping affects 8-bit types (it does not).
+
+.. rubric:: Copy/paste example: ULONG array roundtrip
 
 .. code-block:: python
 
    from objutils import Image, Section
 
-   img = Image([Section(0x4000, bytes(32))])
+   img = Image([Section(0x6000, bytes(32))])
 
-   # Write two ULONG values using word-swapped little-endian semantics.
-   img.write_asam_numeric_array(0x4000, [0x11223344, 0x55667788], "ULONG", "MSB_LAST_MSW_FIRST")
+   img.write_asam_numeric_array(0x6000, [0x11223344, 0x55667788], "ULONG", "MSB_LAST_MSW_FIRST")
 
-   # Verify binary layout in memory.
-   assert img.read(0x4000, 8) == b"\x33\x44\x11\x22\x77\x88\x55\x66"
+   # Optional: verify raw in-memory bytes.
+   assert img.read(0x6000, 8) == b"\x33\x44\x11\x22\x77\x88\x55\x66"
 
-   # Roundtrip back to logical values.
-   values = img.read_asam_numeric_array(0x4000, 2, "ULONG", "MSB_LAST_MSW_FIRST")
+   # Main check: logical values roundtrip correctly.
+   values = img.read_asam_numeric_array(0x6000, 2, "ULONG", "MSB_LAST_MSW_FIRST")
    assert values == (0x11223344, 0x55667788)
 
 Extract loadable image from ELF
@@ -151,8 +215,8 @@ Inspect HEX files
    # Include a hexdump of sections
    oj-hex-info srec app.srec -d
 
-Next steps
-----------
+Where to go next
+----------------
 
 - See the Tutorial for a guided walk-through.
 - Refer to Scripts for comprehensive CLI usage and options.

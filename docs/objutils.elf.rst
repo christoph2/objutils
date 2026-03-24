@@ -6,7 +6,6 @@ Subpackages
 
 .. toctree::
 
-    objutils.elf.visual
 
 Submodules
 ----------
