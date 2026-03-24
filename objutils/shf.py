@@ -30,7 +30,7 @@ from hashlib import sha1
 
 from objutils.image import Image
 from objutils.logger import Logger
-from objutils.section import Section
+from objutils.section import Section, join_sections
 from objutils.utils import create_string_buffer
 
 SHF_DTD = """<!--

@@ -151,14 +151,14 @@ class Reader(hexfile.Reader):
             )
         else:
             raise TypeError(f"Invalid format type {format_type}.")
-        if hasattr(line, "chunk"):
+        if hasattr(line, "chunk") and line.chunk is not None:
             checksum = (~(sum([line.length, checksum_of_address]) + sum(line.chunk))) & 0xFF
         else:
             checksum = (~(sum([line.length, checksum_of_address]))) & 0xFF
         if line.checksum != checksum:
             raise hexfile.InvalidRecordChecksumError()
         line.length -= BIAS[format_type]  # calculate actual data length.
-        if hasattr(line, "chunk") and line.length and (line.length != len(line.chunk)):
+        if hasattr(line, "chunk") and line.chunk is not None and line.length and (line.length != len(line.chunk)):
             raise hexfile.InvalidRecordLengthError("Byte count doesn't match length of actual data.")
 
     def is_data_line(self, line: Any, format_type: int) -> bool:

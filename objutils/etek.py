@@ -5,18 +5,24 @@ This module handles the Extended Tektronix hex format, an extension
 of the standard Tektronix format with 24-bit addressing and symbol support.
 
 Format specification:
-- Data records: %LL6CCAAAAADD
-  - LL: Length field (2 * (data_length + 5) in hex)
+
+- Data records: ``%LL6CCAAAAADD``
+
+  - LL: Length field (``2 * (data_length + 5)`` in hex)
   - 6: Record type identifier
   - CC: Checksum (nibble sum)
   - AAAAAA: 24-bit address (hex)
   - DD: Data bytes (hex)
-- Symbol records: %LL3CCU
+
+- Symbol records: ``%LL3CCU``
+
   - LL: Length field
   - 3: Symbol type identifier
   - CC: Checksum
   - U: Symbol string (name + address)
-- EOF records: %LL8CCAAAAADD
+
+- EOF records: ``%LL8CCAAAAADD``
+
   - 8: EOF type identifier
 """
 
@@ -67,9 +73,9 @@ class Reader(hexfile.Reader):
     VALID_CHARS = re.compile(r"^[a-zA-Z0-9_ %\n\r]*$")
 
     FORMAT_SPEC = (
-        (DATA, "%LL6CCAAAAADD"),
+        (DATA, "%LL6CCAAAAAADD"),
         (SYMBOL, "%LL3CCU"),
-        (EOF, "%LL8CCAAAAADD"),
+        (EOF, "%LL8CCAAAAAADD"),
     )
 
     def check_line(self, line: Any, format_type: int) -> None:
