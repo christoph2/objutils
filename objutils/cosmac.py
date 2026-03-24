@@ -5,11 +5,14 @@ This module handles the RCA Cosmac hex format, used with RCA 1802/1804/1805
 microprocessors and COSMAC development systems.
 
 Format specification:
+
 - Four data record formats with optional address:
-  1. !MAAAA DD - Full format with start symbol
-  2. ?MAAAA DD - Alternate start symbol
-  3. AAAA DD - Address only (no symbol)
-  4. DD - Data only (address continues from previous)
+
+  1. ``!MAAAA DD`` – Full format with start symbol
+  2. ``?MAAAA DD`` – Alternate start symbol
+  3. ``AAAA DD`` – Address only (no symbol)
+  4. ``DD`` – Data only (address continues from previous)
+
 - M: Memory identifier (single hex digit)
 - AAAA: 16-bit address (hex)
 - DD: Data bytes (hex, space-separated)
