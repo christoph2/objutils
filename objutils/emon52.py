@@ -5,7 +5,9 @@ This module handles the EMON52 hex format used by the Elektor
 Electronics EMON52 8052 development system.
 
 Format specification:
-- Data records: LL AAAA:DD CCCC
+
+- Data records: ``LL AAAA:DD CCCC``
+
   - LL: Length/byte count (hex)
   - AAAA: 16-bit address (hex)
   - DD: Data bytes (hex, space-separated)
