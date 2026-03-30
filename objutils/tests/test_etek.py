@@ -15,7 +15,6 @@ import pytest
 from objutils import dumps, loads
 from objutils.hexfile import InvalidRecordChecksumError, InvalidRecordLengthError
 
-
 # ---------------------------------------------------------------------------
 # Test vectors
 # ---------------------------------------------------------------------------
@@ -39,7 +38,7 @@ S19 = (
 )
 
 # Single-byte records for boundary / 24-bit address tests.
-ETEK_SINGLE_BYTE_LOW = b"%0C628000001AB\n"   # address 0x000001, data 0xAB
+ETEK_SINGLE_BYTE_LOW = b"%0C628000001AB\n"  # address 0x000001, data 0xAB
 ETEK_SINGLE_BYTE_HIGH = b"%0C649FF0000CD\n"  # address 0xFF0000, data 0xCD
 
 
@@ -72,13 +71,13 @@ def test_loads_produces_correct_srec_output():
 def test_loads_single_byte_low_address():
     """Single data byte at address 0x000001 is read correctly."""
     img = _etek_loads(ETEK_SINGLE_BYTE_LOW)
-    assert img.read(0x000001, 1) == b"\xAB"
+    assert img.read(0x000001, 1) == b"\xab"
 
 
 def test_loads_single_byte_high_address():
     """Single data byte at address 0xFF0000 (max 24-bit) is read correctly."""
     img = _etek_loads(ETEK_SINGLE_BYTE_HIGH)
-    assert img.read(0xFF0000, 1) == b"\xCD"
+    assert img.read(0xFF0000, 1) == b"\xcd"
 
 
 def test_loads_image_min_address():
@@ -158,4 +157,3 @@ def test_invalid_length_raises():
     bad = b"%2C6C200B000576F77212044696420796F7520726561\n"
     with pytest.raises(InvalidRecordLengthError):
         _etek_loads(bad)
-
