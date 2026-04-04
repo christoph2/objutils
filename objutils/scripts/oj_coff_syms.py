@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from objutils.pecoff import PeParser
+from objutils.pecoff import PeParser, SymbolAPI
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -35,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     # Fetch via SymbolAPI to ensure DB is created/reused
-    syms = pp.SymbolAPI(pp).fetch(name_pattern=args.pattern)  # type: ignore[attr-defined]
+    syms = SymbolAPI(pp).fetch(name_pattern=args.pattern)
     # Fallback: if SymbolAPI attr is not present (static type), use direct list
     if not syms and pp.symbols:
         syms = [type("_S", (), s) for s in pp.symbols]  # quick adapter for printing

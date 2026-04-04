@@ -739,12 +739,12 @@ class SectionAPI:
     def __init__(self, parent: PeParser):
         self.parent = parent
 
-        def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Section]:
-            self.parent.create_db_on_demand()
-            if self.parent.db is None:
-                raise RuntimeError("PE database is not initialized")
-            with self.parent.db.session() as ses:
-                q = ses.query(model.Pe_Section)
+    def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Section]:
+        self.parent.create_db_on_demand()
+        if self.parent.db is None:
+            raise RuntimeError("PE database is not initialized")
+        with self.parent.db.session() as ses:
+            q = ses.query(model.Pe_Section)
             if name_pattern:
                 q = q.filter(model.Pe_Section.name.like(f"%{name_pattern}%"))
             return q.order_by(model.Pe_Section.vaddr).all()
@@ -754,12 +754,12 @@ class SymbolAPI:
     def __init__(self, parent: PeParser):
         self.parent = parent
 
-        def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Symbol]:
-            self.parent.create_db_on_demand()
-            if self.parent.db is None:
-                raise RuntimeError("PE database is not initialized")
-            with self.parent.db.session() as ses:
-                q = ses.query(model.Pe_Symbol)
+    def fetch(self, name_pattern: str | None = None) -> list[model.Pe_Symbol]:
+        self.parent.create_db_on_demand()
+        if self.parent.db is None:
+            raise RuntimeError("PE database is not initialized")
+        with self.parent.db.session() as ses:
+            q = ses.query(model.Pe_Symbol)
             if name_pattern:
                 q = q.filter(model.Pe_Symbol.name.like(f"%{name_pattern}%"))
             return q.order_by(model.Pe_Symbol.value).all()
