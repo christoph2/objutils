@@ -114,7 +114,10 @@ def StdInteger(default=0, primary_key=False, unique=False, nullable=False, index
             count = StdInteger(default=0, index=True)
         ```
     """
-    return Column(Integer, primary_key=primary_key, unique=unique, nullable=nullable, index=index, default=default)
+    kw = dict(primary_key=primary_key, unique=unique, nullable=nullable, index=index)
+    if not primary_key:
+        kw["default"] = default
+    return Column(Integer, **kw)
 
 
 class MixInBase:
