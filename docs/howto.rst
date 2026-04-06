@@ -134,8 +134,8 @@ Inspect HEX files
    # Include a hexdump of sections
    oj-hex-info srec app.srec -d
 
-Next steps
-----------
+Where to go next
+----------------
 
 - See the Tutorial for a guided walk-through.
 - Refer to Scripts for comprehensive CLI usage and options.

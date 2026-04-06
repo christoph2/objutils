@@ -32,6 +32,9 @@ Architecture
     ├── read/write(addr, length)             # Raw bytes
     ├── read_numeric/write_numeric(addr, dtype)   # Single values
     ├── read_numeric_array/write_numeric_array()  # Arrays
+    ├── read_asam_numeric/write_asam_numeric()    # ASAM scalars
+    ├── read_asam_numeric_array/write_asam_numeric_array()  # ASAM arrays
+    ├── read_asam_ndarray/write_asam_ndarray()    # ASAM NumPy arrays
     ├── read_string/write_string()                # Null-terminated strings
     └── read_ndarray/write_ndarray()              # NumPy arrays
 
@@ -587,9 +590,23 @@ class Section:
         internal_dtype = ASAM_NUMERIC_DTYPES.get(normalized_dtype)
         if internal_dtype is None:
             raise TypeError(f"Unsupported ASAM datatype {asam_dtype!r}")
-        if internal_dtype in ("uint8", "int8"):
-            return internal_dtype
         return f"{internal_dtype}_{ASAM_ENDIAN_FOR_BYTEORDER[asam_byte_order]}"
+
+    def _numpy_dtype_from_internal(self, dtype: str) -> np.dtype:
+        type_, byte_order = self._verify_dtype(dtype)
+        return np.dtype(type_).newbyteorder(BYTEORDER[byte_order])
+
+    def _permute_asam_buffer(self, data: bytes, internal_dtype: str, byte_order: str) -> bytes:
+        type_name = internal_dtype.split("_")[0]
+        element_size = TYPE_SIZES.get(type_name, 0)
+        if element_size <= 1 or not data:
+            return data
+        if len(data) % element_size != 0:
+            raise ValueError("ASAM buffer length must be a multiple of the element size")
+        return b"".join(
+            self._permute_asam_bytes_for_read(data[idx : idx + element_size], byte_order)
+            for idx in range(0, len(data), element_size)
+        )
 
     def read(self, addr: int, length: int, **kws) -> bytes:
         """Read raw bytes from section at specified address.
@@ -763,7 +780,7 @@ class Section:
 
         fmt = self._getformat(internal_dtype)
         packed = struct.pack(fmt, value)
-        permuted = self._permute_asam_bytes_for_read(packed, asam_byte_order)
+        permuted = self._permute_asam_buffer(packed, internal_dtype, asam_byte_order)
         return struct.unpack(fmt, permuted)[0]
 
     def write_asam_numeric(
@@ -782,8 +799,43 @@ class Section:
 
         fmt = self._getformat(internal_dtype)
         packed = struct.pack(fmt, value)
-        permuted = self._permute_asam_bytes_for_write(packed, asam_byte_order)
+        permuted = self._permute_asam_buffer(packed, internal_dtype, asam_byte_order)
         self.write(addr, permuted)
+
+    def read_asam_numeric_array(
+        self,
+        addr: int,
+        length: int,
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws,
+    ) -> Union[tuple[int, ...], tuple[float, ...]]:
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        fmt = self._getformat(internal_dtype, length)
+        data_size = struct.calcsize(fmt)
+        raw_data = self.read(addr, data_size, **kws)
+        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+        return struct.unpack(fmt, permuted)
+
+    def write_asam_numeric_array(
+        self,
+        addr: int,
+        data: Union[list[int], list[float]],
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        **kws,
+    ) -> None:
+        if not hasattr(data, "__iter__"):
+            raise TypeError("data must be iterable")
+
+        values = tuple(data)
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        fmt = self._getformat(internal_dtype, len(values))
+        packed = struct.pack(fmt, *values)
+        permuted = self._permute_asam_buffer(packed, internal_dtype, asam_byte_order)
+        self.write(addr, permuted, **kws)
 
     def read_asam_string(self, addr: int, dtype: str, length: int = -1, **kws) -> str:
         encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
@@ -920,6 +972,28 @@ class Section:
         else:
             self.data[offset : offset + data_size] = array.tobytes()
 
+    def write_asam_ndarray(
+        self,
+        addr: int,
+        array: np.ndarray,
+        dtype: str,
+        byte_order: str = "MSB_LAST",
+        order: str = None,
+        **kws,
+    ) -> None:
+        if not isinstance(array, np.ndarray):
+            raise TypeError("array must be of type numpy.ndarray.")
+
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        typed_array = np.asarray(array, dtype=self._numpy_dtype_from_internal(internal_dtype))
+        if order is not None and order == "F":
+            raw_data = fortran_array_to_buffer(array=typed_array)
+        else:
+            raw_data = typed_array.tobytes()
+        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+        self.write(addr, permuted, **kws)
+
     def read_ndarray(self, addr: int, length: int, dtype: str, shape: tuple = None, order: str = None, **kws) -> np.ndarray:
         """ """
         offset = addr - self.start_address
@@ -927,15 +1001,34 @@ class Section:
             raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
         if offset + length > self.length:
             raise InvalidAddressError(f"read_ndarray(0x{addr:08x}) access out of bounds.")
-        type_, byte_order = self._verify_dtype(dtype)
-        dt = np.dtype(type_)
-        dt = dt.newbyteorder(BYTEORDER.get(byte_order))
+        dt = self._numpy_dtype_from_internal(dtype)
         if order is not None and order == "F":
             arr = fortran_array_from_buffer(arr=self.data[offset : offset + length], shape=shape, dtype=dt)
         else:
             flat = np.frombuffer(self.data[offset : offset + length], dtype=dt)
             arr = flat.reshape(shape) if shape else flat
         return arr
+
+    def read_asam_ndarray(
+        self,
+        addr: int,
+        length: int,
+        dtype: str,
+        shape: tuple = None,
+        order: str = None,
+        byte_order: str = "MSB_LAST",
+        **kws,
+    ) -> np.ndarray:
+        asam_byte_order = self._resolve_asam_byteorder(byte_order)
+        internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
+        dt = self._numpy_dtype_from_internal(internal_dtype)
+        raw_data = self.read(addr, length, **kws)
+        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+        if order is not None and order == "F":
+            return fortran_array_from_buffer(arr=permuted, shape=shape, dtype=dt)
+
+        flat = np.frombuffer(permuted, dtype=dt)
+        return flat.reshape(shape) if shape else flat
 
     """
     def write_timestamp():

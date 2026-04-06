@@ -130,7 +130,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import Session, declarative_base, relationship
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import NullPool, StaticPool
 from sqlalchemy.sql import func
 
 from objutils.elf import defs
@@ -1312,6 +1312,11 @@ class Model:
             # else:
             self.dbname = filename
 
+        # NullPool creates a fresh connection each time, which doesn't work for
+        # :memory: SQLite (each connection gets its own empty database).
+        # Use StaticPool for in-memory databases to reuse the same connection.
+        pool_class = StaticPool if self.dbname == ":memory:" else NullPool
+
         self._engine = create_engine(
             f"sqlite:///{self.dbname}",
             echo=debug,
@@ -1319,7 +1324,7 @@ class Model:
                 "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
                 "timeout": SQLITE_TIMEOUT_SECONDS,
             },
-            poolclass=NullPool,
+            poolclass=pool_class,
             native_datetime=True,
         )
 

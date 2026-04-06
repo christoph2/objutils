@@ -6,6 +6,13 @@ from array import array
 
 import pytest
 
+try:
+    import numpy as np
+except ImportError:
+    NUMPY_SUPPORT = False
+else:
+    NUMPY_SUPPORT = True
+
 from objutils import dumps
 from objutils.exceptions import InvalidAddressError
 from objutils.image import Image
@@ -1341,6 +1348,26 @@ def test_image_asam_string_ascii_roundtrip():
     img = Image(Section(data=bytearray(16), start_address=0x1000))
     img.write_asam_string(0x1000, "ABC", "ASCII")
     assert img.read_asam_string(0x1000, "ASCII") == "ABC"
+
+
+def test_image_asam_numeric_array_word_swap_32bit():
+    img = Image(Section(data=bytearray(16), start_address=0x1000))
+    img.write_asam_numeric_array(0x1000, [0x11223344, 0x55667788], "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert img.read(0x1000, 8) == b"\x33\x44\x11\x22\x77\x88\x55\x66"
+    assert img.read_asam_numeric_array(0x1000, 2, "ULONG", byte_order="MSB_LAST_MSW_FIRST") == (
+        0x11223344,
+        0x55667788,
+    )
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_image_asam_ndarray_fortran_roundtrip():
+    img = Image(Section(data=bytearray(32), start_address=0x1000))
+    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
+    img.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", order="F")
+    assert img.read(0x1000, 12) == b"\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00"
+    result = img.read_asam_ndarray(0x1000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST_MSW_LAST")
+    assert np.array_equal(result, arr)
 
 
 if __name__ == "__main__":

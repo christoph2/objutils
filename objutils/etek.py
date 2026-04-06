@@ -67,9 +67,9 @@ class Reader(hexfile.Reader):
     VALID_CHARS = re.compile(r"^[a-zA-Z0-9_ %\n\r]*$")
 
     FORMAT_SPEC = (
-        (DATA, "%LL6CCAAAAADD"),
+        (DATA, "%LL6CCAAAAAADD"),
         (SYMBOL, "%LL3CCU"),
-        (EOF, "%LL8CCAAAAADD"),
+        (EOF, "%LL8CCAAAAAADD"),
     )
 
     def check_line(self, line: Any, format_type: int) -> None:

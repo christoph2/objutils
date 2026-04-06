@@ -18,6 +18,7 @@ objutils provides Python APIs and CLI tools to work with object files and classi
    tutorial
    howto
    scripts
+   session
    modules
 
 Indices and tables

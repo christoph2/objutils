@@ -508,6 +508,7 @@ class Container:
     length: Optional[int] = None
     type: Optional[int] = None
     checksum: Optional[int] = None
+    addrChecksum: Optional[int] = None
     chunk: Optional[bytearray] = None
     junk: Optional[str] = None
     processing_instructions: list[Any] = field(default_factory=list)
@@ -790,7 +791,7 @@ class Reader(BaseType):
         self.stats = Statistics()
         self.valid = True
         self.formats: list[tuple[int, re.Pattern[str]]] = []
-        self.base_address = 0   # Base address for relative addressing (if applicable - mainly Intel HEX)
+        self.base_address = 0  # Base address for relative addressing (if applicable - mainly Intel HEX)
 
         # Parse FORMAT_SPEC into compiled patterns
         if isinstance(self.FORMAT_SPEC, str):
@@ -892,6 +893,7 @@ class Reader(BaseType):
                 length = self._parse_optional_int(dict_, "length")
                 record_type = self._parse_optional_int(dict_, "type")
                 checksum = self._parse_optional_int(dict_, "checksum")
+                addr_checksum = self._parse_optional_int(dict_, "addrChecksum")
                 junk = dict_.get("junk")
 
                 # Parse data chunk
@@ -912,6 +914,7 @@ class Reader(BaseType):
                     length=length,
                     type=record_type,
                     checksum=checksum,
+                    addrChecksum=addr_checksum,
                     chunk=chunk,
                     junk=junk,
                 )

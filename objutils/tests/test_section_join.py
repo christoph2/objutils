@@ -77,4 +77,3 @@ def test_join_sections_keeps_conflict_split_but_merges_followup() -> None:
 def test_join_sections_rejects_non_section_entries() -> None:
     with pytest.raises(TypeError):
         join_sections([Section(0x1000, b"A"), "not-a-section"])  # type: ignore[list-item]
-
