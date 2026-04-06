@@ -5,7 +5,7 @@ Readme
 .. image:: https://github.com/christoph2/objutils/raw/master/docs/objutils_banner.png
     :align: center
 
-|PyPI| |Python Versions| |License: GPLv2| |Code style: black|
+|PyPI| |Python Versions| |License: GPLv2| |Code style: black| |Ask DeepWiki| |PDF Manual|
 
 
 Binary data stored in hex-files is in widespread use especially in embedded systems applications.
@@ -436,3 +436,7 @@ If you contribute code to this project, you are implicitly allowing your code to
    :target: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 .. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
+.. |Ask DeepWiki| image:: https://deepwiki.com/badge.svg
+   :target: https://deepwiki.com/christoph2/objutils
+.. |PDF Manual| image:: https://img.shields.io/badge/docs-PDF%20manual-blue.svg
+   :target: https://objutils.readthedocs.io/_/downloads/en/latest/pdf/

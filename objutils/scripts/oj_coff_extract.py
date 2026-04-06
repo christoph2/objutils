@@ -52,6 +52,14 @@ def main(argv: list[str] | None = None) -> int:
         dest="include",
         default=None,
     )
+    parser.add_argument(
+        "-r",
+        "--no-image-base",
+        help="Use relative virtual addresses (RVAs) instead of absolute addresses. Required for 64-bit PE files "
+        "whose image base pushes addresses beyond 32-bit hex format limits.",
+        dest="no_image_base",
+        action="store_true",
+    )
     parser.add_argument("-n", help="Number of data bytes per line", dest="row_length", default=16, type=int)
     args = parser.parse_args(argv)
 
@@ -60,17 +68,33 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, RuntimeError) as e:
         print(f"\n'{args.pe_file}' is not valid PE/COFF file. Raised exception: '{repr(e)}'.")
         return 1
-    print("\nExtracting from...\n")
+
+    add_image_base = not args.no_image_base
+    image_base = pp.image_base()
+    if args.no_image_base:
+        print(f"\nUsing relative addresses (image base {image_base:#010x} subtracted).\n")
+    else:
+        print(f"\nUsing absolute addresses (image base: {image_base:#010x}).\n")
+
+    print("Extracting from...\n")
     print("Section                   Address    Length")
     print("-" * 45)
     img = pp.create_image(
         callback=callback,
         join=args.join,
+        add_image_base=add_image_base,
         exclude_pattern=args.exclude or "",
         include_pattern=args.include or "",
     )
     if img:
-        dump(args.file_type, args.output_file_name, img, row_length=args.row_length)
+        try:
+            dump(args.file_type, args.output_file_name, img, row_length=args.row_length)
+        except Exception as e:
+            if "address too large" in str(e).lower():
+                print(f"\nError: {e}")
+                print(f"Hint: Try using --no-image-base / -r to use relative addresses (subtract image base {image_base:#010x}).")
+                return 1
+            raise
         print(f"HEX image written to: '{args.output_file_name}' [{len(img)} total bytes]")
     return 0
 

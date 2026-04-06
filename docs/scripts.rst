@@ -371,8 +371,38 @@ Extract sections contributing to the program image from a PE/COFF file.
 
 .. code-block:: shell
 
+    usage: oj-coff-extract [-h] [-j] [-t {ihex,shf,srec,titxt}]
+                           [-e EXCLUDE] [-i INCLUDE] [-r] [-n ROW_LENGTH]
+                           pe_file output_file_name
+
+    positional arguments:
+      pe_file               PE/COFF file
+      output_file_name      Output filename.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -j, --join            Try to make continuous sections.
+      -t {ihex,shf,srec,titxt}, --file-type {ihex,shf,srec,titxt}
+                            Type of output HEX file (default: ihex)
+      -e EXCLUDE, --exclude_pattern EXCLUDE
+                            Exclude sections containing this substring
+      -i INCLUDE, --include_pattern INCLUDE
+                            Include only sections containing this substring
+      -r, --no-image-base   Use relative virtual addresses (RVAs) instead of
+                            absolute addresses. Required for 64-bit PE files
+                            whose image base pushes addresses beyond 32-bit
+                            hex format limits.
+      -n ROW_LENGTH         Number of data bytes per line (default: 16)
+
+Examples:
+
+.. code-block:: shell
+
     oj-coff-extract app.exe app.srec -t srec
     oj-coff-extract app.exe app.hex -t ihex -j
+
+    # 64-bit PE: use relative addresses to stay within 32-bit hex limits
+    oj-coff-extract app64.exe app64.hex --no-image-base
 
 
 oj_coff_import

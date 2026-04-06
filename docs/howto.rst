@@ -84,6 +84,45 @@ Use the CLI to generate HEX for flashing:
 
    oj-elf-extract build/app.elf app.srec -t srec
 
+Extract loadable image from PE/COFF (32-bit and 64-bit)
+-------------------------------------------------------
+
+For 32-bit PE files the default behaviour works out of the box:
+
+.. code-block:: shell
+
+   oj-coff-extract app32.exe app32.hex -t ihex
+
+64-bit PE files typically have an image base of ``0x140000000`` or higher.
+When the image base is added to section RVAs, the resulting absolute addresses
+exceed the 32-bit limit (``0xFFFFFFFF``) that Intel HEX and Motorola S-Record
+formats can represent. The tool will abort with an *"address too large"* error
+in that case.
+
+Use the ``--no-image-base`` (``-r``) flag to emit **relative virtual
+addresses** (RVAs) instead.  RVAs start at zero and therefore stay well within
+32-bit range:
+
+.. code-block:: shell
+
+   # Will fail for a typical 64-bit PE (image base 0x140000000)
+   oj-coff-extract app64.exe app64.hex
+
+   # Use --no-image-base to subtract the image base
+   oj-coff-extract app64.exe app64.hex --no-image-base
+
+The tool prints which mode is active so you can verify:
+
+.. code-block:: text
+
+   Using relative addresses (image base 0x140000000 subtracted).
+
+.. note::
+
+   When ``--no-image-base`` is used, the addresses in the output file are
+   offsets from the PE image base.  Your flash-programming tool or linker
+   script must account for this by adding the base back at load time.
+
 Inspect HEX files
 -----------------
 
