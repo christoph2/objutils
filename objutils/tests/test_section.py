@@ -649,196 +649,6 @@ def test_read_asam_numeric_array_msb_last_msw_first_ulong():
     assert sec.read_asam_numeric_array(0, 2, "ULONG", byte_order="MSB_LAST_MSW_FIRST") == (0x11223344, 0x55667788)
 
 
-def test_asam_numeric_array_signed_roundtrip():
-    sec = Section(data=bytearray(16))
-    sec.write_asam_numeric_array(0, [-1, -2, 3], "SWORD", byte_order="MSB_FIRST")
-    assert sec.data[:6] == bytearray([0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x03])
-    assert sec.read_asam_numeric_array(0, 3, "SWORD", byte_order="MSB_FIRST") == (-1, -2, 3)
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_write_ndarray1():
-    sec = Section(start_address=0x1000, data=bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype="int32")
-    sec.write_ndarray(0x1000, arr)
-    assert (
-        sec.data
-        == b"\x0b\x00\x00\x00\x16\x00\x00\x00!\x00\x00\x00,\x00\x00\x007\x00\x00\x00B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    )
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_write_ndarray_out_of_bounds1():
-    sec = Section(start_address=0x1000, data=bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype="int64")
-    with pytest.raises(InvalidAddressError):
-        sec.write_ndarray(0x1000, arr)
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_write_ndarray_out_of_bounds2():
-    sec = Section(start_address=0x1000, data=bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype="int64")
-    with pytest.raises(InvalidAddressError):
-        sec.write_ndarray(0x9FF, arr)
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_read_ndarray_reshaped():
-    sec = Section(start_address=0x1000, data=bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype="int32")
-    sec.write_ndarray(0x1000, arr)
-
-    result = sec.read_ndarray(0x1000, 24, "int32_le", shape=(2, 3))
-    assert np.array_equal(result, np.array([[11, 22, 33], [44, 55, 66]]))
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_read_ndarray_flat():
-    sec = Section(start_address=0x1000, data=bytearray(32))
-    arr = np.array([[11, 22, 33], [44, 55, 66]], dtype="int32")
-    sec.write_ndarray(0x1000, arr)
-
-    result = sec.read_ndarray(0x1000, 24, "int32_le")
-    assert np.array_equal(result, np.array([11, 22, 33, 44, 55, 66]))
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_read_ndarray_fortan_01():
-    sec = Section(
-        start_address=0x1000,
-        data=bytearray(b"\x01\x00\x04\x00\x07\x00\n\x00\x02\x00\x05\x00\x08\x00\x0b\x00\x03\x00\x06\x00\t\x00\x0c\x00"),
-    )
-
-    result = sec.read_ndarray(0x1000, 24, shape=(3, 4), order="F", dtype="int16_le")
-    assert np.array_equal(
-        result,
-        np.array(
-            [
-                [1, 2, 3],
-                [
-                    4,
-                    5,
-                    6,
-                ],
-                [7, 8, 9],
-                [10, 11, 12],
-            ],
-            dtype=np.int16,
-        ),
-    )
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_read_ndarray_fortan_02():
-    sec = Section(
-        start_address=0x1000,
-        data=[
-            1,
-            3,
-            5,
-            2,
-            4,
-            6,
-            7,
-            9,
-            11,
-            8,
-            10,
-            12,
-            13,
-            15,
-            17,
-            14,
-            16,
-            18,
-            19,
-            21,
-            23,
-            20,
-            22,
-            24,
-            25,
-            27,
-            29,
-            26,
-            28,
-            30,
-            31,
-            33,
-            35,
-            32,
-            34,
-            36,
-            37,
-            39,
-            41,
-            38,
-            40,
-            42,
-            43,
-            45,
-            47,
-            44,
-            46,
-            48,
-        ],
-    )
-
-    result = sec.read_ndarray(0x1000, 48, shape=(2, 4, 3, 2), order="F", dtype="int8_le")
-    assert np.array_equal(
-        result,
-        np.array(
-            [
-                [
-                    [[1, 2], [3, 4], [5, 6]],
-                    [[7, 8], [9, 10], [11, 12]],
-                    [[13, 14], [15, 16], [17, 18]],
-                    [[19, 20], [21, 22], [23, 24]],
-                ],
-                [
-                    [[25, 26], [27, 28], [29, 30]],
-                    [[31, 32], [33, 34], [35, 36]],
-                    [[37, 38], [39, 40], [41, 42]],
-                    [[43, 44], [45, 46], [47, 48]],
-                ],
-            ],
-            dtype=np.int8,
-        ),
-    )
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_write_ndarray_fortan_01():
-    sec = Section(start_address=0x1000, data=bytearray(128))
-    arr = np.array(
-        [
-            [[[1, 2], [3, 4], [5, 6]], [[7, 8], [9, 10], [11, 12]], [[13, 14], [15, 16], [17, 18]], [[19, 20], [21, 22], [23, 24]]],
-            [
-                [[25, 26], [27, 28], [29, 30]],
-                [[31, 32], [33, 34], [35, 36]],
-                [[37, 38], [39, 40], [41, 42]],
-                [[43, 44], [45, 46], [47, 48]],
-            ],
-        ],
-        dtype=np.int8,
-    )
-    sec.write_ndarray(0x1000, arr, order="F")
-    assert sec.read(0x1000, 48) == bytearray(
-        b"\x01\x03\x05\x02\x04\x06\x07\t\x0b\x08\n\x0c\r\x0f\x11\x0e\x10\x12\x13\x15\x17\x14\x16\x18\x19\x1b\x1d\x1a\x1c\x1e\x1f!# \"$%')&(*+-/,.0"
-    )
-
-
-@pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_write_ndarray_fortan_02():
-    sec = Section(start_address=0x1000, data=bytearray(128))
-    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
-    sec.write_ndarray(0x1000, arr, order="F")
-    assert sec.read(0x1000, 24) == bytearray(
-        b"\x01\x00\x04\x00\x07\x00\n\x00\x02\x00\x05\x00\x08\x00\x0b\x00\x03\x00\x06\x00\t\x00\x0c\x00"
-    )
-
-
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_write_asam_ndarray_msb_last_msw_first_ulong():
     sec = Section(start_address=0x1000, data=bytearray(32))
@@ -850,15 +660,333 @@ def test_write_asam_ndarray_msb_last_msw_first_ulong():
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_read_asam_ndarray_msb_last_msw_first_ulong():
     sec = Section(start_address=0x1000, data=bytearray([0x33, 0x44, 0x11, 0x22, 0x77, 0x88, 0x55, 0x66] + [0x00] * 24))
-    result = sec.read_asam_ndarray(0x1000, 8, "ULONG", shape=(2,), byte_order="MSB_LAST_MSW_FIRST")
+    result = sec.read_asam_ndarray(0x1000, 2, "ULONG", shape=(2,), byte_order="MSB_LAST_MSW_FIRST")
     assert np.array_equal(result, np.array([0x11223344, 0x55667788], dtype=np.uint32))
 
 
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
-def test_asam_ndarray_fortran_roundtrip():
+def test_asam_ndarray_column_dir_roundtrip():
+    """Replaces the old test_asam_ndarray_fortran_roundtrip."""
     sec = Section(start_address=0x1000, data=bytearray(32))
     arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
-    sec.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", order="F")
+    sec.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", index_mode="COLUMN_DIR")
     assert sec.read(0x1000, 12) == bytearray(b"\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00")
-    result = sec.read_asam_ndarray(0x1000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST_MSW_LAST")
+    result = sec.read_asam_ndarray(0x1000, 6, "UWORD", shape=(3, 2), index_mode="COLUMN_DIR", byte_order="MSB_FIRST_MSW_LAST")
     assert np.array_equal(result, arr)
+
+
+# ---------------------------------------------------------------------------
+# ASAM ndarray: ROW_DIR / COLUMN_DIR / shape reversal / element count
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_row_dir_2d_val_blk():
+    """ASAM VAL_BLK: MATRIX_DIM 5 4, ROW_DIR."""
+    row_dir_flat = [
+        11, 21, 31, 41, 51,
+        12, 22, 32, 42, 52,
+        13, 23, 33, 43, 53,
+        14, 24, 34, 44, 54,
+    ]
+    sec = Section(start_address=0x1000, data=bytearray(64))
+    arr = np.array(row_dir_flat, dtype=np.uint8).reshape(4, 5)
+    sec.write_asam_ndarray(0x1000, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    assert list(sec.read(0x1000, 20)) == row_dir_flat
+    result = sec.read_asam_ndarray(0x1000, 20, "UBYTE", shape=(5, 4), byte_order="MSB_LAST", index_mode="ROW_DIR")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_column_dir_2d_val_blk():
+    """ASAM VAL_BLK: MATRIX_DIM 5 4, COLUMN_DIR."""
+    col_dir_flat = [
+        11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34,
+        41, 42, 43, 44, 51, 52, 53, 54,
+    ]
+    expected_numpy = np.array([
+        [11, 21, 31, 41, 51], [12, 22, 32, 42, 52],
+        [13, 23, 33, 43, 53], [14, 24, 34, 44, 54],
+    ], dtype=np.uint8)
+    sec = Section(start_address=0x1000, data=bytearray(col_dir_flat + [0] * 44))
+    result = sec.read_asam_ndarray(0x1000, 20, "UBYTE", shape=(5, 4), byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    assert result.shape == (4, 5)
+    assert np.array_equal(result, expected_numpy)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_column_dir_2d_write_roundtrip():
+    """Write COLUMN_DIR, verify raw memory, read back."""
+    arr = np.array([
+        [11, 21, 31, 41, 51], [12, 22, 32, 42, 52],
+        [13, 23, 33, 43, 53], [14, 24, 34, 44, 54],
+    ], dtype=np.uint8)
+    sec = Section(start_address=0x1000, data=bytearray(64))
+    sec.write_asam_ndarray(0x1000, arr, "UBYTE", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    expected_memory = [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54]
+    assert list(sec.read(0x1000, 20)) == expected_memory
+    result = sec.read_asam_ndarray(0x1000, 20, "UBYTE", shape=(5, 4), byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_shape_reversal_1d():
+    """1-D shape (N,) survives reversal unchanged."""
+    sec = Section(start_address=0, data=bytearray(16))
+    arr = np.array([10, 20, 30, 40], dtype=np.uint16)
+    sec.write_asam_ndarray(0, arr, "UWORD", byte_order="MSB_LAST")
+    result = sec.read_asam_ndarray(0, 4, "UWORD", shape=(4,), byte_order="MSB_LAST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_row_dir_uword_le():
+    """ROW_DIR with UWORD little-endian, element-count semantics."""
+    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
+    sec = Section(start_address=0x2000, data=bytearray(32))
+    sec.write_asam_ndarray(0x2000, arr, "UWORD", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    assert sec.read(0x2000, 12) == b"\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06\x00"
+    result = sec.read_asam_ndarray(0x2000, 6, "UWORD", shape=(3, 2), byte_order="MSB_LAST", index_mode="ROW_DIR")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_column_dir_3d():
+    """3-D COLUMN_DIR: only X and Y swapped, Z stays C-order."""
+    arr = np.arange(1, 13, dtype=np.uint8).reshape(2, 2, 3)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    expected_flat = [1, 4, 2, 5, 3, 6, 7, 10, 8, 11, 9, 12]
+    assert list(sec.read(0, 12)) == expected_flat
+    result = sec.read_asam_ndarray(0, 12, "UBYTE", shape=(3, 2, 2), byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    assert result.shape == (2, 2, 3)
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_invalid_index_mode():
+    """Unsupported index_mode must raise ValueError."""
+    sec = Section(start_address=0, data=bytearray(16))
+    arr = np.array([1, 2, 3], dtype=np.uint8)
+    with pytest.raises(ValueError):
+        sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="INVALID")
+    with pytest.raises(ValueError):
+        sec.read_asam_ndarray(0, 3, "UBYTE", shape=(3,), byte_order="MSB_LAST", index_mode="INVALID")
+
+
+# ---------------------------------------------------------------------------
+# ASAM numeric_array ↔ ndarray cross-function roundtrip tests
+# ---------------------------------------------------------------------------
+
+
+def test_asam_numeric_array_sword_roundtrip():
+    """write_asam_numeric_array → read_asam_numeric_array: SWORD, MSB_LAST."""
+    values = (1, -2, 3, -4, 5, -6, 7, -8, 9, -10, 11, -12)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_numeric_array(0, values, "SWORD", byte_order="MSB_LAST")
+    result = sec.read_asam_numeric_array(0, 12, "SWORD", byte_order="MSB_LAST")
+    assert result == values
+
+
+def test_asam_numeric_array_ulong_roundtrip():
+    """write_asam_numeric_array → read_asam_numeric_array: ULONG, MSB_LAST."""
+    values = (0xDEADBEEF, 0xCAFEBABE, 0x12345678)
+    sec = Section(start_address=0, data=bytearray(16))
+    sec.write_asam_numeric_array(0, values, "ULONG", byte_order="MSB_LAST")
+    result = sec.read_asam_numeric_array(0, 3, "ULONG", byte_order="MSB_LAST")
+    assert result == values
+
+
+def test_asam_numeric_array_ulong_msb_first_roundtrip():
+    """write_asam_numeric_array → read_asam_numeric_array: ULONG, MSB_FIRST."""
+    values = (0x11223344, 0x55667788, 0xAABBCCDD)
+    sec = Section(start_address=0, data=bytearray(16))
+    sec.write_asam_numeric_array(0, values, "ULONG", byte_order="MSB_FIRST")
+    result = sec.read_asam_numeric_array(0, 3, "ULONG", byte_order="MSB_FIRST")
+    assert result == values
+
+
+def test_asam_numeric_array_msb_last_msw_first_roundtrip():
+    """write_asam_numeric_array → read_asam_numeric_array: word-swap variant."""
+    values = (0x11223344, 0x55667788)
+    sec = Section(start_address=0, data=bytearray(16))
+    sec.write_asam_numeric_array(0, values, "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    result = sec.read_asam_numeric_array(0, 2, "ULONG", byte_order="MSB_LAST_MSW_FIRST")
+    assert result == values
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_numeric_array_float32_roundtrip():
+    """write_asam_numeric_array → read_asam_numeric_array: FLOAT32_IEEE."""
+    values = (1.5, -2.25, 3.0, 0.0)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_numeric_array(0, values, "FLOAT32_IEEE", byte_order="MSB_LAST")
+    result = sec.read_asam_numeric_array(0, 4, "FLOAT32_IEEE", byte_order="MSB_LAST")
+    for got, expected in zip(result, values):
+        assert got == pytest.approx(expected, abs=1e-6)
+
+
+# ---------------------------------------------------------------------------
+# Cross-function: write_asam_numeric_array → read_asam_ndarray
+# (flat write, shaped read — verifies memory layout consistency)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_numeric_array_to_ndarray_row_dir_sword():
+    """write_asam_numeric_array (flat, C-order) → read_asam_ndarray ROW_DIR.
+
+    ASAM shape (3, 4) → numpy shape (4, 3).
+    C-order memory: row-by-row → 1 2 3 | 4 5 6 | 7 8 9 | 10 11 12.
+    """
+    flat_c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    expected = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_numeric_array(0, flat_c, "SWORD", byte_order="MSB_LAST")
+    result = sec.read_asam_ndarray(0, 12, "SWORD", shape=(3, 4), index_mode="ROW_DIR", byte_order="MSB_LAST")
+    assert result.shape == (4, 3)
+    assert np.array_equal(result, expected)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_numeric_array_to_ndarray_column_dir_sword():
+    """write_asam_numeric_array (flat, column-order) → read_asam_ndarray COLUMN_DIR.
+
+    ASAM shape (3, 4) → numpy shape (4, 3).
+    COLUMN_DIR memory: column-by-column → 1 4 7 10 | 2 5 8 11 | 3 6 9 12.
+    Both must yield the same logical array [[1,2,3],[4,5,6],[7,8,9],[10,11,12]].
+    """
+    flat_f = [1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12]
+    expected = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_numeric_array(0, flat_f, "SWORD", byte_order="MSB_LAST")
+    result = sec.read_asam_ndarray(0, 12, "SWORD", shape=(3, 4), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
+    assert result.shape == (4, 3)
+    assert np.array_equal(result, expected)
+
+
+# ---------------------------------------------------------------------------
+# Cross-function: write_asam_ndarray → read_asam_numeric_array
+# (shaped write, flat read — verifies memory layout consistency)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_ndarray_to_numeric_array_row_dir_sword():
+    """write_asam_ndarray ROW_DIR → read_asam_numeric_array (flat).
+
+    Expected flat tuple: C-order row-by-row.
+    """
+    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "SWORD", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    result = sec.read_asam_numeric_array(0, 12, "SWORD", byte_order="MSB_LAST")
+    assert result == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_ndarray_to_numeric_array_column_dir_sword():
+    """write_asam_ndarray COLUMN_DIR → read_asam_numeric_array (flat).
+
+    Expected flat tuple: column-by-column (Y increments fastest).
+    """
+    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "SWORD", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    result = sec.read_asam_numeric_array(0, 12, "SWORD", byte_order="MSB_LAST")
+    assert result == (1, 4, 7, 10, 2, 5, 8, 11, 3, 6, 9, 12)
+
+
+# ---------------------------------------------------------------------------
+# Full roundtrip: write_asam_ndarray → read_asam_ndarray (various configs)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_row_dir_sword():
+    """write ROW_DIR → read ROW_DIR: SWORD, shape (3, 4)."""
+    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "SWORD", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    result = sec.read_asam_ndarray(0, 12, "SWORD", shape=(3, 4), index_mode="ROW_DIR", byte_order="MSB_LAST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_column_dir_sword():
+    """write COLUMN_DIR → read COLUMN_DIR: SWORD, shape (3, 4)."""
+    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]], dtype=np.int16)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "SWORD", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    result = sec.read_asam_ndarray(0, 12, "SWORD", shape=(3, 4), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_column_dir_ulong_msb_first():
+    """write COLUMN_DIR → read COLUMN_DIR: ULONG, MSB_FIRST, shape (2, 3)."""
+    arr = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.uint32)
+    sec = Section(start_address=0x4000, data=bytearray(64))
+    sec.write_asam_ndarray(0x4000, arr, "ULONG", byte_order="MSB_FIRST", index_mode="COLUMN_DIR")
+    result = sec.read_asam_ndarray(0x4000, 6, "ULONG", shape=(2, 3), index_mode="COLUMN_DIR", byte_order="MSB_FIRST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_row_dir_ulong_word_swap():
+    """write ROW_DIR → read ROW_DIR: ULONG, MSB_LAST_MSW_FIRST (word-swap), shape (2, 2)."""
+    arr = np.array([[0x11223344, 0x55667788], [0xAABBCCDD, 0xEEFF0011]], dtype=np.uint32)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "ULONG", byte_order="MSB_LAST_MSW_FIRST", index_mode="ROW_DIR")
+    result = sec.read_asam_ndarray(0, 4, "ULONG", shape=(2, 2), index_mode="ROW_DIR", byte_order="MSB_LAST_MSW_FIRST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_column_dir_uword_3x5():
+    """write COLUMN_DIR → read COLUMN_DIR: UWORD, shape (3, 5) — wider matrix."""
+    arr = np.arange(1, 16, dtype=np.uint16).reshape(5, 3)
+    sec = Section(start_address=0x1000, data=bytearray(64))
+    sec.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    result = sec.read_asam_ndarray(0x1000, 15, "UWORD", shape=(3, 5), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_asam_ndarray_full_roundtrip_row_dir_ubyte_1d():
+    """1-D roundtrip: index_mode irrelevant for 1-D, but must still work."""
+    arr = np.array([10, 20, 30, 40, 50], dtype=np.uint8)
+    sec = Section(start_address=0, data=bytearray(16))
+    sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    result = sec.read_asam_ndarray(0, 5, "UBYTE", shape=(5,), index_mode="ROW_DIR", byte_order="MSB_LAST")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_ndarray_to_numeric_array_column_dir_3d():
+    """write_asam_ndarray COLUMN_DIR 3D → read_asam_numeric_array (flat).
+
+    For 3D, only the last two dims are column-ordered per slice.
+    arr shape (2, 2, 3) → ASAM shape (3, 2, 2).
+    """
+    arr = np.arange(1, 13, dtype=np.uint8).reshape(2, 2, 3)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
+    flat = sec.read_asam_numeric_array(0, 12, "UBYTE", byte_order="MSB_LAST")
+    assert flat == (1, 4, 2, 5, 3, 6, 7, 10, 8, 11, 9, 12)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_cross_numeric_array_to_ndarray_column_dir_3d():
+    """write_asam_numeric_array (flat 3D COLUMN_DIR) → read_asam_ndarray COLUMN_DIR.
+
+    Verifies the inverse of the previous test.
+    """
+    flat_col = [1, 4, 2, 5, 3, 6, 7, 10, 8, 11, 9, 12]
+    expected = np.arange(1, 13, dtype=np.uint8).reshape(2, 2, 3)
+    sec = Section(start_address=0, data=bytearray(32))
+    sec.write_asam_numeric_array(0, flat_col, "UBYTE", byte_order="MSB_LAST")
+    result = sec.read_asam_ndarray(0, 12, "UBYTE", shape=(3, 2, 2), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
+    assert result.shape == (2, 2, 3)
+    assert np.array_equal(result, expected)
+

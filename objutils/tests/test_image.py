@@ -1364,9 +1364,9 @@ def test_image_asam_numeric_array_word_swap_32bit():
 def test_image_asam_ndarray_fortran_roundtrip():
     img = Image(Section(data=bytearray(32), start_address=0x1000))
     arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
-    img.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", order="F")
+    img.write_asam_ndarray(0x1000, arr, "UWORD", byte_order="MSB_FIRST_MSW_LAST", index_mode="COLUMN_DIR")
     assert img.read(0x1000, 12) == b"\x01\x00\x04\x00\x02\x00\x05\x00\x03\x00\x06\x00"
-    result = img.read_asam_ndarray(0x1000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST_MSW_LAST")
+    result = img.read_asam_ndarray(0x1000, 6, "UWORD", shape=(3, 2), index_mode="COLUMN_DIR", byte_order="MSB_FIRST_MSW_LAST")
     assert np.array_equal(result, arr)
 
 

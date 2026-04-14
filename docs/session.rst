@@ -185,7 +185,8 @@ Verify the raw bytes to understand word-swap layout:
 ASAM ndarrays (NumPy)
 ---------------------
 
-``length`` is the **byte count** for ``read_asam_ndarray``:
+``length`` is the **element count** for ``read_asam_ndarray``.
+``shape`` uses **ASAM** dimension order ``(X, Y, Z, …)``.
 
 .. code-block:: python
 
@@ -193,10 +194,10 @@ ASAM ndarrays (NumPy)
     >>> img = Image([Section(0x5000, bytes(64))])
 
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
-    >>> img.write_asam_ndarray(0x5000, matrix, "UWORD", "MSB_FIRST", order="F")
+    >>> img.write_asam_ndarray(0x5000, matrix, "UWORD", "MSB_FIRST", index_mode="COLUMN_DIR")
 
     >>> matrix_rt = img.read_asam_ndarray(
-    ...     0x5000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST"
+    ...     0x5000, 6, "UWORD", shape=(3, 2), index_mode="COLUMN_DIR", byte_order="MSB_FIRST"
     ... )
     >>> np.array_equal(matrix_rt, matrix)
     True

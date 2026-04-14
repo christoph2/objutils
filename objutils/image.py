@@ -716,11 +716,20 @@ class Image:
         array: Any,
         dtype: str,
         byte_order: str = "MSB_LAST",
-        order: Optional[str] = None,
+        index_mode: str = "ROW_DIR",
         **kws: Any,
     ) -> None:
-        """Write a NumPy ndarray using ASAM datatype and ECU byte order semantics."""
-        self._call_address_function("write_asam_ndarray", addr, array, dtype, byte_order, order=order, **kws)
+        """Write a NumPy ndarray using ASAM datatype and ECU byte order semantics.
+
+        Args:
+            addr: Absolute memory address to write to.
+            array: NumPy ndarray (shape in numpy convention).
+            dtype: ASAM datatype name.
+            byte_order: ASAM byte order string.
+            index_mode: ``"ROW_DIR"`` (default) or ``"COLUMN_DIR"``.
+            **kws: Passed through to section method.
+        """
+        self._call_address_function("write_asam_ndarray", addr, array, dtype, byte_order, index_mode=index_mode, **kws)
 
     def read_ndarray(
         self,
@@ -755,12 +764,27 @@ class Image:
         length: int,
         dtype: str,
         shape: Optional[tuple[int, ...]] = None,
-        order: Optional[str] = None,
         byte_order: str = "MSB_LAST",
+        index_mode: str = "ROW_DIR",
         **kws: Any,
     ) -> Any:
-        """Read a NumPy ndarray using ASAM datatype and ECU byte order semantics."""
-        return self._call_address_function("read_asam_ndarray", addr, length, dtype, shape, order, byte_order, **kws)
+        """Read a NumPy ndarray using ASAM datatype and ECU byte order semantics.
+
+        Args:
+            addr: Start address to read from.
+            length: Number of **elements** (not bytes).
+            dtype: ASAM datatype name.
+            shape: Dimensions in **ASAM** order ``(X, Y, Z, ...)``.
+            byte_order: ASAM byte order string.
+            index_mode: ``"ROW_DIR"`` (default) or ``"COLUMN_DIR"``.
+            **kws: Passed through to section method.
+
+        Returns:
+            NumPy ndarray with shape in numpy convention.
+        """
+        return self._call_address_function(
+            "read_asam_ndarray", addr, length, dtype, shape=shape, byte_order=byte_order, index_mode=index_mode, **kws
+        )
 
     def read_string(self, addr: int, encoding: str = "latin1", length: int = -1, **kws: Any) -> str:
         """Read string from image.

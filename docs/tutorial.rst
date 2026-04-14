@@ -130,8 +130,8 @@ side by side in one small image.
 
    # ASAM ndarrays
    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
-   img.write_asam_ndarray(0x3040, arr, "UWORD", "MSB_FIRST", order="F")
-   arr_roundtrip = img.read_asam_ndarray(0x3040, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST")
+   img.write_asam_ndarray(0x3040, arr, "UWORD", "MSB_FIRST", index_mode="COLUMN_DIR")
+   arr_roundtrip = img.read_asam_ndarray(0x3040, 6, "UWORD", shape=(3, 2), index_mode="COLUMN_DIR", byte_order="MSB_FIRST")
 
    # ASAM strings
    img.write_asam_string(0x3010, "MOTOR", "ASCII")
@@ -149,9 +149,9 @@ side by side in one small image.
    img = Image([Section(0x5000, bytes(64))])
 
    matrix = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint16)
-   img.write_asam_ndarray(0x5000, matrix, "UWORD", "MSB_FIRST", order="F")
+   img.write_asam_ndarray(0x5000, matrix, "UWORD", "MSB_FIRST", index_mode="COLUMN_DIR")
 
-   matrix_rt = img.read_asam_ndarray(0x5000, 12, "UWORD", shape=(3, 2), order="F", byte_order="MSB_FIRST")
+   matrix_rt = img.read_asam_ndarray(0x5000, 6, "UWORD", shape=(3, 2), index_mode="COLUMN_DIR", byte_order="MSB_FIRST")
    assert np.array_equal(matrix_rt, matrix)
 
 .. rubric:: Supported ASAM byte orders
@@ -199,7 +199,7 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
      - ``None``
      - scalar lists/tuples
    * - ``read_asam_ndarray(...)``
-     - byte count
+     - element count
      - ``numpy.ndarray``
      - matrix/tensor data
    * - ``write_asam_ndarray(...)``
@@ -211,15 +211,19 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
 
 - ``read_asam_numeric_array(addr, length, dtype, byte_order="MSB_LAST")``
 - ``write_asam_numeric_array(addr, data, dtype, byte_order="MSB_LAST")``
-- ``read_asam_ndarray(addr, length, dtype, shape=None, order=None, byte_order="MSB_LAST")``
-- ``write_asam_ndarray(addr, array, dtype, byte_order="MSB_LAST", order=None)``
+- ``read_asam_ndarray(addr, length, dtype, shape=None, byte_order="MSB_LAST", index_mode="ROW_DIR")``
+- ``write_asam_ndarray(addr, array, dtype, byte_order="MSB_LAST", index_mode="ROW_DIR")``
 
 .. note::
-   **Fortran-order**
+   **ASAM index modes**
 
-   With ``order="F"``, keep the existing project convention used by
-   ``fortran_array_from_buffer``. For a logical 2x3 matrix, reads use
-   ``shape=(3, 2)`` in the current helper path.
+   ``index_mode="ROW_DIR"`` (default) uses C-like row-major layout
+   where X increments fastest.  ``index_mode="COLUMN_DIR"`` swaps only
+   X and Y (not true Fortran-order for dims > 2).
+
+   ``shape`` uses **ASAM convention** ``(X, Y, Z, …)`` which is reversed
+   compared to numpy ``(…, Z, Y, X)``.  ``length`` is the **element count**,
+   not byte count.
 
 .. warning::
    **Frequent pitfalls**

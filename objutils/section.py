@@ -419,6 +419,78 @@ def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
         return result
 
 
+ASAM_INDEX_MODES = {"ROW_DIR", "COLUMN_DIR"}
+
+
+def _asam_column_dir_from_buffer(data: bytes, numpy_shape: tuple, dtype: Any) -> np.ndarray:
+    """Reconstruct array from ASAM COLUMN_DIR memory layout.
+
+    In COLUMN_DIR only the X and Y dimensions (last two in numpy convention)
+    are swapped compared to ROW_DIR.  Higher dimensions (Z, Z4, Z5) keep
+    C-order.  This is **not** true column-major (Fortran) order for dims > 2.
+
+    Args:
+        data: Raw byte buffer.
+        numpy_shape: Target shape in numpy convention (rows, cols, …).
+        dtype: NumPy dtype.
+
+    Returns:
+        NumPy array with the specified shape.
+    """
+    dt = np.dtype(dtype)
+    flat = np.frombuffer(data, dtype=dt)
+
+    if numpy_shape is None or len(numpy_shape) <= 1:
+        return flat.reshape(numpy_shape) if numpy_shape else flat
+
+    if len(numpy_shape) == 2:
+        return flat.reshape(numpy_shape, order="F")
+
+    # 3D+: only the last two dims (Y, X) are Fortran-ordered per slice.
+    higher_dims = numpy_shape[:-2]
+    yx_shape = numpy_shape[-2:]
+    num_slices = reduce(mul, higher_dims, 1)
+    slice_size = reduce(mul, yx_shape, 1)
+
+    sliced = flat.reshape(num_slices, slice_size)
+    out = np.empty((num_slices, *yx_shape), dtype=dt)
+    for idx in range(num_slices):
+        out[idx] = sliced[idx].reshape(yx_shape, order="F")
+    return out.reshape(numpy_shape)
+
+
+def _asam_column_dir_to_buffer(arr: np.ndarray) -> bytearray:
+    """Serialize array for ASAM COLUMN_DIR memory layout.
+
+    Only the X and Y dimensions (last two in numpy convention) are
+    transposed.  Higher dimensions keep C-order.
+
+    Args:
+        arr: NumPy array to serialize.
+
+    Returns:
+        Byte buffer with COLUMN_DIR memory layout.
+    """
+    if arr.ndim <= 1:
+        return bytearray(arr.tobytes())
+
+    if arr.ndim == 2:
+        return bytearray(arr.tobytes("F"))
+
+    shape = arr.shape
+    higher_dims = shape[:-2]
+    yx_shape = shape[-2:]
+    num_slices = reduce(mul, higher_dims, 1)
+    slice_bytes = reduce(mul, yx_shape, 1) * arr.dtype.itemsize
+    rs_arr = arr.reshape(num_slices, *yx_shape)
+    result = bytearray(arr.nbytes)
+    offset = 0
+    for idx in range(num_slices):
+        result[offset : offset + slice_bytes] = rs_arr[idx].tobytes("F")
+        offset += slice_bytes
+    return result
+
+
 @dataclass(repr=False, order=True)
 class Section:
     """Continuous block of bytes with start address and known length.
@@ -978,17 +1050,44 @@ class Section:
         array: np.ndarray,
         dtype: str,
         byte_order: str = "MSB_LAST",
-        order: str = None,
+        index_mode: str = "ROW_DIR",
         **kws,
     ) -> None:
+        """Write a NumPy ndarray using ASAM datatype and byte order semantics.
+
+        Unlike :meth:`write_ndarray`, this method uses ASAM conventions:
+
+        - ``index_mode`` controls the memory layout (``ROW_DIR`` or
+          ``COLUMN_DIR``) instead of the generic ``order`` parameter.
+        - Byte-order permutations (word-swap variants) are applied per
+          element.
+
+        Args:
+            addr: Absolute memory address to write to.
+            array: NumPy array to write (shape in **numpy** convention,
+                i.e. rows × columns).
+            dtype: ASAM datatype name (e.g. ``"UWORD"``, ``"ULONG"``).
+            byte_order: ASAM byte order string.
+            index_mode: ``"ROW_DIR"`` (default) – X increments fastest
+                (C-like row-major).  ``"COLUMN_DIR"`` – Y increments
+                fastest; only X and Y are swapped (not true column-major
+                for dims > 2).
+            **kws: Passed through to :meth:`write`.
+
+        Raises:
+            TypeError: If *array* is not an ndarray.
+            ValueError: If *index_mode* is unsupported.
+        """
         if not isinstance(array, np.ndarray):
             raise TypeError("array must be of type numpy.ndarray.")
+        if index_mode not in ASAM_INDEX_MODES:
+            raise ValueError(f"Unsupported index_mode {index_mode!r}; use ROW_DIR or COLUMN_DIR.")
 
         asam_byte_order = self._resolve_asam_byteorder(byte_order)
         internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
         typed_array = np.asarray(array, dtype=self._numpy_dtype_from_internal(internal_dtype))
-        if order is not None and order == "F":
-            raw_data = fortran_array_to_buffer(array=typed_array)
+        if index_mode == "COLUMN_DIR":
+            raw_data = _asam_column_dir_to_buffer(typed_array)
         else:
             raw_data = typed_array.tobytes()
         permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
@@ -1015,20 +1114,63 @@ class Section:
         length: int,
         dtype: str,
         shape: tuple = None,
-        order: str = None,
         byte_order: str = "MSB_LAST",
+        index_mode: str = "ROW_DIR",
         **kws,
     ) -> np.ndarray:
+        """Read a NumPy ndarray using ASAM datatype and byte order semantics.
+
+        Unlike :meth:`read_ndarray`, this method uses ASAM conventions:
+
+        - ``length`` is the **element count** (not byte count).
+        - ``shape`` uses ASAM dimension order ``(X, Y, Z, Z4, Z5)``
+          which is **reversed** compared to numpy ``(…, Z, Y, X)``.
+        - ``index_mode`` controls the memory layout instead of the
+          generic ``order`` parameter.
+
+        Args:
+            addr: Absolute memory address to read from.
+            length: Number of **elements** to read.
+            dtype: ASAM datatype name (e.g. ``"UWORD"``, ``"ULONG"``).
+            shape: Array dimensions in **ASAM** convention ``(X, Y, …)``.
+                Converted internally to numpy convention ``(…, Y, X)``.
+            byte_order: ASAM byte order string.
+            index_mode: ``"ROW_DIR"`` (default) – X increments fastest
+                (C-like row-major).  ``"COLUMN_DIR"`` – Y increments
+                fastest; only X and Y are swapped (not true column-major
+                for dims > 2).
+            **kws: Passed through to :meth:`read`.
+
+        Returns:
+            NumPy array with shape in **numpy** convention.
+
+        Raises:
+            ValueError: If *index_mode* is unsupported.
+        """
+        if index_mode not in ASAM_INDEX_MODES:
+            raise ValueError(f"Unsupported index_mode {index_mode!r}; use ROW_DIR or COLUMN_DIR.")
+
         asam_byte_order = self._resolve_asam_byteorder(byte_order)
         internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
         dt = self._numpy_dtype_from_internal(internal_dtype)
-        raw_data = self.read(addr, length, **kws)
-        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
-        if order is not None and order == "F":
-            return fortran_array_from_buffer(arr=permuted, shape=shape, dtype=dt)
 
+        # Compute byte count from element count.
+        type_name = internal_dtype.split("_")[0]
+        type_size = TYPE_SIZES[type_name]
+        byte_count = length * type_size
+
+        # Convert ASAM shape (X, Y, Z …) → numpy shape (… Z, Y, X).
+        numpy_shape = tuple(reversed(shape)) if shape else None
+
+        raw_data = self.read(addr, byte_count, **kws)
+        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+
+        if index_mode == "COLUMN_DIR":
+            return _asam_column_dir_from_buffer(permuted, numpy_shape, dt)
+
+        # ROW_DIR: standard C-order.
         flat = np.frombuffer(permuted, dtype=dt)
-        return flat.reshape(shape) if shape else flat
+        return flat.reshape(numpy_shape) if numpy_shape else flat
 
     """
     def write_timestamp():
