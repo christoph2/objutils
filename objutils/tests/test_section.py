@@ -684,10 +684,26 @@ def test_asam_ndarray_column_dir_roundtrip():
 def test_asam_ndarray_row_dir_2d_val_blk():
     """ASAM VAL_BLK: MATRIX_DIM 5 4, ROW_DIR."""
     row_dir_flat = [
-        11, 21, 31, 41, 51,
-        12, 22, 32, 42, 52,
-        13, 23, 33, 43, 53,
-        14, 24, 34, 44, 54,
+        11,
+        21,
+        31,
+        41,
+        51,
+        12,
+        22,
+        32,
+        42,
+        52,
+        13,
+        23,
+        33,
+        43,
+        53,
+        14,
+        24,
+        34,
+        44,
+        54,
     ]
     sec = Section(start_address=0x1000, data=bytearray(64))
     arr = np.array(row_dir_flat, dtype=np.uint8).reshape(4, 5)
@@ -701,13 +717,36 @@ def test_asam_ndarray_row_dir_2d_val_blk():
 def test_asam_ndarray_column_dir_2d_val_blk():
     """ASAM VAL_BLK: MATRIX_DIM 5 4, COLUMN_DIR."""
     col_dir_flat = [
-        11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34,
-        41, 42, 43, 44, 51, 52, 53, 54,
+        11,
+        12,
+        13,
+        14,
+        21,
+        22,
+        23,
+        24,
+        31,
+        32,
+        33,
+        34,
+        41,
+        42,
+        43,
+        44,
+        51,
+        52,
+        53,
+        54,
     ]
-    expected_numpy = np.array([
-        [11, 21, 31, 41, 51], [12, 22, 32, 42, 52],
-        [13, 23, 33, 43, 53], [14, 24, 34, 44, 54],
-    ], dtype=np.uint8)
+    expected_numpy = np.array(
+        [
+            [11, 21, 31, 41, 51],
+            [12, 22, 32, 42, 52],
+            [13, 23, 33, 43, 53],
+            [14, 24, 34, 44, 54],
+        ],
+        dtype=np.uint8,
+    )
     sec = Section(start_address=0x1000, data=bytearray(col_dir_flat + [0] * 44))
     result = sec.read_asam_ndarray(0x1000, 20, "UBYTE", shape=(5, 4), byte_order="MSB_LAST", index_mode="COLUMN_DIR")
     assert result.shape == (4, 5)
@@ -717,10 +756,15 @@ def test_asam_ndarray_column_dir_2d_val_blk():
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
 def test_asam_ndarray_column_dir_2d_write_roundtrip():
     """Write COLUMN_DIR, verify raw memory, read back."""
-    arr = np.array([
-        [11, 21, 31, 41, 51], [12, 22, 32, 42, 52],
-        [13, 23, 33, 43, 53], [14, 24, 34, 44, 54],
-    ], dtype=np.uint8)
+    arr = np.array(
+        [
+            [11, 21, 31, 41, 51],
+            [12, 22, 32, 42, 52],
+            [13, 23, 33, 43, 53],
+            [14, 24, 34, 44, 54],
+        ],
+        dtype=np.uint8,
+    )
     sec = Section(start_address=0x1000, data=bytearray(64))
     sec.write_asam_ndarray(0x1000, arr, "UBYTE", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
     expected_memory = [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54]
@@ -989,4 +1033,3 @@ def test_cross_numeric_array_to_ndarray_column_dir_3d():
     result = sec.read_asam_ndarray(0, 12, "UBYTE", shape=(3, 2, 2), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
     assert result.shape == (2, 2, 3)
     assert np.array_equal(result, expected)
-
