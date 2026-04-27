@@ -13,7 +13,7 @@ Registers CODECS and implements an interface to them.
 The first parameter is always the codec name.
 """
 
-__version__ = "0.10.4"
+__version__ = "0.10.5"
 
 __all__ = [
     "Image",
