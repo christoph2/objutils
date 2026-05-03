@@ -140,58 +140,60 @@ from construct import Array
 from objutils.dwarf import constants
 
 
+@dataclass
+class TypedValue:
+    """Represents a value on the DWARF stack with an associated type.
+
+    Attributes:
+        value: The actual numeric or address value.
+        type_offset: Offset of the DW_TAG_base_type in .debug_info,
+                    or 0 for the generic type.
+    """
+
+    value: Any
+    type_offset: int = 0  # 0 means generic type
+
+    def __int__(self):
+        return int(self.value)
+
+
 class Stack:
     """Simple LIFO stack for DWARF expression evaluation.
 
     Provides basic stack operations for the DWARF stack machine.
-    Stores arbitrary Python values (integers, addresses, etc.).
-
-    Attributes:
-        _values: Internal list storing stack contents (private)
-
-    Example:
-        ```python
-        stack = Stack()
-        stack.push(42)
-        stack.push(10)
-        result = stack.pop()  # 10
-        top = stack.tos       # 42
-        stack.tos = 100       # Modify top without pop/push
-        ```
+    Stores TypedValue instances.
     """
 
     def __init__(self):
         """Initialize empty stack."""
-        self._values: list[Any] = []
+        self._values: list[TypedValue] = []
 
-    def push(self, value: Any) -> None:
+    def push(self, value: Any, type_offset: int = 0) -> None:
         """Push value onto stack.
 
         Args:
-            value: Value to push (typically int or address)
+            value: Value to push (typically int or address) or TypedValue
+            type_offset: Offset of the base type (0 for generic)
         """
-        self._values.append(value)
+        if isinstance(value, TypedValue):
+            self._values.append(value)
+        else:
+            self._values.append(TypedValue(value, type_offset))
 
-    def pop(self) -> Any:
+    def pop(self) -> TypedValue:
         """Pop and return top value from stack.
 
         Returns:
-            Top stack value
-
-        Raises:
-            IndexError: If stack is empty
+            Top stack TypedValue
         """
         return self._values.pop()
 
     @property
-    def tos(self) -> Any:
+    def tos(self) -> TypedValue:
         """Get top-of-stack value without popping.
 
         Returns:
-            Top stack value
-
-        Raises:
-            IndexError: If stack is empty
+            Top stack TypedValue
         """
         return self._values[-1]
 
@@ -200,36 +202,22 @@ class Stack:
         """Set top-of-stack value without popping.
 
         Args:
-            value: New value for top of stack
-
-        Raises:
-            IndexError: If stack is empty
+            value: New value or TypedValue for top of stack
         """
-        self._values[-1] = value
+        if isinstance(value, TypedValue):
+            self._values[-1] = value
+        else:
+            current_type = self._values[-1].type_offset
+            self._values[-1] = TypedValue(value, current_type)
 
-    def get_at(self, index: int) -> Any:
+    def get_at(self, index: int) -> TypedValue:
         """Get value at index from top of stack.
 
         Args:
             index: Index from top (0 = top, 1 = second, etc.)
 
         Returns:
-            Value at specified index
-
-        Raises:
-            IndexError: If index out of range
-
-        Example:
-            >>> stack = Stack()
-            >>> stack.push(10)  # bottom
-            >>> stack.push(20)
-            >>> stack.push(30)  # top
-            >>> stack.get_at(0)  # 30 (top)
-            30
-            >>> stack.get_at(1)  # 20
-            20
-            >>> stack.get_at(2)  # 10
-            10
+            TypedValue at specified index
         """
         return self._values[-(index + 1)]
 
@@ -244,20 +232,6 @@ class Stack:
     def __str__(self) -> str:
         """Return string representation of stack contents."""
         return f"Stack({self._values!r})"
-
-
-@dataclass
-class EvaluationResult:
-    """Result of DWARF expression evaluation.
-
-    Placeholder for future expansion. Could contain:
-    - Final stack state
-    - Expression interpretation
-    - Error information
-    - Location type (memory, register, etc.)
-    """
-
-    pass
 
 
 ######################
@@ -736,7 +710,7 @@ class Abs(OperationBase):
 
     def stack_op(self, stack):
         a = stack.pop()
-        stack.push(abs(a))
+        stack.push(abs(a.value), a.type_offset)
 
 
 class And_(OperationBase):
@@ -750,7 +724,7 @@ class And_(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a & b)
+        stack.push(a.value & b.value, a.type_offset)
 
 
 class Div(OperationBase):
@@ -764,7 +738,7 @@ class Div(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a // b)
+        stack.push(a.value // b.value, a.type_offset)
 
 
 class Minus(OperationBase):
@@ -778,7 +752,7 @@ class Minus(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a - b)
+        stack.push(a.value - b.value, a.type_offset)
 
 
 class Mod(OperationBase):
@@ -792,7 +766,7 @@ class Mod(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a % b)
+        stack.push(a.value % b.value, a.type_offset)
 
 
 class Mul(OperationBase):
@@ -806,7 +780,7 @@ class Mul(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a * b)
+        stack.push(a.value * b.value, a.type_offset)
 
 
 class Neg(OperationBase):
@@ -819,7 +793,7 @@ class Neg(OperationBase):
 
     def stack_op(self, stack):
         a = stack.pop()
-        stack.push(-a)
+        stack.push(-a.value, a.type_offset)
 
 
 class Not_(OperationBase):
@@ -832,7 +806,7 @@ class Not_(OperationBase):
 
     def stack_op(self, stack):
         a = stack.pop()
-        stack.push(~a)
+        stack.push(~a.value, a.type_offset)
 
 
 class Or_(OperationBase):
@@ -846,7 +820,7 @@ class Or_(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a | b)
+        stack.push(a.value | b.value, a.type_offset)
 
 
 class Plus(OperationBase):
@@ -860,7 +834,7 @@ class Plus(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a + b)
+        stack.push(a.value + b.value, a.type_offset)
 
 
 class Plus_Uconst(OperationBase):
@@ -879,9 +853,18 @@ class Plus_Uconst(OperationBase):
     PARAMETERS = ["uleb"]
 
     def stack_op(self, stack):
-        a = stack.pop()
+        try:
+            a = stack.pop()
+            val = a.value
+            type_offset = a.type_offset
+        except IndexError:
+            # Note: many location expressions (like for member offsets)
+            # assume a base address is already on the stack.
+            # If the stack is empty, we treat the base as 0.
+            val = 0
+            type_offset = 0
         constant = self.result[0]
-        stack.push(a + constant)
+        stack.push(val + constant, type_offset)
 
 
 class Shl(OperationBase):
@@ -893,9 +876,9 @@ class Shl(OperationBase):
     DISPLAY_NAME = "shl"
 
     def stack_op(self, stack):
-        shift = stack.pop()
+        shift = stack.pop().value
         value = stack.pop()
-        stack.push(value << shift)
+        stack.push(value.value << shift, value.type_offset)
 
 
 class Shr(OperationBase):
@@ -907,9 +890,9 @@ class Shr(OperationBase):
     DISPLAY_NAME = "shr"
 
     def stack_op(self, stack):
-        shift = stack.pop()
+        shift = stack.pop().value
         value = stack.pop()
-        stack.push(value >> shift)
+        stack.push(value.value >> shift, value.type_offset)
 
 
 class Shra(OperationBase):
@@ -921,10 +904,10 @@ class Shra(OperationBase):
     DISPLAY_NAME = "shra"
 
     def stack_op(self, stack):
-        shift = stack.pop()
+        shift = stack.pop().value
         value = stack.pop()
         # Python's >> is arithmetic for negative numbers
-        stack.push(value >> shift)
+        stack.push(value.value >> shift, value.type_offset)
 
 
 class Xor(OperationBase):
@@ -938,7 +921,7 @@ class Xor(OperationBase):
     def stack_op(self, stack):
         b = stack.pop()
         a = stack.pop()
-        stack.push(a ^ b)
+        stack.push(a.value ^ b.value, a.type_offset)
 
 
 #############################
@@ -1908,12 +1891,22 @@ class Addrx(OperationBase):
     DISPLAY_NAME = "addrx"
     PARAMETERS = ["uleb"]
 
+    def stack_op(self, stack):
+        index = self.result[0]
+        # In a real implementation, we would look up the address in .debug_addr
+        stack.push(0)
+
 
 class Constx(OperationBase):
     """DW_OP_constx: Push constant from .debug_addr. Stack Effect: [] -> [constant]"""
 
     DISPLAY_NAME = "constx"
     PARAMETERS = ["uleb"]
+
+    def stack_op(self, stack):
+        index = self.result[0]
+        # In a real implementation, we would look up the constant in .debug_addr
+        stack.push(0)
 
 
 class Entry_Value(OperationBase):
@@ -1929,12 +1922,34 @@ class Const_Type(OperationBase):
     DISPLAY_NAME = "const_type"
     PARAMETERS = ["uleb", "u8"]
 
+    def parse(self, image):
+        super().parse(image)
+        size = self.result[1]
+        self.data_block = image.read(size)
+
+    def stack_op(self, stack):
+        type_offset = self.result[0]
+        # For simplicity, we interpret the data block as an integer
+        # In a real implementation, we would use the type information
+        value = int.from_bytes(self.data_block, byteorder="little")  # Assuming little-endian for now
+        stack.push(value, type_offset)
+
+    def __str__(self):
+        return f"{self.DISPLAY_NAME}(type_offset={self.result[0]}, size={self.result[1]}, value=0x{self.data_block.hex()})"
+
 
 class Regval_Type(OperationBase):
     """DW_OP_regval_type: Typed register value. Stack Effect: [] -> [value]"""
 
     DISPLAY_NAME = "regval_type"
     PARAMETERS = ["uleb", "uleb"]
+
+    def stack_op(self, stack):
+        reg_num = self.result[0]
+        type_offset = self.result[1]
+        # In a real implementation, we would fetch the register value here
+        # For now, we push a placeholder
+        stack.push(0, type_offset)
 
 
 class Deref_Type(OperationBase):
@@ -1943,12 +1958,27 @@ class Deref_Type(OperationBase):
     DISPLAY_NAME = "deref_type"
     PARAMETERS = ["u8", "uleb"]
 
+    def stack_op(self, stack):
+        addr = stack.pop().value
+        # size = self.result[0]
+        type_offset = self.result[1]
+        # In a real implementation, we would read from memory here
+        stack.push(0, type_offset)
+
 
 class Xderef_Type(OperationBase):
     """DW_OP_xderef_type: Typed extended dereference. Stack Effect: [addr_space, address] -> [typed_value]"""
 
     DISPLAY_NAME = "xderef_type"
     PARAMETERS = ["u8", "uleb"]
+
+    def stack_op(self, stack):
+        addr = stack.pop().value
+        # addr_space = stack.pop().value
+        # size = self.result[0]
+        type_offset = self.result[1]
+        # In a real implementation, we would read from memory here
+        stack.push(0, type_offset)
 
 
 class Convert(OperationBase):
@@ -1957,12 +1987,22 @@ class Convert(OperationBase):
     DISPLAY_NAME = "convert"
     PARAMETERS = ["uleb"]
 
+    def stack_op(self, stack):
+        val = stack.pop()
+        new_type = self.result[0]
+        stack.push(val.value, new_type)
+
 
 class Reinterpret(OperationBase):
     """DW_OP_reinterpret: Reinterpret value as different type. Stack Effect: [value] -> [reinterpreted_value]"""
 
     DISPLAY_NAME = "reinterpret"
     PARAMETERS = ["uleb"]
+
+    def stack_op(self, stack):
+        val = stack.pop()
+        new_type = self.result[0]
+        stack.push(val.value, new_type)
 
 
 ##################################
@@ -2301,9 +2341,26 @@ OP_MAP = {
     constants.Operation.PGI_omp_thread_num: Gi_Omp_Thread_Num,
 }
 
+
 ######################
 ######################
 ######################
+
+
+@dataclass(frozen=True)
+class EvaluationResult:
+    """Result of DWARF expression evaluation.
+
+    Future expansion could contain:
+    - Final stack state
+    - Expression interpretation
+    - Error information
+    - Location type (memory, register, etc.)
+
+    """
+
+    value: TypedValue
+    representation: str
 
 
 class StackMachine:
@@ -2365,14 +2422,23 @@ class StackMachine:
             try:
                 opcode = OPs(opcode_num)
             except ValueError:
-                print(f"Opcode not found {opcode_num!r}")
-                opcode_name = "<unk>"
-            else:
-                opcode_name = opcode.name  # noqa: F841
+                # print(f"Opcode not found {opcode_num!r}")
+                result.append(f"<unk>({opcode_num:#x})")
+                continue
+
             op_klass = OP_MAP.get(opcode_num)
             if op_klass:
                 operation = op_klass()
                 operation.parse(image)
                 result.append(str(operation))
-                operation.stack_op(self.stack)
-        return "; ".join(result)
+                try:
+                    operation.stack_op(self.stack)
+                except (IndexError, AttributeError):
+                    # Some operations might fail if context is missing
+                    pass
+            else:
+                result.append(f"{opcode.name}()")
+
+        # Return summary of executed ops
+        res_val = self.stack.pop() if not self.stack.empty() else None
+        return EvaluationResult(value=res_val, representation="; ".join(result))

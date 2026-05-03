@@ -174,7 +174,7 @@ class DwarfReaders:
             constants.AttributeForm.DW_FORM_block2,
             constants.AttributeForm.DW_FORM_block4,
         ):
-            return self.stack_machine.evaluate(expr)
+            return self.stack_machine.evaluate(expr).representation
         elif form in (
             constants.AttributeForm.DW_FORM_data1,
             constants.AttributeForm.DW_FORM_data2,

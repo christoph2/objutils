@@ -1466,6 +1466,8 @@ class AttributeParser:
             # cache result
             self.parsed_types[offset] = result
             return result
+        except Exception as e:
+            print(e)
         finally:
             self.type_stack.remove(offset)
 
