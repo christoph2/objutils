@@ -174,7 +174,7 @@ class DwarfReaders:
             constants.AttributeForm.DW_FORM_block2,
             constants.AttributeForm.DW_FORM_block4,
         ):
-            return self.stack_machine.evaluate(expr).representation
+            return self.stack_machine.evaluate(expr).value.value
         elif form in (
             constants.AttributeForm.DW_FORM_data1,
             constants.AttributeForm.DW_FORM_data2,
@@ -182,13 +182,13 @@ class DwarfReaders:
             constants.AttributeForm.DW_FORM_data8,
             constants.AttributeForm.DW_FORM_data16,
         ):
-            return f"0x{int(expr):08x}"
+            return int(expr)
         elif form == constants.AttributeForm.DW_FORM_udata:
             return ULEB.parse(expr)
         elif form == constants.AttributeForm.DW_FORM_sdata:
             return SLEB.parse(expr)
         elif form in (constants.AttributeForm.DW_FORM_sec_offset, constants.AttributeForm.DW_FORM_loclistx):
-            return f"0x{int(expr):08x}"
+            return int(expr)
         else:
             print("Unsupported DWARF expression form:", form, list(expr))
             raise NotImplementedError(f"Unsupported DWARF expression form: {form}")
