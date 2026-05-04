@@ -305,7 +305,8 @@ class ELFMachineType(enum.IntEnum):
     EM_ETPU = 178  # Freescale Extended Time Processing Unit.
     EM_SLE9X = 179  # Infineon Technologies SLE9X core.
     EM_L1OM = 180  # Intel L1OM.
-    EM_AARCH64 = 183
+    EM_K10M = 181 # Intel K10M
+    EM_AARCH64 = 183 # ARM AArch64
     EM_AVR32 = 185  # Atmel Corporation 32-bit microprocessor family.
     EM_STM8 = 186  # STMicroeletronics STM8 8-bit microcontroller.
     EM_TILE64 = 187  # Tilera TILE64 multicore architecture family.
@@ -313,6 +314,40 @@ class ELFMachineType(enum.IntEnum):
     EM_MICROBLAZE = 189  # Xilinx MicroBlaze 32-bit RISC soft processor core.
     EM_CUDA = 190  # NVIDIA CUDA architecture.
     EM_TILEGX = 191  # Tilera TILE-Gx
+    EM_CLOUDSHIELD = 192,  # CloudShield architecture family
+    EM_COREA_1ST = 193,  # KIPO-KAIST Core-A 1st generation processor family
+    EM_COREA_2ND = 194,  # KIPO-KAIST Core-A 2nd generation processor family
+    EM_ARC_COMPACT2 = 195,  # Synopsys ARCompact V2
+    EM_OPEN8 = 196,  # Open8 8-bit RISC soft processor core
+    EM_RL78 = 197,  # Renesas RL78 family
+    EM_VIDEOCORE5 = 198,  # Broadcom VideoCore V processor
+    EM_78KOR = 199,  # Renesas 78KOR family
+    EM_56800EX = 200,  # Freescale 56800EX Digital Signal Controller (DSC)
+    EM_BA1 = 201,  # Beyond BA1 CPU architecture
+    EM_BA2 = 202,  # Beyond BA2 CPU architecture
+    EM_XCORE = 203,  # XMOS xCORE processor family
+    EM_MCHP_PIC = 204,  # Microchip 8-bit PIC(r) family
+    EM_INTEL205 = 205,  # Reserved by Intel
+    EM_INTEL206 = 206,  # Reserved by Intel
+    EM_INTEL207 = 207,  # Reserved by Intel
+    EM_INTEL208 = 208,  # Reserved by Intel
+    EM_INTEL209 = 209,  # Reserved by Intel
+    EM_KM32 = 210,  # KM211 KM32 32-bit processor
+    EM_KMX32 = 211,  # KM211 KMX32 32-bit processor
+    EM_KMX16 = 212,  # KM211 KMX16 16-bit processor
+    EM_KMX8 = 213,  # KM211 KMX8 8-bit processor
+    EM_KVARC = 214,  # KM211 KVARC processor
+    EM_CDP = 215,  # Paneve CDP architecture family
+    EM_COGE = 216,  # Cognitive Smart Memory Processor
+    EM_COOL = 217,  # iCelero CoolEngine
+    EM_NORC = 218,  # Nanoradio Optimized RISC
+    EM_CSR_KALIMBA = 219,  # CSR Kalimba architecture family
+    EM_AMDGPU = 224,  # AMD GPU architecture
+    EM_RISCV = 243,  # RISC-V
+    EM_LANAI = 244,  # Lanai 32-bit processor
+    EM_BPF = 247,  # Linux kernel bpf virtual machine
+    EM_VE = 251,  # NEC SX-Aurora VE
+    EM_CSKY = 252,  # C-SKY 32-bit processor
     EM_AVR_OLD = 0x1057  # AVR magic number.  Written in the absense of an ABI.
     EM_MSP430_OLD = 0x1059  # MSP430 magic number.  Written in the absense of everything.
     EM_MT = 0x2530  # Morpho MT.   Written in the absense of an ABI.
@@ -486,6 +521,7 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_ETPU: "Freescale Extended Time Processing Unit",
     ELFMachineType.EM_SLE9X: "Infineon Technologies SLE9X core",
     ELFMachineType.EM_L1OM: "Intel L1OM",
+    ELFMachineType.EM_K10M: "Intel K10M",
     ELFMachineType.EM_AARCH64: "AArch64",
     ELFMachineType.EM_AVR32: "Atmel Corporation 32-bit microprocessor family",
     ELFMachineType.EM_STM8: "STMicroeletronics STM8 8-bit microcontroller",
@@ -493,6 +529,40 @@ ELF_MACHINE_NAMES = {
     ELFMachineType.EM_TILEPRO: "Tilera TILEPro multicore architecture family",
     ELFMachineType.EM_MICROBLAZE: "Xilinx MicroBlaze 32-bit RISC soft processor core",
     ELFMachineType.EM_TILEGX: "Tilera TILE-Gx",
+    ELFMachineType.EM_CLOUDSHIELD: "CloudShield architecture family",
+    ELFMachineType.EM_COREA_1ST: "KIPO-KAIST Core-A 1st generation processor family",
+    ELFMachineType.EM_COREA_2ND: "KIPO-KAIST Core-A 2nd generation processor family",
+    ELFMachineType.EM_ARC_COMPACT2: "Synopsys ARCompact V2",
+    ELFMachineType.EM_OPEN8: "Open8 8-bit RISC soft processor core",
+    ELFMachineType.EM_RL78: "Renesas RL78 family",
+    ELFMachineType.EM_VIDEOCORE5: "Broadcom VideoCore V processor",
+    ELFMachineType.EM_78KOR: "Renesas 78KOR family",
+    ELFMachineType.EM_56800EX: "Freescale 56800EX Digital Signal Controller (DSC)",
+    ELFMachineType.EM_BA1: "Beyond BA1 CPU architecture",
+    ELFMachineType.EM_BA2: "Beyond BA2 CPU architecture",
+    ELFMachineType.EM_XCORE: "XMOS xCORE processor family",
+    ELFMachineType.EM_MCHP_PIC: "Microchip 8-bit PIC(r) family",
+    ELFMachineType.EM_INTEL205: "Reserved by Intel",
+    ELFMachineType.EM_INTEL206: "Reserved by Intel",
+    ELFMachineType.EM_INTEL207: "Reserved by Intel",
+    ELFMachineType.EM_INTEL208: "Reserved by Intel",
+    ELFMachineType.EM_INTEL209: "Reserved by Intel",
+    ELFMachineType.EM_KM32: "KM211 KM32 32-bit processor",
+    ELFMachineType.EM_KMX32: "KM211 KMX32 32-bit processor",
+    ELFMachineType.EM_KMX16: "KM211 KMX16 16-bit processor",
+    ELFMachineType.EM_KMX8: "KM211 KMX8 8-bit processor",
+    ELFMachineType.EM_KVARC: "KM211 KVARC processor",
+    ELFMachineType.EM_CDP: "Paneve CDP architecture family",
+    ELFMachineType.EM_COGE: "Cognitive Smart Memory Processor",
+    ELFMachineType.EM_COOL: "iCelero CoolEngine",
+    ELFMachineType.EM_NORC: "Nanoradio Optimized RISC",
+    ELFMachineType.EM_CSR_KALIMBA: "CSR Kalimba architecture family",
+    ELFMachineType.EM_AMDGPU: "AMD GPU architecture",
+    ELFMachineType.EM_RISCV: "RISC-V",
+    ELFMachineType.EM_LANAI: "Lanai 32-bit processor",
+    ELFMachineType.EM_BPF: "Linux kernel bpf virtual machine",
+    ELFMachineType.EM_VE: "NEC SX-Aurora VE",
+    ELFMachineType.EM_CSKY: "C-SKY 32-bit processor",
     ELFMachineType.EM_CUDA: "NVIDIA CUDA architecture",
     ELFMachineType.EM_AVR_OLD: "AVR",
     ELFMachineType.EM_MSP430_OLD: "MSP430",
@@ -879,8 +949,12 @@ class ELFAbiType(enum.IntEnum):
     ELFOSABI_NSK = 14  # Hewlett-Packard Non-Stop Kernel
     ELFOSABI_AROS = 15  # AROS
     ELFOSABI_FENIXOS = 16  # FenixOS
-    ELFOSABI_C6000_ELFABI = 64  # Bare-metal TMS320C6000; alt:  ELFOSABI_ARM_AEABI
+    ELFOSABI_CLOUDABI = 17  # Nuxi CloudABI
+    ELFOSABI_AMDGPU_HSA = 64  # AMD HSA runtime
+    # ELFOSABI_FIRST_ARCH = 64,    // First architecture-specific OS ABI
+    #  ELFOSABI_AMDGPU_HSA = 64,    // AMD HSA runtime
     ELFOSABI_C6000_LINUX = 65  # Linux TMS320C6000
+    ELFOSABI_AMDGPU_MESA3D = 66 # AMD GCN GPUs (GFX6+) for MESA runtime
     ELFOSABI_ARM = 97  # ARM
     ELFOSABI_STANDALONE = 255  # Standalone (embedded) application
 
