@@ -119,7 +119,7 @@ from functools import lru_cache
 from itertools import groupby
 from typing import Any, Optional, Union
 
-from objutils import Image, Section
+from objutils import Image, Section, symbols
 from objutils.dwarf.constants import (
     Accessibility,
     AttributeEncoding,
@@ -192,6 +192,109 @@ def is_type_encoding(encoding: Union[int, AttributeEncoding]) -> bool:
     """
     return encoding in DWARF_TYPE_ENCODINGS
 
+def get_type(die: model.DebugInformationEntry):
+    if die is None:
+        return None
+    if isinstance(die, CircularReference):
+        return die
+    if die.tag == "base_type":
+        return symbols.PrimitiveType(die.attributes.get("name"), die.attributes.get("encoding"),
+                             die.attributes.get("byte_size"))
+    elif die.tag == "variable":
+        name = die.attributes.get("name")
+        location = die.attributes.get("location")
+        tp = die.attributes.get("type")
+        return symbols.VariableType(name, tp, location)
+    elif die.tag == 'array_type':
+        byte_size = die.attributes.get("byte_size")
+        base_type = get_type(die.attributes.get("type"))
+        array_spec = []
+        for spec in die.children:
+            lower_bound = int(spec.attributes.get("lower_bound", 0))
+            upper_bound = int(spec.attributes.get("upper_bound", 0))
+            array_spec.append((lower_bound, upper_bound))
+        return symbols.ArrayType(base_type, array_spec)
+    elif die.tag == "typedef":
+        name = die.attributes.get("name")
+        base_type = get_type(die.attributes.get("type"))
+        return symbols.TypeDefiniton(name, base_type)
+    elif die.tag == 'volatile_type':
+        return symbols.VolatileType(get_type(die.attributes.get("type")))
+    elif die.tag == 'const_type':
+        return symbols.ConstantType(get_type(die.attributes.get("type")))
+    elif die.tag == 'pointer_type':
+        return symbols.PointerType(get_type(die.attributes.get("type")))
+    elif die.tag == 'enumeration_type':
+        name = die.attributes.get("name")
+        bytes_size = die.attributes.get("byte_size")
+        encoding = die.attributes.get("encoding")
+        base_type = get_type(die.attributes.get("type"))
+        enumerators = []
+        for ch in die.children:
+            assert ch.tag == "enumerator"
+            assert "const_value" in ch.attributes
+            enumerator = symbols.Enumerator(ch.attributes.get("name"), ch.attributes.get("const_value"))
+            enumerators.append(enumerator)
+
+        return symbols.EnumerationType(name, bytes_size, base_type, encoding, enumerators)
+    elif die.tag == 'structure_type':
+        if "calling_convention" in die.attributes:
+            print("structure has calling_convention")
+        name = die.attributes.get("name")
+        byte_size = die.attributes.get("byte_size", 0)
+        members = []
+        for child in die.children:
+            if child.tag == "member":
+                location = child.attributes.get("data_member_location", 0)
+                name = child.attributes.get("name")
+                tp = get_type(child.attributes.get("type"))
+                artifical = True if child.attributes.get("artifical", 0) == 1 else False
+                mem = symbols.StructMember(name, tp, location)
+                members.append(mem)
+            else:
+                pass
+        return symbols.StructureType(name, byte_size, members)
+    elif die.tag == 'union_type':
+        if "calling_convention" in die.attributes:
+            print("union has calling_convention")
+        name = die.attributes.get("name")
+        byte_size = die.attributes.get("byte_size", 0)
+        alternatives = []
+        for child in die.children:
+            if child.tag == "member":
+                location = child.attributes.get("data_member_location", 0)
+                name = child.attributes.get("name")
+                tp = get_type(child.attributes.get("type"))
+                mem = symbols.StructMember(name, tp, 0)
+                alternatives.append(mem)
+            else:
+                pass
+        return symbols.UnionType(name, byte_size, alternatives)
+    elif die.tag == 'class_type':
+        name = die.attributes.get("name")
+        byte_size = die.attributes.get("byte_size", 0)
+        if "calling_convention" in die.attributes:
+            print("class has calling_convention")
+        members = []
+        for child in die.children:
+            name = child.attributes.get("name")
+            linkage_name = child.attributes.get("linkage_name")
+            location = child.attributes.get("data_member_location", 0)
+            tp = get_type(child.attributes.get("type"))
+            accessibility = child.attributes.get("accessibility", 0)
+            external = bool(child.attributes.get("external", 0))
+            member = symbols.ClassMember(name, linkage_name, tp, location, accessibility, external)
+            members.append(member)
+        return symbols.ClassType(name, byte_size, members)
+    elif die.tag == 'subroutine_type':
+        parameters = []
+        for child in die.children:
+            parameters.append(get_type(child.attributes.get("type")))
+        return symbols.SubroutineType("", die.attributes.get("prototyped", 0), parameters)
+    elif die.tag == 'unspecified_type':
+        return symbols.UnspecifiedType(die.attributes.get("name"))
+    else:
+        raise Exception(f"Unknown type: {die.tag!r}")
 
 @dataclass
 class CompiledUnit:
@@ -1538,3 +1641,15 @@ class AttributeParser:
         tag = getattr(die.abbrev, "tag", die.tag)
         name = self._name_of(die)
         return name or tag
+
+    def get_variable(self, name: str) -> symbols.VariableType | None:
+        die = self.session.query(model.DebugInformationEntry).join(model.DebugInformationEntry.attributes).filter(
+            model.DebugInformationEntry.tag == Tag.variable,
+            model.DIEAttribute.name == AttributeEncoding.name,
+            model.DIEAttribute.raw_value == name
+        ).first()
+        if die:
+            location = self._safe_expression(die.attributes_map["location"])
+            tp = get_type(self.type_tree(die))
+            return symbols.VariableType(name, tp, location)
+        return die
