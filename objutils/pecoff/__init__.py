@@ -720,18 +720,6 @@ class PeParser:
                         characteristics=s["characteristics"],
                     )
                 )
-
-            # Symbols
-            for sym in self.symbols:
-                ses.add(
-                    model.Pe_Symbol(
-                        name=sym["name"],
-                        value=int(sym.get("value", 0)),
-                        section_number=sym["section_number"],
-                        type=int(sym.get("type", 0)),
-                        storage_class=int(sym.get("storage_class", 0)),
-                    )
-                )
             ses.commit()
 
 

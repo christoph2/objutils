@@ -167,14 +167,14 @@ Example Integration:
     ```
 """
 
-# dbghelp_symbols.py
 import ctypes
+import enum
 from copy import copy
 from ctypes import wintypes
 from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
-from typing import Optional
+from typing import Any, Optional
 
 # DLLs
 try:
@@ -187,6 +187,8 @@ except OSError:  # pragma: no cover - non-Windows environment
     kernel32 = None  # type: ignore[assignment]
     psapi = None
     _WINDOWS = False
+
+from objutils import symbols
 
 
 @dataclass
@@ -220,6 +222,107 @@ BOOL = wintypes.BOOL
 LPVOID = wintypes.LPVOID
 LPCWSTR = wintypes.LPCWSTR
 LPCSTR = wintypes.LPCSTR
+
+
+class VARTYPE(IntEnum):
+    """OLE Automation variant type discriminator (vt field of VARIANT)."""
+
+    VT_EMPTY = 0
+    VT_NULL = 1
+    VT_I2 = 2
+    VT_I4 = 3
+    VT_R4 = 4
+    VT_R8 = 5
+    VT_BSTR = 8
+    VT_BOOL = 11
+    VT_I1 = 16
+    VT_UI1 = 17
+    VT_UI2 = 18
+    VT_UI4 = 19
+    VT_I8 = 20
+    VT_UI8 = 21
+    VT_INT = 22
+    VT_UINT = 23
+
+
+class _VARIANT_VALUE(ctypes.Union):
+    """Inner value union of a COM VARIANT (covers numeric and pointer cases)."""
+
+    _fields_ = [
+        ("llVal", ctypes.c_longlong),
+        ("lVal", ctypes.c_long),
+        ("bVal", ctypes.c_ubyte),
+        ("iVal", ctypes.c_short),
+        ("fltVal", ctypes.c_float),
+        ("dblVal", ctypes.c_double),
+        ("boolVal", ctypes.c_short),
+        ("scode", ctypes.c_long),
+        ("cVal", ctypes.c_int8),
+        ("uiVal", ctypes.c_ushort),
+        ("ulVal", ctypes.c_ulong),
+        ("ullVal", ctypes.c_ulonglong),
+        ("intVal", ctypes.c_int),
+        ("uintVal", ctypes.c_uint),
+        ("byref", ctypes.c_void_p),
+    ]
+
+
+class VARIANT(ctypes.Structure):
+    """Minimal ctypes representation of the OLE Automation VARIANT structure.
+
+    The full COM VARIANT is a discriminated union keyed on the ``vt`` field.
+    Only the scalar numeric types that can appear as PDB constant values are
+    covered here; pointer/array/record sub-types are not needed.
+
+    Total size is 16 bytes (matching the Windows ABI definition).
+    """
+
+    _fields_ = [
+        ("vt", ctypes.c_ushort),
+        ("wReserved1", ctypes.c_ushort),
+        ("wReserved2", ctypes.c_ushort),
+        ("wReserved3", ctypes.c_ushort),
+        ("_value", _VARIANT_VALUE),
+    ]
+
+
+def _variant_to_python(variant):
+    """Convert a VARIANT value to an appropriate Python primitive.
+
+    Only the numeric VARTYPE values that are relevant for PDB constant symbols
+    are handled.  Unknown or unsupported types return ``None``.
+    """
+    try:
+        kind = VARTYPE(variant.vt)
+    except ValueError:
+        return None
+    v = variant._value
+    _map = {
+        VARTYPE.VT_I1: lambda: int(v.cVal),
+        VARTYPE.VT_I2: lambda: int(v.iVal),
+        VARTYPE.VT_I4: lambda: int(v.lVal),
+        VARTYPE.VT_I8: lambda: int(v.llVal),
+        VARTYPE.VT_UI1: lambda: int(v.bVal),
+        VARTYPE.VT_UI2: lambda: int(v.uiVal),
+        VARTYPE.VT_UI4: lambda: int(v.ulVal),
+        VARTYPE.VT_UI8: lambda: int(v.ullVal),
+        VARTYPE.VT_INT: lambda: int(v.intVal),
+        VARTYPE.VT_UINT: lambda: int(v.uintVal),
+        VARTYPE.VT_R4: lambda: float(v.fltVal),
+        VARTYPE.VT_R8: lambda: float(v.dblVal),
+        VARTYPE.VT_BOOL: lambda: bool(v.boolVal),
+    }
+    fn = _map.get(kind)
+    return fn() if fn is not None else None
+
+
+class TI_FINDCHILDREN_PARAMS(ctypes.Structure):
+    _fields_ = [
+        ("Count", ULONG),
+        ("Start", ULONG),
+        ("ChildId", ULONG * 1),
+    ]
+
 
 # SYMBOL_INFO struct (ANSI)
 MAX_SYM_NAME = 2000
@@ -462,6 +565,12 @@ class SymTagEnum(IntEnum):
     SymTagDimension = 31
 
 
+class UdtKind(enum.IntEnum):
+    UdtStruct = 0
+    UdtClass = 1
+    UdtUnion = 2
+
+
 class IMAGEHLP_SYMBOL_TYPE_INFO(IntEnum):
     """Constants for SymGetTypeInfo queries.
 
@@ -554,6 +663,44 @@ class BasicType(IntEnum):
     btChar16 = 32
     btChar32 = 33
     btChar8 = 34
+
+
+PRIMITIVE_TYPEMAP = {
+    BasicType.btNoType: "<None>",
+    BasicType.btVoid: "void",
+    BasicType.btChar: "char",
+    BasicType.btWChar: "wchar",
+    BasicType.btInt: "signed int",
+    BasicType.btUInt: "unsigned int",
+    BasicType.btFloat: "float",
+    BasicType.btBCD: "BCD",
+    BasicType.btBool: "bool",
+    BasicType.btLong: "long",
+    BasicType.btULong: "unsigned long",
+    BasicType.btCurrency: "CURRENCY",
+    BasicType.btDate: "DATE",
+    BasicType.btVariant: "VARIANT",
+    BasicType.btComplex: "complex",
+    BasicType.btBit: "BIT",
+    BasicType.btBSTR: "BSTR",
+    BasicType.btHresult: "HRESULT",
+    BasicType.btChar16: "Char16",
+    BasicType.btChar32: "Char32",
+    BasicType.btChar8: "Char8",
+}
+
+
+class DataKind(enum.IntEnum):
+    DataIsUnknown = 0
+    DataIsLocal = 1
+    DataIsStaticLocal = 2
+    DataIsParam = 3
+    DataIsObjectPtr = 4
+    DataIsFileStatic = 5
+    DataIsGlobal = 6
+    DataIsMember = 7
+    DataIsStaticMember = 8
+    DataIsConstant = 9
 
 
 class SymFlag(IntEnum):
@@ -727,6 +874,8 @@ class CTypeInfoDump:
         """
         self.process = process
         self.mod_base = mod_base
+        self._type_cache: dict[int, symbols.TypeInfo] = {}
+        self._resolving: set[int] = set()
 
     def get_type_info(self, type_id, info_type):
         """Query type information from dbghelp.
@@ -756,88 +905,304 @@ class CTypeInfoDump:
                     kernel32.LocalFree(ptr)
                     return name
         elif info_type in (
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BASETYPE,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ARRAYINDEXTYPEID,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_COUNT,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CHILDRENCOUNT,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BASETYPE,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPE,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ARRAYINDEXTYPEID,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_COUNT,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CHILDRENCOUNT,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_DATAKIND,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_UDTKIND,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESSOFFSET,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BITPOSITION,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALTABLESHAPEID,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEPOINTEROFFSET,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CLASSTYPEID,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_NESTED,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMINDEX,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LEXICALPARENT,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_THISADJUST,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_EQUIV_TO,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CALLING_CONVENTION,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_CLOSE_EQUIV_TO,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEOFFSET,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEDISPINDEX,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OBJECTPOINTERTYPEID,
         ):
             out = DWORD()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
                 return out.value
-        elif info_type in (IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH,):
+        elif info_type == IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VALUE:
+            out = VARIANT()
+            if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
+                return _variant_to_python(out)
+        elif info_type in (IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH,
+                           IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESS,
+                           IMAGEHLP_SYMBOL_TYPE_INFO.TI_GTIEX_REQS_VALID):
             out = ULONG64()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
                 return out.value
         elif info_type in (
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_UNALIGNED,
-            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_REFERENCE,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_UNALIGNED,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_REFERENCE,
+                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASECLASS,
         ):
             out = BOOL()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
                 return bool(out.value)
+        elif info_type == IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN:
+            count = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CHILDRENCOUNT)
+            if not count:
+                return []
+
+            # TI_FINDCHILDREN_PARAMS is a variable-sized structure.
+            # We need to allocate enough space for Count, Start, and all ChildIds.
+            size = ctypes.sizeof(TI_FINDCHILDREN_PARAMS) + (count - 1) * ctypes.sizeof(ULONG)
+            buf = (ctypes.c_char * size)()
+            params = ctypes.cast(buf, ctypes.POINTER(TI_FINDCHILDREN_PARAMS))
+            params.contents.Count = count
+            params.contents.Start = 0
+
+            if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, params):
+                # Access ChildId as an array of length 'count'
+                child_ids = ctypes.cast(params.contents.ChildId, ctypes.POINTER(ULONG * count))
+                return list(child_ids.contents)
         return None
 
-    def get_full_type_name(self, type_id) -> str:
+    def _get_referenced_type_id(self, type_id: int) -> int | None:
+        child_id = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID)
+        if child_id is None:
+            child_id = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPE)
+        return child_id
+
+    def _wrap_qualifiers(self, type_id: int, tp: symbols.TypeInfo) -> symbols.TypeInfo:
+        if self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST):
+            tp = symbols.ConstantType(tp)
+        if self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE):
+            tp = symbols.VolatileType(tp)
+        return tp
+
+    def get_data(self, type_id: int) -> symbols.DataType | None:
         tag_val = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG)
         if tag_val is None:
-            return "unknown"
+            return None
+        tag = SymTagEnum(tag_val)
+        if tag != SymTagEnum.SymTagData:
+            return None
+        name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+        tp = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPE)
+        base_type = self.get_full_type_name(tp) if tp is not None else symbols.UnspecifiedType("unknown")
+        data_kind_value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_DATAKIND)
+        try:
+            data_kind = DataKind(data_kind_value)
+        except (TypeError, ValueError):
+            data_kind = DataKind.DataIsUnknown
+
+        value: Any = None
+        if data_kind == DataKind.DataIsConstant:
+            value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VALUE)
+        elif data_kind in (DataKind.DataIsGlobal, DataKind.DataIsStaticLocal, DataKind.DataIsFileStatic,
+                           DataKind.DataIsStaticMember):
+            value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESS)
+        elif data_kind in (DataKind.DataIsLocal, DataKind.DataIsParam, DataKind.DataIsObjectPtr, DataKind.DataIsMember):
+            value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET)
+        return symbols.DataType(name or "", value, base_type, data_kind)
+
+    def get_enumerators(self, type_id: int) -> list[symbols.Enumerator]:
+        tag_val = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG)
+        if tag_val is None:
+            return []
+        tag = SymTagEnum(tag_val)
+        if tag != SymTagEnum.SymTagEnum:
+            return []
+        chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
+        if not chs:
+            return []
+        enumerators: list[symbols.Enumerator] = []
+        for ch in chs:
+            result = self.get_data(ch)
+            if result is None:
+                continue
+            if isinstance(result.value, int):
+                enumerators.append(symbols.Enumerator(result.name, result.value))
+        return enumerators
+
+    def get_struct(self, type_id: int) -> symbols.StructureType:
+        name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+        byte_size = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
+        chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
+        members: list[symbols.StructMember] = []
+        for ch in chs or []:
+            result = self.get_data(ch)
+            if result is None:
+                continue
+            offset = result.value if isinstance(result.value, int) else 0
+            members.append(symbols.StructMember(result.name, result.type, offset))
+        return symbols.StructureType(name or "", int(byte_size or 0), members)
+
+    def get_union(self, type_id: int) -> symbols.UnionType:
+        name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+        byte_size = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
+        chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
+        alternatives: list[symbols.StructMember] = []
+        for ch in chs or []:
+            result = self.get_data(ch)
+            if result is None:
+                continue
+            alternatives.append(symbols.StructMember(result.name, result.type, 0))
+        return symbols.UnionType(name or "", int(byte_size or 0), alternatives)
+
+    def get_class(self, type_id: int) -> symbols.ClassType:
+        name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+        byte_size = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
+        chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
+        members: list[symbols.ClassMember] = []
+        for ch in chs or []:
+            result = self.get_data(ch)
+            if result is None:
+                continue
+            offset = result.value if isinstance(result.value, int) else 0
+            members.append(
+                symbols.ClassMember(
+                    result.name,
+                    "",
+                    result.type,
+                    offset,
+                    0,
+                    result.datakind == DataKind.DataIsStaticMember,
+                )
+            )
+        return symbols.ClassType(name or "", int(byte_size or 0), members)
+
+    def get_args(self, type_id: int) -> symbols.TypeInfo | None:
+        tag_val = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG)
+        if tag_val is None:
+            return None
+        tag = SymTagEnum(tag_val)
+        if tag != SymTagEnum.SymTagFunctionArgType:
+            return None
+        tp = self._get_referenced_type_id(type_id)
+        if tp is None:
+            return symbols.UnspecifiedType("unknown")
+        return self.get_full_type_name(tp)
+
+
+    def get_function(self, type_id: int) -> symbols.SubroutineType:
+        name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+        chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
+        tid = self._get_referenced_type_id(type_id)
+        ret_type: symbols.TypeInfo = symbols.UnspecifiedType("void")
+        if tid is not None:
+            ret_type = self.get_full_type_name(tid)
+        args: list[symbols.TypeInfo] = []
+        for ch in chs or []:
+            arg = self.get_args(ch)
+            if arg is not None:
+                args.append(arg)
+        return symbols.SubroutineType(name or "", 0, ret_type, args)
+
+    def get_full_type_name(self, type_id: int | None) -> symbols.TypeInfo:
+        if type_id is None:
+            return symbols.UnspecifiedType("unknown")
+        if type_id in self._type_cache:
+            return self._type_cache[type_id]
+        if type_id in self._resolving:
+            return symbols.UnspecifiedType(f"recursive_type_{type_id}")
+
+        self._resolving.add(type_id)
+        try:
+            resolved = self._resolve_type(type_id)
+            self._type_cache[type_id] = resolved
+            return resolved
+        finally:
+            self._resolving.discard(type_id)
+
+    def _resolve_type(self, type_id: int) -> symbols.TypeInfo:
+        tag_val = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG)
+        if tag_val is None:
+            return symbols.UnspecifiedType("unknown")
 
         try:
             tag = SymTagEnum(tag_val)
         except ValueError:
-            return f"unknown_tag_{tag_val}"
-
-        prefix = ""
-        if self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST):
-            prefix += "const "
-        if self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE):
-            prefix += "volatile "
+            return symbols.UnspecifiedType(f"unknown_tag_{tag_val}")
 
         if tag == SymTagEnum.SymTagBaseType:
             bt = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BASETYPE)
             length = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
             if bt is not None:
                 try:
-                    bt_name = BasicType(bt).name.lstrip("bt")
+                    base_type = BasicType(bt)
                 except ValueError:
-                    bt_name = f"base_{bt}"
-                if length:
-                    # Map some common lengths to standard names if possible, but bit length is fine
-                    if bt_name == "Int" or bt_name == "UInt":
-                        bt_name = f"{bt_name.lower()}{length*8}_t"
-                    else:
-                        bt_name = f"{bt_name}{length*8}"
-                return prefix + bt_name
-            return prefix + "void"
+                    base_type = bt
+                type_name = PRIMITIVE_TYPEMAP.get(base_type, f"base_{bt}") if isinstance(base_type, BasicType) else f"base_{bt}"
+                enc = symbols.type_encoding_from_pdb_bt(int(base_type))
+                resolved = symbols.PrimitiveType(type_name, enc, int(length or 0))
+                return self._wrap_qualifiers(type_id, resolved)
+            enc = symbols.type_encoding_from_pdb_bt(int(BasicType.btVoid))
+            return self._wrap_qualifiers(type_id, symbols.PrimitiveType("void", enc, int(length or 0)))
 
-        if tag == SymTagEnum.SymTagPointerType:
-            child_id = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID)
+        elif tag == SymTagEnum.SymTagPointerType:
+            child_id = self._get_referenced_type_id(type_id)
             is_ref = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_REFERENCE)
-            suffix = "&" if is_ref else "*"
-            return self.get_full_type_name(child_id) + suffix
+            full_type = self.get_full_type_name(child_id)
+            if is_ref:
+                resolved = symbols.ReferenceType(full_type)
+            else:
+                resolved = symbols.PointerType(full_type)
+            return self._wrap_qualifiers(type_id, resolved)
 
-        if tag == SymTagEnum.SymTagArrayType:
-            child_id = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID)
+        elif tag == SymTagEnum.SymTagArrayType:
+            child_id = self._get_referenced_type_id(type_id)
             count = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_COUNT)
+            full_type = self.get_full_type_name(child_id)
+            byte_size = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
+            if not count and byte_size and isinstance(full_type, symbols.PrimitiveType) and full_type.byte_size:
+                count = int(byte_size // full_type.byte_size)
             if count is not None:
-                return f"{self.get_full_type_name(child_id)}[{count}]"
-            return f"{self.get_full_type_name(child_id)}[]"
-
-        if tag in (SymTagEnum.SymTagUDT, SymTagEnum.SymTagEnum, SymTagEnum.SymTagTypedef):
+                resolved = symbols.ArrayType(full_type, [(0, int(count))])
+            else:
+                resolved = symbols.ArrayType(full_type, [(0, 0)])
+            if isinstance(full_type, symbols.ArrayType):
+                full_type.array_spec.insert(0, (0, count))    # coerce array-specifiers.
+                return full_type
+            else:
+                return self._wrap_qualifiers(type_id, resolved)
+        elif tag == SymTagEnum.SymTagEnum:
             name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
-            if name:
-                return prefix + name
-            return prefix + tag.name.lstrip("SymTag")
-
-        if tag == SymTagEnum.SymTagFunctionType:
-            return prefix + "function"
-
-        return prefix + tag.name.lstrip("SymTag")
+            tp = self._get_referenced_type_id(type_id)
+            base_type = self.get_full_type_name(tp)
+            byte_size = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH)
+            enumerators = self.get_enumerators(type_id)
+            encoding = base_type.encoding if isinstance(base_type, symbols.PrimitiveType) else None
+            resolved = symbols.EnumerationType(name or "", int(byte_size or 0), encoding, base_type, enumerators)
+            return self._wrap_qualifiers(type_id, resolved)
+        elif tag == SymTagEnum.SymTagTypedef:
+            name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+            tp = self._get_referenced_type_id(type_id)
+            base_type = self.get_full_type_name(tp)
+            resolved = symbols.TypeDefiniton(name or "", base_type)
+            return self._wrap_qualifiers(type_id, resolved)
+        elif tag == SymTagEnum.SymTagUDT:
+            udt_kind = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_UDTKIND)
+            if udt_kind == UdtKind.UdtStruct:
+                resolved = self.get_struct(type_id)
+            elif udt_kind == UdtKind.UdtUnion:
+                resolved = self.get_union(type_id)
+            elif udt_kind == UdtKind.UdtClass:
+                resolved = self.get_class(type_id)
+            else:
+                name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
+                resolved = symbols.UnspecifiedType(name or "udt")
+            return self._wrap_qualifiers(type_id, resolved)
+        elif tag == SymTagEnum.SymTagFunctionType:
+            return self._wrap_qualifiers(type_id, self.get_function(type_id))
+        else:
+            return symbols.UnspecifiedType(tag.name.lstrip("SymTag"))
 
 
 class PdbSession:
@@ -913,7 +1278,7 @@ class PdbSession:
         self.type_dumper_cache = {}
 
     @lru_cache
-    def type_info(self, base: int, type_index: int) -> str:
+    def type_info(self, base: int, type_index: int) -> symbols.TypeInfo:
         if type_index:
             if base in self.type_dumper_cache:
                 type_dumper = self.type_dumper_cache[base]
@@ -921,7 +1286,7 @@ class PdbSession:
                 type_dumper = CTypeInfoDump(self.hproc, base)
                 self.type_dumper_cache[base] = type_dumper
             return type_dumper.get_full_type_name(type_index)
-        return "unknown"
+        return symbols.UnspecifiedType("unknown")
 
     def cleanup(self) -> None:
         """Cleans up the dbghelp session."""
@@ -1044,7 +1409,32 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
     try:
         with PdbSession(symbol_path if not symbol_path else [symbol_path]) as session:
             mod_base = session.load_module(pe_path)
-            return session.enum_symbols(mod_base, b"*")
+            pdb_symbols =  session.enum_symbols(mod_base, b"*")
+            result = []
+            for sym in pdb_symbols:
+                if sym.tag != "SymTagData":
+                    continue
+                ti = session.type_info(mod_base, sym.TypeIndex)
+                print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size , sym.decode_flags(), "==>", ti)
+                result.append(symbols.VariableType(sym.Name, ti, sym.Address - mod_base, sym.Size))
+            return result
+            """
+            Name: Symbol name (null-terminated char array)
+                Address: Absolute address in memory
+                ModBase: Module base address
+                Flags: Symbol flags (SymFlag enum values)
+                Tag: Symbol tag type (SymTagEnum values)
+                Size: Symbol size in bytes
+                Value: Symbol value (for constants)
+        
+            Helper Methods:
+                is_function(): True if symbol is a function
+                is_export(): True if symbol is exported
+                is_local(): True if symbol is local variable
+                is_parameter(): True if symbol is function parameter
+                decode_flags(): List of flag names
+                """
+
     except (OSError, RuntimeError, ValueError) as e:
         print(f"Error: {str(e)}")
         return []  # Return an empty list in case of errors.

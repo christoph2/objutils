@@ -35,10 +35,12 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     # Fetch via SymbolAPI to ensure DB is created/reused
-    syms = SymbolAPI(pp).fetch(name_pattern=args.pattern)
+    # syms = SymbolAPI(pp).fetch(name_pattern=args.pattern)
+    syms = pp.symbols
+
     # Fallback: if SymbolAPI attr is not present (static type), use direct list
-    if not syms and pp.symbols:
-        syms = [type("_S", (), s) for s in pp.symbols]  # quick adapter for printing
+    #if not syms and pp.symbols:
+    #    syms = [type("_S", (), s) for s in pp.symbols]  # quick adapter for printing
 
     # syms is a list of model.Pe_Symbol; order by value already in fetch()
     if args.order_by == "N":

@@ -192,20 +192,27 @@ def is_type_encoding(encoding: Union[int, AttributeEncoding]) -> bool:
     """
     return encoding in DWARF_TYPE_ENCODINGS
 
+
 def get_type(die: model.DebugInformationEntry):
     if die is None:
         return None
     if isinstance(die, CircularReference):
         return die
     if die.tag == "base_type":
-        return symbols.PrimitiveType(die.attributes.get("name"), die.attributes.get("encoding"),
-                             die.attributes.get("byte_size"))
+        raw_enc = die.attributes.get("encoding")
+        enc = (
+            symbols.type_encoding_from_dwarf_ate(int(raw_enc))
+            if raw_enc is not None
+            else symbols.TypeEncoding(symbols.TypeKind.UNKNOWN)
+        )
+        return symbols.PrimitiveType(die.attributes.get("name"), enc, die.attributes.get("byte_size"))
     elif die.tag == "variable":
         name = die.attributes.get("name")
         location = die.attributes.get("location")
         tp = die.attributes.get("type")
-        return symbols.VariableType(name, tp, location)
-    elif die.tag == 'array_type':
+        byte_size = die.attributes.get("byte_size")
+        return symbols.VariableType(name, tp, location, byte_size)
+    elif die.tag == "array_type":
         byte_size = die.attributes.get("byte_size")
         base_type = get_type(die.attributes.get("type"))
         array_spec = []
@@ -218,16 +225,17 @@ def get_type(die: model.DebugInformationEntry):
         name = die.attributes.get("name")
         base_type = get_type(die.attributes.get("type"))
         return symbols.TypeDefiniton(name, base_type)
-    elif die.tag == 'volatile_type':
+    elif die.tag == "volatile_type":
         return symbols.VolatileType(get_type(die.attributes.get("type")))
-    elif die.tag == 'const_type':
+    elif die.tag == "const_type":
         return symbols.ConstantType(get_type(die.attributes.get("type")))
-    elif die.tag == 'pointer_type':
+    elif die.tag == "pointer_type":
         return symbols.PointerType(get_type(die.attributes.get("type")))
-    elif die.tag == 'enumeration_type':
+    elif die.tag == "enumeration_type":
         name = die.attributes.get("name")
         bytes_size = die.attributes.get("byte_size")
-        encoding = die.attributes.get("encoding")
+        raw_enc = die.attributes.get("encoding")
+        enc = symbols.type_encoding_from_dwarf_ate(int(raw_enc)) if raw_enc is not None else None
         base_type = get_type(die.attributes.get("type"))
         enumerators = []
         for ch in die.children:
@@ -236,8 +244,8 @@ def get_type(die: model.DebugInformationEntry):
             enumerator = symbols.Enumerator(ch.attributes.get("name"), ch.attributes.get("const_value"))
             enumerators.append(enumerator)
 
-        return symbols.EnumerationType(name, bytes_size, base_type, encoding, enumerators)
-    elif die.tag == 'structure_type':
+        return symbols.EnumerationType(name, bytes_size, enc, base_type, enumerators)
+    elif die.tag == "structure_type":
         if "calling_convention" in die.attributes:
             print("structure has calling_convention")
         name = die.attributes.get("name")
@@ -254,7 +262,7 @@ def get_type(die: model.DebugInformationEntry):
             else:
                 pass
         return symbols.StructureType(name, byte_size, members)
-    elif die.tag == 'union_type':
+    elif die.tag == "union_type":
         if "calling_convention" in die.attributes:
             print("union has calling_convention")
         name = die.attributes.get("name")
@@ -270,7 +278,7 @@ def get_type(die: model.DebugInformationEntry):
             else:
                 pass
         return symbols.UnionType(name, byte_size, alternatives)
-    elif die.tag == 'class_type':
+    elif die.tag == "class_type":
         name = die.attributes.get("name")
         byte_size = die.attributes.get("byte_size", 0)
         if "calling_convention" in die.attributes:
@@ -286,15 +294,16 @@ def get_type(die: model.DebugInformationEntry):
             member = symbols.ClassMember(name, linkage_name, tp, location, accessibility, external)
             members.append(member)
         return symbols.ClassType(name, byte_size, members)
-    elif die.tag == 'subroutine_type':
+    elif die.tag == "subroutine_type":
         parameters = []
         for child in die.children:
             parameters.append(get_type(child.attributes.get("type")))
         return symbols.SubroutineType("", die.attributes.get("prototyped", 0), parameters)
-    elif die.tag == 'unspecified_type':
+    elif die.tag == "unspecified_type":
         return symbols.UnspecifiedType(die.attributes.get("name"))
     else:
         raise Exception(f"Unknown type: {die.tag!r}")
+
 
 @dataclass
 class CompiledUnit:
@@ -1643,13 +1652,20 @@ class AttributeParser:
         return name or tag
 
     def get_variable(self, name: str) -> symbols.VariableType | None:
-        die = self.session.query(model.DebugInformationEntry).join(model.DebugInformationEntry.attributes).filter(
-            model.DebugInformationEntry.tag == Tag.variable,
-            model.DIEAttribute.name == AttributeEncoding.name,
-            model.DIEAttribute.raw_value == name
-        ).first()
+        die = (
+            self.session.query(model.DebugInformationEntry)
+            .join(model.DebugInformationEntry.attributes)
+            .filter(
+                model.DebugInformationEntry.tag == Tag.variable,
+                model.DIEAttribute.name == AttributeEncoding.name,
+                model.DIEAttribute.raw_value == name,
+            )
+            .first()
+        )
         if die:
             location = self._safe_expression(die.attributes_map["location"])
             tp = get_type(self.type_tree(die))
-            return symbols.VariableType(name, tp, location)
+            # byte_size = self._safe_expression(die.attributes_map["byte_size"])
+            byte_size = 0
+            return symbols.VariableType(name, tp, location, byte_size)
         return die
