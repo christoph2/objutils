@@ -17,7 +17,6 @@ import enum
 from dataclasses import dataclass, field
 from typing import Any, TypeAlias
 
-
 # ---------------------------------------------------------------------------
 # Format-neutral type encoding
 # ---------------------------------------------------------------------------
@@ -173,8 +172,7 @@ class TypeEncoding:
 
     def __repr__(self) -> str:
         return (
-            f"TypeEncoding(kind={self.kind.name}, signedness={self.signedness.name}, "
-            f"char_encoding={self.char_encoding.name})"
+            f"TypeEncoding(kind={self.kind.name}, signedness={self.signedness.name}, " f"char_encoding={self.char_encoding.name})"
         )
 
 
@@ -185,25 +183,25 @@ class TypeEncoding:
 # Raw integer keys are the DW_ATE_* values from DWARF4 Table 5.1.
 # HP vendor extensions (0x80–0x8B) are not listed here; they map to UNKNOWN.
 _DWARF_ATE_MAP: dict[int, TypeEncoding] = {
-    0x0:  TypeEncoding(TypeKind.VOID),                                                # void (compiler extension, not in spec)
-    0x1:  TypeEncoding(TypeKind.ADDRESS, Signedness.NOT_APPLICABLE),                  # DW_ATE_address
-    0x2:  TypeEncoding(TypeKind.BOOLEAN, Signedness.NOT_APPLICABLE),                  # DW_ATE_boolean
-    0x3:  TypeEncoding(TypeKind.COMPLEX_FLOAT, Signedness.NOT_APPLICABLE),            # DW_ATE_complex_float
-    0x4:  TypeEncoding(TypeKind.FLOAT, Signedness.NOT_APPLICABLE),                    # DW_ATE_float
-    0x5:  TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),                          # DW_ATE_signed
-    0x6:  TypeEncoding(TypeKind.CHAR, Signedness.SIGNED, CharEncoding.UNSPECIFIED),   # DW_ATE_signed_char
-    0x7:  TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),                        # DW_ATE_unsigned
-    0x8:  TypeEncoding(TypeKind.CHAR, Signedness.UNSIGNED, CharEncoding.UNSPECIFIED), # DW_ATE_unsigned_char
-    0x9:  TypeEncoding(TypeKind.IMAGINARY_FLOAT, Signedness.NOT_APPLICABLE),          # DW_ATE_imaginary_float
-    0xA:  TypeEncoding(TypeKind.PACKED_DECIMAL),                                      # DW_ATE_packed_decimal
-    0xB:  TypeEncoding(TypeKind.NUMERIC_STRING),                                      # DW_ATE_numeric_string
-    0xC:  TypeEncoding(TypeKind.EDITED),                                              # DW_ATE_edited
-    0xD:  TypeEncoding(TypeKind.FIXED, Signedness.SIGNED),                            # DW_ATE_signed_fixed
-    0xE:  TypeEncoding(TypeKind.FIXED, Signedness.UNSIGNED),                          # DW_ATE_unsigned_fixed
-    0xF:  TypeEncoding(TypeKind.DECIMAL_FLOAT, Signedness.NOT_APPLICABLE),            # DW_ATE_decimal_float
-    0x10: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF),   # DW_ATE_UTF  (char16_t / char32_t / u8 in C++)
-    0x11: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UCS),   # DW_ATE_UCS  (Fortran ISO_10646)
-    0x12: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.ASCII), # DW_ATE_ASCII (Fortran ASCII kind)
+    0x0: TypeEncoding(TypeKind.VOID),  # void (compiler extension, not in spec)
+    0x1: TypeEncoding(TypeKind.ADDRESS, Signedness.NOT_APPLICABLE),  # DW_ATE_address
+    0x2: TypeEncoding(TypeKind.BOOLEAN, Signedness.NOT_APPLICABLE),  # DW_ATE_boolean
+    0x3: TypeEncoding(TypeKind.COMPLEX_FLOAT, Signedness.NOT_APPLICABLE),  # DW_ATE_complex_float
+    0x4: TypeEncoding(TypeKind.FLOAT, Signedness.NOT_APPLICABLE),  # DW_ATE_float
+    0x5: TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),  # DW_ATE_signed
+    0x6: TypeEncoding(TypeKind.CHAR, Signedness.SIGNED, CharEncoding.UNSPECIFIED),  # DW_ATE_signed_char
+    0x7: TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),  # DW_ATE_unsigned
+    0x8: TypeEncoding(TypeKind.CHAR, Signedness.UNSIGNED, CharEncoding.UNSPECIFIED),  # DW_ATE_unsigned_char
+    0x9: TypeEncoding(TypeKind.IMAGINARY_FLOAT, Signedness.NOT_APPLICABLE),  # DW_ATE_imaginary_float
+    0xA: TypeEncoding(TypeKind.PACKED_DECIMAL),  # DW_ATE_packed_decimal
+    0xB: TypeEncoding(TypeKind.NUMERIC_STRING),  # DW_ATE_numeric_string
+    0xC: TypeEncoding(TypeKind.EDITED),  # DW_ATE_edited
+    0xD: TypeEncoding(TypeKind.FIXED, Signedness.SIGNED),  # DW_ATE_signed_fixed
+    0xE: TypeEncoding(TypeKind.FIXED, Signedness.UNSIGNED),  # DW_ATE_unsigned_fixed
+    0xF: TypeEncoding(TypeKind.DECIMAL_FLOAT, Signedness.NOT_APPLICABLE),  # DW_ATE_decimal_float
+    0x10: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF),  # DW_ATE_UTF  (char16_t / char32_t / u8 in C++)
+    0x11: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UCS),  # DW_ATE_UCS  (Fortran ISO_10646)
+    0x12: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.ASCII),  # DW_ATE_ASCII (Fortran ASCII kind)
 }
 
 
@@ -232,27 +230,27 @@ def type_encoding_from_dwarf_ate(ate_value: int) -> TypeEncoding:
 
 # Raw integer keys are the btXxx values from Microsoft cvconst.h.
 _PDB_BT_MAP: dict[int, TypeEncoding] = {
-    0:  TypeEncoding(TypeKind.UNKNOWN),                                                # btNoType
-    1:  TypeEncoding(TypeKind.VOID),                                                   # btVoid
-    2:  TypeEncoding(TypeKind.CHAR, Signedness.UNSPECIFIED, CharEncoding.ASCII),       # btChar – plain C char (impl-defined signedness)
-    3:  TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.WIDE),     # btWChar – wchar_t
-    6:  TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),                             # btInt
-    7:  TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),                           # btUInt
-    8:  TypeEncoding(TypeKind.FLOAT, Signedness.NOT_APPLICABLE),                       # btFloat
-    9:  TypeEncoding(TypeKind.BCD),                                                    # btBCD
-    10: TypeEncoding(TypeKind.BOOLEAN, Signedness.NOT_APPLICABLE),                     # btBool
-    13: TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),                             # btLong  (size captured in byte_size)
-    14: TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),                           # btULong
-    25: TypeEncoding(TypeKind.CURRENCY),                                               # btCurrency
-    26: TypeEncoding(TypeKind.DATE),                                                   # btDate
-    27: TypeEncoding(TypeKind.VARIANT),                                                # btVariant
-    28: TypeEncoding(TypeKind.COMPLEX_FLOAT, Signedness.NOT_APPLICABLE),               # btComplex
-    29: TypeEncoding(TypeKind.BIT),                                                    # btBit
-    30: TypeEncoding(TypeKind.BSTR),                                                   # btBSTR
-    31: TypeEncoding(TypeKind.HRESULT),                                                # btHresult
-    32: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF16),    # btChar16 – char16_t (C++11)
-    33: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF32),    # btChar32 – char32_t (C++11)
-    34: TypeEncoding(TypeKind.CHAR, Signedness.UNSIGNED, CharEncoding.UTF8),           # btChar8  – char8_t (C++20, always unsigned)
+    0: TypeEncoding(TypeKind.UNKNOWN),  # btNoType
+    1: TypeEncoding(TypeKind.VOID),  # btVoid
+    2: TypeEncoding(TypeKind.CHAR, Signedness.UNSPECIFIED, CharEncoding.ASCII),  # btChar – plain C char (impl-defined signedness)
+    3: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.WIDE),  # btWChar – wchar_t
+    6: TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),  # btInt
+    7: TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),  # btUInt
+    8: TypeEncoding(TypeKind.FLOAT, Signedness.NOT_APPLICABLE),  # btFloat
+    9: TypeEncoding(TypeKind.BCD),  # btBCD
+    10: TypeEncoding(TypeKind.BOOLEAN, Signedness.NOT_APPLICABLE),  # btBool
+    13: TypeEncoding(TypeKind.INTEGER, Signedness.SIGNED),  # btLong  (size captured in byte_size)
+    14: TypeEncoding(TypeKind.INTEGER, Signedness.UNSIGNED),  # btULong
+    25: TypeEncoding(TypeKind.CURRENCY),  # btCurrency
+    26: TypeEncoding(TypeKind.DATE),  # btDate
+    27: TypeEncoding(TypeKind.VARIANT),  # btVariant
+    28: TypeEncoding(TypeKind.COMPLEX_FLOAT, Signedness.NOT_APPLICABLE),  # btComplex
+    29: TypeEncoding(TypeKind.BIT),  # btBit
+    30: TypeEncoding(TypeKind.BSTR),  # btBSTR
+    31: TypeEncoding(TypeKind.HRESULT),  # btHresult
+    32: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF16),  # btChar16 – char16_t (C++11)
+    33: TypeEncoding(TypeKind.CHAR, Signedness.NOT_APPLICABLE, CharEncoding.UTF32),  # btChar32 – char32_t (C++11)
+    34: TypeEncoding(TypeKind.CHAR, Signedness.UNSIGNED, CharEncoding.UTF8),  # btChar8  – char8_t (C++20, always unsigned)
 }
 
 

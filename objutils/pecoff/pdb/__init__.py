@@ -905,31 +905,31 @@ class CTypeInfoDump:
                     kernel32.LocalFree(ptr)
                     return name
         elif info_type in (
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BASETYPE,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPE,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ARRAYINDEXTYPEID,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_COUNT,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CHILDRENCOUNT,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_DATAKIND,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_UDTKIND,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESSOFFSET,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BITPOSITION,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALTABLESHAPEID,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEPOINTEROFFSET,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CLASSTYPEID,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_NESTED,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMINDEX,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LEXICALPARENT,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_THISADJUST,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_EQUIV_TO,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CALLING_CONVENTION,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_CLOSE_EQUIV_TO,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEOFFSET,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEDISPINDEX,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OBJECTPOINTERTYPEID,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMTAG,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BASETYPE,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPE,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_TYPEID,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ARRAYINDEXTYPEID,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_COUNT,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CHILDRENCOUNT,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_DATAKIND,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_UDTKIND,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESSOFFSET,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_BITPOSITION,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALTABLESHAPEID,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEPOINTEROFFSET,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CLASSTYPEID,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_NESTED,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMINDEX,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LEXICALPARENT,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_THISADJUST,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_EQUIV_TO,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_CALLING_CONVENTION,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_IS_CLOSE_EQUIV_TO,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEOFFSET,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASEDISPINDEX,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OBJECTPOINTERTYPEID,
         ):
             out = DWORD()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
@@ -938,18 +938,20 @@ class CTypeInfoDump:
             out = VARIANT()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
                 return _variant_to_python(out)
-        elif info_type in (IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH,
-                           IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESS,
-                           IMAGEHLP_SYMBOL_TYPE_INFO.TI_GTIEX_REQS_VALID):
+        elif info_type in (
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_LENGTH,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESS,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GTIEX_REQS_VALID,
+        ):
             out = ULONG64()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
                 return out.value
         elif info_type in (
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_UNALIGNED,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_REFERENCE,
-                IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASECLASS,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_CONST,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_VOLATILE,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_UNALIGNED,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_IS_REFERENCE,
+            IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VIRTUALBASECLASS,
         ):
             out = BOOL()
             if dbghelp.SymGetTypeInfo(self.process, self.mod_base, type_id, info_type.value, ctypes.byref(out)):
@@ -1005,8 +1007,12 @@ class CTypeInfoDump:
         value: Any = None
         if data_kind == DataKind.DataIsConstant:
             value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_VALUE)
-        elif data_kind in (DataKind.DataIsGlobal, DataKind.DataIsStaticLocal, DataKind.DataIsFileStatic,
-                           DataKind.DataIsStaticMember):
+        elif data_kind in (
+            DataKind.DataIsGlobal,
+            DataKind.DataIsStaticLocal,
+            DataKind.DataIsFileStatic,
+            DataKind.DataIsStaticMember,
+        ):
             value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_ADDRESS)
         elif data_kind in (DataKind.DataIsLocal, DataKind.DataIsParam, DataKind.DataIsObjectPtr, DataKind.DataIsMember):
             value = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_OFFSET)
@@ -1090,7 +1096,6 @@ class CTypeInfoDump:
             return symbols.UnspecifiedType("unknown")
         return self.get_full_type_name(tp)
 
-
     def get_function(self, type_id: int) -> symbols.SubroutineType:
         name = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_GET_SYMNAME)
         chs = self.get_type_info(type_id, IMAGEHLP_SYMBOL_TYPE_INFO.TI_FINDCHILDREN)
@@ -1168,7 +1173,7 @@ class CTypeInfoDump:
             else:
                 resolved = symbols.ArrayType(full_type, [(0, 0)])
             if isinstance(full_type, symbols.ArrayType):
-                full_type.array_spec.insert(0, (0, count))    # coerce array-specifiers.
+                full_type.array_spec.insert(0, (0, count))  # coerce array-specifiers.
                 return full_type
             else:
                 return self._wrap_qualifiers(type_id, resolved)
@@ -1409,13 +1414,13 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
     try:
         with PdbSession(symbol_path if not symbol_path else [symbol_path]) as session:
             mod_base = session.load_module(pe_path)
-            pdb_symbols =  session.enum_symbols(mod_base, b"*")
+            pdb_symbols = session.enum_symbols(mod_base, b"*")
             result = []
             for sym in pdb_symbols:
                 if sym.tag != "SymTagData":
                     continue
                 ti = session.type_info(mod_base, sym.TypeIndex)
-                print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size , sym.decode_flags(), "==>", ti)
+                print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size, sym.decode_flags(), "==>", ti)
                 result.append(symbols.VariableType(sym.Name, ti, sym.Address - mod_base, sym.Size))
             return result
             """
@@ -1426,7 +1431,7 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
                 Tag: Symbol tag type (SymTagEnum values)
                 Size: Symbol size in bytes
                 Value: Symbol value (for constants)
-        
+
             Helper Methods:
                 is_function(): True if symbol is a function
                 is_export(): True if symbol is exported

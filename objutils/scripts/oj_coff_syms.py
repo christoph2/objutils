@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from objutils.pecoff import PeParser, SymbolAPI
+from objutils.pecoff import PeParser
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -39,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     syms = pp.symbols
 
     # Fallback: if SymbolAPI attr is not present (static type), use direct list
-    #if not syms and pp.symbols:
+    # if not syms and pp.symbols:
     #    syms = [type("_S", (), s) for s in pp.symbols]  # quick adapter for printing
 
     # syms is a list of model.Pe_Symbol; order by value already in fetch()
