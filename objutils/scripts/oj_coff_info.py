@@ -18,7 +18,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("pe_file", help="PE/COFF file (.exe/.dll/.obj)")
     parser.add_argument("--pdb", "-p", dest="pdb_file", nargs="*", help="Path to PDB file if not in same location as PE file")
     args = parser.parse_args(argv)
-    print("Pths", args.pdb_file)
+
+    # dump_type_tree: bool = False
+
     try:
         pp = PeParser(args.pe_file, pdb_path=args.pdb_file)
     except (OSError, ValueError, RuntimeError) as e:
@@ -53,13 +55,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if pp.symbols:
         print_header("Symbols (COFF or PDB)")
-        print("Name                           Value")
-        print("-" * 79)
-        # for sym in
-        #   pp.symbols, key=lambda x: (x.get("value", 0), x.get("name", ""))):
+        print("Name                                               Value              Size")
+        print("-" * 80)
         for sym in pp.symbols:
-            print(f"{sym.name[:30]:30} 0x{sym.rel_address:016X} {sym.tag}")
-
+            print(f"{sym.name.decode():<50} 0x{sym.location:016X} {sym.size}")
     return 0
 
 
