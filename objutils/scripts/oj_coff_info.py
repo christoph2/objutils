@@ -17,6 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Display informations about PE/COFF files.")
     parser.add_argument("pe_file", help="PE/COFF file (.exe/.dll/.obj)")
     parser.add_argument("--pdb", "-p", dest="pdb_file", nargs="*", help="Path to PDB file if not in same location as PE file")
+    parser.add_argument("--symbols", "-s", action="store_true", help="Dump symbols from PDB file if available")
     args = parser.parse_args(argv)
 
     # dump_type_tree: bool = False
@@ -53,7 +54,10 @@ def main(argv: list[str] | None = None) -> int:
             f"0x{s['size_of_raw_data']:06X} 0x{s['virtual_size']:06X}"
         )
 
-    if pp.symbols:
+    if pp.symbols and args.symbols:
+        # pp.symbols = sorted(pp.symbols, key=lambda s: s.name)
+        pp.symbols = sorted(pp.symbols, key=lambda s: s.location)
+
         print_header("Symbols (COFF or PDB)")
         print("Name                                               Value              Size")
         print("-" * 80)

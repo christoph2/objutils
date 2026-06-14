@@ -89,22 +89,12 @@ def main():
         )
 
     print_header("Segments")
-    print("Type         Offset     VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
-    print("-" * 71)
+    print("Type          Offset     VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
+    print("-" * 72)
     for segment in ep.segments:
         print(
-            f"{program_header_name(segment.p_type):12} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x} {program_header_flags_name(segment.p_flags):3} {segment.p_align:>5}"
+            f"{program_header_name(segment.p_type):13} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x} {program_header_flags_name(segment.p_flags):3} {segment.p_align:>5}"
         )
-        """
-        p_type = 1
-        p_offset = 148
-        p_vaddr = 0
-        p_paddr = 0
-        p_filesz = 12924
-        p_memsz = 12924
-        p_flags = 5
-        p_align = 2
-        """
 
     comment = ep.comment
     if comment:
