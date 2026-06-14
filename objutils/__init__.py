@@ -63,6 +63,7 @@ from rich.traceback import install as tb_install
 
 import objutils.ash
 import objutils.binfile
+import objutils.oocdtxt
 import objutils.cosmac
 import objutils.emon52
 import objutils.etek
@@ -123,6 +124,7 @@ registry.register("tek", objutils.tek.Reader, objutils.tek.Writer, "Tektonix for
 registry.register("cosmac", objutils.cosmac.Reader, objutils.cosmac.Writer, "RCA COSMAC format.")
 registry.register("ash", objutils.ash.Reader, objutils.ash.Writer, "ASCII hex space formats.")
 registry.register("shf", objutils.shf.Reader, objutils.shf.Writer, "S Hexdump Format (rfc4149).")
+registry.register("oocdtxt", objutils.oocdtxt.Reader, objutils.oocdtxt.Writer, "OpenOCD flash mdb text format.")
 
 
 def load(codec_name: str, fp: str | Path | BinaryIO, join: bool = True, **kws: Any) -> Image:
