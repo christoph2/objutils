@@ -399,7 +399,7 @@ def test_get_section2():
     assert len(sec) == 64
 
 
-@pytest.mark.parametrize("join,", [False, True])
+@pytest.mark.parametrize("join", [False, True])
 def test_get_section_raises(join):
     img = Image(join=join)
     img.insert_section(data=range(10), start_address=0x030)
