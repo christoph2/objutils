@@ -1303,26 +1303,36 @@ class ProgramHeader(enum.IntEnum):
         PT_HIPROC: End of processor-specific segment types
     """
 
-    PT_NULL = 0  # Program header table entry unused.
-    PT_LOAD = 1  # Loadable program segment.
-    PT_DYNAMIC = 2  # Dynamic linking information.
-    PT_INTERP = 3  # Program interpreter.
-    PT_NOTE = 4  # Auxiliary information.
-    PT_SHLIB = 5  # Reserved.
-    PT_PHDR = 6  # Entry for header table itself.
-    PT_TLS = 7  # Thread-local storage segment
-    PT_NUM = 8  # Number of defined types
-    PT_LOOS = 0x60000000  # Start of OS-specific
-    PT_GNU_EH_FRAME = 0x6474E550  # GCC .eh_frame_hdr segment
-    PT_GNU_STACK = 0x6474E551  # Indicates stack executability
-    PT_GNU_RELRO = 0x6474E552  # Read-only after relocation
-    PT_GNU_PROPERTY = 0x6474E553  # GNU property
+    NULL = 0  # Program header table entry unused.
+    LOAD = 1  # Loadable program segment.
+    DYNAMIC = 2  # Dynamic linking information.
+    INTERP = 3  # Program interpreter.
+    NOTE = 4  # Auxiliary information.
+    SHLIB = 5  # Reserved.
+    PHDR = 6  # Entry for header table itself.
+    TLS = 7  # Thread-local storage segment
+    NUM = 8  # Number of defined types
+    LOOS = 0x60000000  # Start of OS-specific
+    GNU_EH_FRAME = 0x6474E550  # GCC .eh_frame_hdr segment
+    GNU_STACK = 0x6474E551  # Indicates stack executability
+    GNU_RELRO = 0x6474E552  # Read-only after relocation
+    GNU_PROPERTY = 0x6474E553  # GNU property
+    PAX_FLAGS = 0x65041580
 
     PT_LOSUNW = 0x6FFFFFFA
     PT_SUNWBSS = 0x6FFFFFFA  # Sun Specific segment
     PT_SUNWSTACK = 0x6FFFFFFB  # Stack segment
     PT_HISUNW = 0x6FFFFFFF
     PT_HIOS = 0x6FFFFFFF  # End of OS-specific
+    ARM_ARCHEXT = 0x70000000
+    ARM_EXIDX = 0x70000001
+    AARCH64_MEMTAG_MTE = 0x70000002
+    # MIPS_REGINFO = 0x70000000
+    # MIPS_RTPROC = 0x70000001
+    # MIPS_OPTIONS = 0x70000002
+    MIPS_ABIFLAGS = 0x70000003
+
+
     PT_LOPROC = 0x70000000  # Start of processor-specific.
     PT_ARM_EXIDX = PT_LOPROC + 1  # Frame unwind information
     PT_HIPROC = 0x7FFFFFFF  # End of processor-specific
@@ -1337,7 +1347,7 @@ def program_header_name(tp: int) -> str:
     Returns:
         Program header type name without the "PT_" prefix.
     """
-    return ProgramHeader(tp).name[3:]
+    return ProgramHeader(tp).name
 
 
 PF_X = 0x1  # Execute.
