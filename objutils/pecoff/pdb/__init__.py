@@ -1420,7 +1420,7 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
                 if sym.tag != "SymTagData":
                     continue
                 ti = session.type_info(mod_base, sym.TypeIndex)
-                print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size, sym.decode_flags(), "==>", ti)
+                # print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size, sym.decode_flags(), "==>", ti)
                 result.append(symbols.VariableType(sym.Name, ti, sym.Address - mod_base, sym.Size))
             return result
             """
