@@ -85,7 +85,7 @@ from contextlib import contextmanager
 
 from sqlalchemy import Column, Integer, Numeric, String, create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
 Base = declarative_base()
