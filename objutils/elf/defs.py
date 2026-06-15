@@ -1332,7 +1332,6 @@ class ProgramHeader(enum.IntEnum):
     # MIPS_OPTIONS = 0x70000002
     MIPS_ABIFLAGS = 0x70000003
 
-
     PT_LOPROC = 0x70000000  # Start of processor-specific.
     PT_ARM_EXIDX = PT_LOPROC + 1  # Frame unwind information
     PT_HIPROC = 0x7FFFFFFF  # End of processor-specific
