@@ -1,11 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["scikit-build-core", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
 name = "objutils"
-version = "0.10.9"
+version = "0.10.10"
 description = "Objectfile library for Python"
-authors = ["Christoph Schueler <cpu12.gems@googlemail.com>"]
-license = "GPLv2"
+authors = [
+    {name = "Christoph Schueler", email = "cpu12.gems@googlemail.com"}
+]
+license = {text = "GPL-2.0-only"}
 readme = "docs/README.rst"
-homepage = "https://github.com/christoph2/objutils"
+requires-python = ">=3.10,<4.0"
 classifiers = [
 	# How mature is this project? Common values are
 	#   3 - Alpha
@@ -41,19 +47,19 @@ keywords=[
 	"shf",
 	"rfc4194",
 ]
-build = "build_ext.py"
 
-include = [
-    { path = "objutils/*.so", format = "wheel" },
-    { path = "objutils/*.pyd", format = "wheel" },
-
-    { path = "CMakeLists.txt", format = "sdist" },
-
-	{ path = "objutils/extensions/*hpp", format = "sdist" },
-	{ path = "objutils/extensions/*cpp", format = "sdist" },
+dependencies = [
+	"construct>=2.10.70",
+	"mako>=1.3.3",
+	"sqlalchemy>=2.0.29",
+	"rich>=14.2",
+	"numpy>=2.2.5",
 ]
 
-[tool.poetry.scripts]
+[project.urls]
+Repository = "https://www.github.com/Christoph2/objutils"
+
+[project.scripts]
 oj-elf-info = "objutils.scripts.oj_elf_info:main"
 oj-elf-syms = "objutils.scripts.oj_elf_syms:main"
 oj-hex-info = "objutils.scripts.oj_hex_info:main"
@@ -68,32 +74,27 @@ oj-coff-extract = "objutils.scripts.oj_coff_extract:main"
 oj-coff-import = "objutils.scripts.oj_coff_import:main"
 arduino-build-artifacts = "objutils.scripts.arduino_build_artifacts:main"
 
+[project.optional-dependencies]
+dev = [
+	"bumpver>=2023.1129",
+	"pre-commit>=3.7.0",
+	"pytest>=8.1.1,<10.0.0",
+	"black>=24.10,<27.0",
+	"ruff>=0.6.9",
+	"pyupgrade>=3.17.0",
+	"bandit>=1.7.10",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-construct = "^2.10.70"
-mako = "^1.3.3"
-sqlalchemy = "^2.0.29"
-rich = "^14.2"
-numpy = ">=2.2.5"
-
-
-[tool.poetry.group.dev.dependencies]
-bumpver = "^2023.1129"
-pre-commit = "^3.7.0"
-pytest = ">=8.1.1,<10.0.0"
-black = ">=24.10,<27.0"
-ruff = "^0.6.9"
-pyupgrade = "^3.17.0"
-bandit = "^1.7.10"
-
-[build-system]
-requires = ["poetry-core>=1.6.0", "wheel", "cmake>=3.12", "pybind11[global]>=2.12.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry]
+package-mode = false
 
 [tool.pytest.ini_options]
 addopts = "--verbose --tb=short --junitxml=result.xml -o junit_family=xunit2"
 testpaths = "objutils/tests"
+
+[tool.scikit-build]
+wheel.packages = ["objutils"]
+wheel.exclude = []
 
 [tool.mypy]
 strict = false
@@ -121,7 +122,7 @@ skip = ["*_i686", "*-musllinux*"]
 build-frontend = "build"
 
 [tool.bumpver]
-current_version = "0.10.9"
+current_version = "0.10.10"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
