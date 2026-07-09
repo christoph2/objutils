@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "objutils"
-version = "0.10.10"
+version = "0.10.11"
 description = "Objectfile library for Python"
 authors = [
     {name = "Christoph Schueler", email = "cpu12.gems@googlemail.com"}
@@ -122,7 +122,7 @@ skip = ["*_i686", "*-musllinux*"]
 build-frontend = "build"
 
 [tool.bumpver]
-current_version = "0.10.10"
+current_version = "0.10.11"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
