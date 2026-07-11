@@ -44,11 +44,14 @@ Features
 
 - Read ELF files (including symbols) and extract loadable sections.
 - Inspect PE/COFF files and symbols (optional PDB support).
+- Merge multiple HEX files into one (``oj-hex-merge``).
+- Split HEX files into separate sections (``oj-hex-split``).
 - Typed access (scalars, arrays, strings) to binary data.
 
 Recent improvements
 -------------------
 
+- New ``oj-hex-merge`` and ``oj-hex-split`` CLI tools for combining and partitioning HEX files.
 - New ``oj-dwarf-import`` CLI replaces ``dwarfer.py``/``cu_info.py`` for DWARF imports, CU listing, summaries, and attribute traversal.
 - Faster DWARF imports: batched ORM writes, quiet flag propagation, and safe DWARF expression evaluation keep large ELF files stable.
 - Exception handling and typing tightened across DWARF/ELF/PECOFF modules and public APIs to surface real errors without masking them.
@@ -180,6 +183,14 @@ And loaded again...
 
    Section(address = 0X00001000, length = 16, data = b'Hello HEX world!')
    Section(address = 0X00002000, length = 16, data = b'\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10')
+
+Or split it into its sections...
+
+.. code-block:: python
+
+   images = img1.split()
+   for i, img in enumerate(images):
+       dump("srec", f"part_{i}.srec", img)
 
 This leads to the conversion idiom.
 

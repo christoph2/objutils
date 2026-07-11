@@ -278,22 +278,19 @@ oj_hex_info
 
 .. code-block:: shell
 
-    usage: oj-hex-info [-h] [-d]
-                      {ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt}
-                      hex_file
+    usage: oj-hex-info [-h] [-d] [-p]
+                      [file_type] hex_file
 
     Displays informations about HEX files.
 
     positional arguments:
-      {ash,cosmac,emon52,etek,fpc,ihex,mostec,rca,shf,sig,srec,tek,titxt}
-                            file type
+      file_type             file type (optional, if omitted it is probed)
       hex_file              HEX file
 
     optional arguments:
       -h, --help            show this help message and exit
       -d, --dump            hexdump contents
-
-Filetype is a required argument (no auto-probing yet).
+      -p, --print-filename  Print filename including path
 
 Run it as follows:
 
@@ -301,8 +298,9 @@ Without any optional arguments just the addresses and lengths of the contained s
 
 .. code-block:: shell
 
-    $ oj_hex_info srec sample.srec
+    $ oj-hex-info sample.srec
 
+    Sections
     --------
 
     Num   Address    Length
@@ -316,7 +314,7 @@ If you also want to see the contents, add *-d* option:
 
 .. code-block:: shell
 
-    $ oj_hex_info srec sample.srec -d
+    $ oj-hex-info sample.srec -d
 
     Sections
     --------
@@ -341,6 +339,78 @@ If you also want to see the contents, add *-d* option:
     ---------------
            16 bytes
     ---------------
+
+oj_hex_merge
+------------
+
+.. code-block:: shell
+
+    usage: oj-hex-merge [-h] -o OUTPUT [-t OUTPUT_TYPE] [-p] [-v]
+                        input_files [input_files ...]
+
+    Merges multiple HEX files into one.
+
+    positional arguments:
+      input_files           Input HEX files to be merged.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -o OUTPUT, --output OUTPUT
+                            Output HEX file.
+      -t OUTPUT_TYPE, --type OUTPUT_TYPE
+                            Output file type (e.g., ihex, srec). If omitted, it's
+                            inferred from the output file extension.
+      -p, --print-filename  Print filenames while processing
+      -v, --verbose         Verbose output
+
+Example:
+
+.. code-block:: shell
+
+    $ oj-hex-merge file1.hex file2.hex -o merged.hex
+
+Note: Merging files with overlapping sections is not allowed and will result in an error.
+
+oj_hex_split
+------------
+
+.. code-block:: shell
+
+    usage: oj-hex-split [-h] [-o OUTPUT_NAMES [OUTPUT_NAMES ...]]
+                        [-t OUTPUT_TYPE] [-p PREFIX] [-v]
+                        input_file
+
+    Splits a HEX file into multiple files based on its sections.
+
+    positional arguments:
+      input_file            Input HEX file to be split.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -o OUTPUT_NAMES [OUTPUT_NAMES ...], --output-names OUTPUT_NAMES [OUTPUT_NAMES ...]
+                            Optional list of output base names. If not provided,
+                            section numbers are used.
+      -t OUTPUT_TYPE, --type OUTPUT_TYPE
+                            Output file type (e.g., ihex, srec). If omitted, it's
+                            inferred from the input file extension.
+      -p PREFIX, --prefix PREFIX
+                            Prefix for output filenames. Defaults to input
+                            filename (without extension).
+      -v, --verbose         Verbose output
+
+Example:
+
+.. code-block:: shell
+
+    $ oj-hex-split merged.hex
+
+This will generate files like ``merged_000.hex``, ``merged_001.hex``, etc.
+
+You can also specify custom names:
+
+.. code-block:: shell
+
+    $ oj-hex-split merged.hex -o code data
 
 oj_coff_info
 ------------

@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "objutils"
-version = "0.10.11"
+version = "0.10.12"
 description = "Objectfile library for Python"
 authors = [
     {name = "Christoph Schueler", email = "cpu12.gems@googlemail.com"}
@@ -26,11 +26,12 @@ classifiers = [
 	"License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
 	# Specify the Python versions you support here. In particular, ensure
 	# that you indicate whether you support Python 2, Python 3 or both.
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-	"Programming Language :: Python :: 3.13"
+	"Programming Language :: Python :: 3.13",
+	"Programming Language :: Python :: 3.14",
+	"Programming Language :: Python :: 3.15",
 ]
 
 keywords=[
@@ -54,6 +55,7 @@ dependencies = [
 	"sqlalchemy>=2.0.29",
 	"rich>=14.2",
 	"numpy>=2.2.5",
+	"ufilename (>=0.1.1,<0.2.0)",
 ]
 
 [project.urls]
@@ -63,6 +65,8 @@ Repository = "https://www.github.com/Christoph2/objutils"
 oj-elf-info = "objutils.scripts.oj_elf_info:main"
 oj-elf-syms = "objutils.scripts.oj_elf_syms:main"
 oj-hex-info = "objutils.scripts.oj_hex_info:main"
+oj-hex-merge = "objutils.scripts.oj_hex_merge:main"
+oj-hex-split = "objutils.scripts.oj_hex_split:main"
 oj-elf-arm-attrs = "objutils.scripts.oj_elf_arm_attrs:main"
 oj-elf-extract = "objutils.scripts.oj_elf_extract:main"
 oj-elf-import = "objutils.scripts.oj_elf_import:main"
@@ -117,12 +121,12 @@ include = '\.pyi?$'
 
 [tool.cibuildwheel]
 build-verbosity = 3
-build = "cp3{10,11,12,13,14}-*"
+build = "cp3{10,11,12,13,14,15}-*"
 skip = ["*_i686", "*-musllinux*"]
 build-frontend = "build"
 
 [tool.bumpver]
-current_version = "0.10.11"
+current_version = "0.10.12"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true

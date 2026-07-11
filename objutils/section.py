@@ -1325,6 +1325,8 @@ def join_sections(sections: list[Section]) -> list[Section]:
             continue
 
         if section_start == last_end:
+            if isinstance(last_segment.data, bytes):
+                last_segment.data = bytearray(last_segment.data)
             last_segment.data.extend(section.data)
             continue
 
@@ -1342,6 +1344,8 @@ def join_sections(sections: list[Section]) -> list[Section]:
 
         if section_end > last_end:
             tail_offset = overlap_end - section_start
+            if isinstance(last_segment.data, bytes):
+                last_segment.data = bytearray(last_segment.data)
             last_segment.data.extend(section.data[tail_offset:])
 
     return result_sections

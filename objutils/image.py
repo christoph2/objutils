@@ -940,23 +940,13 @@ class Image:
             if not (new_address + len(section) <= s.start_address or new_address >= s.start_address + len(s)):
                 raise InvalidAddressError(f"New address 0x{new_address:08x} causes overlap with section at 0x{s.start_address:08x}")
 
-    def split(self, at: Optional[int] = None, equal_parts: Optional[int] = None, remap: Optional[bool] = None) -> None:
-        """Split image into multiple parts.
+    def split(self) -> list["Image"]:
+        """Split image into multiple parts based on sections.
 
-        Args:
-            at: Address at which to split the image.
-            equal_parts: Number of equal-sized parts to split into.
-            remap: If True, remap addresses after splitting.
-
-        Raises:
-            NotImplementedError: This method is not yet implemented.
-
-        Note:
-            This method is currently a placeholder and needs to be fully
-            implemented for production use. The parameters define different
-            splitting strategies that need to be developed.
+        Returns:
+            List of Image objects, each containing exactly one section.
         """
-        raise NotImplementedError(f"split() is not yet implemented. Called with: at={at}, equal_parts={equal_parts}, remap={remap}")
+        return [Image([section], join=False) for section in self.sections]
 
 
 def _validate_sections(sections: Iterable[Section]) -> None:
