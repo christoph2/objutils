@@ -28,7 +28,7 @@ import sys
 from os import path
 from pathlib import Path
 
-from objutils import load, probe, dump, Image
+from objutils import load, probe, dump
 from ufilename import build_filename, SuffixPolicy, IdentityPolicy
 
 
@@ -78,7 +78,7 @@ def main():
         sys.exit(1)
 
     img = load(file_type, args.input_file)
-    
+
     if not img.sections:
         print(f"No sections found in '{args.input_file}'.")
         sys.exit(0)
@@ -94,15 +94,18 @@ def main():
         elif ext in (".bin",):
             output_type = "bin"
         else:
-            output_type = "ihex" # Fallback
+            output_type = "ihex"  # Fallback
 
     base_prefix = args.prefix if args.prefix else input_path.stem
     output_ext = input_path.suffix if not args.output_type else f".{args.output_type}"
     # Normalize extension mapping for ufilename
     if args.output_type:
-        if args.output_type == "ihex": output_ext = ".hex"
-        elif args.output_type == "srec": output_ext = ".s19"
-        elif args.output_type == "bin": output_ext = ".bin"
+        if args.output_type == "ihex":
+            output_ext = ".hex"
+        elif args.output_type == "srec":
+            output_ext = ".s19"
+        elif args.output_type == "bin":
+            output_ext = ".bin"
 
     if args.verbose:
         print(f"Splitting '{args.input_file}' into {len(img.sections)} sections...")
@@ -119,13 +122,13 @@ def main():
             # Default: append section number
             name_policy = SuffixPolicy(suffix=f"_{idx:03d}")
             out_base = base_prefix
-        
+
         out_filename = build_filename(name_policy, out_base, output_ext)
-        
+
         print(f"Writing '{out_filename}'...")
         if args.verbose:
             print(f"  Section {idx:03d} (0x{section.start_address:08x}, {len(section)} bytes)")
-            
+
         dump(output_type, out_filename, new_img)
 
     print(f"Successfully split into {len(split_images)} files.")
