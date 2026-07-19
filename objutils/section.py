@@ -47,6 +47,14 @@ Usage Examples
     # From bytes
     s1 = Section(start_address=0x1000, data=b"Hello")
 
+    # Check if address is in the section
+    if 0x1050 in s1:
+        data = s1.read(0x1050, 1)
+
+    # Check if address range is fully contained
+    if s1.contains_range(0x1000, 5):
+        data = s1.read(0x1000, 5)
+
     # From string (ASCII encoded)
     s2 = Section(0x2000, "World")
 
@@ -1200,6 +1208,22 @@ class Section:
 
     def __contains__(self, addr) -> bool:
         return self.start_address <= addr < (self.start_address + self.length)
+
+    def contains_range(self, addr: int, size: int) -> bool:
+        """Check if address range is fully contained in the section.
+
+        Args:
+            addr: Start address of the range.
+            size: Size of the range.
+
+        Returns:
+            True if the entire range [addr, addr + size) is within the section.
+        """
+        if size < 0:
+            return False
+        if size == 0:
+            return addr in self
+        return addr in self and (addr + size - 1) in self
 
     @property
     def address(self) -> int:  # Alias

@@ -165,6 +165,10 @@ Usage Examples
     if 0x1050 in img:
         data = img.read(0x1050, 16)
 
+    # Check if address range is fully contained
+    if img.contains_range(0x1000, 0x100):
+        data = img.read(0x1000, 0x100)
+
     # Iterate over sections
     for section in img:
         print(f"Section at 0x{section.start_address:08X}, "
@@ -468,8 +472,61 @@ class Image:
         return not (self == other)
 
     def __contains__(self, addr: int) -> bool:
-        """Check if address is contained in any section."""
-        return any(addr in sec for sec in self.sections)
+        """Check if address is contained in any section of the image.
+
+        Args:
+            addr: Address to check.
+
+        Returns:
+            True if the address is within any section, False otherwise.
+        """
+        return any(addr in section for section in self.sections)
+
+    def contains_range(self, addr: int, size: int) -> bool:
+        """Check if address range is fully contained in the image.
+
+        Args:
+            addr: Start address of the range.
+            size: Size of the range.
+
+        Returns:
+            True if the entire range [addr, addr + size) is covered by sections.
+        """
+        if size < 0:
+            return False
+        if size == 0:
+            return addr in self
+
+        # Check if the range is covered by sections.
+        # Since sections are sorted and non-overlapping, we can check continuity.
+        remaining_size = size
+        current_addr = addr
+
+        # Find the first section that could contain current_addr
+        import bisect
+        from operator import attrgetter
+        idx = bisect.bisect_right(self.sections, current_addr, key=attrgetter("start_address")) - 1
+        if idx < 0:
+            idx = 0
+
+        while idx < len(self.sections) and remaining_size > 0:
+            section = self.sections[idx]
+            if current_addr < section.start_address:
+                # Gap before this section
+                return False
+
+            if current_addr < section.start_address + len(section):
+                # current_addr is in this section
+                covered = min(remaining_size, (section.start_address + len(section)) - current_addr)
+                remaining_size -= covered
+                current_addr += covered
+            else:
+                # current_addr is beyond this section
+                pass
+
+            idx += 1
+
+        return remaining_size == 0
 
     def hexdump(self, fp=sys.stdout) -> None:
         """Print hexadecimal dump of all sections.
@@ -818,16 +875,21 @@ class Image:
         self._call_address_function("write_string", addr, value, encoding, **kws)
 
     def _address_contained(self, address: int, length: int) -> bool:
-        """Check if address range is contained in the image.
+        """Check if address range has ANY overlap with the image.
 
         Args:
             address: Start address to check.
             length: Length of the address range.
 
         Returns:
-            True if the address range is contained in any section, False otherwise.
+            True if the address range overlaps with any section, False otherwise.
         """
-        return address in self or (address + length - 1) in self
+        if length <= 0:
+            return False
+        end = address + length
+        # A range [address, end) overlaps with [s.start, s.end) if:
+        # address < s.end AND s.start < end
+        return any(address < (s.start_address + len(s)) and s.start_address < end for s in self.sections)
 
     def insert_section(
         self, data: Union[bytes, bytearray, memoryview, str], start_address: Optional[int] = None, join: bool = True
@@ -901,6 +963,8 @@ class Image:
             This method currently only validates the address range but does not
             perform the actual update operation. Full implementation is pending.
         """
+        if address is None:
+            address = self.address
         if not self._address_contained(address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 

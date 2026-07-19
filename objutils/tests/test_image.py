@@ -124,6 +124,43 @@ def test_update2(images):
     img0.update_section(data=b"abcdefghij", address=0x109)
 
 
+def test_image_contains_range():
+    s1 = Section(0x100, b"0123")
+    s2 = Section(0x104, b"4567")
+    img = Image([s1, s2], join=False)
+
+    # Spanning across sections
+    assert img.contains_range(0x100, 8) is True
+    assert img.contains_range(0x102, 4) is True
+
+    # Gaps
+    s3 = Section(0x200, b"ABCD")
+    img2 = Image([s1, s3], join=False)
+    assert img2.contains_range(0x100, 4) is True
+    assert img2.contains_range(0x200, 4) is True
+    assert img2.contains_range(0x100, 0x104) is False  # Gap at 0x104-0x1FF
+
+    # Partial coverage
+    assert img2.contains_range(0x103, 2) is False
+
+
+def test_image_address_contained_overlap():
+    s1 = Section(0x100, b"0123")
+    img = Image(s1)
+
+    # Internal overlap
+    assert img._address_contained(0x101, 2) is True
+    # Start overlap
+    assert img._address_contained(0x0FF, 2) is True
+    # End overlap
+    assert img._address_contained(0x103, 2) is True
+    # Fully containing
+    assert img._address_contained(0x0F0, 0x100) is True
+    # No overlap
+    assert img._address_contained(0x0F0, 1) is False
+    assert img._address_contained(0x104, 1) is False
+
+
 """
 
 

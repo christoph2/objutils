@@ -96,6 +96,24 @@ def test_adress_out_of_range2():
     assert 0x15 not in s0
 
 
+def test_section_contains_range():
+    s = Section(0x100, b"0123456789")
+    # Full containment
+    assert s.contains_range(0x100, 10) is True
+    assert s.contains_range(0x100, 5) is True
+    assert s.contains_range(0x105, 5) is True
+
+    # Out of bounds
+    assert s.contains_range(0x0FF, 5) is False
+    assert s.contains_range(0x100, 11) is False
+    assert s.contains_range(0x10A, 1) is False
+
+    # Zero size
+    assert s.contains_range(0x100, 0) is True
+    assert s.contains_range(0x109, 0) is True
+    assert s.contains_range(0x10A, 0) is False
+
+
 def test_copy_data_from_other_section():
     data = Section(data="abcd", start_address=0x8000)
     section = Section(data=data)
