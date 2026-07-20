@@ -505,6 +505,7 @@ class Image:
         # Find the first section that could contain current_addr
         import bisect
         from operator import attrgetter
+
         idx = bisect.bisect_right(self.sections, current_addr, key=attrgetter("start_address")) - 1
         if idx < 0:
             idx = 0
