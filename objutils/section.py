@@ -198,15 +198,15 @@ from copy import copy
 from dataclasses import dataclass
 from functools import reduce
 from operator import attrgetter, mul
-from typing import Any, TextIO, Union
+from typing import Any, TextIO
 
 import numpy as np
 
-import objutils.hexdump as hexdump
+from objutils import hexdump
 from objutils.exceptions import InvalidAddressError
 
 try:
-    from .hexfiles_ext import SequenceMatcher  # noqa: F401
+    from .hexfiles_ext import SequenceMatcher
 except ImportError:
     print("Error: cannot import `SequenceMatcher` from C++-extension, falling back to `difflib`")
     from difflib import SequenceMatcher  # noqa: F401
@@ -367,7 +367,7 @@ def filler(ch: int, n: int) -> bytearray:
     return bytearray([ch] * n)
 
 
-def _data_converter(data: Union[str, bytearray, array, Any]) -> bytearray:
+def _data_converter(data: str | bytearray | array | Any) -> bytearray:
     if isinstance(data, bytearray):
         pass  # no conversion needed.
     elif isinstance(data, int):
@@ -741,7 +741,7 @@ class Section:
             raise InvalidAddressError(f"write(0x{addr:08x}) access out of bounds.")
         self.data[offset : offset + length] = data
 
-    def read_numeric(self, addr: int, dtype: str, **kws) -> Union[int, float]:
+    def read_numeric(self, addr: int, dtype: str, **kws) -> int | float:
         """Read a single numeric value with explicit endianness.
 
         Reads an integer or floating-point value from the specified address.
@@ -802,7 +802,7 @@ class Section:
         tmp &= bit_mask
         return tmp.to_bytes(data_size, byteorder, signed=False)
 
-    def write_numeric(self, addr: int, value: Union[int, float], dtype: str, **kws) -> None:
+    def write_numeric(self, addr: int, value: float, dtype: str, **kws) -> None:
         """Write a single numeric value with explicit endianness.
 
         Writes an integer or floating-point value to the specified address.
@@ -840,7 +840,7 @@ class Section:
 
         self.data[offset : offset + data_size] = struct.pack(fmt, value)
 
-    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws) -> Union[list[int], list[float]]:
+    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws) -> list[int] | list[float]:
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"read_numeric_array(0x{addr:08x}) access out of bounds.")
@@ -851,7 +851,7 @@ class Section:
         data = self.data[offset : offset + data_size]
         return struct.unpack(fmt, data)
 
-    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws) -> Union[int, float]:
+    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws) -> int | float:
         asam_byte_order = self._resolve_asam_byteorder(byte_order)
         internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
         value = self.read_numeric(addr, internal_dtype, **kws)
@@ -866,7 +866,7 @@ class Section:
     def write_asam_numeric(
         self,
         addr: int,
-        value: Union[int, float],
+        value: float,
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws,
@@ -889,7 +889,7 @@ class Section:
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws,
-    ) -> Union[tuple[int, ...], tuple[float, ...]]:
+    ) -> tuple[int, ...] | tuple[float, ...]:
         asam_byte_order = self._resolve_asam_byteorder(byte_order)
         internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
         fmt = self._getformat(internal_dtype, length)
@@ -901,7 +901,7 @@ class Section:
     def write_asam_numeric_array(
         self,
         addr: int,
-        data: Union[list[int], list[float]],
+        data: list[int] | list[float],
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws,
@@ -952,7 +952,7 @@ class Section:
         self.data[offset : offset + len(encoded)] = encoded
         self.data[offset + len(encoded) : offset + total_length] = terminator
 
-    def write_numeric_array(self, addr: int, data: Union[list[int], list[float]], dtype: str, **kws) -> None:
+    def write_numeric_array(self, addr: int, data: list[int] | list[float], dtype: str, **kws) -> None:
         if not hasattr(data, "__iter__"):
             raise TypeError("data must be iterable")
         length = len(data)
@@ -1193,11 +1193,7 @@ class Section:
             yield (self.start_address + item.start(), item.end() - item.start())
 
     def __repr__(self) -> str:
-        return "Section(address = 0X{:08X}, length = {:d}, data = {})".format(
-            self.start_address,
-            self.length,
-            self.repr.repr(bytes(self.data)),
-        )
+        return f"Section(address = 0X{self.start_address:08X}, length = {self.length:d}, data = {self.repr.repr(bytes(self.data))})"
 
     def __len__(self) -> int:
         return len(self.data)
@@ -1261,10 +1257,10 @@ class LazySection(Section):
     def write(self, addr: int, data: bytes, **kws) -> None:
         raise NotImplementedError("LazySection is read-only")
 
-    def write_numeric(self, addr: int, value: Union[int, float], dtype: str, **kws) -> None:
+    def write_numeric(self, addr: int, value: float, dtype: str, **kws) -> None:
         raise NotImplementedError("LazySection is read-only")
 
-    def write_numeric_array(self, addr: int, data: Union[list[int], list[float]], dtype: str, **kws) -> None:
+    def write_numeric_array(self, addr: int, data: list[int] | list[float], dtype: str, **kws) -> None:
         raise NotImplementedError("LazySection is read-only")
 
     def write_string(self, addr: int, value: str, encoding: str = "latin1", **kws):

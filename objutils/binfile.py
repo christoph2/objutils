@@ -26,9 +26,9 @@ __copyright__ = """
 import io
 import zipfile
 from contextlib import closing
-from typing import Any, BinaryIO, Union
+from typing import Any, BinaryIO
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 from objutils.image import Image
 from objutils.section import Section
 
@@ -42,7 +42,7 @@ class NoContiniousError(Exception):
 
 
 class Reader(hexfile.Reader):
-    def load(self, fp: Union[str, BinaryIO], address: int = 0x0000, **kws: Any) -> Image:
+    def load(self, fp: str | BinaryIO, address: int = 0x0000, **kws: Any) -> Image:
         if isinstance(fp, str):
             fp = open(fp, "rb")
         data = fp.read()
@@ -52,7 +52,7 @@ class Reader(hexfile.Reader):
             fp.close()
         return img
 
-    def loads(self, image: Union[str, bytes, bytearray], address: int = 0x0000, **kws: Any) -> Image:
+    def loads(self, image: str | bytes | bytearray, address: int = 0x0000, **kws: Any) -> Image:
         if isinstance(image, str):
             return self.load(io.BytesIO(bytes(image, "ascii")), address)
         else:
@@ -112,12 +112,12 @@ class BinZipReader(hexfile.Reader):
             except (AttributeError, io.UnsupportedOperation):
                 pass
 
-    def load(self, fp: Union[str, BinaryIO], **kws: Any) -> Image:
+    def load(self, fp: str | BinaryIO, **kws: Any) -> Image:
         """Load from zip file."""
         # TODO: Implementation
         return Image([], valid=True)
 
-    def loads(self, data: Union[str, bytes, bytearray], **kws: Any) -> Image:
+    def loads(self, data: str | bytes | bytearray, **kws: Any) -> Image:
         """Load from zip bytes."""
         return self.load(io.BytesIO(data) if isinstance(data, (bytes, bytearray)) else io.BytesIO(data.encode()))
 

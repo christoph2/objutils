@@ -191,12 +191,7 @@ class Writer:
         sections = sorted(image.sections, key=lambda x: x.start_address)
         for idx, section in enumerate(sections):
             result.append(
-                '    <block name="Section #{:04x}" address="{:08x}" word_size="01" length="{:08x}" checksum="{}">'.format(
-                    idx,
-                    section.start_address,
-                    section.length,
-                    sha1_digest(section.data),
-                )
+                f'    <block name="Section #{idx:04x}" address="{section.start_address:08x}" word_size="01" length="{section.length:08x}" checksum="{sha1_digest(section.data)}">'
             )
             nblocks = len(section.data) // BLOCK_SIZE
             remaining = len(section.data) % BLOCK_SIZE

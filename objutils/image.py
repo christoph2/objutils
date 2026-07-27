@@ -277,7 +277,7 @@ import sys
 from bisect import bisect_right
 from collections.abc import Iterable
 from operator import attrgetter, eq
-from typing import Any, Optional, Protocol, Union
+from typing import Any, Protocol
 
 from objutils.exceptions import InvalidAddressError
 from objutils.section import Section, join_sections
@@ -413,9 +413,9 @@ class Image:
 
     def __init__(
         self,
-        sections: Optional[Union[Section, Iterable[Section]]] = None,
+        sections: Section | Iterable[Section] | None = None,
         join: bool = True,
-        meta: Optional[dict[str, Any]] = None,
+        meta: dict[str, Any] | None = None,
     ) -> None:
         if meta is None:
             meta = {}
@@ -507,8 +507,7 @@ class Image:
         from operator import attrgetter
 
         idx = bisect.bisect_right(self.sections, current_addr, key=attrgetter("start_address")) - 1
-        if idx < 0:
-            idx = 0
+        idx = max(idx, 0)
 
         while idx < len(self.sections) and remaining_size > 0:
             section = self.sections[idx]
@@ -581,7 +580,7 @@ class Image:
         """
         return self._call_address_function("read", addr, length, **kws)
 
-    def write(self, addr: int, data: Union[bytes, bytearray], **kws: Any) -> None:
+    def write(self, addr: int, data: bytes | bytearray, **kws: Any) -> None:
         """Write bytes to image.
 
         Args:
@@ -594,7 +593,7 @@ class Image:
         """
         self._call_address_function("write", addr, data, **kws)
 
-    def read_numeric(self, addr: int, dtype: str, **kws: Any) -> Union[int, float]:
+    def read_numeric(self, addr: int, dtype: str, **kws: Any) -> int | float:
         """Read a single numeric value with explicit endianness.
 
         Reads an integer or floating-point value from the specified address,
@@ -640,7 +639,7 @@ class Image:
         """
         return self._call_address_function("read_numeric", addr, dtype, **kws)
 
-    def write_numeric(self, addr: int, value: Union[int, float], dtype: str, **kws: Any) -> None:
+    def write_numeric(self, addr: int, value: float, dtype: str, **kws: Any) -> None:
         """Write a single numeric value with explicit endianness.
 
         Writes an integer or floating-point value to the specified address,
@@ -675,14 +674,14 @@ class Image:
         """
         self._call_address_function("write_numeric", addr, value, dtype, **kws)
 
-    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws: Any) -> Union[int, float]:
+    def read_asam_numeric(self, addr: int, dtype: str, byte_order: str = "MSB_LAST", **kws: Any) -> int | float:
         """Read a numeric ASAM datatype with ECU byte order semantics."""
         return self._call_address_function("read_asam_numeric", addr, dtype, byte_order, **kws)
 
     def write_asam_numeric(
         self,
         addr: int,
-        value: Union[int, float],
+        value: float,
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws: Any,
@@ -705,14 +704,14 @@ class Image:
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws: Any,
-    ) -> list[Union[int, float]]:
+    ) -> list[int | float]:
         """Read an ASAM numeric array with ECU byte order semantics."""
         return self._call_address_function("read_asam_numeric_array", addr, length, dtype, byte_order, **kws)
 
     def write_asam_numeric_array(
         self,
         addr: int,
-        data: Iterable[Union[int, float]],
+        data: Iterable[int | float],
         dtype: str,
         byte_order: str = "MSB_LAST",
         **kws: Any,
@@ -720,7 +719,7 @@ class Image:
         """Write an ASAM numeric array with ECU byte order semantics."""
         self._call_address_function("write_asam_numeric_array", addr, data, dtype, byte_order, **kws)
 
-    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws: Any) -> list[Union[int, float]]:
+    def read_numeric_array(self, addr: int, length: int, dtype: str, **kws: Any) -> list[int | float]:
         """Read array of numeric values from image.
 
         Args:
@@ -737,7 +736,7 @@ class Image:
         """
         return self._call_address_function("read_numeric_array", addr, length, dtype, **kws)
 
-    def write_numeric_array(self, addr: int, data: Iterable[Union[int, float]], dtype: str, **kws: Any) -> None:
+    def write_numeric_array(self, addr: int, data: Iterable[int | float], dtype: str, **kws: Any) -> None:
         """Write array of numeric values to image.
 
         Args:
@@ -754,7 +753,7 @@ class Image:
         """
         self._call_address_function("write_numeric_array", addr, data, dtype, **kws)
 
-    def write_ndarray(self, addr: int, array: Any, order: Optional[str] = None, **kws: Any) -> None:
+    def write_ndarray(self, addr: int, array: Any, order: str | None = None, **kws: Any) -> None:
         """Write NumPy ndarray to image.
 
         Args:
@@ -794,8 +793,8 @@ class Image:
         addr: int,
         length: int,
         dtype: str,
-        shape: Optional[tuple[int, ...]] = None,
-        order: Optional[str] = None,
+        shape: tuple[int, ...] | None = None,
+        order: str | None = None,
         **kws: Any,
     ) -> Any:
         """Read NumPy ndarray from image.
@@ -821,7 +820,7 @@ class Image:
         addr: int,
         length: int,
         dtype: str,
-        shape: Optional[tuple[int, ...]] = None,
+        shape: tuple[int, ...] | None = None,
         byte_order: str = "MSB_LAST",
         index_mode: str = "ROW_DIR",
         **kws: Any,
@@ -893,7 +892,7 @@ class Image:
         return any(address < (s.start_address + len(s)) and s.start_address < end for s in self.sections)
 
     def insert_section(
-        self, data: Union[bytes, bytearray, memoryview, str], start_address: Optional[int] = None, join: bool = True
+        self, data: bytes | bytearray | memoryview | str, start_address: int | None = None, join: bool = True
     ) -> None:
         """Insert/add a new section to image.
 
@@ -949,7 +948,7 @@ class Image:
         result = bisect_right(self._sections, address, key=attrgetter("start_address"))
         return self._sections[result - 1]
 
-    def update_section(self, data: Union[bytes, bytearray], address: Optional[int] = None) -> None:
+    def update_section(self, data: bytes | bytearray, address: int | None = None) -> None:
         """Update existing section data.
 
         Args:
@@ -969,7 +968,7 @@ class Image:
         if not self._address_contained(address, len(data)):
             raise InvalidAddressError("Address-space not in range")
 
-    def delete_section(self, address: Optional[int] = None) -> None:
+    def delete_section(self, address: int | None = None) -> None:
         """Delete section containing the specified address.
 
         Args:

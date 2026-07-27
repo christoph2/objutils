@@ -92,7 +92,7 @@ def main():
     try:
         ep = ElfParser(args.elf_file)
     except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
-        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
+        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{e!r}'.")
         exit(1)
     if args.symbol_list:
         symbol_list = args.symbol_list.split(",")
@@ -108,7 +108,7 @@ def main():
         symbol_list=symbol_list,
     ).items():
         separator = "=" * len(section)
-        print("\n{1:}\n{0:}\n{1:}\n".format(section, separator))
+        print(f"\n{separator}\n{section}\n{separator}\n")
         print("Name")
         print("Value     Size Bind       Type      Access")
         print("-" * 79)
@@ -119,14 +119,7 @@ def main():
                 "X" if sym.executeable else " ",
             )
             print(
-                "{:30}\n{:08x} {:5d} {:10} {:9} {}\n".format(
-                    sym.symbol_name,
-                    sym.st_value,
-                    sym.st_size,
-                    sym.symbol_bind.name[4:],
-                    sym.symbol_type.name[4:],
-                    access_str,
-                )
+                f"{sym.symbol_name:30}\n{sym.st_value:08x} {sym.st_size:5d} {sym.symbol_bind.name[4:]:10} {sym.symbol_type.name[4:]:9} {access_str}\n"
             )
 
 

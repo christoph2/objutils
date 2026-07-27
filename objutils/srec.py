@@ -50,10 +50,10 @@ __all__ = ["Reader", "Writer"]
 import re
 from collections.abc import Mapping, Sequence
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import hexfile
+from objutils import utils
 from objutils.checksums import COMPLEMENT_ONES, lrc
 from objutils.utils import make_list
 
@@ -190,16 +190,8 @@ class Reader(hexfile.Reader):
             pass
         elif format_type == S5:
             # print "S5: [%s]" % line.chunk
-            start_address = line.address  # noqa: F841
-        elif format_type == S7:
-            start_address = line.address  # noqa: F841
-            # print "Startaddress[S7]: %u" % start_address
-            # print "32-Bit Start-Address: ", hex(start_address)
-        elif format_type == S8:
-            start_address = line.address  # noqa: F841
-            # print "Startaddress[S8]: %u" % start_address
-            # print "24-Bit Start-Address: ", hex(start_address)
-        elif format_type == S9:
+            start_address = line.address
+        elif format_type == S7 or format_type == S8 or format_type == S9:
             start_address = line.address  # noqa: F841
             # print "Startaddress[S9]: %u" % start_address
             # print "16-Bit Start-Address: ", hex(start_address)
@@ -235,9 +227,9 @@ class Writer(hexfile.Writer):
     termination records.
     """
 
-    record_type: Optional[int] = None
+    record_type: int | None = None
     s5record: bool = False
-    start_address: Optional[int] = None
+    start_address: int | None = None
 
     MAX_ADDRESS_BITS = 32
 
@@ -272,7 +264,7 @@ class Writer(hexfile.Writer):
         self.address_mask = f"%0{(self.record_type + 1) * 2:d}X"
         self.offset = self.record_type + 2
 
-    def srecord(self, record_type: int, length: int, address: int, data: Optional[Sequence[int]] = None) -> str:
+    def srecord(self, record_type: int, length: int, address: int, data: Sequence[int] | None = None) -> str:
         """Generate a single S-Record line.
 
         Args:

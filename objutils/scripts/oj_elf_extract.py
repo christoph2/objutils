@@ -84,7 +84,7 @@ def main():
     try:
         ep = ElfParser(args.elf_file)
     except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
-        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{repr(e)}'.")
+        print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{e!r}'.")
         exit(1)
     print("\nExtracting from...\n")
     print("Section                   Address    Length")

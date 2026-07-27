@@ -1208,7 +1208,6 @@ def test_read_write_float64_array():
     )
 
 
-#
 def test_write_uint8_negative_offset():
     img = Image(Section(data=bytearray(10), start_address=0x1000))
     with pytest.raises(InvalidAddressError):

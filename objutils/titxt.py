@@ -43,7 +43,7 @@ __copyright__ = """
 
 from typing import Any
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 
 
 class Reader(hexfile.ASCIIHexReader):

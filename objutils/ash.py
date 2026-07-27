@@ -44,7 +44,7 @@ import re
 from functools import partial
 from typing import Any
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 from objutils.checksums import lrc
 
 STX = "\x02"

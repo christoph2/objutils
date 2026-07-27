@@ -30,7 +30,7 @@ class Logger:
     LOGGER_BASE_NAME = "objutils"
     FORMAT = "[%(levelname)s (%(name)s)]: %(message)s"
 
-    def __init__(self, name, level=logging.WARN):
+    def __init__(self, name, level=logging.WARNING):
         self.logger = logging.getLogger(f"{self.LOGGER_BASE_NAME}.{name}")
         self.logger.setLevel(level)
         handler = logging.StreamHandler()
@@ -55,7 +55,7 @@ class Logger:
         self.log(message, logging.INFO)
 
     def warn(self, message):
-        self.log(message, logging.WARN)
+        self.log(message, logging.WARNING)
 
     def debug(self, message):
         self.log(message, logging.DEBUG)
@@ -75,11 +75,11 @@ class Logger:
     def setLevel(self, level):
         LEVEL_MAP = {
             "INFO": logging.INFO,
-            "WARN": logging.WARN,
+            "WARN": logging.WARNING,
             "DEBUG": logging.DEBUG,
             "ERROR": logging.ERROR,
             "CRITICAL": logging.CRITICAL,
         }
         if isinstance(level, str):
-            level = LEVEL_MAP.get(level.upper(), logging.WARN)
+            level = LEVEL_MAP.get(level.upper(), logging.WARNING)
         self.logger.setLevel(level)

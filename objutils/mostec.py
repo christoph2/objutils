@@ -37,12 +37,12 @@ __copyright__ = """
 """
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional
+from typing import Any
 
 import io
-import objutils.checksums as checksums
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import checksums
+from objutils import hexfile
+from objutils import utils
 
 # Record type identifiers
 DATA = 1
@@ -186,7 +186,7 @@ class Writer(hexfile.Writer):
         line = f";{length:02X}{address:04X}{Writer.hex_bytes(row)}{checksum:04X}"
         return line
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose EOF record.
 
         Args:

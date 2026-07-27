@@ -117,7 +117,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import lru_cache
 from itertools import groupby
-from typing import Any, Optional, Union
+from typing import Any
 
 from objutils import Image, Section, symbols
 from objutils.dwarf.constants import (
@@ -174,7 +174,7 @@ unions, classes), and special types (typedefs, subroutines, enumerations).
 """
 
 
-def is_type_encoding(encoding: Union[int, AttributeEncoding]) -> bool:
+def is_type_encoding(encoding: int | AttributeEncoding) -> bool:
     """Check if a DWARF tag represents a type definition.
 
     Args:
@@ -359,11 +359,11 @@ class Variable:
     """
 
     name: str
-    section: Optional[str] = field(default=None)
-    elf_location: Optional[int] = field(default=None)
-    dwarf_location: Optional[str] = field(default=None)
+    section: str | None = field(default=None)
+    elf_location: int | None = field(default=None)
+    dwarf_location: str | None = field(default=None)
     static: bool = field(default=False)
-    type_desc: Optional[DIE] = field(default=None)
+    type_desc: DIE | None = field(default=None)
     _allocated: bool = field(default=False, repr=False)
 
 
@@ -400,7 +400,7 @@ Keys are attribute names (str), values are type converters (enum classes or int)
 # 'data_member_location': b'#\x00',
 
 
-def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, str]) -> Union[int, str]:
+def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: int | str) -> int | str:
     """Get attribute value from attributes_map with fallback default.
 
     Args:
@@ -417,7 +417,7 @@ def get_attribute(attrs: dict[str, DIEAttribute], key: str, default: Union[int, 
         size = get_attribute(die.attributes_map, "byte_size", 0)
         ```
     """
-    attr: Optional[DIEAttribute] = attrs.get(key)
+    attr: DIEAttribute | None = attrs.get(key)
     if attr is None:
         return default
     else:
@@ -760,7 +760,7 @@ class AttributeParser:
             return f"<expr-error:{exc}>"
 
     @lru_cache(maxsize=64 * 1024)
-    def type_tree(self, obj: Union[int, model.DebugInformationEntry, DIEAttribute]) -> dict[str, Any] | CircularReference:
+    def type_tree(self, obj: int | model.DebugInformationEntry | DIEAttribute) -> dict[str, Any] | CircularReference:
         """Resolve and return complete type tree for a DIE, offset, or attribute.
 
         This method accepts multiple input types for convenience:
@@ -810,7 +810,7 @@ class AttributeParser:
         # Case 2: attribute object (expected to be DW_AT_type)
         if isinstance(obj, DIEAttribute):
             # Try to resolve relative ref forms to absolute offset using the parent DIE if available
-            parent: Optional[model.DebugInformationEntry] = getattr(obj, "entry", None)
+            parent: model.DebugInformationEntry | None = getattr(obj, "entry", None)
             off = self._resolve_type_offset(obj, parent)
             if off is None:
                 return {"tag": "<invalid>", "attrs": {}}
@@ -879,7 +879,7 @@ class AttributeParser:
             _allocated=section_name in self.allocated_sections,
         )
 
-    def get_value(self, var: Variable) -> Optional[Any]:
+    def get_value(self, var: Variable) -> Any | None:
         """Extract variable value from ELF section image.
 
         This method resolves the variable's address and extracts its value based
@@ -926,7 +926,7 @@ class AttributeParser:
             # No image for variable, i.e. .bss section and the like.
             return None
         # 1) Resolve address
-        addr: Optional[int] = None
+        addr: int | None = None
         if isinstance(var.elf_location, int):
             addr = var.elf_location
         elif var.dwarf_location is not None:
@@ -948,7 +948,7 @@ class AttributeParser:
             return None
 
         # 2a) Helpers to work with both dict-based and DIE-based nodes
-        def _get_tag(node: Any) -> Optional[str]:
+        def _get_tag(node: Any) -> str | None:
             if node is None:
                 return None
             if isinstance(node, dict):
@@ -1010,7 +1010,7 @@ class AttributeParser:
             return cur
 
         # 2d) Unwrap qualifiers all the way down to base_type
-        def unwrap_to_base(d: Optional[DIE | dict | CircularReference]) -> Optional[DIE]:
+        def unwrap_to_base(d: DIE | dict | CircularReference | None) -> DIE | None:
             # Accept DIE or dict-like from older structures
             seen = 0
             current = d
@@ -1101,7 +1101,7 @@ class AttributeParser:
                     out.append(_reshape(chunk, dims[1:]))
                 return out
 
-            def _element_size(elem: Any) -> Optional[int]:
+            def _element_size(elem: Any) -> int | None:
                 t = _get_tag(elem)
                 attrs = _get_attrs(elem)
                 if t in {"base_type", "pointer_type"}:
@@ -1249,8 +1249,8 @@ class AttributeParser:
     def _resolve_type_offset(
         self,
         type_attr: DIEAttribute,
-        context_die: Optional[model.DebugInformationEntry],
-    ) -> Optional[int]:
+        context_die: model.DebugInformationEntry | None,
+    ) -> int | None:
         """Resolve DW_AT_type attribute value to absolute DIE offset.
 
         Handles CU-relative reference forms (DW_FORM_ref1/2/4/8/udata) by adding

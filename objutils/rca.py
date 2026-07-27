@@ -40,16 +40,16 @@ __copyright__ = """
 import io
 import re
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional
+from typing import Any
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 
 # Record type identifiers
 DATA = 1
 EOF = 2
 
 # Regex to match header (null bytes + !M marker)
-NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.M)
+NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.MULTILINE)
 
 
 class Reader(hexfile.Reader):
@@ -144,7 +144,7 @@ class Writer(hexfile.Writer):
         """
         return f"{address:04X} {Writer.hex_bytes(row)};"
 
-    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_header(self, meta: Mapping[str, Any]) -> str | None:
         """Compose header with separator and marker.
 
         Args:
@@ -155,7 +155,7 @@ class Writer(hexfile.Writer):
         """
         return f"{Writer.SEPARATOR}!M"
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose footer with separator.
 
         Args:

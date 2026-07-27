@@ -577,7 +577,7 @@ class PeParser:
         add_image_base: bool = True,
         include_pattern: str = "",
         exclude_pattern: str = "",
-        callback: typing.Optional[typing.Callable[[Section], None]] = None,
+        callback: typing.Callable[[Section], None] | None = None,
     ) -> Image:
         """Build objutils.Image from PE sections.
 

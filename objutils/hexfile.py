@@ -276,7 +276,7 @@ from dataclasses import dataclass, field
 from functools import partial
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, BinaryIO, Optional, Protocol, Union
+from typing import Any, BinaryIO, Protocol
 
 from objutils.image import Image
 from objutils.logger import Logger
@@ -334,37 +334,31 @@ atoi = partial(int, base=16)
 class HexFileError(Exception):
     """Base exception for all hex file operations."""
 
-    pass
 
 
 class ParseError(HexFileError):
     """Base for parsing-related errors."""
 
-    pass
 
 
 class InvalidRecordTypeError(ParseError):
     """Raised when record type is not recognized."""
 
-    pass
 
 
 class InvalidRecordLengthError(ParseError):
     """Raised when record length doesn't match data."""
 
-    pass
 
 
 class InvalidRecordChecksumError(ParseError):
     """Raised when checksum validation fails."""
 
-    pass
 
 
 class AddressRangeToLargeError(HexFileError):
     """Raised when address exceeds format capabilities."""
 
-    pass
 
 
 # Deprecated alias for backward compatibility
@@ -412,8 +406,8 @@ class MetaRecord:
     """Metadata record (header/footer information)."""
 
     format_type: int
-    address: Optional[int]
-    chunk: Optional[bytearray]
+    address: int | None
+    chunk: bytearray | None
 
 
 # ============================================================================
@@ -437,7 +431,7 @@ class FormatParser:
     Example: "S0LLAAAADDCC" describes Motorola S0 record format.
     """
 
-    def __init__(self, fmt: str, data_separator: Optional[str] = None):
+    def __init__(self, fmt: str, data_separator: str | None = None):
         self.fmt = fmt
         self.translated_format: list[tuple[int, int, str]] = []
         self.data_separator = data_separator
@@ -504,13 +498,13 @@ class Container:
     """Modern attribute container for parsed hex records."""
 
     line_number: int = 0
-    address: Optional[int] = None
-    length: Optional[int] = None
-    type: Optional[int] = None
-    checksum: Optional[int] = None
-    addrChecksum: Optional[int] = None
-    chunk: Optional[bytearray] = None
-    junk: Optional[str] = None
+    address: int | None = None
+    length: int | None = None
+    type: int | None = None
+    checksum: int | None = None
+    addrChecksum: int | None = None
+    chunk: bytearray | None = None
+    junk: str | None = None
     processing_instructions: list[Any] = field(default_factory=list)
 
     def add_processing_instruction(self, pi: Any) -> None:
@@ -536,7 +530,7 @@ class BaseType:
 
     def warn(self, msg: str) -> None:
         """Log warning."""
-        self.logger.warn(msg)
+        self.logger.warning(msg)
 
     def info(self, msg: str) -> None:
         """Log info message."""
@@ -555,15 +549,15 @@ class ReaderProtocol(Protocol):
     valid: bool
     formats: list[tuple[int, re.Pattern]]
 
-    def load(self, fp: Union[str, Path, BinaryIO], join: bool = False, **kws: Any) -> Image: ...
+    def load(self, fp: str | Path | BinaryIO, join: bool = False, **kws: Any) -> Image: ...
 
-    def loads(self, image: Union[str, bytes, bytearray], join: bool = False, **kws: Any) -> Image: ...
+    def loads(self, image: str | bytes | bytearray, join: bool = False, **kws: Any) -> Image: ...
 
     def read(self, fp: BinaryIO, join: bool = False) -> Image: ...
 
     def probe(self, fp: BinaryIO, **kws: Any) -> bool: ...
 
-    def probes(self, image: Union[str, bytes, bytearray]) -> bool: ...
+    def probes(self, image: str | bytes | bytearray) -> bool: ...
 
     def check_line(self, line: Any, format_type: int) -> None: ...
 
@@ -582,7 +576,7 @@ class WriterProtocol(Protocol):
     logger: Logger
     valid: bool
 
-    def dump(self, fp: Union[str, Path, BinaryIO], image: Image, row_length: int = 16, **kws: Any) -> None: ...
+    def dump(self, fp: str | Path | BinaryIO, image: Image, row_length: int = 16, **kws: Any) -> None: ...
 
     def dumps(self, image: Image, row_length: int = 16, **kws: Any) -> str: ...
 
@@ -596,9 +590,9 @@ class WriterProtocol(Protocol):
 
     def compose_row(self, address: int, length: int, row: Sequence[int]) -> str: ...
 
-    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]: ...
+    def compose_header(self, meta: Mapping[str, Any]) -> str | None: ...
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]: ...
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None: ...
 
 
 # ============================================================================
@@ -781,9 +775,9 @@ class Reader(BaseType):
     # Class attributes (override in subclasses)
     ALIGNMENT: int = 0  # 2**n (fixed typo: was ALIGMENT)
     ALIGMENT: int = 0  # Deprecated alias for backward compatibility
-    DATA_SEPARATOR: Optional[str] = None
+    DATA_SEPARATOR: str | None = None
     VALID_CHARS: re.Pattern[str] = re.compile(r"^[a-fA-F0-9 :/;,%\n\r!?S]*$")
-    FORMAT_SPEC: Union[str, list[tuple[int, str]], None] = None
+    FORMAT_SPEC: str | list[tuple[int, str]] | None = None
 
     def __init__(self) -> None:
         """Initialize reader with format specification."""
@@ -801,7 +795,7 @@ class Reader(BaseType):
                 pattern = FormatParser(format_str, self.DATA_SEPARATOR).parse()
                 self.formats.append((format_type, pattern))
 
-    def load(self, fp: Union[str, Path, BinaryIO], join: bool = False, **kws: Any) -> Image:
+    def load(self, fp: str | Path | BinaryIO, join: bool = False, **kws: Any) -> Image:
         """Load image from file path or file-like object.
 
         Args:
@@ -821,7 +815,7 @@ class Reader(BaseType):
                 fp.close()
             return data
 
-    def loads(self, image: Union[str, bytes, bytearray], join: bool = False, **kws: Any) -> Image:
+    def loads(self, image: str | bytes | bytearray, join: bool = False, **kws: Any) -> Image:
         """Load image from string or bytes.
 
         Args:
@@ -838,7 +832,7 @@ class Reader(BaseType):
             buffer = create_string_buffer(image)
         return self.load(buffer, join=join)
 
-    def _parse_optional_int(self, groups: dict[str, Optional[str]], key: str) -> Optional[int]:
+    def _parse_optional_int(self, groups: dict[str, str | None], key: str) -> int | None:
         """Parse an optional numeric capture group using ``atoi``.
 
         Args:
@@ -882,7 +876,7 @@ class Reader(BaseType):
                     continue
 
                 matched = True
-                dict_: dict[str, Optional[str]] = match.groupdict()
+                dict_: dict[str, str | None] = match.groupdict()
 
                 if not dict_:
                     continue
@@ -897,7 +891,7 @@ class Reader(BaseType):
                 junk = dict_.get("junk")
 
                 # Parse data chunk
-                chunk: Optional[bytearray] = None
+                chunk: bytearray | None = None
                 chunk_str = dict_.get("chunk")
                 if chunk_str is not None:
                     if self.DATA_SEPARATOR:
@@ -1036,7 +1030,7 @@ class Reader(BaseType):
 
         return match_ratio >= MIN_MATCH_THRESHOLD
 
-    def probes(self, image: Union[str, bytes, bytearray], **kws: Any) -> bool:
+    def probes(self, image: str | bytes | bytearray, **kws: Any) -> bool:
         """Test if string/bytes matches this format.
 
         Args:
@@ -1100,7 +1094,6 @@ class Reader(BaseType):
             line: Parsed line container
             format_type: Format type identifier
         """
-        pass
 
     def parseData(self, line: Any, format_type: int) -> bool:
         """Parse data from line (optional override).
@@ -1345,7 +1338,7 @@ class Writer(BaseType):
         self.logger = Logger("Writer")
         self.row_length = 16
 
-    def dump(self, fp: Union[str, Path, BinaryIO], image: Image, row_length: int = 16, **kws: Any) -> None:
+    def dump(self, fp: str | Path | BinaryIO, image: Image, row_length: int = 16, **kws: Any) -> None:
         """Write image to file.
 
         Args:
@@ -1448,7 +1441,6 @@ class Writer(BaseType):
         Args:
             image: Image to process
         """
-        pass
 
     def set_parameters(self, **kws: Any) -> None:
         """Set writer parameters from keywords.
@@ -1484,7 +1476,7 @@ class Writer(BaseType):
         """
         raise NotImplementedError("Subclasses must implement compose_row()")
 
-    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_header(self, meta: Mapping[str, Any]) -> str | None:
         """Compose file header (optional override).
 
         Args:
@@ -1495,7 +1487,7 @@ class Writer(BaseType):
         """
         return None
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose file footer (optional override).
 
         Args:
@@ -1654,7 +1646,6 @@ class ASCIIHexReader(Reader):
 
     def check_line(self, line: Any, format_type: int) -> None:
         """No validation needed for ASCII hex formats."""
-        pass
 
     def is_data_line(self, line: Any, format_type: int) -> bool:
         """All lines with data pattern are data lines."""
@@ -1688,12 +1679,12 @@ class ASCIIHexWriter(Writer):
         """
         return self.separators.join([f"{b:02X}" for b in row])
 
-    def compose_header(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_header(self, meta: Mapping[str, Any]) -> str | None:
         """Compose header with start address."""
         if "start_address" in meta:
             return f"@{meta['start_address']:04X}"
         return None
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose footer (q marker for TI-TXT)."""
         return "q"
