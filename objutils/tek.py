@@ -39,11 +39,11 @@ __copyright__ = """
 """
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Optional
+from typing import Any
 
-import objutils.checksums as checksums
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import checksums
+from objutils import hexfile
+from objutils import utils
 
 # Record type identifiers
 DATA = 1
@@ -107,7 +107,7 @@ class Writer(hexfile.Writer):
         super().__init__()
         self.last_address: int = 0
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose EOF record with last address.
 
         Args:

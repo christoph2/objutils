@@ -46,9 +46,9 @@ import re
 from collections.abc import Sequence
 from typing import Any
 
-import objutils.checksums as checksums
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import checksums
+from objutils import hexfile
+from objutils import utils
 
 # Record type identifiers
 DATA = 1

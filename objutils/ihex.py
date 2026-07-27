@@ -27,11 +27,11 @@ __copyright__ = """
 
 from collections.abc import Mapping, Sequence
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
-import objutils.checksums as checksums
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import checksums
+from objutils import hexfile
+from objutils import utils
 from objutils.checksums import COMPLEMENT_TWOS, lrc
 
 # Record type identifiers
@@ -168,7 +168,7 @@ class Writer(hexfile.Writer):
         Args:
             image: Image object to write
         """
-        self.previosAddress: Optional[int] = None  # Note: typo kept for compatibility
+        self.previosAddress: int | None = None  # Note: typo kept for compatibility
         self.start_address: int = 0
 
     def compose_row(self, address: int, length: int, row: Sequence[int]) -> str:
@@ -214,7 +214,7 @@ class Writer(hexfile.Writer):
         result += f":{length:02X}{address:04X}{DATA:02X}{Writer.hex_bytes(row)}{checksum:02X}"
         return result
 
-    def compose_footer(self, meta: Mapping[str, Any]) -> Optional[str]:
+    def compose_footer(self, meta: Mapping[str, Any]) -> str | None:
         """Compose EOF record.
 
         Args:

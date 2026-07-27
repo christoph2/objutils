@@ -48,9 +48,9 @@ __copyright__ = """
 import re
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, BinaryIO, Union
+from typing import Any, BinaryIO
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 from objutils.image import Image
 from objutils.section import Section, join_sections
 
@@ -183,7 +183,7 @@ class Writer(hexfile.Writer):
 
     MAX_ADDRESS_BITS = 32
 
-    def dump(self, fp: Union[str, Path, BinaryIO], image: Image, row_length: int = DEFAULT_ROW_LENGTH, **kws: Any) -> None:
+    def dump(self, fp: str | Path | BinaryIO, image: Image, row_length: int = DEFAULT_ROW_LENGTH, **kws: Any) -> None:
         """Write *image* to *fp*.
 
         Args:

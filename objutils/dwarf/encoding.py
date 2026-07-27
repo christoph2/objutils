@@ -63,13 +63,11 @@ class Endianess(IntEnum):
 class ULEBError(ConstructError):
     """Raised when ULEB128 parsing or building encounters an error."""
 
-    pass
 
 
 class SLEBError(ConstructError):
     """Raised when SLEB128 parsing or building encounters an error."""
 
-    pass
 
 
 @singleton
@@ -96,7 +94,7 @@ class ULEB(Construct):
     """
 
     def __init__(self, *args) -> None:
-        super(__class__, self).__init__()
+        super().__init__()
 
     def _parse(self, stream, context, path: str | None = None) -> int:
         """Parse a ULEB128-encoded value from stream.
@@ -171,7 +169,7 @@ class SLEB(Construct):
     """
 
     def __init__(self, *args) -> None:
-        super(__class__, self).__init__()
+        super().__init__()
 
     def _parse(self, stream, context, path: str | None = None) -> int:
         """Parse a SLEB128-encoded value from stream.
@@ -235,7 +233,7 @@ class One(Construct):
     """
 
     def __init__(self, *args) -> None:
-        super(__class__, self).__init__()
+        super().__init__()
 
     def _parse(self, stream, context, path: str | None = None) -> int:
         """Parse returns constant 1."""
@@ -266,7 +264,7 @@ class Block(Construct):
     MASK: str | None = None
 
     def __init__(self, *args) -> None:
-        super(__class__, self).__init__()
+        super().__init__()
 
     def _parse(self, stream, context, path: str | None = None) -> bytes:
         """Parse block data with fixed-size length prefix.
@@ -410,7 +408,7 @@ class Address(Construct):
         Raises:
             ValueError: If size not in (1, 2, 4, 8).
         """
-        super(__class__, self).__init__()
+        super().__init__()
         idx = 0 if endianess == Endianess.Little else 1
         if size not in (1, 2, 4, 8):
             raise ValueError(f"Address size '{size}' not supported.")
@@ -473,7 +471,7 @@ class StrP(Construct):
         self.endianess = endianess
         self.ntype = (Int32ul, Int32ub)[0 if endianess == Endianess.Little else 1]
         self.stype = CString(encoding="utf8")
-        super(__class__, self).__init__()
+        super().__init__()
 
     def _parse(self, stream, context, path: str | None = None) -> str:
         """Parse string pointer and resolve to actual string.

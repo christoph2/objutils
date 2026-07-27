@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# ruff: noqa: E402
 # Imports come after module docstring
 
 """DWARF 4 debug information parser and processor.
@@ -266,7 +265,7 @@ class Attribute:
 
     encoding: constants.AttributeEncoding
     form: constants.AttributeForm
-    special_value: Optional[Any] = None
+    special_value: Any | None = None
 
     def __iter__(self):
         yield self.encoding
@@ -300,7 +299,6 @@ class Readers:
     Used internally by DwarfReaders to organize parsers.
     """
 
-    pass
 
 
 @dataclass
@@ -531,7 +529,6 @@ class Abbrevations:
                     )
                     continue
                 if attr.attrValue != 0 and attr.formValue != 0:
-                    #
                     try:
                         self.abbrevations[key].attrs.append(
                             Attribute(

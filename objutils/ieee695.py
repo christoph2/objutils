@@ -635,24 +635,24 @@ class Reader:
                 localGlobal = self.checkOptional(self.fpos)  # noqa: F841
             elif attrDef == 37:
                 self.info.objectFormatVersionNumber = self.readNumber(self.fpos)
-                self.info.objectFormatRevisionLevel = self.readNumber(self.fpos)  # noqa: F841
-            elif attrDef == 38:  # noqa: F841
-                self.info.objectFormatType = ObjectFormatTypes[self.readNumber(self.fpos)]  # noqa: F841
-            elif attrDef == 39:  # noqa: F841
+                self.info.objectFormatRevisionLevel = self.readNumber(self.fpos)
+            elif attrDef == 38:
+                self.info.objectFormatType = ObjectFormatTypes[self.readNumber(self.fpos)]
+            elif attrDef == 39:
                 self.info.symbolCaseSensitivity = CaseSensitivity[self.readNumber(self.fpos)]
             elif attrDef == 40:
                 self.info.memoryModel = MemoryModel[self.readNumber(self.fpos)]
-            elif attrDef == 50:  # noqa: F841
+            elif attrDef == 50:
                 year = self.readNumber(self.fpos)
                 month = self.readNumber(self.fpos)
                 day = self.readNumber(self.fpos)
-                hour = self.readNumber(self.fpos)  # noqa: F841
-                minute = self.readNumber(self.fpos)  # noqa: F841
+                hour = self.readNumber(self.fpos)
+                minute = self.readNumber(self.fpos)
                 second = self.readNumber(self.fpos)
                 self.info.creationDate = datetime(year, month, day, hour, minute, second)
             elif attrDef == 51:
                 self.info.commandLine = self.readString(self.fpos)
-            elif attrDef == 52:  # noqa: F841
+            elif attrDef == 52:
                 self.info.executionStatus = self.readNumber(self.fpos)
             elif attrDef == 53:
                 self.info.hostEnvironment = self.readNumber(self.fpos)
@@ -683,15 +683,11 @@ class Reader:
         if f == "A":
             s, t = self.readCharacter(self.fpos), self.readCharacter(self.fpos)
             sectionType = f + s + t
-        elif f == "B":
-            pass
-        elif f == "C":
+        elif f == "B" or f == "C":
             pass
         elif f == "E":
             pass  # todo: 'EA' / 'EZ' !!!
-        elif f == "M":
-            pass
-        elif f == "T":
+        elif f == "M" or f == "T":
             pass
         # todo: 'ZC' / 'ZM'.
         else:

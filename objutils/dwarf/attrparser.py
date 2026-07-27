@@ -321,7 +321,7 @@ class AttributeParser:
         tag = t.get("tag", "<type>")
         name = ""
         attrs = t.get("attrs", {}) if isinstance(t.get("attrs"), dict) else {}
-        if "name" in attrs and attrs["name"]:
+        if attrs.get("name"):
             try:
                 name = str(attrs["name"])
             except (UnicodeDecodeError, ValueError, TypeError):

@@ -325,7 +325,7 @@ class Pass2(Construct):
         Returns:
             None always.
         """
-        return None
+        return
 
     def _build(self, obj: typing.Any, stream: typing.Any, context: typing.Any, path: str) -> None:
         """Build nothing to stream.
@@ -336,7 +336,6 @@ class Pass2(Construct):
             context: Context object (not used).
             path: Path in parent construct.
         """
-        pass
 
     def _sizeof(self, context: typing.Any, path: str) -> int:
         """Return size as 0.
@@ -479,7 +478,6 @@ class ElfFileStruct(Struct):
 
         This method is reserved for future ELF32-specific address handling.
         """
-        pass
 
     def setByteOrder(self) -> None:
         """Placeholder for byte order configuration.

@@ -17,16 +17,16 @@ __version__ = "0.10.13"
 
 __all__ = [
     "Image",
-    "Section",
-    "LazySection",
     "InvalidAddressError",
-    "registry",
-    "load",
-    "loads",
+    "LazySection",
+    "Section",
     "dump",
     "dumps",
+    "load",
+    "loads",
     "probe",
     "probes",
+    "registry",
 ]
 
 __copyright__ = """
@@ -76,9 +76,9 @@ import objutils.sig
 import objutils.srec
 import objutils.tek
 import objutils.titxt
-from objutils.image import Image, InvalidAddressError  # noqa: F401
+from objutils.image import Image, InvalidAddressError
 from objutils.registry import registry
-from objutils.section import Section, LazySection  # noqa: F401
+from objutils.section import Section, LazySection
 
 # Optional developer-friendly console and tracebacks; disabled by default for library consumers.
 _ENABLE_RICH = os.getenv("OBJUTILS_RICH", "0").lower() in {"1", "true", "yes"}
@@ -158,7 +158,7 @@ def loads(codec_name: str, data: str | bytes | bytearray, join: bool = True, **k
     return registry.get(codec_name).Reader().loads(data, join=join, **kws)
 
 
-def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
+def probe(fp: BinaryIO, **kws: Any) -> str | None:
     """Try to guess codec from file.
 
     Returns
@@ -195,7 +195,7 @@ def probe(fp: BinaryIO, **kws: Any) -> Optional[str]:
     return None
 
 
-def probes(data: str | bytes | bytearray, **kws: Any) -> Optional[str]:
+def probes(data: str | bytes | bytearray, **kws: Any) -> str | None:
     """Try to guess codec from bytes.
 
     Returns

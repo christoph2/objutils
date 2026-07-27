@@ -43,7 +43,7 @@ def main():
     if ep.e_machine not in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
         print(f"\n'{args.elf_file}' is not an ARM architecture file.")
         exit(2)
-    print("")
+    print()
     arm_attrs = ep.arm_attributes
     if arm_attrs:
         for key, entries in arm_attrs.items():

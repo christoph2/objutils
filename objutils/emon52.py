@@ -37,7 +37,7 @@ __copyright__ = """
 from collections.abc import Sequence
 from typing import Any, BinaryIO
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 
 # Record type identifiers (Intel HEX compatible)
 DATA = 0

@@ -210,7 +210,6 @@ class CodecDoesNotExistError(Exception):
             print("Format not registered")
     """
 
-    pass
 
 
 class CodecAlreadyExistError(Exception):
@@ -230,7 +229,6 @@ class CodecAlreadyExistError(Exception):
             print("Intel HEX already registered")
     """
 
-    pass
 
 
 class Codec(NamedTuple):
@@ -351,7 +349,7 @@ class Registry(SingletonBase):
 
         This is called only once due to singleton pattern.
         """
-        self._codecs: "OrderedDict[str, Codec]" = OrderedDict()
+        self._codecs: OrderedDict[str, Codec] = OrderedDict()
 
     def __iter__(self) -> Iterator[tuple[str, Codec]]:
         """Iterate over (format_name, codec) pairs.

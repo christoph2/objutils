@@ -39,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         pp = PeParser(args.pe)
     except (OSError, ValueError, RuntimeError) as e:
-        print(f"\n'{args.pe}' is not a valid PE/COFF file. Raised exception: '{repr(e)}'.")
+        print(f"\n'{args.pe}' is not a valid PE/COFF file. Raised exception: '{e!r}'.")
         return 1
 
     # Build DB and populate

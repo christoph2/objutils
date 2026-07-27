@@ -1182,7 +1182,6 @@ class DebugInformation(Base, RidMixIn):
     as a placeholder for future expansion of debug metadata storage.
     """
 
-    pass
 
 
 class CompilationUnit(Base, RidMixIn):
@@ -1193,7 +1192,6 @@ class CompilationUnit(Base, RidMixIn):
     Currently serves as a placeholder for future expansion of CU-level metadata.
     """
 
-    pass
 
 
 def calculateCacheSize(value: int) -> int:
@@ -1214,7 +1212,7 @@ def calculateCacheSize(value: int) -> int:
 REGEX_CACHE: dict[str, Any] = {}
 
 
-def regexer(value: Optional[str], expr: Optional[str]) -> int:
+def regexer(value: str | None, expr: str | None) -> int:
     """SQLite-compatible regex function for pattern matching.
 
     Used with SQLite's CREATE_FUNCTION to enable REGEXP operators in SQL queries.

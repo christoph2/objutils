@@ -40,7 +40,7 @@ __copyright__ = """
 from collections.abc import Sequence
 from typing import Any
 
-import objutils.hexfile as hexfile
+from objutils import hexfile
 
 # Record type identifiers
 DATA0 = 1  # !MAAAA DD
@@ -80,7 +80,7 @@ class Reader(hexfile.Reader):
             Cosmac format has no checksums, validation is minimal.
         """
         # Cosmac has no checksums - nothing to validate
-        return None
+        return
 
     def probe(self, fp: Any, **kws: Any) -> bool:
         """Check if file matches RCA Cosmac format.

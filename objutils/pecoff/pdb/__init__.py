@@ -209,7 +209,7 @@ class ModuleInfo:
 
     base_of_dll: int
     size_of_image: int
-    entry_point: Optional[int]
+    entry_point: int | None
 
 
 # Types
@@ -1441,7 +1441,7 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
                 """
 
     except (OSError, RuntimeError, ValueError) as e:
-        print(f"Error: {str(e)}")
+        print(f"Error: {e!s}")
         return []  # Return an empty list in case of errors.
 
 

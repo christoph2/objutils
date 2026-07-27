@@ -40,8 +40,8 @@ import re
 from functools import partial
 from typing import Any, BinaryIO
 
-import objutils.hexfile as hexfile
-import objutils.utils as utils
+from objutils import hexfile
+from objutils import utils
 from objutils import checksums
 from objutils.image import Image
 from objutils.utils import create_string_buffer, slicer
@@ -55,7 +55,7 @@ PREFIX = "$"
 
 MAPPING = dict(enumerate(chr(n) for n in range(37, 123) if n not in (42,)))
 REV_MAPPING = {ord(value): key for key, value in MAPPING.items()}
-NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.M)
+NULLS = re.compile(r"\0*\s*!M\s*(.*)", re.DOTALL | re.MULTILINE)
 VALID_CHARS = re.compile(r"^\{}[{}]+$".format(PREFIX, re.escape("".join(MAPPING.values()))))
 
 atoi16 = partial(int, base=16)
@@ -91,7 +91,7 @@ class Reader(hexfile.Reader):
         """
         self.last_address = 0
         out_lines = []
-        for line in fp.readlines():
+        for line in fp:
             line = line.strip()
             startSym, line = line[0], line[1:]
 

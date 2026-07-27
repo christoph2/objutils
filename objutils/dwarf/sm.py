@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# ruff: noqa: E402
 # Imports come after module docstring (standard Python practice)
 
 __copyright__ = """
@@ -370,7 +369,6 @@ class OperationBase:
             Default implementation does nothing (no-op).
             Operations that modify the stack must override this.
         """
-        pass
 
     def __str__(self):
         """Return textual representation of operation with parameters.

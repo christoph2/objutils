@@ -68,7 +68,6 @@ class Readers:
         strp, line_strp: String pointer readers.
     """
 
-    pass
 
 
 class DwarfReaders:

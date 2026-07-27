@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         pp = PeParser(args.pe_file)
     except (OSError, ValueError, RuntimeError) as e:
-        print(f"\n'{args.pe_file}' is not valid PE/COFF file. Raised exception: '{repr(e)}'.")
+        print(f"\n'{args.pe_file}' is not valid PE/COFF file. Raised exception: '{e!r}'.")
         return 1
 
     add_image_base = not args.no_image_base
