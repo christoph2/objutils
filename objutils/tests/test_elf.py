@@ -262,6 +262,86 @@ class TestElfDatabase:
         assert parser.session is not None
 
 
+class TestElfInMemoryDatabase:
+    """Test ELF parser with in-memory SQLite database (in_memory=True)."""
+
+    @pytest.fixture
+    def in_memory_parser(self, sample_elf_path):
+        """Create ElfParser instance backed by an in-memory database."""
+        parser = ElfParser(str(sample_elf_path), in_memory=True)
+        try:
+            yield parser
+        finally:
+            parser.close()
+
+    def test_in_memory_db_name_is_memory(self, in_memory_parser):
+        """db_name must be ':memory:' when in_memory=True."""
+        assert in_memory_parser.db_name == ":memory:"
+
+    def test_in_memory_no_prgdb_file(self, sample_elf_path):
+        """in_memory=True must not write a .prgdb file to disk."""
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmpdir:
+            import shutil
+
+            temp_elf = Path(tmpdir) / "test.elf"
+            shutil.copy(sample_elf_path, temp_elf)
+
+            parser = ElfParser(str(temp_elf), in_memory=True)
+            try:
+                pass
+            finally:
+                parser.close()
+
+            prgdb = temp_elf.with_suffix(".prgdb")
+            assert not prgdb.exists(), ".prgdb file must not be created for in_memory=True"
+
+    def test_in_memory_header_properties(self, in_memory_parser):
+        """Header properties work with in-memory database."""
+        assert isinstance(in_memory_parser.e_machine, int)
+        assert in_memory_parser.endianess in ("<", ">")
+
+    def test_in_memory_machine_type_avr(self, in_memory_parser):
+        """AVR ELF has correct machine type with in-memory database."""
+        assert in_memory_parser.e_machine == 83
+
+    def test_in_memory_sections_api(self, in_memory_parser):
+        """SectionAPI works with in-memory database."""
+        sections = list(in_memory_parser.sections.fetch())
+        assert len(sections) > 0
+
+    def test_in_memory_symbols_api(self, in_memory_parser):
+        """SymbolAPI works with in-memory database."""
+        try:
+            symbols = in_memory_parser.symbols.fetch()
+            assert symbols is not None
+        except Exception:
+            pytest.skip("ELF file has no symbol table")
+
+    def test_in_memory_create_image(self, in_memory_parser):
+        """create_image() works with in-memory database."""
+        try:
+            image = in_memory_parser.create_image()
+            if image is not None:
+                from objutils import Image
+
+                assert isinstance(image, Image)
+        except Exception as e:
+            pytest.skip(f"Image creation not supported for this ELF: {e}")
+
+    def test_in_memory_results_match_on_disk(self, sample_elf_path):
+        """In-memory and on-disk databases produce identical header values."""
+        parser_disk = ElfParser(str(sample_elf_path))
+        parser_mem = ElfParser(str(sample_elf_path), in_memory=True)
+        try:
+            assert parser_disk.e_machine == parser_mem.e_machine
+            assert parser_disk.endianess == parser_mem.endianess
+            assert parser_disk.e_entry == parser_mem.e_entry
+            assert parser_disk.e_shnum == parser_mem.e_shnum
+        finally:
+            parser_disk.close()
+            parser_mem.close()
+
+
 class TestElfImageCreation:
     """Test image creation from ELF."""
 

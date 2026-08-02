@@ -19,6 +19,8 @@ The ELF parser module integrates three key components:
    - Automatic database creation and schema management
    - Hash-based change detection to invalidate cached databases when files change
    - Session-based API for efficient database queries
+   - Optional **in-memory database** mode (``in_memory=True``) – no .prgdb file is
+     written to disk; useful for read-only analysis, CI pipelines, and unit tests
 
 3. **Property-Based API**
    - Access ELF header fields directly as properties (e.g., `parser.e_machine`)
@@ -32,7 +34,7 @@ The ELF parser module integrates three key components:
 - **SymbolAPI**: Query interface for accessing ELF symbols with flexible filtering
 - **DBAPI**: Base class providing database session management for API wrappers
 
-**Database Integration (.prgdb files):**
+**Database Integration (.prgdb files and in-memory databases):**
 
 When an ELF file is parsed, the parser automatically creates a .prgdb file
 (SQLite database) next to it. This database contains:
@@ -48,6 +50,16 @@ The database is invalidated and rebuilt if:
 - The source ELF file is modified (detected via SHA512 hash)
 - The database schema changes (column validation)
 - The database file is manually deleted
+
+Pass ``in_memory=True`` to :class:`ElfParser` to skip all on-disk caching.
+All parsed data is then stored in a transient SQLite ``:memory:`` database
+that lives only for the lifetime of the :class:`ElfParser` instance::
+
+    # Standard (persistent .prgdb)
+    parser = ElfParser('firmware.elf')
+
+    # In-memory only – no file written to disk
+    parser = ElfParser('firmware.elf', in_memory=True)
 
 **Image Creation Workflow:**
 
@@ -838,18 +850,25 @@ class ElfParser:
     - Binary parsing of 32-bit and 64-bit ELF formats
     - Both little-endian and big-endian architectures
     - Persistent database caching via SQLite (.prgdb files)
+    - Transient in-memory SQLite databases (``in_memory=True``)
     - Property-based access to ELF header fields
     - Section and symbol queries via SectionAPI and SymbolAPI
     - Image reconstruction for embedded systems workflows
 
-    The parser automatically creates and manages a SQLite database alongside the
-    ELF file for efficient caching and querying of parsed data. This database is
-    invalidated when the ELF file is modified.
+    By default the parser automatically creates and manages a SQLite database
+    alongside the ELF file for efficient caching and querying of parsed data.
+    This database is invalidated when the ELF file is modified.
+
+    Pass ``in_memory=True`` to skip all on-disk caching. The ELF file is then
+    parsed every time and all data is kept in a transient ``:memory:`` SQLite
+    database. Useful for read-only analysis, CI pipelines, or unit tests where
+    creating files on disk is undesirable.
 
     Attributes:
         fp: Memory-mapped view of the ELF file.
         filename: Path to the ELF file.
-        db_name: Path to the associated .prgdb database file.
+        db_name: Path to the associated .prgdb database file, or ``":memory:"``
+            when ``in_memory=True`` was specified.
         session: SQLAlchemy database session for queries.
         db: Model database instance.
         symbols: SymbolAPI for symbol queries.
@@ -860,6 +879,10 @@ class ElfParser:
         >>> print(f"Machine: {parser.e_machine}")
         >>> text = parser.sections.get('.text')
         >>> main = parser.symbols.get('main')
+        >>> image = parser.create_image()
+
+        >>> # No .prgdb file written to disk
+        >>> parser = ElfParser('firmware.elf', in_memory=True)
         >>> image = parser.create_image()
     """
 
@@ -903,15 +926,24 @@ class ElfParser:
         ),
     )
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, in_memory: bool = False) -> None:
         """Initialize ElfParser with an ELF file.
 
         Creates or opens the associated .prgdb database file and parses the ELF
         structure. The database is invalidated and rebuilt if the file has been
         modified or the schema has changed.
 
+        When ``in_memory=True`` is passed, no .prgdb file is written to disk.
+        Instead a transient SQLite ``:memory:`` database is used. This is useful
+        for read-only analysis, testing, or environments where writing to disk is
+        undesirable. In-memory databases are always freshly populated – there is
+        no caching benefit.
+
         Args:
             filename: Path to the ELF file to parse.
+            in_memory: If ``True``, use a transient in-memory SQLite database
+                instead of persisting a .prgdb file alongside the ELF file.
+                Defaults to ``False``.
 
         Raises:
             FileNotFoundError: If the specified file doesn't exist.
@@ -920,16 +952,24 @@ class ElfParser:
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> print(parser.e_machine)
+
+            >>> # Use in-memory database – no .prgdb file is created
+            >>> parser = ElfParser('firmware.elf', in_memory=True)
+            >>> print(parser.e_machine)
         """
         self.fp = create_memorymapped_fileview(filename)
         self.filename = Path(filename)
-        self.db_name = self.filename.with_suffix(model.DB_EXTENSION)
+        self._in_memory: bool = in_memory
+        self.db_name: Path | str = ":memory:" if in_memory else self.filename.with_suffix(model.DB_EXTENSION)
 
         self._images: dict[int, bytes | None] = {}
         self._sections_by_name: OrderedDict[str, typing.Any] = OrderedDict()
         self.asciiCString: CString = CString(encoding="ascii")
 
-        self.create_db_on_demand()
+        if in_memory:
+            self._create_in_memory_db()
+        else:
+            self.create_db_on_demand()
 
         self.symbols: SymbolAPI = SymbolAPI(self)
         self.sections: SectionAPI = SectionAPI(self)
@@ -966,6 +1006,25 @@ class ElfParser:
         datatypes = ElfParser.DATATYPES64.items() if self.b64 else ElfParser.DATATYPES32.items()
         for key, value in datatypes:
             setattr(self, key, value[offset])
+
+    def _create_in_memory_db(self) -> None:
+        """Create a transient in-memory SQLite database and populate it from the ELF file.
+
+        Unlike :meth:`create_db_on_demand`, this method never reads from or writes to
+        disk. It always performs a full parse of the ELF file and stores the result in
+        a SQLite ``:memory:`` database for the lifetime of this :class:`ElfParser`
+        instance.
+
+        Side Effects:
+            - Creates self.db (in-memory :class:`model.Model`) and self.session
+            - Parses and stores all ELF data via :meth:`load_data`
+        """
+        hash_value = calculate_crypto_hash(self.fp.tobytes())
+        self.db = model.Model(":memory:")
+        self.session = self.db.session
+        meta = model.Meta(hash_value=hash_value)
+        self.session.add(meta)
+        self.load_data()
 
     def create_db_on_demand(self) -> None:
         """Create or open the ELF database, validating and rebuilding as needed.

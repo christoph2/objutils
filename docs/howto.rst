@@ -84,6 +84,29 @@ Use the CLI to generate HEX for flashing:
 
    oj-elf-extract build/app.elf app.srec -t srec
 
+Analyse ELF without writing a .prgdb file (in-memory database)
+---------------------------------------------------------------
+
+By default ``ElfParser`` creates a ``<name>.prgdb`` SQLite cache file next to
+the ELF file.  Pass ``in_memory=True`` to keep everything in memory – useful
+for read-only scripting, CI pipelines, or unit tests where disk writes are
+undesirable.
+
+.. code-block:: python
+
+   from objutils.elf import ElfParser
+
+   # No .prgdb file is created – database lives only in RAM
+   with ElfParser('build/app.elf', in_memory=True) as parser:
+       print(f"Machine: {parser.e_machine}")
+       image = parser.create_image()
+
+.. note::
+
+   The in-memory database is rebuilt on every instantiation (no caching
+   benefit).  Use the default on-disk mode if you parse the same file
+   repeatedly and want fast cached access.
+
 Extract loadable image from PE/COFF (32-bit and 64-bit)
 -------------------------------------------------------
 

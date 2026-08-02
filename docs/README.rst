@@ -51,6 +51,9 @@ Features
 Recent improvements
 -------------------
 
+- ``ElfParser`` now supports ``in_memory=True``: use a transient ``:memory:`` SQLite
+  database instead of persisting a .prgdb file – ideal for read-only analysis, CI
+  pipelines and unit tests.
 - New ``oj-hex-merge`` and ``oj-hex-split`` CLI tools for combining and partitioning HEX files.
 - New ``oj-dwarf-import`` CLI replaces ``dwarfer.py``/``cu_info.py`` for DWARF imports, CU listing, summaries, and attribute traversal.
 - Faster DWARF imports: batched ORM writes, quiet flag propagation, and safe DWARF expression evaluation keep large ELF files stable.
