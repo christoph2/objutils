@@ -82,7 +82,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions ${PROJECT_SOURCE_DIR}/objutils/aml)
 
-pybind11_add_module(hexfiles_ext ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/wrapper.cpp ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/exceptions.cpp)
+pybind11_add_module(hexfiles_ext
+    ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/wrapper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/exceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/objutils/extensions/elf_parser.cpp
+)
 
 target_compile_options(hexfiles_ext PUBLIC "-DEXTENSION_NAME=hexfiles_ext" PUBLIC $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:MSVC>>:/utf-8>)
 

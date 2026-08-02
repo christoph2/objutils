@@ -1428,7 +1428,7 @@ class ElfParser:
                 )
                 self.session.add(header)
 
-    def _parse_symbol_section(self, section: model.Elf_Section) -> None:
+    def _parse_symbol_section(self, section: typing.Any) -> None:
         """Parse symbol table section and populate database with symbol entries.
 
         Parses all symbol entries from a symbol table section (SHT_SYMTAB or SHT_DYNSYM)
@@ -1436,43 +1436,119 @@ class ElfParser:
         section, or other named entity with associated metadata like address, size,
         binding, type, and visibility.
 
-        Symbol table structure for 32-bit ELF:
-            - st_name: Offset into string table for symbol name
-            - st_value: Symbol value (typically address)
-            - st_size: Size of symbol in bytes
-            - st_info: Symbol binding (4 bits) and type (4 bits)
-            - st_other: Symbol visibility
-            - st_shndx: Section index symbol is defined in (or special value)
+        Symbol table structure for 32-bit ELF (Elf32_Sym, 16 bytes):
+            - st_name:  Offset into string table for symbol name (uint32)
+            - st_value: Symbol value / address (uint32)
+            - st_size:  Size of symbol in bytes (uint32)
+            - st_info:  Binding (upper 4 bits) and type (lower 4 bits) (uint8)
+            - st_other: Symbol visibility (uint8)
+            - st_shndx: Section index symbol is defined in (uint16)
 
-        Symbol table structure for 64-bit ELF:
+        Symbol table structure for 64-bit ELF (Elf64_Sym, 24 bytes):
             - Field order differs: st_name, st_info, st_other, st_shndx, st_value, st_size
 
+        The method first tries to use the C++ extension ``hexfiles_ext.parse_symbol_table``
+        for maximum performance.  If the extension is not available (e.g. not yet built),
+        it falls back to the ``construct``-based pure-Python parser.
+
+        In both cases, section-name resolution (shndx → section_name, sh_flags) is done
+        in Python with a local cache to avoid repeated SQLAlchemy queries for the same
+        section index.
+
         Args:
-            section: Elf_Section database model representing the symbol table section.
-                Must have sh_link pointing to the associated string table section.
+            section: Parsed construct Container for the symbol-table section.
+                Must have ``sh_link`` (string-table section index) and ``image`` (raw bytes).
 
         Side Effects:
             - Bulk inserts model.Elf_Symbol entries into database
             - Commits transaction on success, rolls back on error
-            - Prints error messages if symbol parsing or database operations fail
-
-        Note:
-            - Symbol names are resolved via section.sh_link string table index
-            - st_shndx may be special value (SHN_ABS, SHN_COMMON, SHN_UNDEF) or section index
-            - Symbol section_name field resolved from st_shndx section reference
-            - Parse errors for individual symbols are caught and logged but don't stop processing
-            - Uses bulk_save_objects for efficient database insertion
-
-        Example:
-            Symbol types (st_info.st_type):
-                - STT_NOTYPE (0): Type not specified
-                - STT_OBJECT (1): Data object (variable)
-                - STT_FUNC (2): Function or executable code
-                - STT_SECTION (3): Section symbol
-                - STT_FILE (4): Source file name
         """
         sh_link = section.sh_link
+        symtab_bytes: bytes = section.image or b""
+        strtab_bytes: bytes = self._images.get(sh_link) or b""
+
+        # ── Fast path: C++ extension ──────────────────────────────────────
+        raw_symbols: list[dict] | None = None
+        try:
+            from objutils.hexfiles_ext import parse_symbol_table as _cpp_parse  # type: ignore[import]
+
+            raw_symbols = _cpp_parse(
+                symtab_bytes,
+                strtab_bytes,
+                self.b64,
+                self._endianess == "<",
+            )
+        except Exception:
+            pass  # fall through to pure-Python path
+
+        if raw_symbols is None:
+            # ── Fallback: construct-based parser ─────────────────────────
+            raw_symbols = self._parse_symbol_section_py(symtab_bytes, strtab_bytes, sh_link)
+
+        # ── Section-name resolution (Python, with cache) ──────────────────
+        # Cache: shndx -> (section_name: str, sh_flags: int)
+        section_cache: dict[int, tuple[str, int]] = {}
         symbols = []
+
+        for sym in raw_symbols:
+            shndx: int = sym["st_shndx"]
+            if shndx in defs.SpecialSections:
+                section_name = defs.special_section_name(shndx)
+                access = 0
+            elif shndx in section_cache:
+                section_name, access = section_cache[shndx]
+            else:
+                section_header = self.session.query(model.Elf_Section).filter(model.Elf_Section.index == shndx).first()
+                if section_header:
+                    section_name = section_header.section_name
+                    access = section_header.sh_flags
+                else:
+                    section_name = str(shndx)
+                    access = 0
+                section_cache[shndx] = (section_name, access)
+
+            db_sym = model.Elf_Symbol(
+                st_name=sym["st_name"],
+                st_value=sym["st_value"],
+                st_size=sym["st_size"],
+                st_bind=sym["st_bind"],
+                st_type=sym["st_type"],
+                st_other=sym["st_other"],
+                st_shndx=shndx,
+                symbol_name=sym["symbol_name"],
+                section_name=section_name,
+                access=access,
+            )
+            symbols.append(db_sym)
+
+        try:
+            self.session.bulk_save_objects(symbols)
+            self.session.commit()
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            print(f"{e}")
+
+    def _parse_symbol_section_py(
+        self,
+        symtab_bytes: bytes,
+        strtab_bytes: bytes,
+        sh_link: int,
+    ) -> list[dict]:
+        """Pure-Python fallback for symbol-table parsing (used when the C++ extension
+        is unavailable).
+
+        Uses the ``construct`` library to parse Elf32_Sym / Elf64_Sym entries and
+        resolves symbol names via :meth:`get_string`.
+
+        Args:
+            symtab_bytes: Raw bytes of the symbol-table section.
+            strtab_bytes: Raw bytes of the string-table section (unused here;
+                name resolution goes through :meth:`get_string` instead).
+            sh_link: Index of the string-table section in ``self._images``.
+
+        Returns:
+            List of dicts with keys matching the C++ extension output.
+        """
         if self.b64:
             Symbol = Struct(
                 "st_name" / self.Word,
@@ -1501,43 +1577,27 @@ class ElfParser:
                 "symbol_name" / Computed(lambda ctx: self.get_string(sh_link, ctx.st_name)),
                 "st_shndx" / self.Half,
             )
-        symbol_cache = {}
-        # num_symbols = len(section.image) // Symbol.sizeof()
-        for offset in range(0, len(section.image), Symbol.sizeof()):
+        entry_size = Symbol.sizeof()
+        result: list[dict] = []
+        for offset in range(0, len(symtab_bytes), entry_size):
             try:
-                sym = Symbol.parse(section.image[offset : offset + Symbol.sizeof()])
+                sym = Symbol.parse(symtab_bytes[offset : offset + entry_size])
             except StreamError as e:
-                print(f"parse symbol section: {e}")
+                print(f"parse symbol section (fallback): {e}")
                 continue
-            section_header = None
-            if sym.st_shndx in defs.SpecialSections:
-                section_name = defs.special_section_name(sym.st_shndx)
-            else:
-                if sym.st_shndx not in symbol_cache:
-                    section_header = self.session.query(model.Elf_Section).filter(model.Elf_Section.index == sym.st_shndx).first()
-                    if section_header:
-                        section_name = section_header.section_name
-                    else:
-                        section_name = str(sym.st_shndx)
-            db_sym = model.Elf_Symbol(
-                st_name=sym.st_name,
-                st_value=sym.st_value,
-                st_size=sym.st_size,
-                st_bind=sym.st_info.st_bind,
-                st_type=sym.st_info.st_type,
-                st_other=sym.st_other,
-                st_shndx=sym.st_shndx,
-                symbol_name=sym.symbol_name,
-                section_name=section_name,
-                access=section_header.sh_flags if section_header else 0,
+            result.append(
+                {
+                    "st_name": sym.st_name,
+                    "st_value": sym.st_value,
+                    "st_size": sym.st_size,
+                    "st_bind": sym.st_info.st_bind,
+                    "st_type": sym.st_info.st_type,
+                    "st_other": sym.st_other,
+                    "st_shndx": sym.st_shndx,
+                    "symbol_name": sym.symbol_name,
+                }
             )
-            symbols.append(db_sym)
-        try:
-            self.session.bulk_save_objects(symbols)
-            self.session.commit()
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            print(f"{e}")
+        return result
 
     def _parse_comment(self, data: bytes) -> str:
         """Parse .comment section containing compiler/linker identification strings.
