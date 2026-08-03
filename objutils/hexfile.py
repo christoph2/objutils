@@ -335,30 +335,24 @@ class HexFileError(Exception):
     """Base exception for all hex file operations."""
 
 
-
 class ParseError(HexFileError):
     """Base for parsing-related errors."""
-
 
 
 class InvalidRecordTypeError(ParseError):
     """Raised when record type is not recognized."""
 
 
-
 class InvalidRecordLengthError(ParseError):
     """Raised when record length doesn't match data."""
-
 
 
 class InvalidRecordChecksumError(ParseError):
     """Raised when checksum validation fails."""
 
 
-
 class AddressRangeToLargeError(HexFileError):
     """Raised when address exceeds format capabilities."""
-
 
 
 # Deprecated alias for backward compatibility

@@ -211,7 +211,6 @@ class CodecDoesNotExistError(Exception):
     """
 
 
-
 class CodecAlreadyExistError(Exception):
     """Raised when attempting to register a format that already exists.
 
@@ -228,7 +227,6 @@ class CodecAlreadyExistError(Exception):
         except CodecAlreadyExistError:
             print("Intel HEX already registered")
     """
-
 
 
 class Codec(NamedTuple):

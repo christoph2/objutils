@@ -69,7 +69,6 @@ class Readers:
     """
 
 
-
 class DwarfReaders:
     """High-Level DWARF Data Reader Interface.
 
