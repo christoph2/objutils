@@ -1183,7 +1183,6 @@ class DebugInformation(Base, RidMixIn):
     """
 
 
-
 class CompilationUnit(Base, RidMixIn):
     __tablename__ = "compilationunit"
     """ORM model for DWARF Compilation Unit (CU).
@@ -1191,7 +1190,6 @@ class CompilationUnit(Base, RidMixIn):
     Represents a compilation unit (single translation unit) within debug information.
     Currently serves as a placeholder for future expansion of CU-level metadata.
     """
-
 
 
 def calculateCacheSize(value: int) -> int:

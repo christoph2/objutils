@@ -300,7 +300,6 @@ class Readers:
     """
 
 
-
 @dataclass
 class DIEAttribute:
     """Parsed DIE attribute with value.

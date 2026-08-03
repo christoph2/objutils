@@ -64,10 +64,8 @@ class ULEBError(ConstructError):
     """Raised when ULEB128 parsing or building encounters an error."""
 
 
-
 class SLEBError(ConstructError):
     """Raised when SLEB128 parsing or building encounters an error."""
-
 
 
 @singleton
