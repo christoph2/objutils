@@ -1051,3 +1051,57 @@ def test_cross_numeric_array_to_ndarray_column_dir_3d():
     result = sec.read_asam_ndarray(0, 12, "UBYTE", shape=(3, 2, 2), index_mode="COLUMN_DIR", byte_order="MSB_LAST")
     assert result.shape == (2, 2, 3)
     assert np.array_equal(result, expected)
+
+
+# ---------------------------------------------------------------------------
+# ASAM string with custom encoding override
+# ---------------------------------------------------------------------------
+
+# Raw bytes from a real ECU that contain \xdc (Ü in Latin-1) but are stored
+# in a field declared as "ASCII".  Neither "ascii" nor "utf-8" can decode them.
+_LATIN1_RAW = b"#MSV90-N52T\xdc-B25-OL-F010-ULEV2-HGAG-LL-K"
+_LATIN1_STR = _LATIN1_RAW.decode("latin-1")  # '#MSV90-N52TÜ-B25-OL-F010-ULEV2-HGAG-LL-K'
+
+
+def test_read_asam_string_custom_encoding_latin1():
+    """read_asam_string with encoding='latin-1' decodes bytes that would fail as ASCII."""
+    data = bytearray(_LATIN1_RAW) + b"\x00"
+    sec = Section(start_address=0x1000, data=data)
+    result = sec.read_asam_string(0x1000, "ASCII", encoding="latin-1")
+    assert result == _LATIN1_STR
+
+
+def test_write_asam_string_custom_encoding_latin1():
+    """write_asam_string with encoding='latin-1' round-trips a string containing non-ASCII."""
+    sec = Section(start_address=0x1000, data=bytearray(64))
+    sec.write_asam_string(0x1000, _LATIN1_STR, "ASCII", encoding="latin-1")
+    raw = bytes(sec.data[: len(_LATIN1_RAW)])
+    assert raw == _LATIN1_RAW
+    # null terminator must follow immediately
+    assert sec.data[len(_LATIN1_RAW)] == 0
+
+
+def test_asam_string_encoding_roundtrip_latin1():
+    """Full write→read round-trip for a Latin-1 encoded ASAM ASCII string."""
+    sec = Section(start_address=0x2000, data=bytearray(64))
+    sec.write_asam_string(0x2000, _LATIN1_STR, "ASCII", encoding="latin-1")
+    result = sec.read_asam_string(0x2000, "ASCII", encoding="latin-1")
+    assert result == _LATIN1_STR
+
+
+def test_read_asam_string_ascii_still_works():
+    """Existing ASCII behaviour (no custom encoding) is not broken."""
+    text = "MOTOR"
+    data = bytearray(text, "ascii") + b"\x00"
+    sec = Section(start_address=0, data=bytearray(data) + bytearray(16))
+    result = sec.read_asam_string(0, "ASCII")
+    assert result == text
+
+
+def test_write_asam_string_utf8_still_works():
+    """Existing UTF8 behaviour (no custom encoding) is not broken."""
+    text = "Drehzahl"
+    sec = Section(start_address=0, data=bytearray(64))
+    sec.write_asam_string(0, text, "UTF8")
+    result = sec.read_asam_string(0, "UTF8")
+    assert result == text

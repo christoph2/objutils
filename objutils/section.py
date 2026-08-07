@@ -917,35 +917,89 @@ class Section:
         permuted = self._permute_asam_buffer(packed, internal_dtype, asam_byte_order)
         self.write(addr, permuted, **kws)
 
-    def read_asam_string(self, addr: int, dtype: str, length: int = -1, **kws) -> str:
-        encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
-        if encoding is None:
-            raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
-        if length == -1 and encoding in ("utf-8", "utf-16", "utf-32"):
+    def read_asam_string(self, addr: int, dtype: str, length: int = -1, encoding: str | None = None, **kws) -> str:
+        """Read an ASAM string from the section.
+
+        Args:
+            addr: Absolute memory address to read from.
+            dtype: ASAM string datatype (``"ASCII"``, ``"UTF8"``, ``"UTF16"``, ``"UTF32"``).
+            length: Number of bytes to read, or ``-1`` for null-terminated (default: -1).
+            encoding: Optional Python codec name that overrides the encoding implied by
+                *dtype* (e.g. ``"latin-1"``, ``"cp1252"``).  Use this when the raw bytes
+                cannot be decoded with the standard ASAM mapping – for example when an
+                embedded ECU stores a nominally-ASCII string with non-ASCII characters
+                such as ``b'\\xdc'`` (``Ü`` in Latin-1).  When *None* (default), the
+                encoding is derived from *dtype* as usual.
+
+        Returns:
+            Decoded string (without null terminator).
+
+        Raises:
+            InvalidAddressError: If address is out of bounds.
+            TypeError: If *dtype* is not a supported ASAM string type and no explicit
+                *encoding* is given, or if the string is not null-terminated.
+
+        Example::
+
+            raw = b'#MSV90-N52T\\xdc-B25-OL-F010-ULEV2-HGAG-LL-K'
+            sec = Section(0x1000, bytearray(raw) + b'\\x00')
+            # dtype="ASCII" alone would fail – override with latin-1:
+            text = sec.read_asam_string(0x1000, "ASCII", encoding="latin-1")
+            # text == '#MSV90-N52TÜ-B25-OL-F010-ULEV2-HGAG-LL-K'
+        """
+        if encoding is not None:
+            actual_encoding = encoding
+        else:
+            actual_encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
+            if actual_encoding is None:
+                raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
+        if length == -1:
             offset = addr - self.start_address
             if offset < 0:
                 raise InvalidAddressError(f"read_asam_string(0x{addr:08x}) access out of bounds.")
             tail = self.data[offset:]
-            terminator = "\x00".encode(encoding=encoding)
+            terminator = "\x00".encode(encoding=actual_encoding)
             pos = tail.find(terminator)
             if pos != -1:
-                return tail[:pos].decode(encoding=encoding)
+                return tail[:pos].decode(encoding=actual_encoding)
             raise TypeError("Unterminated String!!!")
-        return self.read_string(addr, encoding=encoding, length=length, **kws)
+        return self.read_string(addr, encoding=actual_encoding, length=length, **kws)
 
-    def write_asam_string(self, addr: int, value: str, dtype: str, **kws) -> None:
-        encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
-        if encoding is None:
-            raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
-        if encoding == "ascii":
-            self.write_string(addr, value, encoding=encoding, **kws)
-            return
+    def write_asam_string(self, addr: int, value: str, dtype: str, encoding: str | None = None, **kws) -> None:
+        """Write an ASAM string to the section with a null terminator.
 
+        Args:
+            addr: Absolute memory address to write to.
+            value: String to write.
+            dtype: ASAM string datatype (``"ASCII"``, ``"UTF8"``, ``"UTF16"``, ``"UTF32"``).
+            encoding: Optional Python codec name that overrides the encoding implied by
+                *dtype* (e.g. ``"latin-1"``, ``"cp1252"``).  Use this when the string
+                contains characters outside the standard ASAM mapping – for example
+                ``Ü`` (``\\xdc`` in Latin-1) in a nominally-ASCII field.  When *None*
+                (default), the encoding is derived from *dtype* as usual.
+
+        Raises:
+            InvalidAddressError: If address is out of bounds or write would exceed section.
+            TypeError: If *dtype* is not a supported ASAM string type and no explicit
+                *encoding* is given.
+
+        Example::
+
+            sec = Section(0x1000, bytearray(64))
+            text = '#MSV90-N52TÜ-B25-OL-F010-ULEV2-HGAG-LL-K'
+            sec.write_asam_string(0x1000, text, "ASCII", encoding="latin-1")
+        """
+        if encoding is not None:
+            actual_encoding = encoding
+        else:
+            actual_encoding = ASAM_STRING_ENCODINGS.get(dtype.strip().upper())
+            if actual_encoding is None:
+                raise TypeError(f"Unsupported ASAM string datatype {dtype!r}")
         offset = addr - self.start_address
         if offset < 0:
             raise InvalidAddressError(f"write_asam_string(0x{addr:08x}) access out of bounds.")
-        encoded = value.encode(encoding=encoding)
-        terminator = "\x00".encode(encoding=encoding)
+        encoded = value.encode(encoding=actual_encoding)
+        terminator = "\x00".encode(encoding=actual_encoding)
         total_length = len(encoded) + len(terminator)
         if offset + total_length > self.length:
             raise InvalidAddressError(f"write_asam_string(0x{addr:08x}) access out of bounds.")
@@ -1330,7 +1384,6 @@ def join_sections(sections: list[Section]) -> list[Section]:
     sorted_sections = sorted(sections, key=attrgetter("start_address"))
 
     for section in sorted_sections:
-
         if not result_sections:
             result_sections.append(Section(section.start_address, section.data))
             continue

@@ -689,13 +689,31 @@ class Image:
         """Write a numeric ASAM datatype with ECU byte order semantics."""
         self._call_address_function("write_asam_numeric", addr, value, dtype, byte_order, **kws)
 
-    def read_asam_string(self, addr: int, dtype: str, length: int = -1, **kws: Any) -> str:
-        """Read an ASAM string datatype (ASCII/UTF8/UTF16/UTF32)."""
-        return self._call_address_function("read_asam_string", addr, dtype, length, **kws)
+    def read_asam_string(self, addr: int, dtype: str, length: int = -1, encoding: str | None = None, **kws: Any) -> str:
+        """Read an ASAM string datatype (ASCII/UTF8/UTF16/UTF32).
 
-    def write_asam_string(self, addr: int, value: str, dtype: str, **kws: Any) -> None:
-        """Write an ASAM string datatype (ASCII/UTF8/UTF16/UTF32)."""
-        self._call_address_function("write_asam_string", addr, value, dtype, **kws)
+        Args:
+            addr: Absolute memory address to read from.
+            dtype: ASAM string datatype (``"ASCII"``, ``"UTF8"``, ``"UTF16"``, ``"UTF32"``).
+            length: Number of bytes, or ``-1`` for null-terminated (default: -1).
+            encoding: Optional Python codec name overriding the encoding implied by *dtype*
+                (e.g. ``"latin-1"``, ``"cp1252"``).  Useful when raw bytes cannot be decoded
+                with the standard ASAM mapping.
+        """
+        return self._call_address_function("read_asam_string", addr, dtype, length, encoding=encoding, **kws)
+
+    def write_asam_string(self, addr: int, value: str, dtype: str, encoding: str | None = None, **kws: Any) -> None:
+        """Write an ASAM string datatype (ASCII/UTF8/UTF16/UTF32).
+
+        Args:
+            addr: Absolute memory address to write to.
+            value: String to write.
+            dtype: ASAM string datatype (``"ASCII"``, ``"UTF8"``, ``"UTF16"``, ``"UTF32"``).
+            encoding: Optional Python codec name overriding the encoding implied by *dtype*
+                (e.g. ``"latin-1"``, ``"cp1252"``).  Useful when the string contains
+                characters outside the standard ASAM mapping.
+        """
+        self._call_address_function("write_asam_string", addr, value, dtype, encoding=encoding, **kws)
 
     def read_asam_numeric_array(
         self,
