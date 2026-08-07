@@ -427,7 +427,7 @@ def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
         return result
 
 
-ASAM_INDEX_MODES = {"ROW_DIR", "COLUMN_DIR", "ALTERNATE_WITH_X", "ALTERNATE_WITH_Y"}
+ASAM_INDEX_MODES = {"ROW_DIR", "COLUMN_DIR", "ALTERNATE_WITH_X", "ALTERNATE_WITH_Y", "ALTERNATE_CURVES"}
 
 AlternateArrayResult = namedtuple("AlternateArrayResult", "values axis")
 
@@ -1273,7 +1273,12 @@ class Section:
             index_mode: ``"ROW_DIR"`` (default) – X increments fastest
                 (C-like row-major).  ``"COLUMN_DIR"`` – Y increments
                 fastest; only X and Y are swapped (not true column-major
-                for dims > 2).
+                for dims > 2).  ``"ALTERNATE_WITH_X"`` / ``"ALTERNATE_WITH_Y"``
+                – 2-D maps with interleaved axis values (see
+                :meth:`read_asam_ndarray`).  ``"ALTERNATE_CURVES"`` – multiple
+                1-D curves sharing a common axis, stored as Array-of-Structs;
+                array shape must be ``(num_axis_points, num_curves)`` in numpy
+                convention.
             **kws: Passed through to :meth:`write`.
 
         Raises:
@@ -1313,6 +1318,18 @@ class Section:
             # Permute the interleaved buffer. Works correctly when axis and data share the same
             # element size; for different element sizes the permutation is applied per data-dtype
             # stride which may be incorrect – a documented limitation for word-swap byte orders.
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+        elif index_mode == "ALTERNATE_CURVES":
+            # ALTERNATE_CURVES: multiple curves sharing a common axis, stored as
+            # Array-of-Structs (AoS).  Array shape must be (num_axis_points, num_curves)
+            # in numpy convention.  Each row in memory contains all curve values at one
+            # axis breakpoint.  This is identical to C-order (ROW_DIR) for a 2-D array.
+            if typed_array.ndim != 2:
+                raise ValueError(
+                    "ALTERNATE_CURVES requires a 2-D array with shape "
+                    "(num_axis_points, num_curves) in numpy convention"
+                )
+            raw_data = typed_array.tobytes()  # C-order = AoS
             permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
         else:
             raw_data = typed_array.tobytes()
@@ -1371,9 +1388,11 @@ class Section:
                 - ``"ALTERNATE_WITH_X"`` – 2-D maps only; columns of values alternate
                   with X-axis coordinate values.  Returns
                   :class:`AlternateArrayResult` ``(values, x_axis)``.
-                - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; rows of values alternate
-                  with Y-axis coordinate values.  Returns
-                  :class:`AlternateArrayResult` ``(values, y_axis)``.
+                - ``"ALTERNATE_CURVES"`` – 1-D curves with a shared axis, stored
+                  as Array-of-Structs (AoS).  *shape* must be
+                  ``(num_curves, num_axis_points)`` in ASAM convention.
+                  Returns ``ndarray`` with shape
+                  ``(num_axis_points, num_curves)``; each column is one curve.
             **kws: Optional keyword arguments:
 
                 - ``axis_dtype`` (str): ASAM datatype of axis values for
@@ -1399,6 +1418,23 @@ class Section:
 
         # Convert ASAM shape (X, Y, Z …) → numpy shape (… Z, Y, X).
         numpy_shape = tuple(reversed(shape)) if shape else None
+
+        # --- ALTERNATE_CURVES --------------------------------------------------
+        if index_mode == "ALTERNATE_CURVES":
+            if numpy_shape is None or len(numpy_shape) != 2:
+                raise ValueError(
+                    "ALTERNATE_CURVES requires a 2-D shape (num_curves, num_axis_points) "
+                    "in ASAM convention"
+                )
+            type_name = internal_dtype.split("_")[0]
+            type_size = TYPE_SIZES[type_name]
+            byte_count = length * type_size
+            raw_data = self.read(addr, byte_count, **kws)
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+            # numpy_shape is (num_axis_points, num_curves) after ASAM reversal –
+            # exactly the shape of the C-order (AoS) buffer.
+            flat = np.frombuffer(permuted, dtype=dt)
+            return flat.reshape(numpy_shape)
 
         # --- ALTERNATE_WITH_X --------------------------------------------------
         if index_mode == "ALTERNATE_WITH_X":

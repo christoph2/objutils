@@ -256,6 +256,13 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
    | ``ALTERNATE_WITH_Y``   | 2-D maps only: each Y-row preceded by its Y-axis  |
    |                        | coordinate value in memory                        |
    +------------------------+---------------------------------------------------+
+   | ``ALTERNATE_CURVES``   | 1-D curves sharing a common axis, stored as       |
+   |                        | Array-of-Structs (AoS).  Shape must be            |
+   |                        | ``(num_curves, num_axis_points)`` in ASAM         |
+   |                        | convention.  Equivalent to C-order ROW_DIR of     |
+   |                        | a 2-D array; returns                              |
+   |                        | ``ndarray(num_axis_points, num_curves)``.         |
+   +------------------------+---------------------------------------------------+
 
    For ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y``:
 
@@ -324,6 +331,43 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
    - Assuming MSW swapping affects 8-bit types (it does not).
    - Using ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y`` with a 1-D array or
      without a 2-D ``shape`` parameter.
+   - Using ``ALTERNATE_CURVES`` with a 1-D array or a non-2-D ``shape``.
+
+.. rubric:: ALTERNATE_CURVES example (3 curves, 5 axis points)
+
+Corresponds to the C Array-of-Structs pattern from the ASAM specification::
+
+    typedef struct { int DT10; int DT20; int DT30; } CURVE_TYPE;
+    const CURVE_TYPE DATA[5] = {
+        {10, 3, 4}, {12, 2, 6}, {17, 9, 8}, {10, 1, 8}, {18, 3, 8},
+    };
+
+.. code-block:: python
+
+   import numpy as np
+   from objutils import Image, Section
+
+   # numpy shape (5 axis_points, 3 curves); ASAM shape (X=3, Y=5)
+   curves = np.array(
+       [[10, 3, 4],
+        [12, 2, 6],
+        [17, 9, 8],
+        [10, 1, 8],
+        [18, 3, 8]],
+       dtype=np.int32,
+   )
+   total = curves.nbytes
+   img = Image([Section(0xC000, bytes(total + 8))])
+   img.write_asam_ndarray(0xC000, curves, "SLONG", "MSB_LAST",
+                          index_mode="ALTERNATE_CURVES")
+
+   result = img.read_asam_ndarray(0xC000, 15, "SLONG",
+                                  shape=(3, 5), byte_order="MSB_LAST",
+                                  index_mode="ALTERNATE_CURVES")
+   # result.shape == (5, 3)  –  each column is one curve
+   curve_dt10 = result[:, 0]   # [10, 12, 17, 10, 18]
+   curve_dt20 = result[:, 1]   # [ 3,  2,  9,  1,  3]
+   curve_dt30 = result[:, 2]   # [ 4,  6,  8,  8,  8]
 
 .. rubric:: Copy/paste example: ULONG array roundtrip
 

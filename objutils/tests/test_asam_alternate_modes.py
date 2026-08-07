@@ -448,7 +448,7 @@ def test_alternate_invalid_index_mode_write():
     sec = Section(start_address=0, data=bytearray(32))
     arr = np.array([[1, 2]], dtype=np.uint8)
     with pytest.raises(ValueError):
-        sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+        sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="INVALID_MODE")
 
 
 @pytest.mark.skipif("NUMPY_SUPPORT == False")
@@ -456,7 +456,7 @@ def test_alternate_invalid_index_mode_read():
     """Unbekannter index_mode beim Lesen: ValueError erwartet."""
     sec = Section(start_address=0, data=bytearray(32))
     with pytest.raises(ValueError):
-        sec.read_asam_ndarray(0, 4, "UBYTE", shape=(2, 2), byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+        sec.read_asam_ndarray(0, 4, "UBYTE", shape=(2, 2), byte_order="MSB_LAST", index_mode="INVALID_MODE")
 
 
 # ---------------------------------------------------------------------------
@@ -709,3 +709,159 @@ def test_column_dir_still_works():
     sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="COLUMN_DIR")
     result = sec.read_asam_ndarray(0, 6, "UBYTE", shape=(3, 2), byte_order="MSB_LAST", index_mode="COLUMN_DIR")
     assert np.array_equal(result, arr)
+
+
+# ---------------------------------------------------------------------------
+# ALTERNATE_CURVES
+# ---------------------------------------------------------------------------
+# Spezifikation: Mehrere 1-D Kurven teilen eine gemeinsame Achse und werden als
+# Array-of-Structs (AoS) gespeichert. Jede Speicherzeile enthält alle Kurven-Werte
+# für einen Achsbreakpoint.  Dies entspricht exakt C-Order (ROW_DIR) einer 2-D
+# Matrix mit Shape (num_axis_points, num_curves) in numpy-Konvention.
+#
+# C-Äquivalent aus der ASAM-Spezifikation:
+#   typedef struct { int DT10; int DT20; int DT30; int DT40; } VXP_TYPE;
+#   const VXP_TYPE VX_PLUS_DELAY_TIMES[5] = {
+#       { 10, 3, 4, 8 }, { 12, 2, 4, 6 }, { 17, 9, 5, 8 },
+#       { 10, 1, 4, 8 }, { 18, 3, 8, 8 },
+#   };
+# Speicher: 10, 3, 4, 8, 12, 2, 4, 6, 17, 9, 5, 8, 10, 1, 4, 8, 18, 3, 8, 8
+# ---------------------------------------------------------------------------
+
+# Das Beispiel-Array aus der Spezifikation: 5 Achsbreakpoints × 4 Kurven
+VXP_TYPE_DATA = np.array(
+    [
+        [10, 3, 4, 8],   # Breakpoint 0
+        [12, 2, 4, 6],   # Breakpoint 1
+        [17, 9, 5, 8],   # Breakpoint 2
+        [10, 1, 4, 8],   # Breakpoint 3
+        [18, 3, 8, 8],   # Breakpoint 4
+    ],
+    dtype=np.int32,
+)
+
+VXP_FLAT_LE = [
+    10, 0, 0, 0,   3, 0, 0, 0,   4, 0, 0, 0,   8, 0, 0, 0,
+    12, 0, 0, 0,   2, 0, 0, 0,   4, 0, 0, 0,   6, 0, 0, 0,
+    17, 0, 0, 0,   9, 0, 0, 0,   5, 0, 0, 0,   8, 0, 0, 0,
+    10, 0, 0, 0,   1, 0, 0, 0,   4, 0, 0, 0,   8, 0, 0, 0,
+    18, 0, 0, 0,   3, 0, 0, 0,   8, 0, 0, 0,   8, 0, 0, 0,
+]  # 5 * 4 * 4 = 80 Bytes (SLONG, LE)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_memory_layout_ubyte():
+    """ALTERNATE_CURVES: Rohspeicher entspricht AoS-Layout (C-Order).
+
+    5 Breakpoints × 4 Kurven, UBYTE.
+    Speicher: row0=[10,3,4,8], row1=[12,2,4,6], …
+    """
+    arr = VXP_TYPE_DATA.astype(np.uint8)
+    expected = [
+        10, 3, 4, 8,
+        12, 2, 4, 6,
+        17, 9, 5, 8,
+        10, 1, 4, 8,
+        18, 3, 8, 8,
+    ]
+    total_bytes = 5 * 4  # num_axis_points * num_curves
+    sec = Section(start_address=0x1000, data=bytearray(total_bytes + 8))
+    sec.write_asam_ndarray(0x1000, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    assert list(sec.read(0x1000, total_bytes)) == expected
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_roundtrip_ubyte():
+    """ALTERNATE_CURVES: Write → Read Roundtrip (UBYTE)."""
+    arr = VXP_TYPE_DATA.astype(np.uint8)  # numpy shape (5, 4)
+
+    total_bytes = 5 * 4
+    sec = Section(start_address=0x2000, data=bytearray(total_bytes + 16))
+    # ASAM shape (X=num_curves=4, Y=num_axis_points=5)
+    sec.write_asam_ndarray(0x2000, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    result = sec.read_asam_ndarray(0x2000, 20, "UBYTE", shape=(4, 5), byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    assert result.shape == (5, 4)  # numpy: (num_axis_points, num_curves)
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_roundtrip_slong_le():
+    """ALTERNATE_CURVES: Roundtrip mit SLONG (32-Bit LE) – Spec-Beispiel."""
+    # ASAM shape: (X=4 Kurven, Y=5 Breakpoints)
+    total_bytes = 5 * 4 * 4  # 5 breakpoints × 4 curves × 4 bytes
+    sec = Section(start_address=0, data=bytearray(total_bytes + 16))
+    sec.write_asam_ndarray(0, VXP_TYPE_DATA, "SLONG", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    result = sec.read_asam_ndarray(0, 20, "SLONG", shape=(4, 5), byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    assert result.shape == (5, 4)
+    assert np.array_equal(result, VXP_TYPE_DATA)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_raw_memory_slong_le():
+    """ALTERNATE_CURVES: Rohspeicher stimmt mit AoS-Layout überein (SLONG LE)."""
+    total_bytes = 5 * 4 * 4
+    sec = Section(start_address=0, data=bytearray(total_bytes + 8))
+    sec.write_asam_ndarray(0, VXP_TYPE_DATA, "SLONG", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    assert list(sec.read(0, total_bytes)) == VXP_FLAT_LE
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_individual_curve_access():
+    """ALTERNATE_CURVES: Einzelne Kurven per Spalten-Slice abrufbar."""
+    arr = VXP_TYPE_DATA.astype(np.uint8)
+    total_bytes = 5 * 4
+    sec = Section(start_address=0, data=bytearray(total_bytes + 8))
+    sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    result = sec.read_asam_ndarray(0, 20, "UBYTE", shape=(4, 5), byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+
+    # Kurve 0 (DT10): [10, 12, 17, 10, 18]
+    assert list(result[:, 0]) == [10, 12, 17, 10, 18]
+    # Kurve 1 (DT20): [3, 2, 9, 1, 3]
+    assert list(result[:, 1]) == [3, 2, 9, 1, 3]
+    # Kurve 2 (DT30): [4, 4, 5, 4, 8]
+    assert list(result[:, 2]) == [4, 4, 5, 4, 8]
+    # Kurve 3 (DT40): [8, 6, 8, 8, 8]
+    assert list(result[:, 3]) == [8, 6, 8, 8, 8]
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_big_endian():
+    """ALTERNATE_CURVES mit BE (MSB_FIRST)."""
+    arr = np.array([[0x0102, 0x0304], [0x0506, 0x0708]], dtype=np.uint16)  # 2 Breakpoints, 2 Kurven
+    # BE-Speicher: 0x01 0x02  0x03 0x04  0x05 0x06  0x07 0x08
+    expected = [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]
+    total_bytes = 2 * 2 * 2
+    sec = Section(start_address=0, data=bytearray(total_bytes + 8))
+    sec.write_asam_ndarray(0, arr, "UWORD", byte_order="MSB_FIRST", index_mode="ALTERNATE_CURVES")
+    assert list(sec.read(0, total_bytes)) == expected
+    result = sec.read_asam_ndarray(0, 4, "UWORD", shape=(2, 2), byte_order="MSB_FIRST", index_mode="ALTERNATE_CURVES")
+    assert np.array_equal(result, arr)
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_requires_2d():
+    """ALTERNATE_CURVES mit 1-D Array: ValueError erwartet."""
+    sec = Section(start_address=0, data=bytearray(32))
+    arr = np.array([1, 2, 3], dtype=np.uint8)
+    with pytest.raises(ValueError, match="2-D"):
+        sec.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_read_requires_2d_shape():
+    """ALTERNATE_CURVES beim Lesen ohne 2-D shape: ValueError erwartet."""
+    sec = Section(start_address=0, data=bytearray(32))
+    with pytest.raises(ValueError, match="2-D"):
+        sec.read_asam_ndarray(0, 4, "UBYTE", shape=(4,), byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+
+
+@pytest.mark.skipif("NUMPY_SUPPORT == False")
+def test_alternate_curves_layout_equals_row_dir():
+    """ALTERNATE_CURVES und ROW_DIR erzeugen identisches Speicher-Layout."""
+    arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint8)
+    sec_curves = Section(start_address=0, data=bytearray(16))
+    sec_row    = Section(start_address=0, data=bytearray(16))
+    sec_curves.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
+    sec_row.write_asam_ndarray(   0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    assert sec_curves.read(0, 6) == sec_row.read(0, 6)
+

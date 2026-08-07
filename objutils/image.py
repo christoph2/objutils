@@ -812,6 +812,10 @@ class Image:
                 - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; each Y-row is preceded by
                   its Y-axis coordinate value.  Pass axis values via
                   ``y_axis=<array>`` in *kws*.
+                - ``"ALTERNATE_CURVES"`` – multiple 1-D curves sharing a common axis,
+                  stored as Array-of-Structs (AoS).  Array shape must be
+                  ``(num_axis_points, num_curves)`` in numpy convention.
+                  Memory layout is identical to C-order ``ROW_DIR``.
             **kws: Keyword arguments passed through to the section method.
                 Relevant for ALTERNATE modes:
 
@@ -882,6 +886,9 @@ class Image:
                   by its X-axis coordinate value in memory.
                 - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; each Y-row is preceded by
                   its Y-axis coordinate value in memory.
+                - ``"ALTERNATE_CURVES"`` – multiple 1-D curves sharing a common axis,
+                  stored as Array-of-Structs (AoS); returns
+                  ``ndarray(num_axis_points, num_curves)``.
             **kws: Keyword arguments passed through to the section method.
                 Relevant for ALTERNATE modes:
 
