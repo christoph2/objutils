@@ -178,13 +178,35 @@ side by side in one small image.
 - ``UTF16``
 - ``UTF32``
 
+.. rubric:: Encoding override for ASAM strings
+
+When an ECU stores text that cannot be decoded with the default ASAM mapping
+(for example Latin-1 characters in a nominally ASCII field), pass an explicit
+``encoding`` keyword argument to override:
+
+.. code-block:: python
+
+   from objutils import Image, Section
+
+   img = Image([Section(0x4000, bytes(64))])
+
+   # Write a string that contains a non-ASCII character (Ü = 0xDC in Latin-1)
+   img.write_asam_string(0x4000, "MOTOR_ÜBERDREHZAHL", "ASCII", encoding="latin-1")
+
+   # Read it back with the same override
+   text = img.read_asam_string(0x4000, "ASCII", encoding="latin-1")
+   # text == 'MOTOR_ÜBERDREHZAHL'
+
+Without ``encoding=...`` the codec is derived from *dtype* as usual
+(``ASCII`` → ``"ascii"``, ``UTF8`` → ``"utf-8"``, …).
+
 .. rubric:: ASAM Array Cheat Sheet
 
 Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 18 22 20
+   :widths: 30 18 28 20
 
    * - Method
      - ``length`` semantics
@@ -198,10 +220,14 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
      - n/a (from ``len(data)``)
      - ``None``
      - scalar lists/tuples
-   * - ``read_asam_ndarray(...)``
+   * - ``read_asam_ndarray(...)`` ROW_DIR / COLUMN_DIR
      - element count
      - ``numpy.ndarray``
      - matrix/tensor data
+   * - ``read_asam_ndarray(...)`` ALTERNATE_WITH_X/Y
+     - ignored (derived from shape)
+     - ``AlternateArrayResult(values, axis)``
+     - interleaved axis+value maps
    * - ``write_asam_ndarray(...)``
      - n/a (from ``array.nbytes``)
      - ``None``
@@ -217,13 +243,77 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
 .. note::
    **ASAM index modes**
 
-   ``index_mode="ROW_DIR"`` (default) uses C-like row-major layout
-   where X increments fastest.  ``index_mode="COLUMN_DIR"`` swaps only
-   X and Y (not true Fortran-order for dims > 2).
+   +------------------------+---------------------------------------------------+
+   | ``index_mode``         | Memory layout                                     |
+   +========================+===================================================+
+   | ``ROW_DIR`` (default)  | C-order row-major; X increments fastest           |
+   +------------------------+---------------------------------------------------+
+   | ``COLUMN_DIR``         | X and Y swapped; not true Fortran for dims > 2    |
+   +------------------------+---------------------------------------------------+
+   | ``ALTERNATE_WITH_X``   | 2-D maps only: each X-column preceded by its      |
+   |                        | X-axis coordinate value in memory                 |
+   +------------------------+---------------------------------------------------+
+   | ``ALTERNATE_WITH_Y``   | 2-D maps only: each Y-row preceded by its Y-axis  |
+   |                        | coordinate value in memory                        |
+   +------------------------+---------------------------------------------------+
 
-   ``shape`` uses **ASAM convention** ``(X, Y, Z, …)`` which is reversed
-   compared to numpy ``(…, Z, Y, X)``.  ``length`` is the **element count**,
-   not byte count.
+   For ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y``:
+
+   - Pass axis values with ``x_axis=<array>`` or ``y_axis=<array>`` to
+     ``write_asam_ndarray``.
+   - ``read_asam_ndarray`` returns an ``AlternateArrayResult(values, axis)``
+     named tuple; unpack with ``values, axis = result`` or access as
+     ``result.values`` / ``result.axis``.
+   - The ``length`` parameter of ``read_asam_ndarray`` is ignored for these
+     modes; the byte count is derived from ``shape``.
+
+   ``shape`` always uses **ASAM convention** ``(X, Y, Z, …)`` – reversed
+   compared to numpy ``(…, Z, Y, X)``.
+
+.. rubric:: ALTERNATE_WITH_X example (map, 5 columns × 4 rows)
+
+.. code-block:: python
+
+   import numpy as np
+   from objutils import Image, Section
+
+   # Value matrix: shape (4, 5) in numpy  =  ASAM shape (X=5, Y=4)
+   matrix = np.array(
+       [[11, 21, 31, 41, 51],
+        [12, 22, 32, 42, 52],
+        [13, 23, 33, 43, 53],
+        [14, 24, 34, 44, 54]],
+       dtype=np.uint8,
+   )
+   x_axis = np.array([10, 20, 30, 40, 50], dtype=np.uint8)
+
+   # Memory: x[0]=10, col0=[11,12,13,14], x[1]=20, col1=[21,22,23,24], …
+   img = Image([Section(0x8000, bytes(5 * (1 + 4) + 16))])
+   img.write_asam_ndarray(0x8000, matrix, "UBYTE", "MSB_LAST",
+                          index_mode="ALTERNATE_WITH_X", x_axis=x_axis)
+
+   result = img.read_asam_ndarray(0x8000, 0, "UBYTE",
+                                  shape=(5, 4), byte_order="MSB_LAST",
+                                  index_mode="ALTERNATE_WITH_X")
+   assert np.array_equal(result.values, matrix)
+   assert np.array_equal(result.axis, x_axis)
+
+.. rubric:: ALTERNATE_WITH_Y example (map, 5 columns × 4 rows)
+
+.. code-block:: python
+
+   y_axis = np.array([1, 2, 3, 4], dtype=np.uint8)
+
+   # Memory: y[0]=1, row0=[11,21,31,41,51], y[1]=2, row1=[12,22,32,42,52], …
+   img2 = Image([Section(0x9000, bytes(4 * (1 + 5) + 16))])
+   img2.write_asam_ndarray(0x9000, matrix, "UBYTE", "MSB_LAST",
+                           index_mode="ALTERNATE_WITH_Y", y_axis=y_axis)
+
+   result2 = img2.read_asam_ndarray(0x9000, 0, "UBYTE",
+                                    shape=(5, 4), byte_order="MSB_LAST",
+                                    index_mode="ALTERNATE_WITH_Y")
+   assert np.array_equal(result2.values, matrix)
+   assert np.array_equal(result2.axis, y_axis)
 
 .. warning::
    **Frequent pitfalls**
@@ -232,6 +322,8 @@ Quick reference for the ASAM array helpers on ``Image`` and ``Section``.
    - Forgetting that byte order is applied per element, not per full buffer.
    - Passing unsupported ASAM dtype names (must be values like ``UWORD``/``ULONG``).
    - Assuming MSW swapping affects 8-bit types (it does not).
+   - Using ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y`` with a 1-D array or
+     without a 2-D ``shape`` parameter.
 
 .. rubric:: Copy/paste example: ULONG array roundtrip
 

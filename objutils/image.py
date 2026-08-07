@@ -798,11 +798,29 @@ class Image:
 
         Args:
             addr: Absolute memory address to write to.
-            array: NumPy ndarray (shape in numpy convention).
-            dtype: ASAM datatype name.
-            byte_order: ASAM byte order string.
-            index_mode: ``"ROW_DIR"`` (default) or ``"COLUMN_DIR"``.
-            **kws: Passed through to section method.
+            array: NumPy ndarray (shape in numpy convention, i.e. rows × columns).
+            dtype: ASAM datatype name (e.g. ``"UWORD"``, ``"ULONG"``).
+            byte_order: ASAM byte order string (e.g. ``"MSB_FIRST"``, ``"MSB_LAST"``).
+            index_mode: Memory layout mode:
+
+                - ``"ROW_DIR"`` (default) – C-order row-major; X increments fastest.
+                - ``"COLUMN_DIR"`` – X and Y swapped; not true Fortran-order for
+                  dims > 2.
+                - ``"ALTERNATE_WITH_X"`` – 2-D maps only; each X-column is preceded
+                  by its X-axis coordinate value.  Pass axis values via
+                  ``x_axis=<array>`` in *kws*.
+                - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; each Y-row is preceded by
+                  its Y-axis coordinate value.  Pass axis values via
+                  ``y_axis=<array>`` in *kws*.
+            **kws: Keyword arguments passed through to the section method.
+                Relevant for ALTERNATE modes:
+
+                - ``x_axis`` (array-like): X-axis coordinate values for
+                  ``ALTERNATE_WITH_X``.
+                - ``y_axis`` (array-like): Y-axis coordinate values for
+                  ``ALTERNATE_WITH_Y``.
+                - ``axis_dtype`` (str): ASAM datatype for axis values (defaults
+                  to the same as *dtype*).
         """
         self._call_address_function("write_asam_ndarray", addr, array, dtype, byte_order, index_mode=index_mode, **kws)
 
@@ -847,15 +865,36 @@ class Image:
 
         Args:
             addr: Start address to read from.
-            length: Number of **elements** (not bytes).
-            dtype: ASAM datatype name.
-            shape: Dimensions in **ASAM** order ``(X, Y, Z, ...)``.
-            byte_order: ASAM byte order string.
-            index_mode: ``"ROW_DIR"`` (default) or ``"COLUMN_DIR"``.
-            **kws: Passed through to section method.
+            length: Number of **elements** (not bytes).  Ignored for
+                ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y`` – the byte count
+                is derived from *shape* in those modes.
+            dtype: ASAM datatype name (e.g. ``"UWORD"``, ``"ULONG"``).
+            shape: Dimensions in **ASAM** order ``(X, Y, Z, ...)``, which is
+                the reverse of numpy order ``(..., Z, Y, X)``.
+                **Required** for ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y``.
+            byte_order: ASAM byte order string (e.g. ``"MSB_FIRST"``, ``"MSB_LAST"``).
+            index_mode: Memory layout mode:
+
+                - ``"ROW_DIR"`` (default) – C-order row-major; X increments fastest.
+                - ``"COLUMN_DIR"`` – X and Y swapped; not true Fortran-order for
+                  dims > 2.
+                - ``"ALTERNATE_WITH_X"`` – 2-D maps only; each X-column is preceded
+                  by its X-axis coordinate value in memory.
+                - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; each Y-row is preceded by
+                  its Y-axis coordinate value in memory.
+            **kws: Keyword arguments passed through to the section method.
+                Relevant for ALTERNATE modes:
+
+                - ``axis_dtype`` (str): ASAM datatype for axis values (defaults
+                  to the same as *dtype*).
 
         Returns:
-            NumPy ndarray with shape in numpy convention.
+            - ``numpy.ndarray`` with shape in numpy convention for ``ROW_DIR``
+              and ``COLUMN_DIR``.
+            - :class:`~objutils.section.AlternateArrayResult` ``(values, axis)``
+              named tuple for ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y``.
+              Access via ``result.values`` / ``result.axis`` or unpack:
+              ``values, axis = result``.
         """
         return self._call_address_function(
             "read_asam_ndarray", addr, length, dtype, shape=shape, byte_order=byte_order, index_mode=index_mode, **kws

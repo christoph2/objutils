@@ -163,6 +163,15 @@ ASAM strings
     >>> img.read_asam_string(0x3020, "UTF8")
     'Drehzahl'
 
+When an ECU stores non-ASCII characters in a nominally ASCII field, override
+the codec with an explicit ``encoding`` keyword argument:
+
+.. code-block:: python
+
+    >>> img.write_asam_string(0x3030, "MOTOR_ÜBERDREHZAHL", "ASCII", encoding="latin-1")
+    >>> img.read_asam_string(0x3030, "ASCII", encoding="latin-1")
+    'MOTOR_ÜBERDREHZAHL'
+
 ASAM numeric arrays
 -------------------
 
@@ -201,6 +210,65 @@ ASAM ndarrays (NumPy)
     ... )
     >>> np.array_equal(matrix_rt, matrix)
     True
+
+ASAM ndarrays — ALTERNATE_WITH_X / ALTERNATE_WITH_Y
+----------------------------------------------------
+
+For characteristic maps (2-D) the ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y``
+index modes interleave axis coordinate values with the function values in memory.
+
+**ALTERNATE_WITH_X** — each X-column is preceded by its X-axis coordinate:
+
+.. code-block:: python
+
+    >>> import numpy as np
+    >>> from objutils import Image, Section
+
+    >>> # Value matrix numpy shape (Y=2, X=3); ASAM shape (X=3, Y=2)
+    >>> vals = np.array([[11, 21, 31], [12, 22, 32]], dtype=np.uint8)
+    >>> x_ax = np.array([10, 20, 30], dtype=np.uint8)
+
+    >>> total = 3 * (1 + 2)   # num_x * (axis_byte + num_y)
+    >>> img = Image([Section(0xA000, bytes(total + 8))])
+    >>> img.write_asam_ndarray(0xA000, vals, "UBYTE", "MSB_LAST",
+    ...                        index_mode="ALTERNATE_WITH_X", x_axis=x_ax)
+
+    >>> # Raw memory: [10, 11, 12,  20, 21, 22,  30, 31, 32]
+    >>> list(img.read(0xA000, total))
+    [10, 11, 12, 20, 21, 22, 30, 31, 32]
+
+    >>> result = img.read_asam_ndarray(0xA000, 0, "UBYTE",
+    ...                                shape=(3, 2), byte_order="MSB_LAST",
+    ...                                index_mode="ALTERNATE_WITH_X")
+    >>> np.array_equal(result.values, vals)
+    True
+    >>> np.array_equal(result.axis, x_ax)
+    True
+
+**ALTERNATE_WITH_Y** — each Y-row is preceded by its Y-axis coordinate:
+
+.. code-block:: python
+
+    >>> y_ax = np.array([100, 200], dtype=np.uint8)
+
+    >>> total_y = 2 * (1 + 3)   # num_y * (axis_byte + num_x)
+    >>> img2 = Image([Section(0xB000, bytes(total_y + 8))])
+    >>> img2.write_asam_ndarray(0xB000, vals, "UBYTE", "MSB_LAST",
+    ...                         index_mode="ALTERNATE_WITH_Y", y_axis=y_ax)
+
+    >>> # Raw memory: [100, 11, 21, 31,  200, 12, 22, 32]
+    >>> list(img2.read(0xB000, total_y))
+    [100, 11, 21, 31, 200, 12, 22, 32]
+
+    >>> result2 = img2.read_asam_ndarray(0xB000, 0, "UBYTE",
+    ...                                  shape=(3, 2), byte_order="MSB_LAST",
+    ...                                  index_mode="ALTERNATE_WITH_Y")
+    >>> np.array_equal(result2.values, vals)
+    True
+
+``read_asam_ndarray`` returns an ``AlternateArrayResult`` named tuple for
+these modes.  Access the parts via ``result.values`` / ``result.axis``, or
+unpack: ``values, axis = result``.
 
 What next?
 ----------

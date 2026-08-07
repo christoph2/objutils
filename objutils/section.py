@@ -427,7 +427,147 @@ def fortran_array_to_buffer(array: np.ndarray) -> bytearray:
         return result
 
 
-ASAM_INDEX_MODES = {"ROW_DIR", "COLUMN_DIR"}
+ASAM_INDEX_MODES = {"ROW_DIR", "COLUMN_DIR", "ALTERNATE_WITH_X", "ALTERNATE_WITH_Y"}
+
+AlternateArrayResult = namedtuple("AlternateArrayResult", "values axis")
+
+
+def _asam_alternate_x_to_buffer(arr: np.ndarray, x_axis: np.ndarray | None, axis_dtype: np.dtype) -> bytearray:
+    """Serialize a 2-D value array for ASAM ALTERNATE_WITH_X memory layout.
+
+    For each X-column *i* the X-axis coordinate value is stored first, followed by all
+    Y values of that column::
+
+        [x[0], f(x0,y0), f(x0,y1), …, x[1], f(x1,y0), f(x1,y1), …]
+
+    Args:
+        arr:         Value array in numpy convention (shape ``(Y, X)``).
+        x_axis:      X-axis coordinate values (length ``X``), or ``None`` if axis is omitted.
+        axis_dtype:  NumPy dtype for axis values.
+
+    Raises:
+        ValueError: If *arr* is not 2-D or *x_axis* length mismatches number of columns.
+    """
+    if arr.ndim != 2:
+        raise ValueError("ALTERNATE_WITH_X only supports 2-D arrays (maps)")
+    num_y, num_x = arr.shape
+    if x_axis is not None and len(x_axis) != num_x:
+        raise ValueError(f"x_axis length ({len(x_axis)}) must match number of columns ({num_x})")
+    result = bytearray()
+    for x_idx in range(num_x):
+        if x_axis is not None:
+            result.extend(np.array(x_axis[x_idx], dtype=axis_dtype).tobytes())
+        result.extend(arr[:, x_idx].tobytes())
+    return result
+
+
+def _asam_alternate_x_from_buffer(
+    data: bytes,
+    numpy_shape: tuple,
+    dtype: np.dtype,
+    axis_dtype: np.dtype,
+) -> tuple:
+    """Deserialize ASAM ALTERNATE_WITH_X memory layout.
+
+    Args:
+        data:         Raw byte buffer.
+        numpy_shape:  Shape in numpy convention ``(Y, X)``.
+        dtype:        NumPy dtype for value elements.
+        axis_dtype:   NumPy dtype for axis elements.
+
+    Returns:
+        ``AlternateArrayResult(values, x_axis)`` where *values* has shape
+        ``(Y, X)`` and *x_axis* has shape ``(X,)``.
+
+    Raises:
+        ValueError: If *numpy_shape* is not 2-D.
+    """
+    if len(numpy_shape) != 2:
+        raise ValueError("ALTERNATE_WITH_X only supports 2-D shapes")
+    num_y, num_x = numpy_shape
+    data_es = dtype.itemsize
+    axis_es = axis_dtype.itemsize
+    x_axis_vals: list = []
+    col_data: list = []
+    offset = 0
+    for _ in range(num_x):
+        x_val = np.frombuffer(data[offset : offset + axis_es], dtype=axis_dtype)[0]
+        x_axis_vals.append(x_val)
+        offset += axis_es
+        col_vals = np.frombuffer(data[offset : offset + num_y * data_es], dtype=dtype).copy()
+        col_data.append(col_vals)
+        offset += num_y * data_es
+    arr = np.column_stack(col_data) if num_x > 1 else col_data[0].reshape(num_y, 1)
+    return arr, np.array(x_axis_vals, dtype=axis_dtype)
+
+
+def _asam_alternate_y_to_buffer(arr: np.ndarray, y_axis: np.ndarray | None, axis_dtype: np.dtype) -> bytearray:
+    """Serialize a 2-D value array for ASAM ALTERNATE_WITH_Y memory layout.
+
+    For each Y-row *j* the Y-axis coordinate value is stored first, followed by all
+    X values of that row::
+
+        [y[0], f(x0,y0), f(x1,y0), …, y[1], f(x0,y1), f(x1,y1), …]
+
+    Args:
+        arr:         Value array in numpy convention (shape ``(Y, X)``).
+        y_axis:      Y-axis coordinate values (length ``Y``), or ``None`` if axis is omitted.
+        axis_dtype:  NumPy dtype for axis values.
+
+    Raises:
+        ValueError: If *arr* is not 2-D or *y_axis* length mismatches number of rows.
+    """
+    if arr.ndim != 2:
+        raise ValueError("ALTERNATE_WITH_Y only supports 2-D arrays (maps)")
+    num_y, num_x = arr.shape
+    if y_axis is not None and len(y_axis) != num_y:
+        raise ValueError(f"y_axis length ({len(y_axis)}) must match number of rows ({num_y})")
+    result = bytearray()
+    for y_idx in range(num_y):
+        if y_axis is not None:
+            result.extend(np.array(y_axis[y_idx], dtype=axis_dtype).tobytes())
+        result.extend(arr[y_idx, :].tobytes())
+    return result
+
+
+def _asam_alternate_y_from_buffer(
+    data: bytes,
+    numpy_shape: tuple,
+    dtype: np.dtype,
+    axis_dtype: np.dtype,
+) -> tuple:
+    """Deserialize ASAM ALTERNATE_WITH_Y memory layout.
+
+    Args:
+        data:         Raw byte buffer.
+        numpy_shape:  Shape in numpy convention ``(Y, X)``.
+        dtype:        NumPy dtype for value elements.
+        axis_dtype:   NumPy dtype for axis elements.
+
+    Returns:
+        ``AlternateArrayResult(values, y_axis)`` where *values* has shape
+        ``(Y, X)`` and *y_axis* has shape ``(Y,)``.
+
+    Raises:
+        ValueError: If *numpy_shape* is not 2-D.
+    """
+    if len(numpy_shape) != 2:
+        raise ValueError("ALTERNATE_WITH_Y only supports 2-D shapes")
+    num_y, num_x = numpy_shape
+    data_es = dtype.itemsize
+    axis_es = axis_dtype.itemsize
+    y_axis_vals: list = []
+    row_data: list = []
+    offset = 0
+    for _ in range(num_y):
+        y_val = np.frombuffer(data[offset : offset + axis_es], dtype=axis_dtype)[0]
+        y_axis_vals.append(y_val)
+        offset += axis_es
+        row_vals = np.frombuffer(data[offset : offset + num_x * data_es], dtype=dtype).copy()
+        row_data.append(row_vals)
+        offset += num_x * data_es
+    arr = np.vstack(row_data) if num_y > 1 else row_data[0].reshape(1, num_x)
+    return arr, np.array(y_axis_vals, dtype=axis_dtype)
 
 
 def _asam_column_dir_from_buffer(data: bytes, numpy_shape: tuple, dtype: Any) -> np.ndarray:
@@ -880,7 +1020,7 @@ class Section:
         fmt = self._getformat(internal_dtype)
         packed = struct.pack(fmt, value)
         permuted = self._permute_asam_buffer(packed, internal_dtype, asam_byte_order)
-        self.write(addr, permuted)
+        self.write(addr, permuted, **kws)
 
     def read_asam_numeric_array(
         self,
@@ -1150,9 +1290,33 @@ class Section:
         typed_array = np.asarray(array, dtype=self._numpy_dtype_from_internal(internal_dtype))
         if index_mode == "COLUMN_DIR":
             raw_data = _asam_column_dir_to_buffer(typed_array)
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+        elif index_mode in ("ALTERNATE_WITH_X", "ALTERNATE_WITH_Y"):
+            if typed_array.ndim != 2:
+                raise ValueError(f"{index_mode} only supports 2-D arrays (maps)")
+            axis_dtype_kwarg = kws.pop("axis_dtype", None)
+            if axis_dtype_kwarg is not None:
+                _asam_axis_bo = self._resolve_asam_byteorder(byte_order)
+                _internal_axis_dtype = self._asam_numeric_dtype_to_internal(axis_dtype_kwarg, _asam_axis_bo)
+                axis_dt = self._numpy_dtype_from_internal(_internal_axis_dtype)
+            else:
+                axis_dt = typed_array.dtype
+                _internal_axis_dtype = internal_dtype
+            if index_mode == "ALTERNATE_WITH_X":
+                x_axis_raw = kws.pop("x_axis", None)
+                x_ax = np.asarray(x_axis_raw, dtype=axis_dt) if x_axis_raw is not None else None
+                raw_data = _asam_alternate_x_to_buffer(typed_array, x_ax, axis_dt)
+            else:
+                y_axis_raw = kws.pop("y_axis", None)
+                y_ax = np.asarray(y_axis_raw, dtype=axis_dt) if y_axis_raw is not None else None
+                raw_data = _asam_alternate_y_to_buffer(typed_array, y_ax, axis_dt)
+            # Permute the interleaved buffer. Works correctly when axis and data share the same
+            # element size; for different element sizes the permutation is applied per data-dtype
+            # stride which may be incorrect – a documented limitation for word-swap byte orders.
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
         else:
             raw_data = typed_array.tobytes()
-        permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
         self.write(addr, permuted, **kws)
 
     def read_ndarray(self, addr: int, length: int, dtype: str, shape: tuple = None, order: str = None, **kws) -> np.ndarray:
@@ -1179,7 +1343,7 @@ class Section:
         byte_order: str = "MSB_LAST",
         index_mode: str = "ROW_DIR",
         **kws,
-    ) -> np.ndarray:
+    ) -> "np.ndarray | AlternateArrayResult":
         """Read a NumPy ndarray using ASAM datatype and byte order semantics.
 
         Unlike :meth:`read_ndarray`, this method uses ASAM conventions:
@@ -1192,37 +1356,91 @@ class Section:
 
         Args:
             addr: Absolute memory address to read from.
-            length: Number of **elements** to read.
+            length: Number of **elements** to read (not counting axis values
+                for ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y``).
             dtype: ASAM datatype name (e.g. ``"UWORD"``, ``"ULONG"``).
             shape: Array dimensions in **ASAM** convention ``(X, Y, …)``.
                 Converted internally to numpy convention ``(…, Y, X)``.
+                **Required** for ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y``.
             byte_order: ASAM byte order string.
-            index_mode: ``"ROW_DIR"`` (default) – X increments fastest
-                (C-like row-major).  ``"COLUMN_DIR"`` – Y increments
-                fastest; only X and Y are swapped (not true column-major
-                for dims > 2).
-            **kws: Passed through to :meth:`read`.
+            index_mode: Memory layout mode:
+
+                - ``"ROW_DIR"`` (default) – X increments fastest (C-like row-major).
+                - ``"COLUMN_DIR"`` – Y increments fastest; only X and Y are swapped
+                  (not true column-major for dims > 2).
+                - ``"ALTERNATE_WITH_X"`` – 2-D maps only; columns of values alternate
+                  with X-axis coordinate values.  Returns
+                  :class:`AlternateArrayResult` ``(values, x_axis)``.
+                - ``"ALTERNATE_WITH_Y"`` – 2-D maps only; rows of values alternate
+                  with Y-axis coordinate values.  Returns
+                  :class:`AlternateArrayResult` ``(values, y_axis)``.
+            **kws: Optional keyword arguments:
+
+                - ``axis_dtype`` (str): ASAM datatype of axis values for
+                  ``ALTERNATE_WITH_X`` / ``ALTERNATE_WITH_Y`` (defaults to
+                  the same as *dtype*).
+                - All remaining kwargs are passed through to :meth:`read`.
 
         Returns:
-            NumPy array with shape in **numpy** convention.
+            - ``np.ndarray`` for ``ROW_DIR`` and ``COLUMN_DIR``.
+            - :class:`AlternateArrayResult` ``(values, axis)`` for
+              ``ALTERNATE_WITH_X`` and ``ALTERNATE_WITH_Y``.
 
         Raises:
-            ValueError: If *index_mode* is unsupported.
+            ValueError: If *index_mode* is unsupported, or if a 2-D shape is
+                not provided for ALTERNATE modes.
         """
         if index_mode not in ASAM_INDEX_MODES:
-            raise ValueError(f"Unsupported index_mode {index_mode!r}; use ROW_DIR or COLUMN_DIR.")
+            raise ValueError(f"Unsupported index_mode {index_mode!r}; " f"use one of {sorted(ASAM_INDEX_MODES)}.")
 
         asam_byte_order = self._resolve_asam_byteorder(byte_order)
         internal_dtype = self._asam_numeric_dtype_to_internal(dtype, asam_byte_order)
         dt = self._numpy_dtype_from_internal(internal_dtype)
 
+        # Convert ASAM shape (X, Y, Z …) → numpy shape (… Z, Y, X).
+        numpy_shape = tuple(reversed(shape)) if shape else None
+
+        # --- ALTERNATE_WITH_X --------------------------------------------------
+        if index_mode == "ALTERNATE_WITH_X":
+            if numpy_shape is None or len(numpy_shape) != 2:
+                raise ValueError("ALTERNATE_WITH_X requires a 2-D shape (X, Y) in ASAM convention")
+            axis_dtype_kwarg = kws.pop("axis_dtype", None)
+            if axis_dtype_kwarg is not None:
+                _ax_bo = self._resolve_asam_byteorder(byte_order)
+                _ax_internal = self._asam_numeric_dtype_to_internal(axis_dtype_kwarg, _ax_bo)
+                axis_dt = self._numpy_dtype_from_internal(_ax_internal)
+            else:
+                axis_dt = dt
+            num_y, num_x = numpy_shape
+            byte_count = num_x * (axis_dt.itemsize + num_y * dt.itemsize)
+            raw_data = self.read(addr, byte_count, **kws)
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+            values, x_axis = _asam_alternate_x_from_buffer(permuted, numpy_shape, dt, axis_dt)
+            return AlternateArrayResult(values, x_axis)
+
+        # --- ALTERNATE_WITH_Y --------------------------------------------------
+        if index_mode == "ALTERNATE_WITH_Y":
+            if numpy_shape is None or len(numpy_shape) != 2:
+                raise ValueError("ALTERNATE_WITH_Y requires a 2-D shape (X, Y) in ASAM convention")
+            axis_dtype_kwarg = kws.pop("axis_dtype", None)
+            if axis_dtype_kwarg is not None:
+                _ax_bo = self._resolve_asam_byteorder(byte_order)
+                _ax_internal = self._asam_numeric_dtype_to_internal(axis_dtype_kwarg, _ax_bo)
+                axis_dt = self._numpy_dtype_from_internal(_ax_internal)
+            else:
+                axis_dt = dt
+            num_y, num_x = numpy_shape
+            byte_count = num_y * (axis_dt.itemsize + num_x * dt.itemsize)
+            raw_data = self.read(addr, byte_count, **kws)
+            permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
+            values, y_axis = _asam_alternate_y_from_buffer(permuted, numpy_shape, dt, axis_dt)
+            return AlternateArrayResult(values, y_axis)
+
+        # --- Standard modes (ROW_DIR / COLUMN_DIR) ----------------------------
         # Compute byte count from element count.
         type_name = internal_dtype.split("_")[0]
         type_size = TYPE_SIZES[type_name]
         byte_count = length * type_size
-
-        # Convert ASAM shape (X, Y, Z …) → numpy shape (… Z, Y, X).
-        numpy_shape = tuple(reversed(shape)) if shape else None
 
         raw_data = self.read(addr, byte_count, **kws)
         permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
