@@ -1326,8 +1326,7 @@ class Section:
             # axis breakpoint.  This is identical to C-order (ROW_DIR) for a 2-D array.
             if typed_array.ndim != 2:
                 raise ValueError(
-                    "ALTERNATE_CURVES requires a 2-D array with shape "
-                    "(num_axis_points, num_curves) in numpy convention"
+                    "ALTERNATE_CURVES requires a 2-D array with shape " "(num_axis_points, num_curves) in numpy convention"
                 )
             raw_data = typed_array.tobytes()  # C-order = AoS
             permuted = self._permute_asam_buffer(raw_data, internal_dtype, asam_byte_order)
@@ -1422,10 +1421,7 @@ class Section:
         # --- ALTERNATE_CURVES --------------------------------------------------
         if index_mode == "ALTERNATE_CURVES":
             if numpy_shape is None or len(numpy_shape) != 2:
-                raise ValueError(
-                    "ALTERNATE_CURVES requires a 2-D shape (num_curves, num_axis_points) "
-                    "in ASAM convention"
-                )
+                raise ValueError("ALTERNATE_CURVES requires a 2-D shape (num_curves, num_axis_points) " "in ASAM convention")
             type_name = internal_dtype.split("_")[0]
             type_size = TYPE_SIZES[type_name]
             byte_count = length * type_size

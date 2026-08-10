@@ -731,21 +731,96 @@ def test_column_dir_still_works():
 # Das Beispiel-Array aus der Spezifikation: 5 Achsbreakpoints × 4 Kurven
 VXP_TYPE_DATA = np.array(
     [
-        [10, 3, 4, 8],   # Breakpoint 0
-        [12, 2, 4, 6],   # Breakpoint 1
-        [17, 9, 5, 8],   # Breakpoint 2
-        [10, 1, 4, 8],   # Breakpoint 3
-        [18, 3, 8, 8],   # Breakpoint 4
+        [10, 3, 4, 8],  # Breakpoint 0
+        [12, 2, 4, 6],  # Breakpoint 1
+        [17, 9, 5, 8],  # Breakpoint 2
+        [10, 1, 4, 8],  # Breakpoint 3
+        [18, 3, 8, 8],  # Breakpoint 4
     ],
     dtype=np.int32,
 )
 
 VXP_FLAT_LE = [
-    10, 0, 0, 0,   3, 0, 0, 0,   4, 0, 0, 0,   8, 0, 0, 0,
-    12, 0, 0, 0,   2, 0, 0, 0,   4, 0, 0, 0,   6, 0, 0, 0,
-    17, 0, 0, 0,   9, 0, 0, 0,   5, 0, 0, 0,   8, 0, 0, 0,
-    10, 0, 0, 0,   1, 0, 0, 0,   4, 0, 0, 0,   8, 0, 0, 0,
-    18, 0, 0, 0,   3, 0, 0, 0,   8, 0, 0, 0,   8, 0, 0, 0,
+    10,
+    0,
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    4,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    12,
+    0,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    4,
+    0,
+    0,
+    0,
+    6,
+    0,
+    0,
+    0,
+    17,
+    0,
+    0,
+    0,
+    9,
+    0,
+    0,
+    0,
+    5,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    10,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    4,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    18,
+    0,
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    0,
 ]  # 5 * 4 * 4 = 80 Bytes (SLONG, LE)
 
 
@@ -758,11 +833,26 @@ def test_alternate_curves_memory_layout_ubyte():
     """
     arr = VXP_TYPE_DATA.astype(np.uint8)
     expected = [
-        10, 3, 4, 8,
-        12, 2, 4, 6,
-        17, 9, 5, 8,
-        10, 1, 4, 8,
-        18, 3, 8, 8,
+        10,
+        3,
+        4,
+        8,
+        12,
+        2,
+        4,
+        6,
+        17,
+        9,
+        5,
+        8,
+        10,
+        1,
+        4,
+        8,
+        18,
+        3,
+        8,
+        8,
     ]
     total_bytes = 5 * 4  # num_axis_points * num_curves
     sec = Section(start_address=0x1000, data=bytearray(total_bytes + 8))
@@ -860,8 +950,7 @@ def test_alternate_curves_layout_equals_row_dir():
     """ALTERNATE_CURVES und ROW_DIR erzeugen identisches Speicher-Layout."""
     arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.uint8)
     sec_curves = Section(start_address=0, data=bytearray(16))
-    sec_row    = Section(start_address=0, data=bytearray(16))
+    sec_row = Section(start_address=0, data=bytearray(16))
     sec_curves.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ALTERNATE_CURVES")
-    sec_row.write_asam_ndarray(   0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ROW_DIR")
+    sec_row.write_asam_ndarray(0, arr, "UBYTE", byte_order="MSB_LAST", index_mode="ROW_DIR")
     assert sec_curves.read(0, 6) == sec_row.read(0, 6)
-
