@@ -926,7 +926,7 @@ class ElfParser:
         ),
     )
 
-    def __init__(self, filename: str, in_memory: bool = False) -> None:
+    def __init__(self, filename: str | Path, in_memory: bool = False) -> None:
         """Initialize ElfParser with an ELF file.
 
         Creates or opens the associated .prgdb database file and parses the ELF
