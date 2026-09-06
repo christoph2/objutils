@@ -51,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     print("-" * 79)
     for sym in syms:
         name = getattr(sym, "name", getattr(sym, "symbol_name", ""))
+        name = name.decode("utf-8") if isinstance(name, bytes) else name
         value = getattr(sym, "value", getattr(sym, "st_value", 0))
         print(f"{name:40}\n0x{int(value):016X}\n")
 
