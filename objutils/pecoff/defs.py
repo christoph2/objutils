@@ -79,6 +79,8 @@ See Also:
       https://docs.microsoft.com/windows/win32/debug/pe-format
 """
 
+from enum import IntEnum
+
 # PE file signature (follows DOS header at offset 0x3C)
 PE_SIGNATURE = b"PE\x00\x00"
 
@@ -163,6 +165,31 @@ IMAGE_SCN_MEM_WRITE = 0x80000000  # Section is writable
 
 IMAGE_SYM_CLASS_EXTERNAL = 2  # External (public) symbol
 IMAGE_SYM_CLASS_STATIC = 3  # Static (private) symbol
+
+
+# ============================================================================
+# Symbol Types (IMAGE_SYM_TYPE_*)
+# ============================================================================
+# Microsoft COFF Symbol Base Types.
+
+
+class ImageSym(IntEnum):
+    IMAGE_SYM_TYPE_NULL = 0  # No type information or unknown base type. Microsoft tools use this setting
+    IMAGE_SYM_TYPE_VOID = 1  # No valid type; used with void pointers and functions
+    IMAGE_SYM_TYPE_CHAR = 2  # A character (signed byte)
+    IMAGE_SYM_TYPE_SHORT = 3  # A 2-byte signed integer
+    IMAGE_SYM_TYPE_INT = 4  # A natural integer type (normally 4 bytes in Windows)
+    IMAGE_SYM_TYPE_LONG = 5  # A 4-byte signed integer
+    IMAGE_SYM_TYPE_FLOAT = 6  # A 4-byte floating-point number
+    IMAGE_SYM_TYPE_DOUBLE = 7  # An 8-byte floating-point number
+    IMAGE_SYM_TYPE_STRUCT = 8  # A structure
+    IMAGE_SYM_TYPE_UNION = 9  # A union
+    IMAGE_SYM_TYPE_ENUM = 10  # An enumerated type
+    IMAGE_SYM_TYPE_MOE = 11  # A member of enumeration (a specific value)
+    IMAGE_SYM_TYPE_BYTE = 12  # A byte; unsigned 1-byte integer
+    IMAGE_SYM_TYPE_WORD = 13  # A word; unsigned 2-byte integer
+    IMAGE_SYM_TYPE_UINT = 14  # An unsigned integer of natural size (normally, 4 bytes)
+    IMAGE_SYM_TYPE_DWORD = 15  # An unsigned 4-byte integer
 
 
 def decode_characteristics(characteristics: int) -> list[str]:

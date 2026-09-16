@@ -54,15 +54,29 @@ def main(argv: list[str] | None = None) -> int:
             f"0x{s['size_of_raw_data']:06X} 0x{s['virtual_size']:06X}"
         )
 
-    if pp.symbols and args.symbols:
-        # pp.symbols = sorted(pp.symbols, key=lambda s: s.name)
-        pp.symbols = sorted(pp.symbols, key=lambda s: s.location)
+    if args.symbols:
+        if pp.pdb_symbols:
+            coff_symbols = sorted(pp.pdb_symbols, key=lambda s: s.location)
 
-        print_header("Symbols (COFF or PDB)")
-        print("Name                                               Value              Size")
-        print("-" * 80)
-        for sym in pp.symbols:
-            print(f"{sym.name.decode():<50} 0x{sym.location:016X} {sym.size}")
+            print_header("Symbols (PDB)")
+            print("Name                                               Value              Size")
+            print("-" * 80)
+            for sym in coff_symbols:
+                print(f"{sym.name:<50} 0x{sym.location:016X} {sym.size}")
+        elif pp.coff_symbols:
+
+            def pe_sorter(s: dict):
+                return 0 if s.location is None else s.location
+
+            coff_symbols = sorted(pp.coff_symbols, key=pe_sorter)
+
+            print_header("Symbols (COFF)")
+            print("Name                                               Value")
+            print("-" * 80)
+            for sym in coff_symbols:
+                if sym.storage_class not in (2, 3) or sym.location is None:
+                    continue
+                print(f"{sym.name:<50} 0x{int(sym.location):016X}")
     return 0
 
 

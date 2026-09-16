@@ -36,24 +36,29 @@ def main(argv: list[str] | None = None) -> int:
 
     # Fetch via SymbolAPI to ensure DB is created/reused
     # syms = SymbolAPI(pp).fetch(name_pattern=args.pattern)
-    syms = pp.symbols
+    syms = pp.coff_symbols
+    if syms:
+        if args.order_by == "N":
+            syms = sorted(syms, key=lambda s: getattr(s, "name", getattr(s, "symbol_name", "")))
 
-    # Fallback: if SymbolAPI attr is not present (static type), use direct list
-    # if not syms and pp.symbols:
-    #    syms = [type("_S", (), s) for s in pp.symbols]  # quick adapter for printing
-
-    # syms is a list of model.Pe_Symbol; order by value already in fetch()
-    if args.order_by == "N":
-        syms = sorted(syms, key=lambda s: getattr(s, "name", getattr(s, "symbol_name", "")))
-
-    print("Name")
-    print("Value")
-    print("-" * 79)
-    for sym in syms:
-        name = getattr(sym, "name", getattr(sym, "symbol_name", ""))
-        name = name.decode("utf-8") if isinstance(name, bytes) else name
-        value = getattr(sym, "value", getattr(sym, "st_value", 0))
-        print(f"{name:40}\n0x{int(value):016X}\n")
+        print("Name")
+        print("Value")
+        print("-" * 79)
+        for sym in syms:
+            if not sym.storage_class in (2, 3) or sym.location is None:
+                continue
+            name = sym.name
+            value = sym.value
+            address = sym.location
+            print(f"{name:40}\n0x{int(value):016X}  0x{int(address):016X}\n")
+    syms = pp.pdb_symbols
+    if syms:
+        syms = sorted(syms, key=lambda s: getattr(s, "name", ""))
+        for sym in syms:
+            name = sym.name
+            name = name.decode("utf-8") if isinstance(name, bytes) else name
+            location = sym.location
+            print(f"{name:40}\n0x{location:016X}\n")
 
     return 0
 

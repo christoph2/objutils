@@ -71,7 +71,8 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         # Symbols
-        for sym in pp.symbols:
+        for sym in pp.coff_symbols:
+            print(sym)
             ses.add(
                 pe_model.Pe_Symbol(
                     name=sym["name"],

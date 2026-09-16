@@ -667,9 +667,9 @@ class SymbolAPI(DBAPI):
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> # Find any 'main' symbol
-            >>> main = parser.symbols.get('main')
+            >>> main = parser.coff_symbols.get('main')
             >>> # Find 'main' in .text section specifically
-            >>> main_text = parser.symbols.get('main', section_name='.text')
+            >>> main_text = parser.coff_symbols.get('main', section_name='.text')
         """
         query = self.query(model.Elf_Symbol)
         if section_name:
@@ -718,18 +718,18 @@ class SymbolAPI(DBAPI):
         Example:
             >>> parser = ElfParser('firmware.elf')
             >>> # Get all global functions
-            >>> funcs = parser.symbols.fetch(
+            >>> funcs = parser.coff_symbols.fetch(
             ...     bindings='g',
             ...     types_str='func'
             ... )
             >>> # Get symbols in .text section by address
-            >>> text_syms = parser.symbols.fetch(
+            >>> text_syms = parser.coff_symbols.fetch(
             ...     sections='.text',
             ...     order_by_value=True,
             ...     group_by_section=False
             ... )
             >>> # Get GCC special symbols
-            >>> special = parser.symbols.fetch(
+            >>> special = parser.coff_symbols.fetch(
             ...     name_pattern=r'^_'
             ... )
         """
@@ -815,7 +815,7 @@ class SymbolAPI(DBAPI):
 
         Example:
             >>> parser = ElfParser('firmware.elf')
-            >>> special_syms = parser.symbols.fetch_gcc_special_symbols()
+            >>> special_syms = parser.coff_symbols.fetch_gcc_special_symbols()
             >>> for sym in special_syms:
             ...     print(f"{sym.symbol_name}: 0x{sym.st_value:08x}")
         """
@@ -878,7 +878,7 @@ class ElfParser:
         >>> parser = ElfParser('firmware.elf')
         >>> print(f"Machine: {parser.e_machine}")
         >>> text = parser.sections.get('.text')
-        >>> main = parser.symbols.get('main')
+        >>> main = parser.coff_symbols.get('main')
         >>> image = parser.create_image()
 
         >>> # No .prgdb file written to disk

@@ -137,6 +137,7 @@ See Also:
 """
 
 import io
+from dataclasses import dataclass
 import os
 import typing
 from pathlib import Path
@@ -147,6 +148,7 @@ from objutils import Image, Section
 from objutils.utils import create_memorymapped_fileview
 
 from . import defs, model
+from ..symbols import VariableType
 
 try:
     from .pdb import pdb_symbols_for_pe  # type: ignore
@@ -220,6 +222,16 @@ CoffSymbol = Struct(
 )
 
 
+@dataclass(slots=True)
+class Symbol:
+    name: str
+    value: int
+    section_number: int
+    type: int
+    storage_class: int
+    location: int
+
+
 class PeParser:
     """Parser for PE/COFF executables and object files.
 
@@ -238,7 +250,7 @@ class PeParser:
         coff_header: COFF header dictionary (machine, sections, characteristics)
         optional_header: Optional header dictionary (image_base, entry_point, alignments)
         sections: List of section dictionaries (name, vaddr, size, characteristics)
-        symbols: List of symbol dictionaries (name, value, section, type)
+        coff_symbols: List of symbol dictionaries (name, value, section, type)
         db: Optional SQLAlchemy database model for querying
 
     Example:
@@ -297,7 +309,8 @@ class PeParser:
         self.coff_header: dict[str, int] | None = None
         self.optional_header: dict[str, int] | None = None
         self.sections: list[dict[str, typing.Any]] = []
-        self.symbols: list[dict[str, typing.Any]] = []
+        self.coff_symbols: list[Symbol] = []
+        self.pdb_symbols: list[VariableType] = []
 
         # DB model
         self.db: model.Model | None = None
@@ -423,6 +436,7 @@ class PeParser:
 
         # Section table
         self.sections = []
+        self.section_start_addresses = []
         for i in range(number_of_sections):
             section_hdr = SectionHeader.parse_stream(f)
             # name may be slash + offset into string table for long names in OBJ; in PE, usually inline
@@ -437,20 +451,25 @@ class PeParser:
                     "characteristics": section_hdr.characteristics,
                 }
             )
+            self.section_start_addresses.append(section_hdr.virtual_address)
 
         # Symbols (COFF symbol table) if present
-        self.symbols = []
+        self.coff_symbols = []
         if self.coff_header["pointer_to_symbol_table"] and self.coff_header["number_of_symbols"]:
             self._parse_coff_symbols()
         # If no COFF symbols, try PDB symbols via dbghelp (best effort)
-        if not self.symbols and pdb_symbols_for_pe:
+        if not self.coff_symbols and pdb_symbols_for_pe:
             try:
-                # pdb_file = str(self._pdb_path) if self._pdb_path else str(self._path)
-                # self.symbols = pdb_symbols_for_pe(pdb_file)  # type: ignore[misc]
-                self.symbols = pdb_symbols_for_pe(self._path, self._pdb_path)  # type: ignore[misc]
+                self.pdb_symbols = pdb_symbols_for_pe(self._path, self._pdb_path)  # type: ignore[misc]
             except (OSError, RuntimeError, ValueError) as e:
                 # Best-effort only; ignore if PDB not available
                 print(f"Failed to retrieve PDB symbols: {e}")
+
+    def symbol_addresses(self, symbol_names: list[str]) -> dict[str | int]:
+        if self.coff_symbols:
+            return {sym.name: sym.location for sym in self.coff_symbols if sym.name in symbol_names}
+        elif self.pdb_symbols:
+            return {sym.name: sym.location for sym in self.pdb_symbols if sym.name in symbol_names}
 
     def _parse_coff_symbols(self) -> None:
         """Parse COFF symbol table and string table.
@@ -503,6 +522,7 @@ class PeParser:
 
         f.seek(start_symtab)
         i = 0
+        MAX_SECTIONS = len(self.sections)
         while i < count:
             rec = f.read(symrec_size)
             if len(rec) < symrec_size:
@@ -510,14 +530,31 @@ class PeParser:
             symbol = CoffSymbol.parse(rec)
             name8 = symbol.name_raw
             name = get_name(name8)
-            self.symbols.append(
-                {
-                    "name": name,
-                    "value": symbol.value,
-                    "section_number": symbol.section_number,
-                    "type": symbol.type,
-                    "storage_class": symbol.storage_class,
-                }
+            if symbol.storage_class in (2, 3) and symbol.section_number <= MAX_SECTIONS:
+                try:
+                    address_base = self.section_start_addresses[symbol.section_number - 1] + symbol.value
+                except IndexError:
+                    address_base = None
+            else:
+                address_base = None
+            """
+            class Symbol:
+                name: str
+                value: int
+                section_number: int
+                type: int
+                storage_class: int
+                location: int
+            """
+            self.coff_symbols.append(
+                Symbol(
+                    name=name,
+                    value=symbol.value,
+                    section_number=symbol.section_number,
+                    type=symbol.type,
+                    storage_class=symbol.storage_class,
+                    location=address_base,
+                )
             )
             # Skip aux records
             if symbol.number_of_aux_symbols:

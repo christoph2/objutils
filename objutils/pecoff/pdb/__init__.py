@@ -1421,7 +1421,7 @@ def pdb_symbols_for_pe(pe_path: str, symbol_path: str | None = None) -> list[dic
                     continue
                 ti = session.type_info(mod_base, sym.TypeIndex)
                 # print(f"{sym.tag:15}", sym.Name, hex(sym.Address - mod_base), sym.Size, sym.decode_flags(), "==>", ti)
-                result.append(symbols.VariableType(sym.Name, ti, sym.Address - mod_base, sym.Size))
+                result.append(symbols.VariableType(sym.Name.decode("utf8"), ti, sym.Address - mod_base, sym.Size))
             return result
             """
             Name: Symbol name (null-terminated char array)
