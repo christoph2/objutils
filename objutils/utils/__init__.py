@@ -160,7 +160,11 @@ class SingletonBase:
 def create_memorymapped_fileview(filename, writeable=False):
     size = os.path.getsize(filename)
     fd = os.open(filename, os.O_RDWR if writeable else os.O_RDONLY)
-    return memoryview(mmap.mmap(fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ))
+    try:
+        mm = mmap.mmap(fd, size, access=mmap.ACCESS_WRITE if writeable else mmap.ACCESS_READ)
+    finally:
+        os.close(fd)
+    return memoryview(mm)
 
 
 def enum_from_str(enum_class: IntEnum, enumerator: str) -> IntEnum:
