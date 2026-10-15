@@ -1084,128 +1084,144 @@ class DwarfProcessor:
                 except (TypeError, ValueError):
                     return tag
 
-        transaction = session.begin() if not session.in_transaction() else nullcontext()
+        SQLITE_INT64_MIN = -(2**63)
+        SQLITE_INT64_MAX = 2**63 - 1
 
-        with transaction, no_autoflush:
-            while True:
-                section_pos = image.tell()
-                if section_pos >= section_length - 1:
-                    break
-                root_element = DebugInformationEntry("root")
-                die_stack = [root_element]
-                db_parent_stack: list[int] = []
+        def _normalize_raw_value(value: Any) -> Any:
+            """Keep DB writes SQLite-safe while preserving semantics for consumers."""
+            if value is None:
+                return None
+            if isinstance(value, int) and not (SQLITE_INT64_MIN <= value <= SQLITE_INT64_MAX):
+                return str(value)
+            return value
 
-                dbgInfo = DbgInfo.parse_stream(image)  # CU
-                cu_length = dbgInfo.header.unit_length
-                version = dbgInfo.header.version
-                if version < 5:
-                    debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
-                    address_size = dbgInfo.body.address_size
-                else:
-                    if version > 5: # Handle messed up version numbers in some binaries (e.g. 39424)
-                        address_size = self.elf_address_size
-                    else:
-                        address_size = dbgInfo.body.address_size
-                    debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
-                idx += 1
-                if self.verbose:
-                    print(
-                        f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}"
-                    )
-                level = 0
-                pos = 0
-                offset += dbgInfo.stop - dbgInfo.start
-                form_readers = self.get_form_readers(address_size)
-                if pos >= cu_length:
-                    break
+        try:
+            with no_autoflush:
                 while True:
-                    die_start = None
-                    start = image.tell()
-                    if start >= dbgInfo.start + cu_length + 4:
+                    section_pos = image.tell()
+                    if section_pos >= section_length - 1:
                         break
-                    if start >= section_length - 1:
-                        break
-                    attr = Attribute.parse_stream(image)
-                    abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
-                    if not abbr:
-                        if level > 0:
-                            level -= 1
-                        if len(die_stack) > 1:
-                            die_stack.pop()
-                        if db_parent_stack:
-                            db_parent_stack.pop()
+                    root_element = DebugInformationEntry("root")
+                    die_stack = [root_element]
+                    db_parent_stack: list[int] = []
+
+                    dbgInfo = DbgInfo.parse_stream(image)  # CU
+                    cu_length = dbgInfo.header.unit_length
+                    version = dbgInfo.header.version
+                    if version < 5:
+                        debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                        address_size = dbgInfo.body.address_size
                     else:
-                        die = DebugInformationEntry(abbr.tag)
-                        die_rid = next_die_rid
-                        next_die_rid += 1
-                        parent_rid = db_parent_stack[-1] if db_parent_stack else None
-
-                        pending_die_rows.append(
-                            {
-                                "rid": die_rid,
-                                "tag": _coerce_tag_value(abbr.tag),
-                                "offset": start,
-                                "cu_start": dbgInfo.start,
-                                "parent_id": parent_rid,
-                            }
+                        if version > 5: # Handle messed up version numbers in some binaries (e.g. 39424)
+                            address_size = self.elf_address_size
+                        else:
+                            address_size = dbgInfo.body.address_size
+                        debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
+                    idx += 1
+                    if self.verbose:
+                        print(
+                            f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}"
                         )
+                    level = 0
+                    pos = 0
+                    offset += dbgInfo.stop - dbgInfo.start
+                    form_readers = self.get_form_readers(address_size)
+                    if pos >= cu_length:
+                        break
+                    while True:
+                        die_start = None
+                        start = image.tell()
+                        if start >= dbgInfo.start + cu_length + 4:
+                            break
+                        if start >= section_length - 1:
+                            break
+                        attr = Attribute.parse_stream(image)
+                        abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
+                        if not abbr:
+                            if level > 0:
+                                level -= 1
+                            if len(die_stack) > 1:
+                                die_stack.pop()
+                            if db_parent_stack:
+                                db_parent_stack.pop()
+                        else:
+                            die = DebugInformationEntry(abbr.tag)
+                            die_rid = next_die_rid
+                            next_die_rid += 1
+                            parent_rid = db_parent_stack[-1] if db_parent_stack else None
 
-                        if attr.attr != 0:
-                            die_stack[-1].children.append(die)
-                        die_start = start
-                        if abbr.children:
-                            die_stack.append(die)
-                            db_parent_stack.append(die_rid)
-                            level += 1
-                        for enc, form, special_value in abbr.attrs:
-                            reader = form_readers.get(form)
-                            start = image.tell()
-                            if reader is None:
-                                if form == constants.AttributeForm.DW_FORM_implicit_const:
-                                    value = special_value
-                                    die.attributes.append((enc.name, DIEAttribute(value, value)))
-                                    pending_attr_rows.append(
-                                        {
-                                            "name": int(enc),
-                                            "form": int(form),
-                                            "raw_value": value,
-                                            "entry_id": die_rid,
-                                        }
-                                    )
-                                    offset += attr.stop - attr.start
-                                    pos = image.tell()
-                                    if pos >= dbgInfo.start + cu_length + 4:
-                                        break
-                                    continue
-                                else:
-                                    continue
-                            value = reader.parse_stream(image)
-                            die.attributes.append((enc.name, DIEAttribute(value, value)))
-                            pending_attr_rows.append(
+                            pending_die_rows.append(
                                 {
-                                    "name": int(enc),
-                                    "form": int(form) if form is not None else None,
-                                    "raw_value": value,
-                                    "entry_id": die_rid,
+                                    "rid": die_rid,
+                                    "tag": _coerce_tag_value(abbr.tag),
+                                    "offset": start,
+                                    "cu_start": dbgInfo.start,
+                                    "parent_id": parent_rid,
                                 }
                             )
-                        offset += attr.stop - attr.start
-                        pos = image.tell()
-                        if pos >= dbgInfo.start + cu_length + 4:
-                            break
-                    if die_start is not None:
-                        die_map[die_start] = die
 
-                result.append(root_element)
+                            if attr.attr != 0:
+                                die_stack[-1].children.append(die)
+                            die_start = start
+                            if abbr.children:
+                                die_stack.append(die)
+                                db_parent_stack.append(die_rid)
+                                level += 1
+                            for enc, form, special_value in abbr.attrs:
+                                reader = form_readers.get(form)
+                                start = image.tell()
+                                if reader is None:
+                                    if form == constants.AttributeForm.DW_FORM_implicit_const:
+                                        value = special_value
+                                        normalized_value = _normalize_raw_value(value)
+                                        die.attributes.append((enc.name, DIEAttribute(normalized_value, normalized_value)))
+                                        pending_attr_rows.append(
+                                            {
+                                                "name": int(enc),
+                                                "form": int(form),
+                                                "raw_value": normalized_value,
+                                                "entry_id": die_rid,
+                                            }
+                                        )
+                                        offset += attr.stop - attr.start
+                                        pos = image.tell()
+                                        if pos >= dbgInfo.start + cu_length + 4:
+                                            break
+                                        continue
+                                    else:
+                                        continue
+                                value = reader.parse_stream(image)
+                                normalized_value = _normalize_raw_value(value)
+                                die.attributes.append((enc.name, DIEAttribute(normalized_value, normalized_value)))
+                                pending_attr_rows.append(
+                                    {
+                                        "name": int(enc),
+                                        "form": int(form) if form is not None else None,
+                                        "raw_value": normalized_value,
+                                        "entry_id": die_rid,
+                                    }
+                                )
+                            offset += attr.stop - attr.start
+                            pos = image.tell()
+                            if pos >= dbgInfo.start + cu_length + 4:
+                                break
+                        if die_start is not None:
+                            die_map[die_start] = die
 
-            if pending_die_rows:
-                die_insert = model.DebugInformationEntry.__table__.insert()
-                for chunk in _iter_chunks(pending_die_rows, DIE_BATCH_SIZE):
-                    session.execute(die_insert, chunk)
-            if pending_attr_rows:
-                attr_insert = model.DIEAttribute.__table__.insert()
-                for chunk in _iter_chunks(pending_attr_rows, ATTR_BATCH_SIZE):
-                    session.execute(attr_insert, chunk)
+                    result.append(root_element)
+
+                if pending_die_rows:
+                    die_insert = model.DebugInformationEntry.__table__.insert()
+                    for chunk in _iter_chunks(pending_die_rows, DIE_BATCH_SIZE):
+                        session.execute(die_insert, chunk)
+                if pending_attr_rows:
+                    attr_insert = model.DIEAttribute.__table__.insert()
+                    for chunk in _iter_chunks(pending_attr_rows, ATTR_BATCH_SIZE):
+                        session.execute(attr_insert, chunk)
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
         return DebugInformation(die_map, [d.children[0] for d in result])
 
     def pubnames(self):

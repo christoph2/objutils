@@ -2585,76 +2585,71 @@ def import_dwarf_to_db(
         pass
 
     try:
-        ep = ElfParser(str(elf_p))
+        with ElfParser(str(elf_p)) as ep:
+            if verbose:
+                _print(str(ep))
+
+            try:
+                dp = DwarfProcessor(ep)
+            except TypeError as te:
+                _print(f"No DWARF sections available in '{elf_path}': {te}")
+                return 1
+
+            if run_pubnames:
+                try:
+                    dp.pubnames()
+                except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
+                    if verbose:
+                        _print(f"Warning: pubnames failed: {e}")
+            if run_aranges:
+                try:
+                    dp.aranges()
+                except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
+                    if verbose:
+                        _print(f"Warning: aranges failed: {e}")
+            if run_lines:
+                try:
+                    dp.do_lines()
+                except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
+                    if verbose:
+                        _print(f"Warning: do_lines failed: {e}")
+
+            try:
+                dp.do_dbg_info()
+            except (SQLAlchemyError, StreamError, ValueError, RuntimeError, OverflowError) as e:
+                _print(f"Error while parsing .debug_info: {e}")
+                return 3
+
+            if run_mac:
+                try:
+                    dp.do_mac_info()
+                except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
+                    if verbose:
+                        _print(f"Warning: do_mac_info failed: {e}")
+
+            try:
+                if out_db:
+                    src_db = default_db_path
+                    dst_db = Path(out_db)
+                    if str(dst_db.resolve()) != str(src_db.resolve()):
+                        if not src_db.exists():
+                            with model.Model(str(dst_db)) as _mdb:  # type: ignore[attr-defined]
+                                pass
+                        else:
+                            import shutil as _shutil
+
+                            _shutil.copyfile(str(src_db), str(dst_db))
+                        _print(f"Wrote database: {dst_db}")
+                    else:
+                        _print(f"Database available at: {src_db}")
+                else:
+                    _print(f"Database available at: {default_db_path}")
+            except (OSError, SQLAlchemyError) as e:
+                _print(f"Failed to write/copy database: {e}")
+                return 4
     except (OSError, SQLAlchemyError, StreamError, ValueError) as e:
         _print(f"Failed to open ELF file '{elf_path}': {e}")
         return 2
-
-    if verbose:
-        _print(str(ep))
-
-    try:
-        dp = DwarfProcessor(ep)
-    except TypeError as te:
-        _print(f"No DWARF sections available in '{elf_path}': {te}")
-        return 1
-
-    if run_pubnames:
-        try:
-            dp.pubnames()
-        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
-            if verbose:
-                _print(f"Warning: pubnames failed: {e}")
-    if run_aranges:
-        try:
-            dp.aranges()
-        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
-            if verbose:
-                _print(f"Warning: aranges failed: {e}")
-    if run_lines:
-        try:
-            dp.do_lines()
-        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
-            if verbose:
-                _print(f"Warning: do_lines failed: {e}")
-
-    try:
-        dp.do_dbg_info()
-    except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
-        _print(f"Error while parsing .debug_info: {e}")
-        return 3
-
-    if run_mac:
-        try:
-            dp.do_mac_info()
-        except (SQLAlchemyError, StreamError, ValueError, RuntimeError) as e:
-            if verbose:
-                _print(f"Warning: do_mac_info failed: {e}")
-
-    try:
-        if out_db:
-            src_db = default_db_path
-            dst_db = Path(out_db)
-            if str(dst_db.resolve()) != str(src_db.resolve()):
-                if not src_db.exists():
-                    with model.Model(str(dst_db)) as _mdb:  # type: ignore[attr-defined]
-                        pass
-                else:
-                    try:
-                        ep.db.close()
-                    except SQLAlchemyError:
-                        pass
-                    import shutil as _shutil
-
-                    _shutil.copyfile(str(src_db), str(dst_db))
-                _print(f"Wrote database: {dst_db}")
-            else:
-                _print(f"Database available at: {src_db}")
-        else:
-            _print(f"Database available at: {default_db_path}")
-    except (OSError, SQLAlchemyError) as e:
-        _print(f"Failed to write/copy database: {e}")
-        return 4
 
     return 0
 
