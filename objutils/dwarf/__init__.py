@@ -689,6 +689,7 @@ class DwarfProcessor:
             strings=self.strings,
             line_strings=self.line_strings,
         )
+        self.elf_address_size = address_size
         self.readers = factory.readers
         self.stack_machine = factory.stack_machine
 
@@ -1101,8 +1102,11 @@ class DwarfProcessor:
                     debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
                     address_size = dbgInfo.body.address_size
                 else:
+                    if version > 5: # Handle messed up version numbers in some binaries (e.g. 39424)
+                        address_size = self.elf_address_size
+                    else:
+                        address_size = dbgInfo.body.address_size
                     debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
-                    address_size = dbgInfo.body.address_size
                 idx += 1
                 if self.verbose:
                     print(
