@@ -254,6 +254,7 @@ __copyright__ = """
 """
 
 import binascii
+import contextlib
 import hashlib
 import os
 import re
@@ -965,6 +966,7 @@ class ElfParser:
         self._images: dict[int, bytes | None] = {}
         self._sections_by_name: OrderedDict[str, typing.Any] = OrderedDict()
         self.asciiCString: CString = CString(encoding="ascii")
+        self._closed: bool = False
 
         if in_memory:
             self._create_in_memory_db()
@@ -1121,15 +1123,36 @@ class ElfParser:
 
     def close(self) -> None:
         """Release database and file resources."""
+        if getattr(self, "_closed", False):
+            return
+        self._closed = True
+
         db = getattr(self, "db", None)
         if db is not None:
             db.close()
+            self.db = None
+            self.session = None
+
         fp = getattr(self, "fp", None)
         if fp is not None and hasattr(fp, "release"):
             try:
                 fp.release()
-            except BufferError:
+            except (BufferError, ValueError):
                 pass
+            self.fp = None
+
+    def __enter__(self) -> typing.Self:
+        """Support ``with ElfParser(...) as parser`` usage for deterministic cleanup."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Always release parser resources when leaving a context manager block."""
+        self.close()
+
+    def __del__(self) -> None:
+        """Best-effort fallback cleanup when parser objects are garbage-collected."""
+        with contextlib.suppress(AttributeError, OSError, RuntimeError, ValueError):
+            self.close()
 
     def load_data(self) -> None:
         """Parse ELF file and populate database.
