@@ -186,7 +186,7 @@ import io
 import json
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from construct import (
     Array,
@@ -198,8 +198,6 @@ from construct import (
     If,
     IfThenElse,
     Int8ul,
-    Int32ub,
-    Int32ul,
     Padding,
     Pass,
     Struct,
@@ -433,6 +431,10 @@ class Abbrevations:
         "stop" / Tell,
     )
 
+    @staticmethod
+    def _tag_name_fallback(tag: int) -> str:
+        return f"User TAG value: 0x{tag:04x}"
+
     def __init__(self, section):
         """Initialize abbreviation parser.
 
@@ -442,6 +444,67 @@ class Abbrevations:
         self.image = section.image
         self.length = len(section.image)
         self.abbrevations = {}
+        self._parsed_offsets: set[int] = set()
+        self._tag_name_cache: dict[int, str] = {}
+        self._encoding_cache: dict[int, Any] = {}
+        self._form_cache: dict[int, Any] = {}
+
+    def _tag_name(self, tag: int) -> str:
+        cached = self._tag_name_cache.get(tag)
+        if cached is not None:
+            return cached
+        try:
+            value = constants.Tag(tag).name
+        except (AttributeError, TypeError, ValueError):
+            value = self._tag_name_fallback(tag)
+        self._tag_name_cache[tag] = value
+        return value
+
+    def _encoding(self, attr_value: int):
+        cached = self._encoding_cache.get(attr_value)
+        if cached is not None:
+            return cached
+        try:
+            value = constants.AttributeEncoding(attr_value)
+        except (TypeError, ValueError):
+            value = constants.FakeEncoding(attr_value)
+        self._encoding_cache[attr_value] = value
+        return value
+
+    def _form(self, form_value: int):
+        cached = self._form_cache.get(form_value)
+        if cached is not None:
+            return cached
+        value = constants.AttributeForm(form_value)
+        self._form_cache[form_value] = value
+        return value
+
+    def _build_abbrev(self, tag: int, children: bool, attrs: list[Any]) -> Abbrevation:
+        abbrev = Abbrevation(self._tag_name(tag), bool(children), [])
+        append_attr = abbrev.attrs.append
+        implicit_const = constants.AttributeForm.DW_FORM_implicit_const
+        for attr_value, form_value, special_value in attrs:
+            encoding = self._encoding(attr_value)
+            form = self._form(form_value)
+            if form == implicit_const:
+                append_attr(Attribute(encoding, form, special_value))
+            else:
+                append_attr(Attribute(encoding, form))
+        return abbrev
+
+    def _read_uleb(self, image: bytes, offset: int) -> tuple[int, int]:
+        """Decode one ULEB128 value from image[offset:] and return (value, new_offset)."""
+        result = 0
+        shift = 0
+        length = self.length
+        while offset < length:
+            bval = image[offset]
+            offset += 1
+            result |= (bval & 0x7F) << shift
+            if (bval & 0x80) == 0:
+                return result, offset
+            shift += 7
+        raise ValueError("Truncated ULEB128 in .debug_abbrev section.")
 
     def get(self, abbr_offset, item):
         """Retrieve abbreviation schema by code.
@@ -455,96 +518,53 @@ class Abbrevations:
         """
         if item == 0:
             return None
-        if (abbr_offset, item) in self.abbrevations:
-            return self.abbrevations.get(
-                (
-                    abbr_offset,
-                    item,
-                )
-            )
-        else:
-            return self._fetch(abbr_offset, item)
+        if abbr_offset not in self._parsed_offsets:
+            self._fetch(abbr_offset)
+        return self.abbrevations.get((abbr_offset, item))
 
-    def _fetch(self, abbr_offset, item):
+    def _fetch(self, abbr_offset):
         """Parse abbreviation from raw bytes and cache it.
 
-        Parses abbreviation table starting at abbr_offset, caching all
-        entries encountered until the requested item is found.
+        Parses a complete abbreviation table starting at abbr_offset and
+        caches all entries for O(1) subsequent lookups.
 
         Args:
             abbr_offset: Start offset in abbreviation section
-            item: Target abbreviation code
-
-        Returns:
-            Abbrevation instance for the requested code
         """
+        if abbr_offset in self._parsed_offsets:
+            return
+
+        image = self.image
         offset = abbr_offset
-        while True:
-            abbrv_header = self.AbbrevationHeader.parse(self.image[offset:])
-            # print("ABBREV-CODE", hex(offset), abbrv_header)
-            code = abbrv_header.code
-            offset += abbrv_header.stop - abbrv_header.start
-            if code == 0:
-                continue
-            key = (
-                abbr_offset,
-                code,
-            )
-            if offset >= self.length:
-                break
-            abbrv_body = self.AbbrevationBody.parse(self.image[offset:])
-            tag = abbrv_body.tag
-            children = abbrv_body.children
-            offset += abbrv_body.stop - abbrv_body.start
-
-            try:
-                self.abbrevations[key] = Abbrevation(
-                    constants.Tag(tag).name,
-                    (children == 1),
-                    [],
-                )
-            except TypeError:
-                self.abbrevations[key] = Abbrevation(
-                    f"User TAG value: 0x{tag:04x}",
-                    (children == 1),
-                    [],
-                )
-
-            while True:
-                attr = self.AttributeStruct.parse(self.image[offset:])
-                if not attr.next:
-                    # key_offset = offset
+        try:
+            while offset < self.length:
+                code, offset = self._read_uleb(image, offset)
+                if code == 0:
                     break
-                if attr.formValue == constants.AttributeForm.DW_FORM_implicit_const:
-                    offset += attr.stop - attr.start
-                    special_value = self.SpecialValueStruct.parse(self.image[offset:])
-                    offset += special_value.stop - special_value.start
-                    self.abbrevations[key].attrs.append(
-                        Attribute(
-                            constants.AttributeEncoding(attr.attrValue),
-                            constants.AttributeForm(attr.formValue),
-                            special_value.value,
-                        )
-                    )
-                    continue
-                if attr.attrValue != 0 and attr.formValue != 0:
-                    try:
-                        self.abbrevations[key].attrs.append(
-                            Attribute(
-                                constants.AttributeEncoding(attr.attrValue),
-                                constants.AttributeForm(attr.formValue),
-                            )
-                        )
-                    except TypeError:
-                        self.abbrevations[key].attrs.append(
-                            Attribute(
-                                constants.FakeEncoding(attr.attrValue),
-                                constants.AttributeForm(attr.formValue),
-                            )
-                        )
-                offset += attr.stop - attr.start
-            if code == item:
-                return self.abbrevations[key]
+                tag, offset = self._read_uleb(image, offset)
+                if offset >= self.length:
+                    break
+                children = image[offset]
+                offset += 1
+
+                attrs: list[tuple[int, int, Any]] = []
+                while True:
+                    attr_value, offset = self._read_uleb(image, offset)
+                    form_value, offset = self._read_uleb(image, offset)
+                    if attr_value == 0 or form_value == 0:
+                        break
+                    if form_value == constants.AttributeForm.DW_FORM_implicit_const:
+                        special_value, offset = self._read_uleb(image, offset)
+                        attrs.append((attr_value, form_value, special_value))
+                    else:
+                        attrs.append((attr_value, form_value, None))
+
+                self.abbrevations[(abbr_offset, code)] = self._build_abbrev(tag, (children == 1), attrs)
+        except ValueError:
+            # Graceful fallback: keep already cached entries and mark offset parsed.
+            pass
+
+        self._parsed_offsets.add(abbr_offset)
 
 
 class DwarfProcessor:
@@ -619,9 +639,6 @@ class DwarfProcessor:
         Earlier or later DWARF versions may not parse correctly.
     """
 
-    DATATYPES32 = {
-        "Addr": (Int32ul, Int32ub),  # 4 - Unsigned program address
-    }
 
     UTF8String = CString(encoding="utf8")
 
@@ -1030,28 +1047,52 @@ class DwarfProcessor:
             "stop" / Tell,
             "size" / Computed(this.stop - this.start),
         )
+        from contextlib import nullcontext
+
+        from sqlalchemy import func
+
         offset = 0
         result = []
         die_map = {}
         idx = 0
+        pending_die_rows: list[dict[str, Any]] = []
+        pending_attr_rows: list[dict[str, Any]] = []
         session = self.db_session
         try:
             no_autoflush = session.no_autoflush
         except AttributeError:
-            from contextlib import nullcontext
-
             no_autoflush = nullcontext()
 
-        with no_autoflush:
+        max_rid = session.query(func.max(model.DebugInformationEntry.rid)).scalar() or 0
+        next_die_rid = int(max_rid) + 1
+
+        # Chunk sizes tuned for SQLite bulk inserts to avoid oversized execute payloads.
+        DIE_BATCH_SIZE = 10000
+        ATTR_BATCH_SIZE = 20000
+
+        def _iter_chunks(rows: list[dict[str, Any]], size: int):
+            for start_idx in range(0, len(rows), size):
+                yield rows[start_idx : start_idx + size]
+
+        def _coerce_tag_value(tag: Any) -> Any:
+            try:
+                return int(constants.Tag[str(tag)])
+            except (KeyError, TypeError, ValueError):
+                try:
+                    return int(tag)
+                except (TypeError, ValueError):
+                    return tag
+
+        transaction = session.begin() if not session.in_transaction() else nullcontext()
+
+        with transaction, no_autoflush:
             while True:
                 section_pos = image.tell()
                 if section_pos >= section_length - 1:
                     break
                 root_element = DebugInformationEntry("root")
                 die_stack = [root_element]
-                db_die_stack = []
-                pending_dies = []
-                pending_attrs = []
+                db_parent_stack: list[int] = []
 
                 dbgInfo = DbgInfo.parse_stream(image)  # CU
                 cu_length = dbgInfo.header.unit_length
@@ -1065,7 +1106,7 @@ class DwarfProcessor:
                 idx += 1
                 if self.verbose:
                     print(
-                        f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}  pointer-size:  {address_size}  version: {version}"
+                        f"   Compilation Unit #{idx:05d}  offset: 0x{dbgInfo.start:08x}  length: 0x{cu_length:08x}  abbrev-offset: 0x{debug_abbrev_offset:08x}"
                     )
                 level = 0
                 pos = 0
@@ -1083,33 +1124,34 @@ class DwarfProcessor:
                     attr = Attribute.parse_stream(image)
                     abbr = self.abbrevations.get(debug_abbrev_offset, attr.attr)
                     if not abbr:
-                        # End of a sibling list: pop one level on both in-memory and DB stacks
                         if level > 0:
                             level -= 1
-                        # Pop in-memory DIE stack if we have a nested context (keep root at index 0)
                         if len(die_stack) > 1:
                             die_stack.pop()
-                        # Pop DB parent stack so subsequent siblings attach to the correct parent
-                        if db_die_stack:
-                            db_die_stack.pop()
+                        if db_parent_stack:
+                            db_parent_stack.pop()
                     else:
                         die = DebugInformationEntry(abbr.tag)
-                        db_die = model.DebugInformationEntry(tag=abbr.tag)
-                        # Cache-friendly: store DIE offset for quick lookups by external tools
-                        db_die.offset = start
-                        # Store CU start for reference resolution later
-                        db_die.cu_start = dbgInfo.start
-                        # Set parent on DB DIE if we have one on stack
-                        if db_die_stack:
-                            db_die.parent = db_die_stack[-1]
-                        pending_dies.append(db_die)
+                        die_rid = next_die_rid
+                        next_die_rid += 1
+                        parent_rid = db_parent_stack[-1] if db_parent_stack else None
+
+                        pending_die_rows.append(
+                            {
+                                "rid": die_rid,
+                                "tag": _coerce_tag_value(abbr.tag),
+                                "offset": start,
+                                "cu_start": dbgInfo.start,
+                                "parent_id": parent_rid,
+                            }
+                        )
+
                         if attr.attr != 0:
                             die_stack[-1].children.append(die)
                         die_start = start
                         if abbr.children:
                             die_stack.append(die)
-                            # Push this db_die as the current parent for subsequent entries until a null DIE is encountered
-                            db_die_stack.append(db_die)
+                            db_parent_stack.append(die_rid)
                             level += 1
                         for enc, form, special_value in abbr.attrs:
                             reader = form_readers.get(form)
@@ -1117,22 +1159,32 @@ class DwarfProcessor:
                             if reader is None:
                                 if form == constants.AttributeForm.DW_FORM_implicit_const:
                                     value = special_value
-                                    # In-memory representation (keep minimal to preserve structure)
                                     die.attributes.append((enc.name, DIEAttribute(value, value)))
-                                    pending_attrs.append((db_die, enc, form, value))
+                                    pending_attr_rows.append(
+                                        {
+                                            "name": int(enc),
+                                            "form": int(form),
+                                            "raw_value": value,
+                                            "entry_id": die_rid,
+                                        }
+                                    )
                                     offset += attr.stop - attr.start
                                     pos = image.tell()
                                     if pos >= dbgInfo.start + cu_length + 4:
                                         break
                                     continue
                                 else:
-                                    # Unknown reader; skip gracefully
                                     continue
                             value = reader.parse_stream(image)
-                            # In-memory representation: do not compute heavy display, keep simple
                             die.attributes.append((enc.name, DIEAttribute(value, value)))
-                            # DB attribute: store for lazy display
-                            pending_attrs.append((db_die, enc, form, value))
+                            pending_attr_rows.append(
+                                {
+                                    "name": int(enc),
+                                    "form": int(form) if form is not None else None,
+                                    "raw_value": value,
+                                    "entry_id": die_rid,
+                                }
+                            )
                         offset += attr.stop - attr.start
                         pos = image.tell()
                         if pos >= dbgInfo.start + cu_length + 4:
@@ -1140,25 +1192,16 @@ class DwarfProcessor:
                     if die_start is not None:
                         die_map[die_start] = die
 
-                if pending_dies:
-                    session.add_all(pending_dies)
-                    session.flush()
-                    if pending_attrs:
-                        attr_rows = []
-                        for db_die, enc, form, value in pending_attrs:
-                            attr_rows.append(
-                                {
-                                    "name": int(enc),
-                                    "form": int(form) if form is not None else None,
-                                    "raw_value": value,
-                                    "entry_id": db_die.rid,
-                                }
-                            )
-                        if attr_rows:
-                            session.execute(model.DIEAttribute.__table__.insert(), attr_rows)
-                    session.flush()
                 result.append(root_element)
-                session.commit()
+
+            if pending_die_rows:
+                die_insert = model.DebugInformationEntry.__table__.insert()
+                for chunk in _iter_chunks(pending_die_rows, DIE_BATCH_SIZE):
+                    session.execute(die_insert, chunk)
+            if pending_attr_rows:
+                attr_insert = model.DIEAttribute.__table__.insert()
+                for chunk in _iter_chunks(pending_attr_rows, ATTR_BATCH_SIZE):
+                    session.execute(attr_insert, chunk)
         return DebugInformation(die_map, [d.children[0] for d in result])
 
     def pubnames(self):

@@ -36,14 +36,26 @@ Copyright (C) 2010-2025 by Christoph Schueler
 import struct
 import time
 from dataclasses import dataclass
+from functools import lru_cache
 from enum import IntEnum
+from typing import ClassVar
 
 from construct import Int8ul, Int16ub, Int16ul, Int32ub, Int32ul, Int64ub, Int64ul
-from construct.core import Bytes, Construct, ConstructError, CString, singleton
+from construct.core import Construct, ConstructError, CString, singleton
 
 # from objutils.dwarf.lineprog import Line
 
 NULL_CHAR: bytes = b"\x00"
+
+_UTF8_CSTRING = CString(encoding="utf8")
+
+
+def _read_byte(stream) -> int:
+    """Read a single byte from a stream and return it as an integer."""
+    data = stream.read(1)
+    if not data:
+        raise EOFError("Unexpected end of stream while decoding DWARF data.")
+    return data[0]
 
 
 class Endianess(IntEnum):
@@ -112,8 +124,10 @@ class ULEB(Construct):
         shift = 0
         while True:
             try:
-                bval = ord(stream.read(1))
+                bval = _read_byte(stream)
             except (AttributeError, OSError, TypeError, ValueError) as e:
+                raise ULEBError(str(e)) from e
+            except EOFError as e:
                 raise ULEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             if bval & 0x80 == 0:
@@ -188,8 +202,10 @@ class SLEB(Construct):
         idx = 0
         while True:
             try:
-                bval = ord(stream.read(1))
+                bval = _read_byte(stream)
             except (AttributeError, OSError, TypeError, ValueError) as e:
+                raise SLEBError(str(e)) from e
+            except EOFError as e:
                 raise SLEBError(str(e)) from e
             result |= (bval & 0x7F) << shift
             shift += 7
@@ -240,9 +256,7 @@ class One(Construct):
     def _build(self, value: int, stream, context, path: str | None = None) -> None:
         """Build writes a single byte with value 1."""
         count = struct.pack("B", 1)
-        value = 1
         stream.write(count)
-        stream.write(bytes(value, encoding="ascii"))
 
 
 class Block(Construct):
@@ -277,9 +291,10 @@ class Block(Construct):
         """
         msk = f"{self.BYTEORDER}{self.MASK}"
         count = stream.read(self.SIZE)
+        if len(count) != self.SIZE:
+            raise ConstructError("Unexpected end of stream while decoding DWARF block length.")
         count = struct.unpack(msk, count)[0]
-        result = Bytes(count).parse_stream(stream)
-        return result
+        return stream.read(count)
 
     def _build(self, value: bytes | bytearray, stream, context, path: str | None = None) -> None:
         """Build block data with fixed-size length prefix.
@@ -293,7 +308,7 @@ class Block(Construct):
         msk = f"{self.BYTEORDER}{self.MASK}"
         count = struct.pack(msk, len(value))
         stream.write(count)
-        stream.write(bytes(value, encoding="ascii"))
+        stream.write(bytes(value))
 
 
 @singleton
@@ -307,14 +322,13 @@ class BlockUleb(Block):
     def _parse(self, stream, context, path: str | None = None) -> bytes:
         """Parse block with ULEB128 length prefix."""
         count = ULEB.parse_stream(stream)
-        result = Bytes(count).parse_stream(stream)
-        return result
+        return stream.read(count)
 
     def _build(self, value: bytes | bytearray, stream, context, path: str | None = None) -> None:
         """Build block with ULEB128 length prefix."""
         count = ULEB.build(len(value))
         stream.write(count)
-        stream.write(bytes(value, encoding="ascii"))
+        stream.write(bytes(value))
 
 
 @singleton
@@ -389,7 +403,7 @@ class Address(Construct):
         TYPES: Mapping of address sizes to (little-endian, big-endian) type pairs.
     """
 
-    TYPES: dict[int, tuple[Construct, Construct]] = {
+    TYPES: ClassVar[dict[int, tuple[Construct, Construct]]] = {
         1: (Int8ul, Int8ul),
         2: (Int16ul, Int16ub),
         4: (Int32ul, Int32ub),
@@ -483,20 +497,17 @@ class StrP(Construct):
             Resolved string value from debug_str section.
         """
         offset = self.ntype.parse_stream(stream)
-        data = self.image[offset:]
-        result = self.stype.parse(data)
-        return result
 
-    def _build(self, value: str, stream, context, path: str | None = None) -> None:
-        """Build string pointer (not typically used for parsing).
+        return _resolve_strp(self.image, offset)
 
-        Args:
-            value: String value.
-            stream: Output binary stream.
-            context: Construct building context.
-            path: Path for error messages.
-        """
-        stream.write(self.type.build(value))
+    def _build(self, value: int, stream, context, path: str | None = None) -> None:
+        """Build string pointer offset field."""
+        stream.write(self.ntype.build(value))
+
+
+@lru_cache(maxsize=65536)
+def _resolve_strp(image: bytes, offset: int) -> str:
+    return _UTF8_CSTRING.parse(image[offset:])
 
 
 class ArrayOfCStrings(Construct):
@@ -532,7 +543,7 @@ class ArrayOfCStrings(Construct):
         result = []
 
         while True:
-            value = CString(encoding="utf8").parse_stream(stream)
+            value = self.str_type.parse_stream(stream)
             if not value:
                 break
             result.append(value)
@@ -633,8 +644,11 @@ class FilenameSequence(Construct):
             path: Path for error messages.
         """
         if values:
-            for value in values:
-                stream.write(self.str_type.build(value))
+            for value in values.values():
+                stream.write(self.str_type.build(value.name))
+                stream.write(ULEB.build(value.dir_index))
+                stream.write(ULEB.build(int(value.last_modified)))
+                stream.write(ULEB.build(value.length))
         else:
             stream.write(NULL_CHAR)
         stream.write(NULL_CHAR)
