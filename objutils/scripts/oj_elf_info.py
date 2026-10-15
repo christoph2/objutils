@@ -71,60 +71,60 @@ def main():
     )
 
     args = parser.parse_args()
-    ep = ElfParser(args.elf_file)
-    print(f"Class:       {ELF_CLASS_NAMES.get(ep.ei_class, '*** INVALID ***')}")
-    print(f"Type:        {ELFType(ep.e_type).name[3:]} [{ELF_TYPE_NAMES.get(ep.e_type, '')}]")
-    print(f"Machine:     {ep.machine_data}")
-    print(f"Data:        {ELF_BYTE_ORDER_NAMES.get(ep.ei_data, '*** INVALID ***')}")
-    print(f"OS/ABI       {ELFAbiType(ep.ei_osabi).name[9:]} / v{ep.ei_abiversion}")
+    with ElfParser(args.elf_file, in_memory=True) as ep:
+        print(f"Class:       {ELF_CLASS_NAMES.get(ep.ei_class, '*** INVALID ***')}")
+        print(f"Type:        {ELFType(ep.e_type).name[3:]} [{ELF_TYPE_NAMES.get(ep.e_type, '')}]")
+        print(f"Machine:     {ep.machine_data}")
+        print(f"Data:        {ELF_BYTE_ORDER_NAMES.get(ep.ei_data, '*** INVALID ***')}")
+        print(f"OS/ABI       {ELFAbiType(ep.ei_osabi).name[9:]} / v{ep.ei_abiversion}")
 
-    sections = ep.query(model.Elf_Section).order_by(model.Elf_Section.index).all()
-    print_header("Sections")
-    print("Name                      Type           Addr     Offs     Size   Al")
-    print("-" * 79)
-    for sec in sections:
-        print(
-            f"{sec.section_name:25} {sec.section_display_name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
-            f" {sec.sh_size:06x} {sec.sh_addralign:2}"
-        )
-
-    print_header("Segments")
-    print("Type          Offset     VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
-    print("-" * 72)
-    for segment in ep.segments:
-        print(
-            f"{program_header_name(segment.p_type):13} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x} {program_header_flags_name(segment.p_flags):3} {segment.p_align:>5}"
-        )
-
-    comment = ep.comment
-    if comment:
-        print_header(".comment")
-        print(comment)
-    for note in ep.notes:
-        print_header(note.section_name)
-        print("Type Name            Desc")
+        sections = ep.query(model.Elf_Section).order_by(model.Elf_Section.index).all()
+        print_header("Sections")
+        print("Name                      Type           Addr     Offs     Size   Al")
         print("-" * 79)
-        print(f"{note.type:4} {note.name:15} {note.desc}")
+        for sec in sections:
+            print(
+                f"{sec.section_name:25} {sec.section_display_name[4:]:14} {sec.sh_addr:08x} {sec.sh_offset:08x}"
+                f" {sec.sh_size:06x} {sec.sh_addralign:2}"
+            )
 
-    # dbSecs = ep.debug_sections()
-    # dbSecs = ep.sections.fetch(name_pattern=".debug*")
-    # dbSecs = ep.sections.fetch(name_pattern="*")
+        print_header("Segments")
+        print("Type          Offset     VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align")
+        print("-" * 72)
+        for segment in ep.segments:
+            print(
+                f"{program_header_name(segment.p_type):13} 0x{segment.p_offset:08x} 0x{segment.p_vaddr:08x} 0x{segment.p_paddr:08x} 0x{segment.p_filesz:05x} 0x{segment.p_memsz:05x} {program_header_flags_name(segment.p_flags):3} {segment.p_align:>5}"
+            )
 
-    # if dbSecs:
-    #     dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
-    #     dp.do_abbrevs()
-    #     dp.do_mac_info()
-    #     dp.do_dbg_info()
-    from objutils.dwarf import DwarfProcessor
+        comment = ep.comment
+        if comment:
+            print_header(".comment")
+            print(comment)
+        for note in ep.notes:
+            print_header(note.section_name)
+            print("Type Name            Desc")
+            print("-" * 79)
+            print(f"{note.type:4} {note.name:15} {note.desc}")
 
-    if ep.debug_sections():
-        dp = DwarfProcessor(ep)
-        dp.pubnames()
-        dp.aranges()
-        dp.do_lines()
-        dp.do_dbg_info()
-        # dp.processDebugInfo()
-        dp.do_mac_info()
+        # dbSecs = ep.debug_sections()
+        # dbSecs = ep.sections.fetch(name_pattern=".debug*")
+        # dbSecs = ep.sections.fetch(name_pattern="*")
+
+        # if dbSecs:
+        #     dp = DwarfProcessor(dbSecs, ep.b64, ep.endianess)
+        #     dp.do_abbrevs()
+        #     dp.do_mac_info()
+        #     dp.do_dbg_info()
+        from objutils.dwarf import DwarfProcessor
+
+        if ep.debug_sections():
+            dp = DwarfProcessor(ep)
+            dp.pubnames()
+            dp.aranges()
+            dp.do_lines()
+            dp.do_dbg_info()
+            # dp.processDebugInfo()
+            dp.do_mac_info()
 
 
 def print_header(text):
