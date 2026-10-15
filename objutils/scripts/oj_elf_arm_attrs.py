@@ -36,24 +36,24 @@ def main():
     # parser.add_argument("-l", help = "loglevel [warn | info | error | debug]", dest = "loglevel", type = str, default = "warn")
     args = parser.parse_args()
     try:
-        ep = ElfParser(args.elf_file)
+        with ElfParser(args.elf_file) as ep:
+            if ep.e_machine not in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
+                print(f"\n'{args.elf_file}' is not an ARM architecture file.")
+                exit(2)
+            print()
+            arm_attrs = ep.arm_attributes
+            if arm_attrs:
+                for key, entries in arm_attrs.items():
+                    print("{1:}\n{0:}\n{1:}\n".format(key, "=" * len(key)))
+                    print("Name                           Value\nDescription")
+                    print("-" * 79)
+                    for attr in entries:
+                        print(f"{attr.tag_name:30} {attr.value}\n{attr.description}\n")
+            else:
+                print("*** No .ARM.attributes section ***")
     except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
         print(f"\n{args.elf_file!r} is not valid ELF file. Raised exception: {e!r}.")
         exit(1)
-    if ep.e_machine not in (defs.ELFMachineType.EM_ARM, defs.ELFMachineType.EM_AARCH64):
-        print(f"\n'{args.elf_file}' is not an ARM architecture file.")
-        exit(2)
-    print()
-    arm_attrs = ep.arm_attributes
-    if arm_attrs:
-        for key, entries in arm_attrs.items():
-            print("{1:}\n{0:}\n{1:}\n".format(key, "=" * len(key)))
-            print("Name                           Value\nDescription")
-            print("-" * 79)
-            for attr in entries:
-                print(f"{attr.tag_name:30} {attr.value}\n{attr.description}\n")
-    else:
-        print("*** No .ARM.attributes section ***")
 
 
 if __name__ == "__main__":
