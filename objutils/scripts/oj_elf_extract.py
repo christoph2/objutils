@@ -82,22 +82,22 @@ def main():
     parser.add_argument("-n", help="Number of data bytes per line", dest="row_length", default=16, type=int)
     args = parser.parse_args()
     try:
-        ep = ElfParser(args.elf_file)
+        with ElfParser(args.elf_file) as ep:
+            print("\nExtracting from...\n")
+            print("Section                   Address    Length")
+            print("-" * 45)
+            img = ep.create_image(
+                callback=callback,
+                join=args.join,
+                exclude_pattern=args.exclude,
+                include_pattern=args.include,
+            )
+            if img:
+                dump(args.file_type, args.output_file_name, img, row_length=args.row_length)
+                print(f"HEX image written to: '{args.output_file_name}' [{len(img)} total bytes]")
     except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
         print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{e!r}'.")
         exit(1)
-    print("\nExtracting from...\n")
-    print("Section                   Address    Length")
-    print("-" * 45)
-    img = ep.create_image(
-        callback=callback,
-        join=args.join,
-        exclude_pattern=args.exclude,
-        include_pattern=args.include,
-    )
-    if img:
-        dump(args.file_type, args.output_file_name, img, row_length=args.row_length)
-        print(f"HEX image written to: '{args.output_file_name}' [{len(img)} total bytes]")
 
 
 if __name__ == "__main__":
