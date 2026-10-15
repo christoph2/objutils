@@ -90,37 +90,37 @@ def main():
     )
     args = parser.parse_args()
     try:
-        ep = ElfParser(args.elf_file)
+        with ElfParser(args.elf_file) as ep:
+            if args.symbol_list:
+                symbol_list = args.symbol_list.split(",")
+            else:
+                symbol_list = []
+            for section, syms in ep.symbols.fetch(
+                sections=args.sections,
+                name_pattern=args.pattern,
+                order_by_value=True if args.order_by == "V" else False,
+                bindings=args.bindings,
+                types_str=args.types,
+                access=args.access,
+                symbol_list=symbol_list,
+            ).items():
+                separator = "=" * len(section)
+                print(f"\n{separator}\n{section}\n{separator}\n")
+                print("Name")
+                print("Value     Size Bind       Type      Access")
+                print("-" * 79)
+                for sym in syms:
+                    access_str = "{}{}{}".format(
+                        "A" if sym.allocate else " ",
+                        "W" if sym.writeable else " ",
+                        "X" if sym.executeable else " ",
+                    )
+                    print(
+                        f"{sym.symbol_name:30}\n{sym.st_value:08x} {sym.st_size:5d} {sym.symbol_bind.name[4:]:10} {sym.symbol_type.name[4:]:9} {access_str}\n"
+                    )
     except (OSError, SQLAlchemyError, ValueError, RuntimeError) as e:
         print(f"\n'{args.elf_file}' is not valid ELF file. Raised exception: '{e!r}'.")
         exit(1)
-    if args.symbol_list:
-        symbol_list = args.symbol_list.split(",")
-    else:
-        symbol_list = []
-    for section, syms in ep.symbols.fetch(
-        sections=args.sections,
-        name_pattern=args.pattern,
-        order_by_value=True if args.order_by == "V" else False,
-        bindings=args.bindings,
-        types_str=args.types,
-        access=args.access,
-        symbol_list=symbol_list,
-    ).items():
-        separator = "=" * len(section)
-        print(f"\n{separator}\n{section}\n{separator}\n")
-        print("Name")
-        print("Value     Size Bind       Type      Access")
-        print("-" * 79)
-        for sym in syms:
-            access_str = "{}{}{}".format(
-                "A" if sym.allocate else " ",
-                "W" if sym.writeable else " ",
-                "X" if sym.executeable else " ",
-            )
-            print(
-                f"{sym.symbol_name:30}\n{sym.st_value:08x} {sym.st_size:5d} {sym.symbol_bind.name[4:]:10} {sym.symbol_type.name[4:]:9} {access_str}\n"
-            )
 
 
 if __name__ == "__main__":
