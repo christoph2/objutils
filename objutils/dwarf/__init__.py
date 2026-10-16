@@ -639,7 +639,6 @@ class DwarfProcessor:
         Earlier or later DWARF versions may not parse correctly.
     """
 
-
     UTF8String = CString(encoding="utf8")
 
     def __init__(self, elf_parser, *, verbose: bool = True):
@@ -1112,7 +1111,7 @@ class DwarfProcessor:
                         debug_abbrev_offset = dbgInfo.body.debug_abbrev_offset
                         address_size = dbgInfo.body.address_size
                     else:
-                        if version > 5: # Handle messed up version numbers in some binaries (e.g. 39424)
+                        if version > 5:  # Handle messed up version numbers in some binaries (e.g. 39424)
                             address_size = self.elf_address_size
                         else:
                             address_size = dbgInfo.body.address_size
