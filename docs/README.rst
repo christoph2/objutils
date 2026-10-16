@@ -37,7 +37,7 @@ Or with Poetry:
 Prerequisites
 -------------
 
-- Python >= 3.9
+- Python 3.10 to 3.15
 
 Features
 --------

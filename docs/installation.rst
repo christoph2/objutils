@@ -4,7 +4,7 @@ Installation and Getting Started
 Supported Python and platforms
 ------------------------------
 
-- Python >= 3.9 (CPython; PyPy not tested)
+- Python 3.10 to 3.15 (CPython; PyPy not tested)
 - Cross-platform; no OS-specific restrictions
 
 Install
