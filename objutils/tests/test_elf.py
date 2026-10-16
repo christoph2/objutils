@@ -10,12 +10,14 @@ Based on the actual ElfParser API which uses:
 """
 
 import collections
+import gc
 import tempfile
+import weakref
 from pathlib import Path
 
 import pytest
 
-from objutils.elf import ElfParser
+from objutils.elf import ElfParser, import_dwarf_to_db, model
 
 # Test data directory
 EXAMPLES_DIR = Path(__file__).parent.parent.parent / "examples"
@@ -341,6 +343,57 @@ class TestElfInMemoryDatabase:
             parser_disk.close()
             parser_mem.close()
 
+    def test_in_memory_context_manager_closes_parser(self, sample_elf_path):
+        """Context-manager usage must release in-memory parser resources."""
+        with ElfParser(str(sample_elf_path), in_memory=True) as parser:
+            assert parser.session is not None
+            assert parser.e_machine == 83
+
+        assert parser._closed is True
+        assert parser.db is None
+        assert parser.session is None
+        assert parser.fp is None
+
+    def test_in_memory_close_is_idempotent(self, sample_elf_path):
+        """Calling close() multiple times should be safe."""
+        parser = ElfParser(str(sample_elf_path), in_memory=True)
+        parser.close()
+        parser.close()
+        assert parser._closed is True
+
+    def test_in_memory_multiple_parsers_sequential_cleanup(self, sample_elf_path):
+        """Opening multiple in-memory parsers sequentially must not raise cleanup errors."""
+        for _ in range(25):
+            with ElfParser(str(sample_elf_path), in_memory=True) as parser:
+                assert isinstance(parser.e_entry, int)
+
+    def test_in_memory_stress_multiple_elf_files_cleanup(self):
+        """Stress-test in-memory cleanup across multiple ELF files and many open/close cycles."""
+        available_elfs = [EXAMPLES_DIR / name for name in SAMPLE_ELF_FILES if (EXAMPLES_DIR / name).exists()]
+        if not available_elfs:
+            pytest.skip("No sample ELF files found for stress test")
+
+        for cycle in range(15):
+            for elf_path in available_elfs:
+                with ElfParser(str(elf_path), in_memory=True) as parser:
+                    # Touch common ELF and optional debug/DWARF query paths.
+                    assert isinstance(parser.e_machine, int)
+                    _ = parser.debug_sections()
+                    ref = weakref.ref(parser)
+
+                assert parser._closed is True
+                assert parser.db is None
+                assert parser.session is None
+                assert parser.fp is None
+
+                del parser
+                gc.collect()
+                assert ref() is None
+
+            # Force periodic collection between larger batches.
+            if cycle % 5 == 4:
+                gc.collect()
+
 
 class TestElfImageCreation:
     """Test image creation from ELF."""
@@ -376,6 +429,35 @@ class TestElfDebugSections:
         debug_secs = parser.debug_sections()
         # May be empty, but should return a list
         assert isinstance(debug_secs, (collections.OrderedDict, type(None)))
+
+
+class TestDwarfImportRegression:
+    """Regression tests for DWARF importer into .prgdb databases."""
+
+    def test_import_dwarf_populates_database(self):
+        """Importing DWARF should succeed and persist DIE/attribute rows."""
+        candidates = [
+            EXAMPLES_DIR / "lang-generics.elf",
+            EXAMPLES_DIR / "hello_xcp.ino.elf",
+            EXAMPLES_DIR / "avr.elf",
+        ]
+        elf_path = next((p for p in candidates if p.exists()), None)
+        if elf_path is None:
+            pytest.skip("No suitable ELF sample found for DWARF import regression test")
+
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmpdir:
+            out_db = Path(tmpdir) / "imported.prgdb"
+            rc = import_dwarf_to_db(str(elf_path), str(out_db), quiet=True, verbose=False, force=True)
+            assert rc == 0
+            assert out_db.exists()
+
+            db = model.Model(str(out_db))
+            try:
+                session = db.session
+                assert session.query(model.DebugInformationEntry).count() > 0
+                assert session.query(model.DIEAttribute).count() > 0
+            finally:
+                db.close()
 
 
 if __name__ == "__main__":
