@@ -139,6 +139,25 @@ from construct import Array
 from objutils.dwarf import constants
 
 
+class DynamicValue:
+
+    """Represents a dynamic value (can only evaluated by a debugger) on the DWARF stack.
+    """
+
+    def __init__(self, expr: str):
+        self.expr = expr
+
+    def __str__(self) -> str:
+        return self.expr
+
+    def __repr__(self):
+        return f"DynamicValue({self.expr})"
+
+    @property
+    def value(self):
+        return self.expr
+
+
 @dataclass
 class TypedValue:
     """Represents a value on the DWARF stack with an associated type.
@@ -2438,5 +2457,5 @@ class StackMachine:
                 result.append(f"{opcode.name}()")
 
         # Return summary of executed ops
-        res_val = self.stack.pop() if not self.stack.empty() else None
+        res_val = self.stack.pop() if not self.stack.empty() else DynamicValue("; ".join(result))
         return EvaluationResult(value=res_val, representation="; ".join(result))
