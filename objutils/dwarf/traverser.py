@@ -1374,9 +1374,9 @@ class AttributeParser:
                 lower_bound = 0
                 upper_bound = 0
                 if "lower_bound" in entry.attributes_map:
-                    lower_bound = int(entry.attributes_map["lower_bound"].raw_value)
+                    lower_bound = self.dwarf_expression(entry.attributes_map["lower_bound"].form, entry.attributes_map["lower_bound"].raw_value)
                 if "upper_bound" in entry.attributes_map:
-                    upper_bound = int(entry.attributes_map["upper_bound"].raw_value)
+                    upper_bound = self.dwarf_expression(entry.attributes_map["upper_bound"].form, entry.attributes_map["upper_bound"].raw_value)
                 print(
                     f"{'    ' * level}{tag} '{name}'{type_info} [lower_bound={lower_bound}: upper_bound={upper_bound}] [off=0x{entry.offset:08x}]"
                 )
