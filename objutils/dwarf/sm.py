@@ -140,9 +140,7 @@ from objutils.dwarf import constants
 
 
 class DynamicValue:
-
-    """Represents a dynamic value (can only evaluated by a debugger) on the DWARF stack.
-    """
+    """Represents a dynamic value (can only evaluated by a debugger) on the DWARF stack."""
 
     def __init__(self, expr: str):
         self.expr = expr
